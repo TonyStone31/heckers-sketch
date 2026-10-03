@@ -1,0 +1,19 @@
+object SplashForm: TSplashForm
+  Left = 440
+  Height = 330
+  Top = 260
+  Width = 620
+  BorderStyle = bsNone
+  Caption = 'Heckers Sketch'
+  ClientHeight = 330
+  ClientWidth = 620
+  DoubleBuffered = True
+  FormStyle = fsSystemStayOnTop
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnMouseDown = SplashMouseDown
+  OnPaint = SplashPaint
+  ParentDoubleBuffered = False
+  Position = poScreenCenter
+  Scaled = False
+end

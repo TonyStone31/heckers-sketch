@@ -1,0 +1,3579 @@
+HeckersSketch 2
+units = ft in
+
+sheet 'Broom'
+  ink = black
+  width = 1
+  units = ft in
+  scale = '1/4"'
+  snap = '1/16"'
+  view = 3d
+  camera = -0.907571, 0.43, 4.958987, 630.308, 606.307
+
+  box
+    at   = 5 3/4" west, 1.3" south, 5.4" up
+    size = 11 1/2" east, 2.6" north, 2" up
+    paint = #1C5696
+    width = 1.4
+  end
+  box
+    at   = 5.87" west, 1.42" south, 7.4" up
+    size = 11.74" east, 2.84" north, 0.45" up
+    paint = #123A6C
+    width = 1.2
+  end
+  box
+    at   = 5.77" west, 1.44" south, 5.95" up
+    size = 11.54" east, 0.12" north, 0.6" up
+    paint = #CE4234
+    width = 0.9
+  end
+  box
+    at   = 1.15" west, 0.55" south, 7.85" up
+    size = 2.3" east, 1.1" north, 1 1/4" up
+    paint = #123A6C
+    width = 1.2
+  end
+  solid
+    paint = #A8AEB6
+    points
+      p1 = 0.137964" west, 0.4065" south, 8.753772" up
+      p2 = p1 + 0.275928" east
+      p3 = 0.386568" west, 0.29034" south, 8.782728" up
+      p4 = p3 + 0.773136" east
+      p5 = 0.5586" west, 0.081" south, 8.834916" up
+      p6 = p5 + 1.1172" east
+      p7 = 0.62" west, 0.18" north, 8.9" up
+      p8 = p7 + 1.24" east
+      p9 = 0.5586" west, 0.441" north, 8.96508" up
+      p10 = p9 + 1.1172" east
+      p11 = 0.386568" west, 0.65034" north, 9.017268" up
+      p12 = p11 + 0.773136" east
+      p13 = 0.137964" west, 0.7665" north, 9.046236" up
+      p14 = p13 + 0.275928" east
+      p15 = 0.137964" west, 1.180656" south, 11.858712" up
+      p16 = p15 + 0.275928" east
+      p17 = 0.386568" west, 1.064484" south, 11.88768" up
+      p18 = p17 + 0.773136" east
+      p19 = 0.5586" west, 0.855168" south, 11.939868" up
+      p20 = p19 + 1.1172" east
+      p21 = 0.62" west, 0.594156" south, 12.004944" up
+      p22 = p21 + 1.24" east
+      p23 = 0.5586" west, 0.333132" south, 12.07002" up
+      p24 = p23 + 1.1172" east
+      p25 = 0.386568" west, 0.123816" south, 12.12222" up
+      p26 = p25 + 0.773136" east
+      p27 = 0.137964" west, 0.007644" south, 12.151176" up
+      p28 = p27 + 0.275928" east
+    end
+    face = p6 p4 p2 p1 p3 p5 p7 p9 p11 p13 p14 p12 p10 p8
+    face = p22 p24 p26 p28 p27 p25 p23 p21 p19 p17 p15 p16 p18 p20
+    face = p10 p12 p26 p24
+    face = p11 p9 p23 p25
+    face = p5 p3 p17 p19
+    face = p3 p1 p15 p17
+    face = p2 p4 p18 p16
+    face = p4 p6 p20 p18
+    line = p8 to p10
+    line = p22 to p24
+    line = p8 to p22
+    line = p10 to p12
+    line = p24 to p26
+    line = p10 to p24
+    line = p12 to p14
+    line = p26 to p28
+    line = p12 to p26
+    line = p14 to p13
+    line = p28 to p27
+    line = p14 to p28
+    line = p13 to p11
+    line = p27 to p25
+    line = p13 to p27
+    line = p11 to p9
+    line = p25 to p23
+    line = p11 to p25
+    line = p9 to p7
+    line = p23 to p21
+    line = p9 to p23
+    line = p7 to p5
+    line = p21 to p19
+    line = p7 to p21
+    line = p5 to p3
+    line = p19 to p17
+    line = p5 to p19
+    line = p3 to p1
+    line = p17 to p15
+    line = p3 to p17
+    line = p1 to p2
+    line = p15 to p16
+    line = p1 to p15
+    line = p2 to p4
+    line = p16 to p18
+    line = p2 to p16
+    line = p4 to p6
+    line = p18 to p20
+    line = p4 to p18
+    line = p6 to p8
+    line = p20 to p22
+    line = p6 to p20
+  end
+  solid
+    paint = #C69A60
+    points
+      p1 = 0.115716" west, 0.311904" south, 8.777352" up
+      p2 = p1 + 0.231432" east
+      p3 = 0.324216" west, 0.214476" south, 8.801652" up
+      p4 = p3 + 0.648432" east
+      p5 = 0.468504" west, 0.038916" south, 8.845416" up
+      p6 = p5 + 0.937" east
+      p7 = 0.52" west, 0.18" north, 8.9" up
+      p8 = p7 + 1.04" east
+      p9 = 0.468504" west, 0.398916" north, 8.95458" up
+      p10 = p9 + 0.937" east
+      p11 = 0.324216" west, 0.574476" north, 8.998356" up
+      p12 = p11 + 0.648432" east
+      p13 = 0.115716" west, 0.671904" north, 9.022644" up
+      p14 = p13 + 0.231432" east
+      p15 = 0.115716" west, 11.440308" south, 53.410956" up
+      p16 = p15 + 0.231432" east
+      p17 = 0.324216" west, 11.34288" south, 53.435244" up
+      p18 = p17 + 0.648432" east
+      p19 = 0.468504" west, 11.16732" south, 53.47902" up
+      p20 = p19 + 0.937" east
+      p21 = 0.52" west, 10.948404" south, 53.533608" up
+      p22 = p21 + 1.04" east
+      p23 = 0.468504" west, 10.729488" south, 53.588184" up
+      p24 = p23 + 0.937" east
+      p25 = 0.324216" west, 10.553928" south, 53.63196" up
+      p26 = p25 + 0.648432" east
+      p27 = 0.115716" west, 10.4565" south, 4' 5 21/32" up
+      p28 = p27 + 0.231432" east
+    end
+    face = p6 p4 p2 p1 p3 p5 p7 p9 p11 p13 p14 p12 p10 p8
+    face = p22 p24 p26 p28 p27 p25 p23 p21 p19 p17 p15 p16 p18 p20
+    line = p8 to p10
+    line = p22 to p24
+    line = p8 to p22
+    line = p10 to p12
+    line = p24 to p26
+    line = p10 to p24
+    line = p12 to p14
+    line = p26 to p28
+    line = p12 to p26
+    line = p14 to p13
+    line = p28 to p27
+    line = p14 to p28
+    line = p13 to p11
+    line = p27 to p25
+    line = p13 to p27
+    line = p11 to p9
+    line = p25 to p23
+    line = p11 to p25
+    line = p9 to p7
+    line = p23 to p21
+    line = p9 to p23
+    line = p7 to p5
+    line = p21 to p19
+    line = p7 to p21
+    line = p5 to p3
+    line = p19 to p17
+    line = p5 to p19
+    line = p3 to p1
+    line = p17 to p15
+    line = p3 to p17
+    line = p1 to p2
+    line = p15 to p16
+    line = p1 to p15
+    line = p2 to p4
+    line = p16 to p18
+    line = p2 to p16
+    line = p4 to p6
+    line = p18 to p20
+    line = p4 to p18
+    line = p6 to p8
+    line = p20 to p22
+    line = p6 to p20
+  end
+  solid
+    paint = #CE4234
+    points
+      p1 = 0.135732" west, 7.519224" south, 37.321632" up
+      p2 = p1 + 0.271464" east
+      p3 = 0.380328" west, 7.404936" south, 37.350132" up
+      p4 = p3 + 0.760656" east
+      p5 = 0.549588" west, 7.199" south, 37.40148" up
+      p6 = p5 + 1.099176" east
+      p7 = 0.61" west, 6.94218" south, 37.465512" up
+      p8 = p7 + 1.22" east
+      p9 = 0.549588" west, 6.685368" south, 37.529532" up
+      p10 = p9 + 1.099176" east
+      p11 = 0.380328" west, 6.479424" south, 37.58088" up
+      p12 = p11 + 0.760656" east
+      p13 = 0.135732" west, 6.365136" south, 3' 1 39/64" up
+      p14 = p13 + 0.271464" east
+      p15 = 0.135732" west, 8.607864" south, 41.687964" up
+      p16 = p15 + 0.271464" east
+      p17 = 0.380328" west, 8.493576" south, 41.716464" up
+      p18 = p17 + 0.760656" east
+      p19 = 0.549588" west, 8.287632" south, 41.767812" up
+      p20 = p19 + 1.099176" east
+      p21 = 0.61" west, 8.030832" south, 41.831832" up
+      p22 = p21 + 1.22" east
+      p23 = 0.549588" west, 7.77402" south, 41.895864" up
+      p24 = p23 + 1.099176" east
+      p25 = 0.380328" west, 7.568076" south, 41.947212" up
+      p26 = p25 + 0.760656" east
+      p27 = 0.135732" west, 7.453788" south, 41.975712" up
+      p28 = p27 + 0.271464" east
+    end
+    face = p22 p24 p26 p28 p27 p25 p23 p21 p19 p17 p15 p16 p18 p20
+    line = p8 to p10
+    line = p22 to p24
+    line = p8 to p22
+    line = p10 to p12
+    line = p24 to p26
+    line = p10 to p24
+    line = p12 to p14
+    line = p26 to p28
+    line = p12 to p26
+    line = p14 to p13
+    line = p28 to p27
+    line = p14 to p28
+    line = p13 to p11
+    line = p27 to p25
+    line = p13 to p27
+    line = p11 to p9
+    line = p25 to p23
+    line = p11 to p25
+    line = p9 to p7
+    line = p23 to p21
+    line = p9 to p23
+    line = p7 to p5
+    line = p21 to p19
+    line = p7 to p21
+    line = p5 to p3
+    line = p19 to p17
+    line = p5 to p19
+    line = p3 to p1
+    line = p17 to p15
+    line = p3 to p17
+    line = p1 to p2
+    line = p15 to p16
+    line = p1 to p15
+    line = p2 to p4
+    line = p16 to p18
+    line = p2 to p16
+    line = p4 to p6
+    line = p18 to p20
+    line = p4 to p18
+    line = p6 to p8
+    line = p20 to p22
+    line = p6 to p20
+  end
+  solid
+    paint = #A8AEB6
+    points
+      p1 = 0.12684" west, 11.34246" south, 52.817" up
+      p2 = p1 + 0.25368" east
+      p3 = 0.355392" west, 11.23566" south, 52.84362" up
+      p4 = p3 + 0.710784" east
+      p5 = 0.513552" west, 11.043216" south, 52.891596" up
+      p6 = p5 + 1.027104" east
+      p7 = 0.57" west, 10.803252" south, 52.951428" up
+      p8 = p7 + 1.14" east
+      p9 = 0.513552" west, 10.563288" south, 53.01126" up
+      p10 = p9 + 1.027104" east
+      p11 = 0.355392" west, 10.370844" south, 53.059236" up
+      p12 = p11 + 0.710784" east
+      p13 = 0.12684" west, 10.264056" south, 53.085864" up
+      p14 = p13 + 0.25368" east
+      p15 = 0.12684" west, 11.5239" south, 53.544708" up
+      p16 = p15 + 0.25368" east
+      p17 = 0.355392" west, 11.4171" south, 53.571336" up
+      p18 = p17 + 0.710784" east
+      p19 = 0.513552" west, 11.224668" south, 53.619312" up
+      p20 = p19 + 1.027104" east
+      p21 = 0.57" west, 10.984692" south, 53.679144" up
+      p22 = p21 + 1.14" east
+      p23 = 0.513552" west, 10.744728" south, 53.738976" up
+      p24 = p23 + 1.027104" east
+      p25 = 0.355392" west, 10.552284" south, 53.786964" up
+      p26 = p25 + 0.710784" east
+      p27 = 0.12684" west, 10.445496" south, 53.81358" up
+      p28 = p27 + 0.25368" east
+    end
+    face = p6 p4 p2 p1 p3 p5 p7 p9 p11 p13 p14 p12 p10 p8
+    line = p8 to p10
+    line = p22 to p24
+    line = p8 to p22
+    line = p10 to p12
+    line = p24 to p26
+    line = p10 to p24
+    line = p12 to p14
+    line = p26 to p28
+    line = p12 to p26
+    line = p14 to p13
+    line = p28 to p27
+    line = p14 to p28
+    line = p13 to p11
+    line = p27 to p25
+    line = p13 to p27
+    line = p11 to p9
+    line = p25 to p23
+    line = p11 to p25
+    line = p9 to p7
+    line = p23 to p21
+    line = p9 to p23
+    line = p7 to p5
+    line = p21 to p19
+    line = p7 to p21
+    line = p5 to p3
+    line = p19 to p17
+    line = p5 to p19
+    line = p3 to p1
+    line = p17 to p15
+    line = p3 to p17
+    line = p1 to p2
+    line = p15 to p16
+    line = p1 to p15
+    line = p2 to p4
+    line = p16 to p18
+    line = p2 to p16
+    line = p4 to p6
+    line = p18 to p20
+    line = p4 to p18
+    line = p6 to p8
+    line = p20 to p22
+    line = p6 to p20
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.83428" west, 1.300404" south, 0.203496" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 5.325" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.419224" west, 1.317468" south, 0.20892" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.997724" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.224392" west, 1.33524" south, 0.212196" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.67046" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.809336" west, 1.352304" south, 0.21762" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.343184" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.393632" west, 1.369548" south, 0.222504" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.015908" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.978576" west, 1.381692" south, 0.243" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.688632" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.783744" west, 1.398756" south, 0.248412" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.361368" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.368688" west, 1.416528" south, 0.251688" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.034092" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 2.953632" west, 1.433604" south, 0.257112" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.706816" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.538576" west, 1.451364" south, 0.260388" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.37954" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2 11/32" west, 1.282632" south, 0.833556" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.052276" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.928904" west, 1.300404" south, 0.836832" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 1.725" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.513848" west, 1.317468" south, 0.842256" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 1.397724" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.098792" west, 1.33524" south, 0.845532" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 1.07046" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.90396" west, 1.352304" south, 0.850956" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.743184" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.488904" west, 1.369548" south, 0.85584" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.415908" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.073848" west, 1.381692" south, 0.876324" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.088632" west, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.233208" east, 1.398756" south, 0.881748" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.088632" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.428688" east, 1.416528" south, 0.885024" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.415908" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 27/32" east, 1.433604" south, 0.890448" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.743184" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.2588" east, 1.451364" south, 0.893724" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.07046" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.673844" east, 1.282632" south, 1.466892" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.397724" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.868688" east, 1.300404" south, 1.470156" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.725" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.283744" east, 1.317468" south, 1.475592" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 2.052276" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.6988" east, 1.33524" south, 1.478856" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 2.37954" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 3.11364" east, 1.352304" south, 1.484292" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 2.706816" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.308472" east, 1.369548" south, 1.489176" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.034092" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.723528" east, 1.381692" south, 1.509648" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.361368" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.138584" east, 1.398756" south, 1.515084" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.688632" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.55364" east, 1.416528" south, 1.518348" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.015908" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.748472" east, 1.433604" south, 1.523784" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.343184" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.163528" east, 1.451364" south, 1.527048" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.67046" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.57922" east, 1.282632" south, 2.100216" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.997724" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.994276" east, 1.300404" south, 2.103492" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 5.325" east, 0.905" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.879016" west, 0.683328" south, 0 up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 5.325" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.46396" west, 0.700752" south, 0 up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.997724" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.269116" west, 0.71676" south, 0 up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.67046" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.85406" west, 0.73278" south, 0 up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.343184" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.438368" west, 0.569844" south, 0.495084" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.015908" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.023312" west, 0.580224" south, 0.520944" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.688632" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.828468" west, 0.596232" south, 0.529596" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.361368" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.413424" west, 0.612252" south, 0.538248" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.034092" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 2.998368" west, 0.629664" south, 0.542592" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.706816" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.583312" west, 0.645684" south, 0.551244" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.37954" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.388468" west, 0.66732" south, 0.542688" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.052276" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.97364" west, 0.683328" south, 0.55134" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 1.725" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.558584" west, 0.700752" south, 0.555696" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 1.397724" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.143528" west, 0.71676" south, 0.564348" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 1.07046" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.948684" west, 0.73278" south, 0.573" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.743184" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.53364" west, 0.569844" south, 1.12842" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.415908" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.118584" west, 0.580224" south, 1.15428" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.088632" west, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" west
+      top3 = top2 + 0.15" south
+      top4 = top3 + 0.15" east
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top3 top4 top1 top2   { facing up }
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.188472" east, 0.596232" south, 1.162932" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.088632" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.383952" east, 0.612252" south, 1.171584" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.415908" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.799" east, 0.629664" south, 1.175928" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.743184" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.214064" east, 0.645684" south, 1.18458" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.07046" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.62912" east, 0.66732" south, 1.176024" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.397724" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.823952" east, 0.683328" south, 1.184676" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.725" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.239" east, 0.700752" south, 1.189032" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 2.052276" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.654064" east, 0.71676" south, 1.197684" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 2.37954" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 3.068904" east, 0.73278" south, 1.206324" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 2.706816" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.263736" east, 0.569844" south, 1.761756" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.034092" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.678792" east, 0.580224" south, 1.787604" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.361368" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.093848" east, 0.596232" south, 1.796256" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.688632" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.508904" east, 0.612252" south, 1.804908" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.015908" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.703736" east, 0.629664" south, 1.809264" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.343184" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.118792" east, 0.645684" south, 1.817916" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.67046" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.534496" east, 0.66732" south, 1.80936" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.997724" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.949552" east, 0.683328" south, 1.818" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 5.325" east, 0.415" south, 5.45" up
+      top2 = top1 + 0.15" south
+      top3 = top2 + 0.15" east
+      top4 = top3 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top2..top4 top1   { facing up }
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.813" west, 0.01014" north, 0.195972" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 5.325" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.508048" west, 0.006228" south, 0.203544" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.997724" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.203092" west, 0.025404" south, 0.202512" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.67046" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.898148" west, 0.041772" south, 0.210096" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.343184" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.37364" west, 0.049692" north, 0.217128" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 4.015908" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.068684" west, 0.041772" north, 0.250512" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.688632" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.76374" west, 0.025404" north, 0.258084" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.361368" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.458796" west, 0.006228" north, 0.257064" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 3.034092" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 2.93364" west, 0.01014" south, 0.264636" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.706816" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.628684" west, 0.026496" south, 0.27222" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 2.37954" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.32374" west, 0.026496" north, 0.821724" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.052276" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.01858" west, 0.01014" north, 0.829296" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.725" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.493424" west, 0.006228" south, 0.83688" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.397724" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.188468" west, 0.025404" south, 0.835848" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.07046" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.883524" west, 0.041772" south, 0.843432" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.743184" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.57858" west, 0.049692" north, 0.850464" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.415908" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.053424" west, 0.041772" north, 0.883848" up
+      floor2 = floor1 + 0.108" west
+      floor3 = floor2 + 0.108" south
+      floor4 = floor3 + 0.108" east
+      top1 = 0.088632" west, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor2 floor1 floor4 floor3   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor3 floor4 top1 top4
+    face = floor4 floor1 top2 top1
+    face = floor1 floor2 top3 top2
+    face = floor2 floor3 top4 top3
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.143532" east, 0.025404" north, 0.89142" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.088632" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.449544" east, 0.006228" north, 0.8904" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.415908" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.7545" east, 0.01014" south, 0.897972" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 0.743184" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.279656" east, 0.026496" south, 0.905544" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 1.07046" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.5846" east, 0.026496" north, 1.45506" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.397724" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.889544" east, 0.01014" north, 1.462632" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.725" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.1945" east, 0.006228" south, 1.470216" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.052276" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.719656" east, 0.025404" south, 1.469184" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.37954" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 3.024816" east, 0.041772" south, 1.476756" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.706816" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.32976" east, 0.049692" north, 1.4838" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.034092" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.634704" east, 0.041772" north, 1.517184" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.361368" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.159872" east, 0.025404" north, 1.524756" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 3.688632" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.464816" east, 0.006228" north, 1.523724" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.015908" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.76976" east, 0.01014" south, 1.531308" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.343184" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.074704" east, 0.026496" south, 1.53888" up
+      floor2 = floor1 + 0.108" south
+      floor3 = floor2 + 0.108" east
+      floor4 = floor3 + 0.108" north
+      top1 = 4.67046" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor1 floor4..floor2   { facing down }
+    face = top1..top4   { facing up }
+    face = floor2 floor3 top2 top1
+    face = floor3 floor4 top3 top2
+    face = floor4 floor1 top4 top3
+    face = floor1 floor2 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.599224" east, 0.026496" north, 2.088396" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.997724" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.904168" east, 0.01014" north, 2.095968" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 5.325" east, 0.075" south, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.967828" west, 0.630024" north, 0 up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 5.325" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.552772" west, 0.613308" north, 0 up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.997724" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.137716" west, 0.595884" north, 0 up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.67046" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.722672" west, 0.577764" north, 0 up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.343184" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.528476" west, 0.741396" north, 0.489708" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.015908" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.11342" west, 0.73524" north, 0.528468" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 3.688632" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.698364" west, 0.71712" north, 0.530664" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 3.361368" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.283308" west, 0.699696" north, 0.53502" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 3.034092" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.088476" west, 0.68298" north, 0.541524" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.706816" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.67342" west, 0.665556" north, 0.545868" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.37954" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.258364" west, 0.647436" north, 0.548064" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.052276" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.843092" west, 0.630024" north, 0.55242" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.725" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.64826" west, 0.613308" north, 0.558924" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.397724" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.233204" west, 0.595884" north, 0.563268" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.07046" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.818148" west, 0.577764" north, 0.565464" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.743184" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.403092" west, 0.741396" north, 1.123044" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.415908" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.20826" west, 0.73524" north, 1.161804" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.088632" west, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.098796" east, 0.71712" north, 1.164" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 0.088632" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.51492" east, 0.699696" north, 1.168356" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 0.415908" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.929976" east, 0.68298" north, 1.174848" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 0.743184" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.12482" east, 0.665556" north, 1.179204" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.07046" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.539876" east, 0.647436" north, 1.1814" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.397724" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.95492" east, 0.630024" north, 1.185756" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.725" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.369976" east, 0.613308" north, 1.192248" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.052276" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.56482" east, 0.595884" north, 1.196604" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.37954" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.980092" east, 0.577764" north, 1.1988" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.706816" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.395136" east, 0.741396" north, 1.75638" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 3.034092" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.810192" east, 0.73524" north, 1.79514" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 3.361368" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.005036" east, 0.71712" north, 1.797336" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 3.688632" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.420092" east, 0.699696" north, 1.801692" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.015908" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.835136" east, 0.68298" north, 1.808184" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.343184" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.250192" east, 0.665556" north, 1.81254" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.67046" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.444388" east, 0.647436" north, 1.814736" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.997724" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.859444" east, 0.630024" north, 1.819092" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 5.325" east, 0.415" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.902452" west, 1.427268" north, 0.18414" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 5.325" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.597508" west, 1.42146" north, 0.223968" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.997724" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.07234" west, 1.393836" north, 0.197136" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.67046" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.767396" west, 1.389432" north, 0.241272" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.343184" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.4631" west, 1.360932" north, 0.211752" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 4.015908" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.158156" west, 1.344564" north, 0.219336" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 3.688632" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.633" west, 1.340172" north, 0.26346" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 3.361368" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.328044" west, 1.312548" north, 0.236628" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 3.034092" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.0231" west, 1.30674" north, 0.276468" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.706816" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.718156" west, 1.279116" north, 0.249636" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.37954" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 2.193" west, 1.454892" north, 0.844308" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 2.052276" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.887828" west, 1.427268" north, 0.817476" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.725" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.582884" west, 1.42146" north, 0.857304" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.397724" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 1.27794" west, 1.393836" north, 0.830472" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 1.07046" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.752772" west, 1.389432" north, 0.874608" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.743184" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.447828" west, 1.360932" north, 0.845088" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.415908" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #343A44
+    points
+      floor1 = 0.142884" west, 1.344564" north, 0.85266" up
+      floor2 = floor1 + 0.108" north
+      floor3 = floor2 + 0.108" west
+      floor4 = floor3 + 0.108" south
+      top1 = 0.088632" west, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" north
+      top3 = top2 + 0.15" west
+      top4 = top3 + 0.15" south
+    end
+    face = floor3..floor1 floor4   { facing down }
+    face = top4 top1..top3   { facing up }
+    face = floor4 floor1 top1 top4
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.05406" east, 1.340172" north, 0.896796" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 0.088632" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.580296" east, 1.312548" north, 0.869964" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 0.415908" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 0.885252" east, 1.30674" north, 0.909804" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 0.743184" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.190196" east, 1.279116" north, 0.882972" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.07046" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 1.49514" east, 1.454892" north, 1.477644" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.397724" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.020296" east, 1.427268" north, 1.450812" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 1.725" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.325252" east, 1.42146" north, 1.49064" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.052276" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.630196" east, 1.393836" north, 1.463808" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.37954" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #D44E3A
+    points
+      floor1 = 2.935356" east, 1.389432" north, 1.507944" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 2.706816" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.460512" east, 1.360932" north, 1.478424" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 3.034092" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 3.765468" east, 1.344564" north, 1.486" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 3.361368" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.070412" east, 1.340172" north, 1.530132" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 3.688632" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.375356" east, 1.312548" north, 1.5033" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.015908" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 4.900512" east, 1.30674" north, 1.543128" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.343184" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.205468" east, 1.279116" north, 1.516296" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.67046" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.509764" east, 1.454892" north, 2.110968" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 4.997724" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+  solid
+    paint = #E8BA4E
+    points
+      floor1 = 5.814708" east, 1.427268" north, 2.084136" up
+      floor2 = floor1 + 0.108" east
+      floor3 = floor2 + 0.108" north
+      floor4 = floor1 + 0.108" north
+      top1 = 5.325" east, 0.905" north, 5.45" up
+      top2 = top1 + 0.15" east
+      top3 = top2 + 0.15" north
+      top4 = top1 + 0.15" north
+    end
+    face = floor4..floor1   { facing down }
+    face = top1..top4   { facing up }
+    face = floor1 floor2 top2 top1
+    face = floor2 floor3 top3 top2
+    face = floor3 floor4 top4 top3
+    face = floor4 floor1 top1 top4
+  end
+end

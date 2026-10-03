@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rotate - Heckers Sketch</title>
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="../index.html">Help</a> &rsaquo; Rotate</nav>
+<header><h1>Rotate</h1><p class="lead">Turn things about a point.</p></header>
+<p>Keyboard: <kbd>Q</kbd> - SketchUp's key for it, not R, which is the
+rectangle.</p>
+
+<h2 id="how-to-use-it">How to use it</h2>
+<ol>
+<li>Pick what you want to turn first.  With nothing picked it turns everything
+joined to what you click, which is usually what you meant but not always.</li>
+<li>Click the center it turns about.</li>
+<li>Click a point to measure the angle <i>from</i> - anywhere on the thing
+will do, and a corner is easiest to aim at.</li>
+<li>Swing round to the angle and click, or type it and press
+<kbd>Enter</kbd>.</li>
+</ol>
+
+<h2 id="typing-the-angle">Typing the angle</h2>
+<p><code>34.1</code> is degrees.  <code>8:12</code> is a slope - eight in
+twelve, the way a roof pitch is written - and it is there because that is the
+number on the drawing you are working from, and doing the arctangent in your
+head to get 33.69 is how mistakes happen.</p>
+
+<figure>
+  <a class="zoom" href="../shots/tool-rotate.webp" target="_blank" title="Open larger"><img src="../shots/tool-rotate.webp" alt="A rectangle picked, then turned thirty degrees about its middle by typing the angle."></a>
+  <figcaption>Picked first, then the center, then a point to measure the
+  angle from - and the angle <b>typed</b>.  A swung angle is a number nobody
+  chose; a typed one is 30 degrees exactly.</figcaption>
+</figure>
+
+<h2 id="which-plane-it-turns-in">Which plane it turns in</h2>
+<p>This is the part that catches people, because in 3D "turn it 30 degrees"
+is not a complete instruction until something says <i>about what</i>.</p>
+<ul>
+<li>By default the plane comes from <b>the face under the cursor</b> when you
+click the center.  Click the center on the top of a box and it turns flat on
+that top, which is nearly always what you meant.</li>
+<li><b>The arrow keys</b> say it outright, before you start: right is red,
+left is green, up is blue.  The color of the protractor tells you which one
+is holding.</li>
+<li><b>Alt</b> frees it from the face under the cursor.  It then turns flat
+unless an arrow says otherwise, and <kbd>Alt</kbd> again goes back to
+following faces.  The <a href="protractor.html">protractor</a> works exactly
+the same way.</li>
+</ul>
+
+<h2 id="copies-and-rows-of-them">Copies, and rows of them</h2>
+<p><kbd>Ctrl</kbd> leaves a copy behind, so the original stays and a turned
+one appears.  Straight after a copy, <code>3x</code> makes three of them at
+that angle apart, and <code>/3</code> divides the turn you just made into
+three - which is how a bolt circle, a fan of rafters or a row of spokes gets
+laid out without any arithmetic.</p>
+
+<h2 id="see-also">See also</h2><ul>
+<li><a href="move.html">Move</a> - the same idea in a straight line, with the same copy trick</li>
+<li><a href="protractor.html">The protractor</a> - marking an angle rather than turning by one</li>
+<li><a href="../planes.html">The working plane</a> - the other place this question comes up</li>
+</ul>
+<footer><a href="../index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

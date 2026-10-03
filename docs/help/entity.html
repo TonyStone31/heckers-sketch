@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The entity panel - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; The entity panel</nav>
+<header><h1>The entity panel</h1><p class="lead">What is picked, and the few things you can change about it.</p></header>
+
+<p><code>/info</code> puts it down the right-hand side.  <code>/info off</code>
+takes it away.  It is remembered between sessions.</p>
+<p>It reads whatever is picked, and changes as you pick something else -
+which is why it is docked rather than a dialog you have to open.</p>
+
+<h2 id="with-one-thing-picked">With one thing picked</h2>
+<table class="sheet">
+<tr><th>Picked</th><th>It says</th></tr>
+<tr><td>A line</td><td>length, both ends, pen width, whether the crease is softened, and which solid it belongs to</td></tr>
+<tr><td>A circle or an arc</td><td>radius, center, sweep, <b>how many sides</b>, which plane it was drawn in</td></tr>
+<tr><td>A face</td><td>area, how many corners, how many windows, which solid</td></tr>
+<tr><td>A note</td><td>what it says, where it points, its size</td></tr>
+<tr><td>A dimension</td><td>what it measures, and what is written on it if that was typed over</td></tr>
+<tr><td>A guide</td><td>where it is</td></tr>
+</table>
+
+<h2 id="what-you-can-change-from-it">What you can change from it</h2>
+<ul>
+<li><b>Sides</b>, on a circle or an arc - <kbd>-</kbd> and <kbd>+</kbd>
+beside the figure.  This is the one worth knowing: the number of sides used
+to be something you set <i>before</i> drawing and could never change
+afterwards.  Draw a circle at 24, decide it wants to be 48, and it is two
+presses.</li>
+<li><b>Soften</b>, on a line or an arc.  A softened crease is hidden except
+where the surface turns away from you, which is what makes a pulled circle
+read as a pipe rather than a barrel of staves.</li>
+<li><b>Length</b>, on a line.  Pick the line, type the new length and
+press <kbd>Enter</kbd> - the panel doesn't need to be open for it.  Which
+end moves follows SketchUp's rule:
+  <ul>
+  <li>a loose line moves the end it was drawn to;</li>
+  <li>a line joined to something at one end moves its free end;</li>
+  <li>a line joined at both ends can't be changed this way - the panel says
+  <i>joined at both ends - fixed</i>.  Move one of its ends with the move
+  tool instead.</li>
+  </ul>
+</li>
+<li><b>Width</b>, on a line or an arc - <kbd>-</kbd> and <kbd>+</kbd>,
+through the same widths as the LINE WIDTH button.</li>
+<li><b>Color</b>, on a line, an arc, a note or a dimension - <b>Change...</b>
+opens the color picker.  The LINE COLOR and LINE WIDTH buttons still set what
+the <i>next</i> thing is drawn with; these change what is already there.</li>
+<li><b>Material</b>, on a face - <b>Paint...</b> opens the color picker, and
+the face is that color, not a tint of it.  A face's material is a separate
+thing from the pen that drew its edges, which is how SketchUp has it: paint a
+face red and it is red, while the lines around it stay whatever color they
+were.  <b>Back to default</b> returns it to the near-white every face starts
+as.  If the face is one of several picked, all the picked faces are painted
+at once.</li>
+<li><b>Size</b>, on a note.</li>
+<li><b>Reverse</b>, on a face - or on several at once.  See
+<a href="faces.html">faces, front and back</a>.</li>
+</ul>
+<p>Everything it changes goes on the undo stack like anything else.</p>
+
+<h2 id="with-several-picked">With several picked</h2>
+<p>How many of each, the total length of the lines and the total area of the
+faces.  Colors can be set for all of them at once, and the buttons say how
+many they will land on:</p>
+<ul>
+<li><b>Material - Paint <i>n</i> faces...</b> paints every picked face,
+and <b>Back to default</b> strips them all back to the near-white.</li>
+<li><b>Color - Change <i>n</i>...</b> sets the pen color of every picked
+line, arc, note and dimension.  Faces are not included - they are painted,
+not inked - and guides never take a color.</li>
+<li><b>Reverse</b> turns over every picked face.</li>
+</ul>
+<p>Sizes and widths are still one at a time, on purpose: a stepper that acted
+on nine things at once is a way to lose nine things.  A color is not a
+stepper - it is one decision, the button says how many it lands on, and undo
+puts it back.</p>
+
+<h2 id="with-nothing-picked">With nothing picked</h2>
+<p>What the sheet adds up to: how many things, how many lines and how long
+they are altogether, how many faces and how much area.  It is a question
+people ask of a drawing often enough to be worth the space when there is
+nothing else to show.</p>
+
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="tools/circle.html">The circle tool</a> - setting the sides before you draw</li>
+<li><a href="tools/select.html">Select</a></li>
+<li><a href="faces.html">Faces, front and back</a></li>
+</ul>
+
+<footer><a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

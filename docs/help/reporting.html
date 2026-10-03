@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>When it breaks - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; When it breaks</nav>
+<header><h1>When it breaks</h1><p class="lead">Telling us about it.</p></header>
+<h2 id="sending-one">Sending one</h2>
+<ol>
+<li><code>/report</code>.</li>
+<li>Say what you were doing and what happened.  A line or two is plenty.</li>
+<li>Send.</li>
+</ol>
+<p>Nothing leaves the machine until you press send.</p>
+
+<h2 id="what-goes-with-it">What goes with it</h2>
+<ul>
+<li>A picture of the screen as it is now.</li>
+<li>The drawing itself, so the fault can be reproduced rather than imagined.
+Untick that if you would rather not send your work - the rest still
+helps.</li>
+<li>The last few dozen things you did, with the tool, the view and where you
+clicked.</li>
+<li>How the frames have been going: how many took longer than a fortieth of a
+second, the worst one, and which part of the frame was slow.  So "it felt
+glitchy" arrives with the numbers already in it.</li>
+<li>How the program is set up and what it was in the middle of: how it was
+started, the window and the screen it is on, the theme and grid, the view
+cube, what each tool is set to, and every open sheet with its view, scale,
+snap and zoom.  A file named when the program was started is written as
+<code>&lt;file&gt;</code>, and sheets are numbered, not named.</li>
+<li>What machine this is - memory, processor, graphics, operating system.
+Nothing about you.</li>
+</ul>
+
+<p>To see all of that before sending anything, type <code>/state</code> for
+the program and <code>/sysinfo</code> for the machine.</p>
+
+<h2 id="what-makes-a-report-easy-to-act-on">What makes a report easy to act on</h2>
+<ul>
+<li><b>Send it while it is on the screen.</b>  The picture and the last few
+dozen actions are the most useful part, and they are gone once you carry
+on.</li>
+<li><b>Say what you expected.</b>  "It should have snapped to the guide" says
+more than "snapping is broken", because it says which of the several things
+it might have snapped to you meant.</li>
+<li><b>One fault per report</b> where you can.  Two in one are two things to
+find and one place to say they were fixed.</li>
+</ul>
+
+<h2 id="what-happens-to-it">What happens to it</h2>
+<p>It lands in a postbox that anybody could write to, and it is read as
+<b>evidence</b> - something to reproduce and check - rather than as an
+instruction.  That is worth knowing because of what it means for you: the
+postbox is anonymous, nothing in a report says who sent it, and there is
+therefore <b>no way to write back</b>.  If you want an answer rather than a
+fix, this is not the road.</p>
+<p>What you get instead is the fix, in a release, with a line about it in
+<b>What's new</b>.  Several of the things in there this month started as two
+sentences and a screenshot from somebody who was annoyed.</p>
+
+<h2 id="things-not-to-worry-about">Things not to worry about</h2>
+<ul>
+<li><b>Sending the same thing twice.</b>  Two reports of one fault is a
+better problem than none.</li>
+<li><b>Not being sure it is a bug.</b>  "This felt wrong and I do not know
+why" is a useful report - half of them turn out to be something that is
+technically working and reads as broken, which is worth fixing too.</li>
+<li><b>Not knowing the words for it.</b>  Describe what you did and what you
+saw.  The picture and the last few dozen actions carry the rest.</li>
+<li><b>Your drawing.</b>  Untick it if you would rather not send it.  It
+makes a fault quicker to find and it is never required.</li>
+</ul>
+
+<h2 id="the-postcard">The postcard</h2>
+<p>The second time the program starts it asks, once, whether it may send us
+a <b>postcard</b>: one note saying what sort of computer it is running on -
+the operating system, processor, memory, graphics and screen - and, if you
+care to say, what you want to use it for.  The whole of the text is on the
+screen before you answer, <b>No thanks</b> is as big a button as <b>Send
+it</b>, and whichever you press it never asks again.</p>
+<p>It is not a bug report and it is not tracking.  There is no serial number
+or identifier in it, nothing that names you or your machine, and no way to
+tell two postcards apart; it goes the same encrypted way a report goes, and
+we count it as one machine.  We are two people making this and we cannot
+otherwise tell whether anybody is trying it - that is the whole reason.
+<code>/postcard</code> brings the window back if you change your mind, and
+<code>--offline</code> means it is never asked at all.</p>
+<footer><a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

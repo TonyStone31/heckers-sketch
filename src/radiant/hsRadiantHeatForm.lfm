@@ -1,0 +1,554 @@
+object RadiantHeatForm: TRadiantHeatForm
+  Left = 320
+  Height = 700
+  Top = 140
+  Width = 1100
+  BorderStyle = bsDialog
+  Caption = 'Heat load, flow and the boiler'
+  ClientHeight = 700
+  ClientWidth = 1100
+  KeyPreview = True
+  Position = poOwnerFormCenter
+  OnKeyDown = FormKeyDown
+  object pnJob: TBCPanel
+    Left = 12
+    Height = 676
+    Top = 12
+    Width = 330
+    BevelOuter = bvNone
+    TabOrder = 0
+    object lblJobHead: TLabel
+      Left = 16
+      Height = 22
+      Top = 12
+      Width = 300
+      AutoSize = False
+      Caption = 'The building'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblJobHint: TLabel
+      Left = 16
+      Height = 54
+      Top = 38
+      Width = 300
+      AutoSize = False
+      Caption = 'Outside design temperature is the 99% winter low for the town - ask the supplier or look it up (ASHRAE).'
+      WordWrap = True
+    end
+    object lblOutdoor: TLabel
+      Left = 16
+      Height = 18
+      Top = 106
+      Width = 130
+      AutoSize = False
+      Caption = 'Outdoor design'
+    end
+    object edOutdoor: TSpinEdit
+      Left = 150
+      Height = 28
+      Top = 100
+      Width = 70
+      MaxValue = 70
+      MinValue = -60
+      Increment = 1
+      TabOrder = 1
+      Value = 0
+      OnChange = FieldChange
+    end
+    object lblOutdoorF: TLabel
+      Left = 226
+      Height = 18
+      Top = 106
+      Width = 60
+      AutoSize = False
+      Caption = 'deg F'
+    end
+    object lblIndoor: TLabel
+      Left = 16
+      Height = 18
+      Top = 144
+      Width = 130
+      AutoSize = False
+      Caption = 'Indoor'
+    end
+    object edIndoor: TSpinEdit
+      Left = 150
+      Height = 28
+      Top = 138
+      Width = 70
+      MaxValue = 85
+      MinValue = 40
+      Increment = 1
+      TabOrder = 2
+      Value = 68
+      OnChange = FieldChange
+    end
+    object lblIndoorF: TLabel
+      Left = 226
+      Height = 18
+      Top = 144
+      Width = 60
+      AutoSize = False
+      Caption = 'deg F'
+    end
+    object lblClimate: TLabel
+      Left = 16
+      Height = 18
+      Top = 182
+      Width = 130
+      AutoSize = False
+      Caption = 'Climate zone'
+    end
+    object cbClimate: TComboBox
+      Left = 150
+      Height = 28
+      Top = 176
+      Width = 120
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 3
+    end
+    object btnClimateHelp: TBCButton
+      Left = 278
+      Height = 28
+      Top = 176
+      Width = 36
+      Caption = '?'
+      Hint = 'which zone a county is in - the Department of Energy''s guide, every county, the 2021 code (opens in the browser)'
+      ShowHint = True
+      OnClick = btnClimateHelpClick
+    end
+    object lblGlycol: TLabel
+      Left = 16
+      Height = 18
+      Top = 220
+      Width = 130
+      AutoSize = False
+      Caption = 'Glycol'
+    end
+    object edGlycol: TSpinEdit
+      Left = 150
+      Height = 28
+      Top = 214
+      Width = 70
+      MaxValue = 60
+      MinValue = 0
+      Increment = 5
+      TabOrder = 4
+      Value = 0
+      OnChange = FieldChange
+    end
+    object lblGlycolPct: TLabel
+      Left = 226
+      Height = 18
+      Top = 220
+      Width = 60
+      AutoSize = False
+      Caption = '%'
+    end
+    object lblAltitude: TLabel
+      Left = 16
+      Height = 18
+      Top = 258
+      Width = 130
+      AutoSize = False
+      Caption = 'Altitude'
+    end
+    object edAltitude: TSpinEdit
+      Left = 150
+      Height = 28
+      Top = 252
+      Width = 90
+      MaxValue = 14000
+      MinValue = 0
+      Increment = 500
+      TabOrder = 5
+      Value = 0
+      OnChange = FieldChange
+    end
+    object lblAltitudeFt: TLabel
+      Left = 246
+      Height = 18
+      Top = 258
+      Width = 40
+      AutoSize = False
+      Caption = 'ft'
+    end
+    object cbDhw: TCheckBox
+      Left = 16
+      Height = 22
+      Top = 296
+      Width = 22
+      OnChange = FieldChange
+      TabOrder = 6
+    end
+    object lblDhw: TLabel
+      Left = 44
+      Height = 18
+      Top = 298
+      Width = 276
+      AutoSize = False
+      Caption = 'The boiler makes the hot water too'
+      FocusControl = cbDhw
+      OnClick = CheckLabelClick
+    end
+    object lblBaths: TLabel
+      Left = 16
+      Height = 18
+      Top = 334
+      Width = 130
+      AutoSize = False
+      Caption = 'Bathrooms'
+    end
+    object edBaths: TSpinEdit
+      Left = 150
+      Height = 28
+      Top = 328
+      Width = 70
+      MaxValue = 8
+      MinValue = 1
+      Increment = 1
+      TabOrder = 7
+      Value = 2
+      OnChange = FieldChange
+    end
+    object lblMethod: TLabel
+      Left = 16
+      Height = 110
+      Top = 372
+      Width = 300
+      AutoSize = False
+      Caption = 'A simplified heat loss: walls, glass, doors, ceiling, the slabs edge and the air that leaks in, at the code U-values for the climate zone. Every table and number used is printed in the submittal.'
+      WordWrap = True
+    end
+    object btnOk: TBCButton
+      Left = 16
+      Height = 34
+      Top = 590
+      Width = 140
+      Caption = 'Use it'
+      OnClick = btnOkClick
+    end
+    object btnCancel: TBCButton
+      Left = 164
+      Height = 34
+      Top = 590
+      Width = 140
+      Caption = 'Cancel'
+      OnClick = btnCancelClick
+    end
+    object btnOff: TBCButton
+      Left = 16
+      Height = 34
+      Top = 632
+      Width = 288
+      Caption = 'Leave the heat load out'
+      OnClick = btnOffClick
+    end
+  end
+  object pnPlan: TBCPanel
+    Left = 354
+    Height = 676
+    Top = 12
+    Width = 412
+    BevelOuter = bvNone
+    TabOrder = 8
+    object lblPlanHead: TLabel
+      Left = 16
+      Height = 22
+      Top = 12
+      Width = 380
+      AutoSize = False
+      Caption = 'Outside walls - click a wall to change it'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object pbPlan: TPaintBox
+      Left = 16
+      Height = 540
+      Top = 40
+      Width = 380
+      OnMouseDown = pbPlanMouseDown
+      OnPaint = pbPlanPaint
+    end
+    object lblPlanHint: TLabel
+      Left = 16
+      Height = 80
+      Top = 588
+      Width = 380
+      AutoSize = False
+      Caption = 'Blue: an outside wall.  Orange: a wall to a space not heated - a garage.  Gray: inside.  A wall two zones share is always inside.  Click inside a zone to fill it in.'
+      WordWrap = True
+    end
+  end
+  object pnZone: TBCPanel
+    Left = 778
+    Height = 676
+    Top = 12
+    Width = 310
+    BevelOuter = bvNone
+    TabOrder = 9
+    object lblZoneHead: TLabel
+      Left = 16
+      Height = 22
+      Top = 12
+      Width = 290
+      AutoSize = False
+      Caption = 'Zone 1'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object cbZone: TComboBox
+      Left = 16
+      Height = 28
+      Top = 40
+      Width = 290
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 10
+    end
+    object lblUse: TLabel
+      Left = 16
+      Height = 18
+      Top = 86
+      Width = 110
+      AutoSize = False
+      Caption = 'What it is'
+    end
+    object cbUse: TComboBox
+      Left = 126
+      Height = 28
+      Top = 80
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 11
+    end
+    object lblAbove: TLabel
+      Left = 16
+      Height = 18
+      Top = 120
+      Width = 110
+      AutoSize = False
+      Caption = 'Above it'
+    end
+    object cbAbove: TComboBox
+      Left = 126
+      Height = 28
+      Top = 114
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 12
+    end
+    object lblWalls: TLabel
+      Left = 16
+      Height = 18
+      Top = 154
+      Width = 110
+      AutoSize = False
+      Caption = 'Outside walls'
+    end
+    object cbWalls: TComboBox
+      Left = 126
+      Height = 28
+      Top = 148
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 13
+    end
+    object lblSlab: TLabel
+      Left = 16
+      Height = 18
+      Top = 188
+      Width = 110
+      AutoSize = False
+      Caption = 'Slab insulation'
+    end
+    object cbSlab: TComboBox
+      Left = 126
+      Height = 28
+      Top = 182
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 14
+    end
+    object lblCover: TLabel
+      Left = 16
+      Height = 18
+      Top = 222
+      Width = 110
+      AutoSize = False
+      Caption = 'Floor covering'
+    end
+    object cbCover: TComboBox
+      Left = 126
+      Height = 28
+      Top = 216
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 15
+    end
+    object lblTight: TLabel
+      Left = 16
+      Height = 18
+      Top = 256
+      Width = 110
+      AutoSize = False
+      Caption = 'Air tightness'
+    end
+    object cbTight: TComboBox
+      Left = 126
+      Height = 28
+      Top = 250
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 16
+    end
+    object lblSnow: TLabel
+      Left = 16
+      Height = 18
+      Top = 290
+      Width = 110
+      AutoSize = False
+      Caption = 'Snow melt'
+    end
+    object cbSnow: TComboBox
+      Left = 126
+      Height = 28
+      Top = 284
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 17
+    end
+    object lblRun: TLabel
+      Left = 16
+      Height = 18
+      Top = 324
+      Width = 110
+      AutoSize = False
+      Caption = 'Header to boiler'
+    end
+    object cbRun: TComboBox
+      Left = 126
+      Height = 28
+      Top = 318
+      Width = 180
+      ItemHeight = 0
+      OnChange = FieldChange
+      Style = csDropDownList
+      TabOrder = 18
+    end
+    object lblCeiling: TLabel
+      Left = 16
+      Height = 18
+      Top = 358
+      Width = 110
+      AutoSize = False
+      Caption = 'Ceiling height'
+    end
+    object edCeiling: TSpinEdit
+      Left = 126
+      Height = 28
+      Top = 352
+      Width = 70
+      MaxValue = 60
+      MinValue = 1
+      Increment = 1
+      TabOrder = 19
+      Value = 9
+      OnChange = FieldChange
+    end
+    object lblCeilingFt: TLabel
+      Left = 202
+      Height = 18
+      Top = 358
+      Width = 60
+      AutoSize = False
+      Caption = 'ft'
+    end
+    object lblWindows: TLabel
+      Left = 16
+      Height = 18
+      Top = 392
+      Width = 110
+      AutoSize = False
+      Caption = 'Windows'
+    end
+    object edWindows: TSpinEdit
+      Left = 126
+      Height = 28
+      Top = 386
+      Width = 80
+      MaxValue = 50000
+      MinValue = 0
+      Increment = 10
+      TabOrder = 20
+      Value = 0
+      OnChange = FieldChange
+    end
+    object lblWindowsSq: TLabel
+      Left = 212
+      Height = 18
+      Top = 392
+      Width = 80
+      AutoSize = False
+      Caption = 'sq ft'
+    end
+    object lblDoors: TLabel
+      Left = 16
+      Height = 18
+      Top = 426
+      Width = 110
+      AutoSize = False
+      Caption = 'Overhead doors'
+    end
+    object edDoors: TSpinEdit
+      Left = 126
+      Height = 28
+      Top = 420
+      Width = 80
+      MaxValue = 50000
+      MinValue = 0
+      Increment = 10
+      TabOrder = 21
+      Value = 0
+      OnChange = FieldChange
+    end
+    object lblDoorsSq: TLabel
+      Left = 212
+      Height = 18
+      Top = 426
+      Width = 80
+      AutoSize = False
+      Caption = 'sq ft'
+    end
+    object memResult: TMemo
+      Left = 16
+      Height = 200
+      Top = 460
+      Width = 290
+      Font.Height = -11
+      Font.Name = 'monospace'
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssAutoVertical
+      TabOrder = 22
+    end
+  end
+end

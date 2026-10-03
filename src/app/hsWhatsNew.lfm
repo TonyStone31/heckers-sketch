@@ -1,0 +1,91 @@
+object WhatsNewForm: TWhatsNewForm
+  Left = 370
+  Height = 640
+  Top = 100
+  Width = 760
+  BorderStyle = bsNone
+  Caption = 'What''s new'
+  ClientHeight = 640
+  ClientWidth = 760
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  Position = poMainFormCenter
+  Scaled = False
+  object pnlHead: TBCPanel
+    Tag = 1
+    Left = 0
+    Height = 48
+    Top = 0
+    Width = 760
+    TabOrder = 0
+    OnMouseDown = HeadDown
+    OnMouseMove = HeadMove
+    OnMouseUp = HeadUp
+    object lblTitle: TLabel
+      Left = 18
+      Height = 26
+      Top = 12
+      Width = 460
+      AutoSize = False
+      Caption = 'What''s new'
+      Font.Height = -19
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      OnMouseDown = HeadDown
+      OnMouseMove = HeadMove
+      OnMouseUp = HeadUp
+    end
+    object btnShut: TBCButton
+      Tag = 2
+      Left = 716
+      Height = 28
+      Top = 10
+      Width = 30
+      Caption = 'X'
+      OnClick = GoClick
+    end
+  end
+  object pnlBody: TBCPanel
+    Left = 14
+    Height = 522
+    Top = 60
+    Width = 732
+    TabOrder = 1
+    object Page: TInkPage
+      Left = 10
+      Height = 502
+      Top = 10
+      Width = 712
+      TabOrder = 0
+      OnLinkClick = PageLinkClick
+    end
+  end
+  object pnlFoot: TBCPanel
+    Left = 14
+    Height = 44
+    Top = 586
+    Width = 732
+    TabOrder = 2
+    object lblWhich: TLabel
+      Tag = 1
+      Left = 14
+      Height = 20
+      Top = 12
+      Width = 420
+      AutoSize = False
+      Caption = ''
+      Transparent = True
+    end
+    object btnGo: TBCButton
+      Tag = 1
+      Left = 588
+      Height = 32
+      Top = 6
+      Width = 130
+      Caption = 'Continue'
+      OnClick = GoClick
+    end
+  end
+end

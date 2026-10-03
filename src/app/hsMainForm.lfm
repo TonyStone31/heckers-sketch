@@ -1,0 +1,221 @@
+object MainForm: TMainForm
+  Left = 2161
+  Height = 760
+  Top = 839
+  Width = 1180
+  Caption = 'Heckers Sketch'
+  ClientHeight = 760
+  ClientWidth = 1180
+  Color = clBlack
+  Constraints.MinHeight = 600
+  Constraints.MinWidth = 940
+  DoubleBuffered = True
+  KeyPreview = True
+  ParentDoubleBuffered = False
+  Position = poScreenCenter
+  LCLVersion = '4.99.0.0'
+  Scaled = False
+  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
+  OnKeyUp = FormKeyUp
+  OnPaint = FormPaint
+  OnResize = FormResize
+  OnShow = FormShow
+  object pbScreen: TPaintBox
+    Left = 40
+    Height = 460
+    Top = 120
+    Width = 1200
+    OnMouseDown = pbScreenMouseDown
+    OnMouseMove = pbScreenMouseMove
+    OnMouseUp = pbScreenMouseUp
+    OnMouseWheel = pbScreenMouseWheel
+    OnPaint = pbScreenPaint
+  end
+  object pbQuick: TPaintBox
+    Left = 200
+    Height = 24
+    Top = 4
+    Width = 240
+    OnMouseDown = pbQuickMouseDown
+    OnMouseLeave = pbQuickMouseLeave
+    OnMouseMove = pbQuickMouseMove
+    OnPaint = pbQuickPaint
+  end
+  object pbTools: TPaintBox
+    Left = 8
+    Height = 400
+    Top = 60
+    Width = 132
+    OnMouseDown = pbToolsMouseDown
+    OnMouseLeave = pbToolsMouseLeave
+    OnMouseMove = pbToolsMouseMove
+    OnPaint = pbToolsPaint
+  end
+  object pbInfo: TPaintBox
+    Left = 1000
+    Height = 400
+    Top = 60
+    Width = 210
+    OnMouseDown = pbInfoMouseDown
+    OnMouseLeave = pbInfoMouseLeave
+    OnMouseMove = pbInfoMouseMove
+    OnPaint = pbInfoPaint
+  end
+  object pbGroups: TPaintBox
+    Left = 1000
+    Height = 200
+    Top = 470
+    Width = 210
+    OnMouseDown = pbGroupsMouseDown
+    OnMouseLeave = pbGroupsMouseLeave
+    OnMouseMove = pbGroupsMouseMove
+    OnMouseWheel = pbGroupsMouseWheel
+    OnPaint = pbGroupsPaint
+  end
+  object pbSlice: TPaintBox
+    Left = 700
+    Height = 24
+    Top = 8
+    Width = 300
+    OnMouseDown = pbSliceMouseDown
+    OnMouseLeave = pbSliceMouseLeave
+    OnMouseMove = pbSliceMouseMove
+    OnMouseWheel = pbSliceMouseWheel
+    OnPaint = pbSlicePaint
+  end
+  object pbView: TPaintBox
+    Left = 1030
+    Height = 30
+    Top = 84
+    Width = 228
+    OnMouseDown = pbViewMouseDown
+    OnMouseLeave = pbViewMouseLeave
+    OnMouseMove = pbViewMouseMove
+    OnPaint = pbViewPaint
+  end
+  object pbTabs: TPaintBox
+    Left = 22
+    Height = 30
+    Top = 84
+    Width = 1236
+    OnMouseDown = pbTabsMouseDown
+    OnMouseLeave = pbTabsMouseLeave
+    OnMouseMove = pbTabsMouseMove
+    OnPaint = pbTabsPaint
+  end
+  object pbCmd: TPaintBox
+    Left = 22
+    Height = 44
+    Top = 630
+    Width = 1236
+    OnMouseDown = pbCmdMouseDown
+    OnMouseLeave = pbCmdMouseLeave
+    OnMouseMove = pbCmdMouseMove
+    OnPaint = pbCmdPaint
+  end
+  object pbDeck: TPaintBox
+    Left = 180
+    Height = 172
+    Top = 692
+    Width = 920
+    OnMouseDown = pbDeckMouseDown
+    OnMouseLeave = pbDeckMouseLeave
+    OnMouseMove = pbDeckMouseMove
+    OnPaint = pbDeckPaint
+  end
+  object tmrTick: TTimer
+    Enabled = False
+    Interval = 16
+    OnTimer = tmrTickTimer
+    Left = 60
+    Top = 16
+  end
+  object dlgColor: TColorDialog
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    Left = 132
+    Top = 16
+  end
+  object dlgOpen: TOpenDialog
+    Title = 'Open a drawing'
+    DefaultExt = '.hsk'
+    Filter = 'Heckers Sketch drawing|*.hsk|All files|*.*'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    Left = 348
+    Top = 16
+  end
+  object dlgSave: TSaveDialog
+    Title = 'Save your sketch'
+    DefaultExt = '.png'
+    Filter = 'PNG image|*.png'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 204
+    Top = 16
+  end
+  object dlgPrint: TPrintDialog
+    Left = 276
+    Top = 16
+  end
+  object dlgStringers: TSaveDialog
+    Title = 'Save the stringer sheet'
+    DefaultExt = '.pdf'
+    Filter = 'PDF (*.pdf)|*.pdf'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 492
+    Top = 16
+  end
+  object dlgSubmittal: TSaveDialog
+    Title = 'Print the radiant submittal again'
+    DefaultExt = '.pdf'
+    Filter = 'PDF (*.pdf)|*.pdf|Text (*.txt)|*.txt'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 420
+    Top = 16
+  end
+  object pmView: TPopupMenu
+    Left = 8
+    Top = 8
+  end
+  object pmCanvas: TPopupMenu
+    Left = 48
+    Top = 8
+  end
+  object pmFile: TPopupMenu
+    Left = 96
+    Top = 8
+  end
+  object pmGroups: TPopupMenu
+    Left = 136
+    Top = 8
+  end
+  object pmCmd: TPopupMenu
+    Left = 176
+    Top = 8
+  end
+end

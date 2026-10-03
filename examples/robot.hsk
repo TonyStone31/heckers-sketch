@@ -1,0 +1,4450 @@
+HeckersSketch 2
+units = ft in
+
+sheet 'Robot'
+  ink = black
+  width = 1
+  units = ft in
+  scale = '1/4"'
+  snap = '1/16"'
+  view = 3d
+  camera = -1.05, 0.26, 3.748678, 615.37, 668.361
+
+  box
+    at   = 3 3/4" east, 6.2" south, 0 up
+    size = 5 1/2" east, 10" north, 2 1/2" up
+    paint = #2E3034
+  end
+  box
+    at   = 4 1/2" east, 2" south, 2 1/2" up
+    size = 4" east, 4" north, 1' 5" up
+    paint = #565C64
+  end
+  pull
+    points = (
+      3.501588" east, 2 1/2" south, 33.410772" up to + 1/2" east, 1' 2" down to
+      + 4.996816" east, 0.17846" up to + 1/2" west, 1' 2" up
+    )
+    by = 5" north
+    paint = #ACB3BB
+  end
+  box
+    at   = 9 1/4" west, 6.2" south, 0 up
+    size = 5 1/2" east, 10" north, 2 1/2" up
+    paint = #2E3034
+  end
+  box
+    at   = 8 1/2" west, 2" south, 2 1/2" up
+    size = 4" east, 4" north, 1' 5" up
+    paint = #565C64
+  end
+  pull
+    points = (
+      8.998404" west, 2 1/2" south, 19.589232" up to
+      + 4.996812" east, 0.178464" down to + 1/2" east, 1' 2" up to
+      + 4.99682" west, 0.178456" up
+    )
+    by = 5" north
+    paint = #ACB3BB
+  end
+  box
+    at   = 8 1/2" west, 4" south, 2' 9 1/2" up
+    size = 1' 5" east, 8" north, 6" up
+    paint = #565C64
+  end
+  box
+    at   = 10 1/2" west, 5" south, 3' 3 1/2" up
+    size = 1' 9" east, 10" north, 1' 11" up
+    paint = #ACB3BB
+  end
+  box
+    at   = 7.4" west, 5.6" south, 44.1" up
+    size = 14.8" east, 0.6" north, 11.8" up
+    paint = #C83020
+  end
+  solid
+    paint = #565C64
+    points
+      p1 = 9.7" east, 0 north, 55.1" up
+      p2 = 9.7" east, 1.7" south, 55.555512" up
+      p3 = 8.85" east, 1.472244" south, 55.555512" up
+      p4 = p3 + 1.7" east
+      p5 = 8.227752" east, 0.85" south, 55.555512" up
+      p6 = p5 + 2.944488" east
+      p7 = 8" east, 0 north, 55.555512" up
+      p8 = p7 + 3.4" east
+      p9 = p5 + 1.7" north
+      p10 = p9 + 2.944488" east
+      p11 = p3 + 2.944488" north
+      p12 = p11 + 1.7" east
+      p13 = p2 + 3.4" north
+      p14 = 9.7" east, 2.944488" south, 56.8" up
+      p15 = 8.227752" east, 2.55" south, 56.8" up
+      p16 = p15 + 2.944488" east
+      p17 = 7.15" east, 1.472244" south, 56.8" up
+      p18 = p17 + 5.1" east
+      p19 = 6.755508" east, 0 north, 56.8" up
+      p20 = p19 + 5.888976" east
+      p21 = p17 + 2.944488" north
+      p22 = p21 + 5.1" east
+      p23 = p15 + 5.1" north
+      p24 = p23 + 2.944488" east
+      p25 = p14 + 5.888976" north
+      p26 = 9.7" east, 3.4" south, 4' 10 1/2" up
+      p27 = 8" east, 2.944488" south, 4' 10 1/2" up
+      p28 = p27 + 3.4" east
+      p29 = 6.755508" east, 1.7" south, 4' 10 1/2" up
+      p30 = p29 + 5.888976" east
+      p31 = 6.3" east, 0 north, 4' 10 1/2" up
+      p32 = p31 + 6.8" east
+      p33 = p29 + 3.4" north
+      p34 = p33 + 5.888976" east
+      p35 = p27 + 5.888976" north
+      p36 = p35 + 3.4" east
+      p37 = p26 + 6.8" north
+      p38 = p14 + 3.4" up
+      p39 = p15 + 3.4" up
+      p40 = p39 + 2.944488" east
+      p41 = p17 + 3.4" up
+      p42 = p41 + 5.1" east
+      p43 = p19 + 3.4" up
+      p44 = p43 + 5.888976" east
+      p45 = p41 + 2.944488" north
+      p46 = p45 + 5.1" east
+      p47 = p39 + 5.1" north
+      p48 = p47 + 2.944488" east
+      p49 = p38 + 5.888976" north
+      p50 = p2 + 5.888976" up
+      p51 = p3 + 5.888976" up
+      p52 = p51 + 1.7" east
+      p53 = p5 + 5.888976" up
+      p54 = p53 + 2.944488" east
+      p55 = p7 + 5.888976" up
+      p56 = p55 + 3.4" east
+      p57 = p53 + 1.7" north
+      p58 = p57 + 2.944488" east
+      p59 = p51 + 2.944488" north
+      p60 = p59 + 1.7" east
+      p61 = p50 + 3.4" north
+      p62 = p1 + 6.8" up
+    end
+    face = p10 p8 p1
+    face = p12 p10 p1
+    face = p13 p12 p1
+    face = p11 p13 p1
+    face = p9 p11 p1
+    face = p7 p9 p1
+    face = p5 p7 p1
+    face = p3 p5 p1
+    face = p2 p3 p1
+    face = p4 p2 p1
+    face = p6 p4 p1
+    face = p8 p6 p1
+    face = p8 p10 p22 p20
+    face = p10 p12 p24 p22
+    face = p12 p13 p25 p24
+    face = p13 p11 p23 p25
+    face = p11 p9 p21 p23
+    face = p9 p7 p19 p21
+    face = p7 p5 p17 p19
+    face = p5 p3 p15 p17
+    face = p3 p2 p14 p15
+    face = p2 p4 p16 p14
+    face = p4 p6 p18 p16
+    face = p6 p8 p20 p18
+    face = p20 p22 p34 p32
+    face = p22 p24 p36 p34
+    face = p24 p25 p37 p36
+    face = p25 p23 p35 p37
+    face = p23 p21 p33 p35
+    face = p21 p19 p31 p33
+    face = p19 p17 p29 p31
+    face = p17 p15 p27 p29
+    face = p15 p14 p26 p27
+    face = p14 p16 p28 p26
+    face = p16 p18 p30 p28
+    face = p18 p20 p32 p30
+    face = p32 p34 p46 p44
+    face = p34 p36 p48 p46
+    face = p36 p37 p49 p48
+    face = p37 p35 p47 p49
+    face = p35 p33 p45 p47
+    face = p33 p31 p43 p45
+    face = p31 p29 p41 p43
+    face = p29 p27 p39 p41
+    face = p27 p26 p38 p39
+    face = p26 p28 p40 p38
+    face = p28 p30 p42 p40
+    face = p30 p32 p44 p42
+    face = p44 p46 p58 p56
+    face = p46 p48 p60 p58
+    face = p48 p49 p61 p60
+    face = p49 p47 p59 p61
+    face = p47 p45 p57 p59
+    face = p45 p43 p55 p57
+    face = p43 p41 p53 p55
+    face = p41 p39 p51 p53
+    face = p39 p38 p50 p51
+    face = p38 p40 p52 p50
+    face = p40 p42 p54 p52
+    face = p42 p44 p56 p54
+    face = p56 p58 p62
+    face = p58 p60 p62
+    face = p60..p62
+    face = p61 p59 p62
+    face = p59 p57 p62
+    face = p57 p55 p62
+    face = p55 p53 p62
+    face = p53 p51 p62
+    face = p51 p50 p62
+    face = p50 p52 p62
+    face = p52 p54 p62
+    face = p54 p56 p62
+  end
+  pull
+    points = (
+      7.64664" east, 2.2" south, 57.710244" up to + 5" east, 1' 1" down to
+      + 4.106716" east, 1.579504" up to + 5" west, 1' 1" up
+    )
+    by = 4.4" north
+    paint = #ACB3BB
+  end
+  solid
+    paint = #565C64
+    points
+      p1 = 14.7" east, 0 north, 43.2" up
+      p2 = 14.7" east, 1.15" south, 43.508136" up
+      p3 = 1' 2 1/8" east, 0.995928" south, 43.508136" up
+      p4 = p3 + 1.15" east
+      p5 = 13.704072" east, 0.575" south, 43.508136" up
+      p6 = p5 + 1.991856" east
+      p7 = 13.55" east, 0 north, 43.508136" up
+      p8 = p7 + 2.3" east
+      p9 = p5 + 1.15" north
+      p10 = p9 + 1.991856" east
+      p11 = p3 + 1.991856" north
+      p12 = p11 + 1.15" east
+      p13 = p2 + 2.3" north
+      p14 = 14.7" east, 1.991856" south, 44.35" up
+      p15 = 13.704072" east, 1.725" south, 44.35" up
+      p16 = p15 + 1.991856" east
+      p17 = 12.975" east, 0.995928" south, 44.35" up
+      p18 = p17 + 3.45" east
+      p19 = 12.708144" east, 0 north, 44.35" up
+      p20 = p19 + 3.983712" east
+      p21 = p17 + 1.991856" north
+      p22 = p21 + 3.45" east
+      p23 = p15 + 3.45" north
+      p24 = p23 + 1.991856" east
+      p25 = p14 + 3.983712" north
+      p26 = 14.7" east, 2.3" south, 3' 9 1/2" up
+      p27 = 13.55" east, 1.991856" south, 3' 9 1/2" up
+      p28 = p27 + 2.3" east
+      p29 = 12.708144" east, 1.15" south, 3' 9 1/2" up
+      p30 = p29 + 3.983712" east
+      p31 = 12.4" east, 0 north, 3' 9 1/2" up
+      p32 = p31 + 4.6" east
+      p33 = p29 + 2.3" north
+      p34 = p33 + 3.983712" east
+      p35 = p27 + 3.983712" north
+      p36 = p35 + 2.3" east
+      p37 = p26 + 4.6" north
+      p38 = p14 + 2.3" up
+      p39 = p15 + 2.3" up
+      p40 = p39 + 1.991856" east
+      p41 = p17 + 2.3" up
+      p42 = p41 + 3.45" east
+      p43 = p19 + 2.3" up
+      p44 = p43 + 3.983712" east
+      p45 = p41 + 1.991856" north
+      p46 = p45 + 3.45" east
+      p47 = p39 + 3.45" north
+      p48 = p47 + 1.991856" east
+      p49 = p38 + 3.983712" north
+      p50 = p2 + 3.983724" up
+      p51 = p3 + 3.983724" up
+      p52 = p51 + 1.15" east
+      p53 = p5 + 3.983724" up
+      p54 = p53 + 1.991856" east
+      p55 = p7 + 3.983724" up
+      p56 = p55 + 2.3" east
+      p57 = p53 + 1.15" north
+      p58 = p57 + 1.991856" east
+      p59 = p51 + 1.991856" north
+      p60 = p59 + 1.15" east
+      p61 = p50 + 2.3" north
+      p62 = p1 + 4.6" up
+    end
+    face = p10 p8 p1
+    face = p12 p10 p1
+    face = p13 p12 p1
+    face = p11 p13 p1
+    face = p9 p11 p1
+    face = p7 p9 p1
+    face = p5 p7 p1
+    face = p3 p5 p1
+    face = p2 p3 p1
+    face = p4 p2 p1
+    face = p6 p4 p1
+    face = p8 p6 p1
+    face = p8 p10 p22 p20
+    face = p10 p12 p24 p22
+    face = p12 p13 p25 p24
+    face = p13 p11 p23 p25
+    face = p11 p9 p21 p23
+    face = p9 p7 p19 p21
+    face = p7 p5 p17 p19
+    face = p5 p3 p15 p17
+    face = p3 p2 p14 p15
+    face = p2 p4 p16 p14
+    face = p4 p6 p18 p16
+    face = p6 p8 p20 p18
+    face = p20 p22 p34 p32
+    face = p22 p24 p36 p34
+    face = p24 p25 p37 p36
+    face = p25 p23 p35 p37
+    face = p23 p21 p33 p35
+    face = p21 p19 p31 p33
+    face = p19 p17 p29 p31
+    face = p17 p15 p27 p29
+    face = p15 p14 p26 p27
+    face = p14 p16 p28 p26
+    face = p16 p18 p30 p28
+    face = p18 p20 p32 p30
+    face = p32 p34 p46 p44
+    face = p34 p36 p48 p46
+    face = p36 p37 p49 p48
+    face = p37 p35 p47 p49
+    face = p35 p33 p45 p47
+    face = p33 p31 p43 p45
+    face = p31 p29 p41 p43
+    face = p29 p27 p39 p41
+    face = p27 p26 p38 p39
+    face = p26 p28 p40 p38
+    face = p28 p30 p42 p40
+    face = p30 p32 p44 p42
+    face = p44 p46 p58 p56
+    face = p46 p48 p60 p58
+    face = p48 p49 p61 p60
+    face = p49 p47 p59 p61
+    face = p47 p45 p57 p59
+    face = p45 p43 p55 p57
+    face = p43 p41 p53 p55
+    face = p41 p39 p51 p53
+    face = p39 p38 p50 p51
+    face = p38 p40 p52 p50
+    face = p40 p42 p54 p52
+    face = p42 p44 p56 p54
+    face = p56 p58 p62
+    face = p58 p60 p62
+    face = p60..p62
+    face = p61 p59 p62
+    face = p59 p57 p62
+    face = p57 p55 p62
+    face = p55 p53 p62
+    face = p53 p51 p62
+    face = p51 p50 p62
+    face = p50 p52 p62
+    face = p52 p54 p62
+    face = p54 p56 p62
+  end
+  pull
+    points = (
+      1' 1/2" east, 10.682628" south, 43.452228" up to
+      + 1.685256" north, 4.06446" down to + 4.4" east to
+      + 1.685256" south, 4.06446" up
+    )
+    by = 9.84" north, 4.08" up
+    paint = #565C64
+  end
+  box
+    at   = 13.1" east, 13.24" south, 40.02" up
+    size = 1.4" east, 3.4" north, 2.8" up
+    paint = #ACB3BB
+  end
+  box
+    at   = 14.9" east, 13.24" south, 40.02" up
+    size = 1.4" east, 3.4" north, 2.8" up
+    paint = #ACB3BB
+  end
+  solid
+    paint = #565C64
+    points
+      p1 = 9.7" west, 0 north, 55.1" up
+      p2 = 9.7" west, 1.7" south, 55.555512" up
+      p3 = 10.55" west, 1.472244" south, 55.555512" up
+      p4 = p3 + 1.7" east
+      p5 = 11.17224" west, 0.85" south, 55.555512" up
+      p6 = p5 + 2.944488" east
+      p7 = 11.4" west, 0 north, 55.555512" up
+      p8 = p7 + 3.4" east
+      p9 = p5 + 1.7" north
+      p10 = p9 + 2.944488" east
+      p11 = p3 + 2.944488" north
+      p12 = p11 + 1.7" east
+      p13 = p2 + 3.4" north
+      p14 = 9.7" west, 2.944488" south, 56.8" up
+      p15 = 11.17224" west, 2.55" south, 56.8" up
+      p16 = p15 + 2.944488" east
+      p17 = 1' 1/4" west, 1.472244" south, 56.8" up
+      p18 = p17 + 5.1" east
+      p19 = 12.644484" west, 0 north, 56.8" up
+      p20 = p19 + 5.888976" east
+      p21 = p17 + 2.944488" north
+      p22 = p21 + 5.1" east
+      p23 = p15 + 5.1" north
+      p24 = p23 + 2.944488" east
+      p25 = p14 + 5.888976" north
+      p26 = 9.7" west, 3.4" south, 4' 10 1/2" up
+      p27 = 11.4" west, 2.944488" south, 4' 10 1/2" up
+      p28 = p27 + 3.4" east
+      p29 = 12.644484" west, 1.7" south, 4' 10 1/2" up
+      p30 = p29 + 5.888976" east
+      p31 = 13.1" west, 0 north, 4' 10 1/2" up
+      p32 = p31 + 6.8" east
+      p33 = p29 + 3.4" north
+      p34 = p33 + 5.888976" east
+      p35 = p27 + 5.888976" north
+      p36 = p35 + 3.4" east
+      p37 = p26 + 6.8" north
+      p38 = p14 + 3.4" up
+      p39 = p15 + 3.4" up
+      p40 = p39 + 2.944488" east
+      p41 = p17 + 3.4" up
+      p42 = p41 + 5.1" east
+      p43 = p19 + 3.4" up
+      p44 = p43 + 5.888976" east
+      p45 = p41 + 2.944488" north
+      p46 = p45 + 5.1" east
+      p47 = p39 + 5.1" north
+      p48 = p47 + 2.944488" east
+      p49 = p38 + 5.888976" north
+      p50 = p2 + 5.888976" up
+      p51 = p3 + 5.888976" up
+      p52 = p51 + 1.7" east
+      p53 = p5 + 5.888976" up
+      p54 = p53 + 2.944488" east
+      p55 = p7 + 5.888976" up
+      p56 = p55 + 3.4" east
+      p57 = p53 + 1.7" north
+      p58 = p57 + 2.944488" east
+      p59 = p51 + 2.944488" north
+      p60 = p59 + 1.7" east
+      p61 = p50 + 3.4" north
+      p62 = p1 + 6.8" up
+    end
+    face = p10 p8 p1
+    face = p12 p10 p1
+    face = p13 p12 p1
+    face = p11 p13 p1
+    face = p9 p11 p1
+    face = p7 p9 p1
+    face = p5 p7 p1
+    face = p3 p5 p1
+    face = p2 p3 p1
+    face = p4 p2 p1
+    face = p6 p4 p1
+    face = p8 p6 p1
+    face = p8 p10 p22 p20
+    face = p10 p12 p24 p22
+    face = p12 p13 p25 p24
+    face = p13 p11 p23 p25
+    face = p11 p9 p21 p23
+    face = p9 p7 p19 p21
+    face = p7 p5 p17 p19
+    face = p5 p3 p15 p17
+    face = p3 p2 p14 p15
+    face = p2 p4 p16 p14
+    face = p4 p6 p18 p16
+    face = p6 p8 p20 p18
+    face = p20 p22 p34 p32
+    face = p22 p24 p36 p34
+    face = p24 p25 p37 p36
+    face = p25 p23 p35 p37
+    face = p23 p21 p33 p35
+    face = p21 p19 p31 p33
+    face = p19 p17 p29 p31
+    face = p17 p15 p27 p29
+    face = p15 p14 p26 p27
+    face = p14 p16 p28 p26
+    face = p16 p18 p30 p28
+    face = p18 p20 p32 p30
+    face = p32 p34 p46 p44
+    face = p34 p36 p48 p46
+    face = p36 p37 p49 p48
+    face = p37 p35 p47 p49
+    face = p35 p33 p45 p47
+    face = p33 p31 p43 p45
+    face = p31 p29 p41 p43
+    face = p29 p27 p39 p41
+    face = p27 p26 p38 p39
+    face = p26 p28 p40 p38
+    face = p28 p30 p42 p40
+    face = p30 p32 p44 p42
+    face = p44 p46 p58 p56
+    face = p46 p48 p60 p58
+    face = p48 p49 p61 p60
+    face = p49 p47 p59 p61
+    face = p47 p45 p57 p59
+    face = p45 p43 p55 p57
+    face = p43 p41 p53 p55
+    face = p41 p39 p51 p53
+    face = p39 p38 p50 p51
+    face = p38 p40 p52 p50
+    face = p40 p42 p54 p52
+    face = p42 p44 p56 p54
+    face = p56 p58 p62
+    face = p58 p60 p62
+    face = p60..p62
+    face = p61 p59 p62
+    face = p59 p57 p62
+    face = p57 p55 p62
+    face = p55 p53 p62
+    face = p53 p51 p62
+    face = p51 p50 p62
+    face = p50 p52 p62
+    face = p52 p54 p62
+    face = p54 p56 p62
+  end
+  pull
+    points = (
+      16.753356" west, 2.2" south, 46.289748" up to
+      + 4.106712" east, 1.5795" down to + 5" east, 1' 1" up to
+      + 4.10672" west, 1.579508" up
+    )
+    by = 4.4" north
+    paint = #ACB3BB
+  end
+  solid
+    paint = #565C64
+    points
+      p1 = 14.7" west, 0 north, 43.2" up
+      p2 = 14.7" west, 1.15" south, 43.508136" up
+      p3 = 15.275" west, 0.995928" south, 43.508136" up
+      p4 = p3 + 1.15" east
+      p5 = 15.695928" west, 0.575" south, 43.508136" up
+      p6 = p5 + 1.991856" east
+      p7 = 15.85" west, 0 north, 43.508136" up
+      p8 = p7 + 2.3" east
+      p9 = p5 + 1.15" north
+      p10 = p9 + 1.991856" east
+      p11 = p3 + 1.991856" north
+      p12 = p11 + 1.15" east
+      p13 = p2 + 2.3" north
+      p14 = 14.7" west, 1.991856" south, 44.35" up
+      p15 = 15.695928" west, 1.725" south, 44.35" up
+      p16 = p15 + 1.991856" east
+      p17 = 16.425" west, 0.995928" south, 44.35" up
+      p18 = p17 + 3.45" east
+      p19 = 16.691856" west, 0 north, 44.35" up
+      p20 = p19 + 3.983712" east
+      p21 = p17 + 1.991856" north
+      p22 = p21 + 3.45" east
+      p23 = p15 + 3.45" north
+      p24 = p23 + 1.991856" east
+      p25 = p14 + 3.983712" north
+      p26 = 14.7" west, 2.3" south, 3' 9 1/2" up
+      p27 = 15.85" west, 1.991856" south, 3' 9 1/2" up
+      p28 = p27 + 2.3" east
+      p29 = 16.691856" west, 1.15" south, 3' 9 1/2" up
+      p30 = p29 + 3.983712" east
+      p31 = 1' 5" west, 0 north, 3' 9 1/2" up
+      p32 = p31 + 4.6" east
+      p33 = p29 + 2.3" north
+      p34 = p33 + 3.983712" east
+      p35 = p27 + 3.983712" north
+      p36 = p35 + 2.3" east
+      p37 = p26 + 4.6" north
+      p38 = p14 + 2.3" up
+      p39 = p15 + 2.3" up
+      p40 = p39 + 1.991856" east
+      p41 = p17 + 2.3" up
+      p42 = p41 + 3.45" east
+      p43 = p19 + 2.3" up
+      p44 = p43 + 3.983712" east
+      p45 = p41 + 1.991856" north
+      p46 = p45 + 3.45" east
+      p47 = p39 + 3.45" north
+      p48 = p47 + 1.991856" east
+      p49 = p38 + 3.983712" north
+      p50 = p2 + 3.983724" up
+      p51 = p3 + 3.983724" up
+      p52 = p51 + 1.15" east
+      p53 = p5 + 3.983724" up
+      p54 = p53 + 1.991856" east
+      p55 = p7 + 3.983724" up
+      p56 = p55 + 2.3" east
+      p57 = p53 + 1.15" north
+      p58 = p57 + 1.991856" east
+      p59 = p51 + 1.991856" north
+      p60 = p59 + 1.15" east
+      p61 = p50 + 2.3" north
+      p62 = p1 + 4.6" up
+    end
+    face = p10 p8 p1
+    face = p12 p10 p1
+    face = p13 p12 p1
+    face = p11 p13 p1
+    face = p9 p11 p1
+    face = p7 p9 p1
+    face = p5 p7 p1
+    face = p3 p5 p1
+    face = p2 p3 p1
+    face = p4 p2 p1
+    face = p6 p4 p1
+    face = p8 p6 p1
+    face = p8 p10 p22 p20
+    face = p10 p12 p24 p22
+    face = p12 p13 p25 p24
+    face = p13 p11 p23 p25
+    face = p11 p9 p21 p23
+    face = p9 p7 p19 p21
+    face = p7 p5 p17 p19
+    face = p5 p3 p15 p17
+    face = p3 p2 p14 p15
+    face = p2 p4 p16 p14
+    face = p4 p6 p18 p16
+    face = p6 p8 p20 p18
+    face = p20 p22 p34 p32
+    face = p22 p24 p36 p34
+    face = p24 p25 p37 p36
+    face = p25 p23 p35 p37
+    face = p23 p21 p33 p35
+    face = p21 p19 p31 p33
+    face = p19 p17 p29 p31
+    face = p17 p15 p27 p29
+    face = p15 p14 p26 p27
+    face = p14 p16 p28 p26
+    face = p16 p18 p30 p28
+    face = p18 p20 p32 p30
+    face = p32 p34 p46 p44
+    face = p34 p36 p48 p46
+    face = p36 p37 p49 p48
+    face = p37 p35 p47 p49
+    face = p35 p33 p45 p47
+    face = p33 p31 p43 p45
+    face = p31 p29 p41 p43
+    face = p29 p27 p39 p41
+    face = p27 p26 p38 p39
+    face = p26 p28 p40 p38
+    face = p28 p30 p42 p40
+    face = p30 p32 p44 p42
+    face = p44 p46 p58 p56
+    face = p46 p48 p60 p58
+    face = p48 p49 p61 p60
+    face = p49 p47 p59 p61
+    face = p47 p45 p57 p59
+    face = p45 p43 p55 p57
+    face = p43 p41 p53 p55
+    face = p41 p39 p51 p53
+    face = p39 p38 p50 p51
+    face = p38 p40 p52 p50
+    face = p40 p42 p54 p52
+    face = p42 p44 p56 p54
+    face = p56 p58 p62
+    face = p58 p60 p62
+    face = p60..p62
+    face = p61 p59 p62
+    face = p59 p57 p62
+    face = p57 p55 p62
+    face = p55 p53 p62
+    face = p53 p51 p62
+    face = p51 p50 p62
+    face = p50 p52 p62
+    face = p52 p54 p62
+    face = p54 p56 p62
+  end
+  pull
+    points = (
+      16.9" west, 10.682628" south, 43.452228" up to
+      + 1.685256" north, 4.06446" down to + 4.4" east to
+      + 1.685256" south, 4.06446" up
+    )
+    by = 9.84" north, 4.08" up
+    paint = #565C64
+  end
+  box
+    at   = 16.3" west, 13.24" south, 40.02" up
+    size = 1.4" east, 3.4" north, 2.8" up
+    paint = #ACB3BB
+  end
+  box
+    at   = 1' 2 1/2" west, 13.24" south, 40.02" up
+    size = 1.4" east, 3.4" north, 2.8" up
+    paint = #ACB3BB
+  end
+  box
+    at   = 2.6" west, 2.6" south, 5' 2 1/2" up
+    size = 5.2" east, 5.2" north, 3" up
+    paint = #565C64
+  end
+  box
+    at   = 5 1/2" west, 4 1/2" south, 5' 5 1/2" up
+    size = 11" east, 9" north, 9" up
+    paint = #ACB3BB
+  end
+  box
+    at   = 1.4" east, 4.85" south, 70.6" up
+    size = 3" east, 0.35" north, 2.4" up
+    paint = orange
+    width = 0.8
+  end
+  box
+    at   = 4.4" west, 4.85" south, 70.6" up
+    size = 3" east, 0.35" north, 2.4" up
+    paint = orange
+    width = 0.8
+  end
+  box
+    at   = 5.7" west, 4 3/4" south, 66.7" up
+    size = 11.4" east, 1/4" north, 1.8" up
+    paint = #565C64
+    width = 0.8
+  end
+  box
+    at   = 0.35" west, 0.35" south, 6' 2 1/2" up
+    size = 0.7" east, 0.7" north, 5 1/2" up
+    paint = #565C64
+    width = 0.8
+  end
+  box
+    at   = 1.1" west, 1.1" south, 6' 8" up
+    size = 2.2" east, 2.2" north, 1 1/2" up
+    paint = #C83020
+    width = 0.8
+  end
+  solid
+    paint = #C83020
+    points
+      p1 = 5.3" west, 6.85" south, 3' 9 1/2" up
+      p2 = p1 + 10.6" east
+      p3 = p1 + 1 1/4" north
+      p4 = p3 + 10.6" east
+      p5 = 5.455764" west, 6.85" south, 45.51756" up
+      p6 = p5 + 10.911528" east
+      p7 = p5 + 1 1/4" north
+      p8 = p7 + 10.911528" east
+      p9 = 5.603724" west, 6.85" south, 45.569328" up
+      p10 = p9 + 11.207448" east
+      p11 = p9 + 1 1/4" north
+      p12 = p11 + 11.207448" east
+      p13 = 5.736444" west, 6.85" south, 45.652716" up
+      p14 = p13 + 11.472888" east
+      p15 = p13 + 1 1/4" north
+      p16 = p15 + 11.472888" east
+      p17 = 5.847288" west, 6.85" south, 45.76356" up
+      p18 = p17 + 11.694576" east
+      p19 = p17 + 1 1/4" north
+      p20 = p19 + 11.694576" east
+      p21 = 5.930676" west, 6.85" south, 45.89628" up
+      p22 = p21 + 11.861352" east
+      p23 = p21 + 1 1/4" north
+      p24 = p23 + 11.861352" east
+      p25 = 3 3/4" west, 7.27" south, 3' 10" up
+      p26 = p25 + 7 1/2" east
+      p27 = p25 + 0.48" north
+      p28 = p27 + 7 1/2" east
+      p29 = 3.94314" west, 7.27" south, 46.030596" up
+      p30 = p29 + 0.38628" east
+      p31 = p30 + 7.11372" east
+      p32 = p31 + 0.38628" east
+      p33 = p29 + 0.48" north
+      p34 = p33 + 0.38628" east
+      p35 = p34 + 7.11372" east
+      p36 = p35 + 0.38628" east
+      p37 = 5.982444" west, 6.85" south, 46.04424" up
+      p38 = p37 + 11.964888" east
+      p39 = p37 + 1 1/4" north
+      p40 = p39 + 11.964888" east
+      p41 = 4.117368" west, 7.27" south, 46.119372" up
+      p42 = p41 + 0.734736" east
+      p43 = p42 + 6.765264" east
+      p44 = p43 + 0.734736" east
+      p45 = p41 + 0.48" north
+      p46 = p45 + 0.734736" east
+      p47 = p46 + 6.765264" east
+      p48 = p47 + 0.734736" east
+      p49 = 6" west, 6.85" south, 46.2" up
+      p50 = p49 + 1' east
+      p51 = p49 + 1 1/4" north
+      p52 = p51 + 1' east
+      p53 = 4.255632" west, 7.27" south, 46.257636" up
+      p54 = p53 + 1.011264" east
+      p55 = p54 + 6.488736" east
+      p56 = p55 + 1.011264" east
+      p57 = p53 + 0.48" north
+      p58 = p57 + 1.011264" east
+      p59 = p58 + 6.488736" east
+      p60 = p59 + 1.011264" east
+      p61 = 4.344408" west, 7.27" south, 46.431864" up
+      p62 = p61 + 1.188816" east
+      p63 = p62 + 6.311184" east
+      p64 = p63 + 1.188816" east
+      p65 = p61 + 0.48" north
+      p66 = p65 + 1.188816" east
+      p67 = p66 + 6.311184" east
+      p68 = p67 + 1.188816" east
+      p69 = 4 3/8" west, 7.27" south, 3' 10 5/8" up
+      p70 = p69 + 1 1/4" east
+      p71 = p70 + 6 1/4" east
+      p72 = p71 + 1 1/4" east
+      p73 = p69 + 0.48" north
+      p74 = p73 + 1 1/4" east
+      p75 = p74 + 6 1/4" east
+      p76 = p75 + 1 1/4" east
+      p77 = p61 + 0.38628" up
+      p78 = p77 + 1.188816" east
+      p79 = p78 + 6.311184" east
+      p80 = p79 + 1.188816" east
+      p81 = p77 + 0.48" north
+      p82 = p81 + 1.188816" east
+      p83 = p82 + 6.311184" east
+      p84 = p83 + 1.188816" east
+      p85 = p53 + 0.734736" up
+      p86 = p85 + 1.011264" east
+      p87 = p86 + 6.488736" east
+      p88 = p87 + 1.011264" east
+      p89 = p85 + 0.48" north
+      p90 = p89 + 1.011264" east
+      p91 = p90 + 6.488736" east
+      p92 = p91 + 1.011264" east
+      p93 = p41 + 1.011264" up
+      p94 = p93 + 0.734736" east
+      p95 = p94 + 6.765264" east
+      p96 = p95 + 0.734736" east
+      p97 = p93 + 0.48" north
+      p98 = p97 + 0.734736" east
+      p99 = p98 + 6.765264" east
+      p100 = p99 + 0.734736" east
+      p101 = p29 + 1.188816" up
+      p102 = p101 + 0.38628" east
+      p103 = p102 + 7.11372" east
+      p104 = p103 + 0.38628" east
+      p105 = p101 + 0.48" north
+      p106 = p105 + 0.38628" east
+      p107 = p106 + 7.11372" east
+      p108 = p107 + 0.38628" east
+      p109 = p25 + 1 1/4" up
+      p110 = p109 + 7 1/2" east
+      p111 = p109 + 0.48" north
+      p112 = p111 + 7 1/2" east
+      p113 = 4.2" west, 6.85" south, 3' 11 3/4" up
+      p114 = p113 + 8.4" east
+      p115 = p113 + 0.12" north
+      p116 = p115 + 8.4" east
+      p117 = 4.266756" west, 6.85" south, 47.757528" up
+      p118 = p117 + 8.533512" east
+      p119 = p117 + 0.12" north
+      p120 = p119 + 8.533512" east
+      p121 = 4.330164" west, 6.85" south, 47.779716" up
+      p122 = p121 + 8.660328" east
+      p123 = p121 + 0.12" north
+      p124 = p123 + 8.660328" east
+      p125 = 4.387044" west, 6.85" south, 47.815452" up
+      p126 = p125 + 8.774088" east
+      p127 = p125 + 0.12" north
+      p128 = p127 + 8.774088" east
+      p129 = 4.434552" west, 6.85" south, 47.86296" up
+      p130 = p129 + 8.869104" east
+      p131 = p129 + 0.12" north
+      p132 = p131 + 8.869104" east
+      p133 = 4.470288" west, 6.85" south, 47.91984" up
+      p134 = p133 + 8.940576" east
+      p135 = p133 + 0.12" north
+      p136 = p135 + 8.940576" east
+      p137 = 4.492476" west, 6.85" south, 47.983248" up
+      p138 = p137 + 8.984952" east
+      p139 = p137 + 0.12" north
+      p140 = p139 + 8.984952" east
+      p141 = 4 1/2" west, 6.85" south, 48.05" up
+      p142 = p141 + 9" east
+      p143 = p141 + 0.12" north
+      p144 = p143 + 9" east
+      p145 = 0.8" west, 6.73" south, 48.1" up
+      p146 = p145 + 0.7" east
+      p147 = p146 + 0.2" east
+      p148 = p147 + 0.7" east
+      p149 = 1.2" west, 6.73" south, 48.9" up
+      p150 = p149 + 0.4" east
+      p151 = p150 + 0.7" east
+      p152 = p151 + 0.2" east
+      p153 = p152 + 0.7" east
+      p154 = p153 + 0.4" east
+      p155 = 2.4" west, 6.73" south, 49.9" up
+      p156 = p155 + 1.2" east
+      p157 = p156 + 2.4" east
+      p158 = p157 + 1.2" east
+      p159 = p155 + 0.6" up
+      p160 = p159 + 1.2" east
+      p161 = p160 + 2.4" east
+      p162 = p161 + 1.2" east
+      p163 = p160 + 0.6" up
+      p164 = p163 + 0.4" east
+      p165 = p164 + 1.6" east
+      p166 = p165 + 0.4" east
+      p167 = 1/2" west, 6.73" south, 51.6" up
+      p168 = p167 + 0.3" east
+      p169 = p168 + 0.4" east
+      p170 = p169 + 0.3" east
+      p171 = p167 + 0.3" up
+      p172 = p171 + 0.3" east
+      p173 = p172 + 0.4" east
+      p174 = p173 + 0.3" east
+      p175 = p164 + 1.3" up
+      p176 = p175 + 1.6" east
+      p177 = p141 + 4.9" up
+      p178 = p177 + 9" east
+      p179 = p177 + 0.12" north
+      p180 = p179 + 9" east
+      p181 = p137 + 5.033508" up
+      p182 = p181 + 8.984952" east
+      p183 = p181 + 0.12" north
+      p184 = p183 + 8.984952" east
+      p185 = p133 + 5.160324" up
+      p186 = p185 + 8.940576" east
+      p187 = p185 + 0.12" north
+      p188 = p187 + 8.940576" east
+      p189 = p129 + 5.274096" up
+      p190 = p189 + 8.869104" east
+      p191 = p189 + 0.12" north
+      p192 = p191 + 8.869104" east
+      p193 = p125 + 5.3691" up
+      p194 = p193 + 8.774088" east
+      p195 = p193 + 0.12" north
+      p196 = p195 + 8.774088" east
+      p197 = p121 + 5.440584" up
+      p198 = p197 + 8.660328" east
+      p199 = p197 + 0.12" north
+      p200 = p199 + 8.660328" east
+      p201 = p117 + 5.48496" up
+      p202 = p201 + 8.533512" east
+      p203 = p201 + 0.12" north
+      p204 = p203 + 8.533512" east
+      p205 = p113 + 5 1/2" up
+      p206 = p205 + 8.4" east
+      p207 = p205 + 0.12" north
+      p208 = p207 + 8.4" east
+      p209 = 3.525" west, 6.912504" south, 53.55" up
+      p210 = p209 + 0.15" east
+      p211 = p210 + 0.15" east
+      p212 = p211 + 0.15" east
+      p213 = p212 + 0.075" east
+      p214 = p213 + 0.45" east
+      p215 = p214 + 0.075" east
+      p216 = p215 + 0.45" east
+      p217 = p216 + 0.075" east
+      p218 = p217 + 0.15" east
+      p219 = p218 + 0.15" east
+      p220 = p219 + 0.15" east
+      p221 = p220 + 0.075" east
+      p222 = p221 + 0.45" east
+      p223 = p222 + 0.075" east
+      p224 = p223 + 0.15" east
+      p225 = p224 + 0.15" east
+      p226 = p225 + 0.15" east
+      p227 = p226 + 0.075" east
+      p228 = p227 + 0.45" east
+      p229 = p228 + 3/8" east
+      p230 = p229 + 0.45" east
+      p231 = p230 + 0.075" east
+      p232 = p231 + 0.15" east
+      p233 = p232 + 0.15" east
+      p234 = p233 + 0.15" east
+      p235 = p234 + 0.075" east
+      p236 = p235 + 0.45" east
+      p237 = p236 + 0.225" east
+      p238 = p237 + 0.15" east
+      p239 = p238 + 0.225" east
+      p240 = p239 + 0.45" east
+      p241 = p240 + 0.075" east
+      p242 = p241 + 0.15" east
+      p243 = p242 + 0.15" east
+      p244 = p243 + 0.15" east
+      p245 = p209 + 1/16" north
+      p246 = p245 + 0.15" east
+      p247 = p246 + 0.15" east
+      p248 = p247 + 0.15" east
+      p249 = p248 + 0.075" east
+      p250 = p249 + 0.45" east
+      p251 = p250 + 0.075" east
+      p252 = p251 + 0.45" east
+      p253 = p252 + 0.075" east
+      p254 = p253 + 0.15" east
+      p255 = p254 + 0.15" east
+      p256 = p255 + 0.15" east
+      p257 = p256 + 0.075" east
+      p258 = p257 + 0.45" east
+      p259 = p258 + 0.075" east
+      p260 = p259 + 0.15" east
+      p261 = p260 + 0.15" east
+      p262 = p261 + 0.15" east
+      p263 = p262 + 0.075" east
+      p264 = p263 + 0.45" east
+      p265 = p264 + 3/8" east
+      p266 = p265 + 0.45" east
+      p267 = p266 + 0.075" east
+      p268 = p267 + 0.15" east
+      p269 = p268 + 0.15" east
+      p270 = p269 + 0.15" east
+      p271 = p270 + 0.075" east
+      p272 = p271 + 0.45" east
+      p273 = p272 + 0.225" east
+      p274 = p273 + 0.15" east
+      p275 = p274 + 0.225" east
+      p276 = p275 + 0.45" east
+      p277 = p276 + 0.075" east
+      p278 = p277 + 0.15" east
+      p279 = p278 + 0.15" east
+      p280 = p279 + 0.15" east
+      p281 = 2.85" west, 6.912504" south, 53.7" up
+      p282 = p281 + 0.3" east
+      p283 = p282 + 0.225" east
+      p284 = p283 + 0.3" east
+      p285 = p284 + 3/4" east
+      p286 = p285 + 0.3" east
+      p287 = p286 + 0.6" east
+      p288 = p287 + 0.3" east
+      p289 = p288 + 0.525" east
+      p290 = p289 + 0.3" east
+      p291 = p290 + 0.9" east
+      p292 = p291 + 0.3" east
+      p293 = p292 + 3/4" east
+      p294 = p293 + 0.3" east
+      p295 = p281 + 1/16" north
+      p296 = p295 + 0.3" east
+      p297 = p296 + 0.225" east
+      p298 = p297 + 0.3" east
+      p299 = p298 + 3/4" east
+      p300 = p299 + 0.3" east
+      p301 = p300 + 0.6" east
+      p302 = p301 + 0.3" east
+      p303 = p302 + 0.525" east
+      p304 = p303 + 0.3" east
+      p305 = p304 + 0.9" east
+      p306 = p305 + 0.3" east
+      p307 = p306 + 3/4" east
+      p308 = p307 + 0.3" east
+      p309 = p49 + 7.6" up
+      p310 = p309 + 1' east
+      p311 = p309 + 1 1/4" north
+      p312 = p311 + 1' east
+      p313 = p218 + 0.2625" up
+      p314 = p313 + 2.925" east
+      p315 = p313 + 1/16" north
+      p316 = p315 + 2.925" east
+      p317 = p210 + 0.3" up
+      p318 = p317 + 0.15" east
+      p319 = p318 + 3/8" east
+      p320 = p319 + 0.225" east
+      p321 = p320 + 1.35" east
+      p322 = p321 + 0.225" east
+      p323 = p322 + 0.3" east
+      p324 = p323 + 0.12" east
+      p325 = p324 + 0.15" east
+      p326 = p325 + 0.03" east
+      p327 = p326 + 0.075" east
+      p328 = p327 + 0.3" east
+      p329 = p328 + 0.525" east
+      p330 = p329 + 0.3" east
+      p331 = p330 + 0.9" east
+      p332 = p331 + 0.225" east
+      p333 = p332 + 1.35" east
+      p334 = p333 + 0.15" east
+      p335 = p317 + 1/16" north
+      p336 = p335 + 0.15" east
+      p337 = p336 + 3/8" east
+      p338 = p337 + 0.225" east
+      p339 = p338 + 1.35" east
+      p340 = p339 + 0.225" east
+      p341 = p340 + 0.3" east
+      p342 = p341 + 0.12" east
+      p343 = p342 + 0.15" east
+      p344 = p343 + 0.03" east
+      p345 = p344 + 0.075" east
+      p346 = p345 + 0.3" east
+      p347 = p346 + 0.525" east
+      p348 = p347 + 0.3" east
+      p349 = p348 + 0.9" east
+      p350 = p349 + 0.225" east
+      p351 = p350 + 1.35" east
+      p352 = p351 + 0.15" east
+      p353 = 1.725" west, 6.912504" south, 53.925" up
+      p354 = p353 + 2.925" east
+      p355 = p353 + 1/16" north
+      p356 = p355 + 2.925" east
+      p357 = p37 + 7.911528" up
+      p358 = p357 + 11.964888" east
+      p359 = p357 + 1 1/4" north
+      p360 = p359 + 11.964888" east
+      p361 = p317 + 0.15" up
+      p362 = p361 + 0.15" east
+      p363 = p362 + 3/8" east
+      p364 = p363 + 0.225" east
+      p365 = p364 + 1.35" east
+      p366 = p365 + 0.225" east
+      p367 = p366 + 0.3" east
+      p368 = p367 + 0.15" east
+      p369 = p368 + 3/8" east
+      p370 = p369 + 0.3" east
+      p371 = p370 + 0.525" east
+      p372 = p371 + 0.3" east
+      p373 = p372 + 3/4" east
+      p374 = p373 + 0.225" east
+      p375 = p374 + 1.35" east
+      p376 = p375 + 0.15" east
+      p377 = p361 + 1/16" north
+      p378 = p377 + 0.15" east
+      p379 = p378 + 3/8" east
+      p380 = p379 + 0.225" east
+      p381 = p380 + 1.35" east
+      p382 = p381 + 0.225" east
+      p383 = p382 + 0.3" east
+      p384 = p383 + 0.15" east
+      p385 = p384 + 3/8" east
+      p386 = p385 + 0.3" east
+      p387 = p386 + 0.525" east
+      p388 = p387 + 0.3" east
+      p389 = p388 + 3/4" east
+      p390 = p389 + 0.225" east
+      p391 = p390 + 1.35" east
+      p392 = p391 + 0.15" east
+      p393 = p313 + 0.225" up
+      p394 = p393 + 2.925" east
+      p395 = p393 + 1/16" north
+      p396 = p395 + 2.925" east
+      p397 = p21 + 8.207448" up
+      p398 = p397 + 11.861352" east
+      p399 = p397 + 1 1/4" north
+      p400 = p399 + 11.861352" east
+      p401 = p363 + 0.15" up
+      p402 = p401 + 0.3" east
+      p403 = p402 + 0.225" east
+      p404 = p403 + 0.3" east
+      p405 = p404 + 3/4" east
+      p406 = p405 + 0.3" east
+      p407 = p406 + 0.225" east
+      p408 = p407 + 0.15" east
+      p409 = p408 + 3/8" east
+      p410 = p409 + 0.3" east
+      p411 = p410 + 0.525" east
+      p412 = p411 + 0.3" east
+      p413 = p412 + 3/4" east
+      p414 = p413 + 0.3" east
+      p415 = p414 + 0.075" east
+      p416 = p415 + 0.15" east
+      p417 = p416 + 0.15" east
+      p418 = p417 + 0.15" east
+      p419 = p418 + 0.225" east
+      p420 = p419 + 0.3" east
+      p421 = p401 + 1/16" north
+      p422 = p421 + 0.3" east
+      p423 = p422 + 0.225" east
+      p424 = p423 + 0.3" east
+      p425 = p424 + 3/4" east
+      p426 = p425 + 0.3" east
+      p427 = p426 + 0.225" east
+      p428 = p427 + 0.15" east
+      p429 = p428 + 3/8" east
+      p430 = p429 + 0.3" east
+      p431 = p430 + 0.525" east
+      p432 = p431 + 0.3" east
+      p433 = p432 + 3/4" east
+      p434 = p433 + 0.3" east
+      p435 = p434 + 0.075" east
+      p436 = p435 + 0.15" east
+      p437 = p436 + 0.15" east
+      p438 = p437 + 0.15" east
+      p439 = p438 + 0.225" east
+      p440 = p439 + 0.3" east
+      p441 = p17 + 8.472888" up
+      p442 = p441 + 11.694576" east
+      p443 = p441 + 1 1/4" north
+      p444 = p443 + 11.694576" east
+      p445 = p209 + 3/4" up
+      p446 = p445 + 0.15" east
+      p447 = p446 + 0.15" east
+      p448 = p447 + 0.15" east
+      p449 = p448 + 0.075" east
+      p450 = p449 + 0.45" east
+      p451 = p450 + 0.075" east
+      p452 = p451 + 0.45" east
+      p453 = p452 + 0.075" east
+      p454 = p453 + 0.15" east
+      p455 = p454 + 0.15" east
+      p456 = p455 + 0.15" east
+      p457 = p456 + 0.075" east
+      p458 = p457 + 0.45" east
+      p459 = p458 + 0.075" east
+      p460 = p459 + 0.45" east
+      p461 = p460 + 0.075" east
+      p462 = p461 + 0.45" east
+      p463 = p462 + 3/8" east
+      p464 = p463 + 0.45" east
+      p465 = p464 + 0.075" east
+      p466 = p465 + 0.15" east
+      p467 = p466 + 0.15" east
+      p468 = p467 + 0.15" east
+      p469 = p468 + 0.075" east
+      p470 = p469 + 0.45" east
+      p471 = p470 + 0.075" east
+      p472 = p471 + 0.45" east
+      p473 = p472 + 0.075" east
+      p474 = p473 + 0.45" east
+      p475 = p474 + 0.075" east
+      p476 = p475 + 0.15" east
+      p477 = p476 + 0.15" east
+      p478 = p477 + 0.15" east
+      p479 = p445 + 1/16" north
+      p480 = p479 + 0.15" east
+      p481 = p480 + 0.15" east
+      p482 = p481 + 0.15" east
+      p483 = p482 + 0.075" east
+      p484 = p483 + 0.45" east
+      p485 = p484 + 0.075" east
+      p486 = p485 + 0.45" east
+      p487 = p486 + 0.075" east
+      p488 = p487 + 0.15" east
+      p489 = p488 + 0.15" east
+      p490 = p489 + 0.15" east
+      p491 = p490 + 0.075" east
+      p492 = p491 + 0.45" east
+      p493 = p492 + 0.075" east
+      p494 = p493 + 0.45" east
+      p495 = p494 + 0.075" east
+      p496 = p495 + 0.45" east
+      p497 = p496 + 3/8" east
+      p498 = p497 + 0.45" east
+      p499 = p498 + 0.075" east
+      p500 = p499 + 0.15" east
+      p501 = p500 + 0.15" east
+      p502 = p501 + 0.15" east
+      p503 = p502 + 0.075" east
+      p504 = p503 + 0.45" east
+      p505 = p504 + 0.075" east
+      p506 = p505 + 0.45" east
+      p507 = p506 + 0.075" east
+      p508 = p507 + 0.45" east
+      p509 = p508 + 0.075" east
+      p510 = p509 + 0.15" east
+      p511 = p510 + 0.15" east
+      p512 = p511 + 0.15" east
+      p513 = p13 + 8.694576" up
+      p514 = p513 + 11.472888" east
+      p515 = p513 + 1 1/4" north
+      p516 = p515 + 11.472888" east
+      p517 = p9 + 8.861352" up
+      p518 = p517 + 11.207448" east
+      p519 = p517 + 1 1/4" north
+      p520 = p519 + 11.207448" east
+      p521 = p5 + 8.964888" up
+      p522 = p521 + 10.911528" east
+      p523 = p521 + 1 1/4" north
+      p524 = p523 + 10.911528" east
+      p525 = p1 + 9" up
+      p526 = p525 + 10.6" east
+      p527 = p525 + 1 1/4" north
+      p528 = p527 + 10.6" east
+    end
+    face   { facing north }
+      points = (
+        p3 p7 p11 p15 p19 p23 p39 p51 p311 p359 p399 p443 p515 p519 p523 p527
+        p528 p524 p520 p516 p444 p400 p360 p312 p52 p40 p24 p20 p16 p12 p8 p4
+      )
+      ink = #C83020
+    end
+    face   { facing south }
+      points = (
+        p2 p6 p10 p14 p18 p22 p38 p50 p310 p358 p398 p442 p514 p518 p522 p526
+        p525 p521 p517 p513 p441 p397 p357 p309 p49 p37 p21 p17 p13 p9 p5 p1
+      )
+      hole = (
+        p113 p117 p121 p125 p129 p133 p137 p141 p177 p181 p185 p189 p193 p197
+        p201 p205 p206 p202 p198 p194 p190 p186 p182 p178 p142 p138 p134 p130
+        p126 p122 p118 p114
+      )
+      hole = p479 p480 p377 p378 p481 p482 p248 p247 p336 p335 p246 p245
+      hole = p483 p484 p422 p421 p379 p380 p338 p337 p295 p296 p250 p249
+      hole = p485 p486 p424 p423 p297 p298 p252 p251
+      hole = p487 p488 p395 p489 p490 p355 p256 p255 p315 p254 p253
+      hole = p491 p492 p426 p425 p381 p382 p340 p339 p299 p300 p258 p257
+      hole = p493 p494 p344 p343 p262 p261 p342 p341 p260 p259
+      hole = p263 p264 p386 p385 p429 p430 p496 p495 p345 p346 p302 p301
+      hole = p265 p266 p388 p387 p431 p432 p498 p497 p347 p348 p304 p303
+      hole = p499 p500 p396 p501 p502 p356 p270 p269 p316 p268 p267
+      hole = p503 p504 p434 p433 p389 p390 p350 p349 p305 p306 p272 p271
+      hole = p436 p435 p505 p506 p438 p437 p274 p273
+      hole = p507 p508 p440 p439 p307 p308 p276 p275
+      hole = p509 p510 p391 p392 p511 p512 p280 p279 p352 p351 p278 p277
+      ink = #C83020
+    end
+    face
+      points = p4 p8 p6 p2
+      ink = #C83020
+    end
+    face
+      points = p8 p12 p10 p6
+      ink = #C83020
+    end
+    face
+      points = p12 p16 p14 p10
+      ink = #C83020
+    end
+    face
+      points = p16 p20 p18 p14
+      ink = #C83020
+    end
+    face
+      points = p20 p24 p22 p18
+      ink = #C83020
+    end
+    face
+      points = p24 p40 p38 p22
+      ink = #C83020
+    end
+    face
+      points = p40 p52 p50 p38
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p52 p312 p310 p50
+      ink = #C83020
+    end
+    face
+      points = p312 p360 p358 p310
+      ink = #C83020
+    end
+    face
+      points = p360 p400 p398 p358
+      ink = #C83020
+    end
+    face
+      points = p400 p444 p442 p398
+      ink = #C83020
+    end
+    face
+      points = p444 p516 p514 p442
+      ink = #C83020
+    end
+    face
+      points = p516 p520 p518 p514
+      ink = #C83020
+    end
+    face
+      points = p520 p524 p522 p518
+      ink = #C83020
+    end
+    face
+      points = p524 p528 p526 p522
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p528 p527 p525 p526
+      ink = #C83020
+    end
+    face
+      points = p527 p523 p521 p525
+      ink = #C83020
+    end
+    face
+      points = p523 p519 p517 p521
+      ink = #C83020
+    end
+    face
+      points = p519 p515 p513 p517
+      ink = #C83020
+    end
+    face
+      points = p515 p443 p441 p513
+      ink = #C83020
+    end
+    face
+      points = p443 p399 p397 p441
+      ink = #C83020
+    end
+    face
+      points = p399 p359 p357 p397
+      ink = #C83020
+    end
+    face
+      points = p359 p311 p309 p357
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p311 p51 p49 p309
+      ink = #C83020
+    end
+    face
+      points = p51 p39 p37 p49
+      ink = #C83020
+    end
+    face
+      points = p39 p23 p21 p37
+      ink = #C83020
+    end
+    face
+      points = p23 p19 p17 p21
+      ink = #C83020
+    end
+    face
+      points = p19 p15 p13 p17
+      ink = #C83020
+    end
+    face
+      points = p15 p11 p9 p13
+      ink = #C83020
+    end
+    face
+      points = p11 p7 p5 p9
+      ink = #C83020
+    end
+    face
+      points = p7 p3 p1 p5
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p3 p4 p2 p1
+      ink = #C83020
+    end
+    face
+      points = p115 p119 p117 p113
+      ink = #C83020
+    end
+    face
+      points = p119 p123 p121 p117
+      ink = #C83020
+    end
+    face
+      points = p123 p127 p125 p121
+      ink = #C83020
+    end
+    face
+      points = p127 p131 p129 p125
+      ink = #C83020
+    end
+    face
+      points = p131 p135 p133 p129
+      ink = #C83020
+    end
+    face
+      points = p135 p139 p137 p133
+      ink = #C83020
+    end
+    face
+      points = p139 p143 p141 p137
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p143 p179 p177 p141
+      ink = #C83020
+    end
+    face
+      points = p179 p183 p181 p177
+      ink = #C83020
+    end
+    face
+      points = p183 p187 p185 p181
+      ink = #C83020
+    end
+    face
+      points = p187 p191 p189 p185
+      ink = #C83020
+    end
+    face
+      points = p191 p195 p193 p189
+      ink = #C83020
+    end
+    face
+      points = p195 p199 p197 p193
+      ink = #C83020
+    end
+    face
+      points = p199 p203 p201 p197
+      ink = #C83020
+    end
+    face
+      points = p203 p207 p205 p201
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p207 p208 p206 p205
+      ink = #C83020
+    end
+    face
+      points = p208 p204 p202 p206
+      ink = #C83020
+    end
+    face
+      points = p204 p200 p198 p202
+      ink = #C83020
+    end
+    face
+      points = p200 p196 p194 p198
+      ink = #C83020
+    end
+    face
+      points = p196 p192 p190 p194
+      ink = #C83020
+    end
+    face
+      points = p192 p188 p186 p190
+      ink = #C83020
+    end
+    face
+      points = p188 p184 p182 p186
+      ink = #C83020
+    end
+    face
+      points = p184 p180 p178 p182
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p180 p144 p142 p178
+      ink = #C83020
+    end
+    face
+      points = p144 p140 p138 p142
+      ink = #C83020
+    end
+    face
+      points = p140 p136 p134 p138
+      ink = #C83020
+    end
+    face
+      points = p136 p132 p130 p134
+      ink = #C83020
+    end
+    face
+      points = p132 p128 p126 p130
+      ink = #C83020
+    end
+    face
+      points = p128 p124 p122 p126
+      ink = #C83020
+    end
+    face
+      points = p124 p120 p118 p122
+      ink = #C83020
+    end
+    face
+      points = p120 p116 p114 p118
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p116 p115 p113 p114
+      ink = #C83020
+    end
+    face   { facing south }
+      points = (
+        p116 p120 p124 p128 p132 p136 p140 p144 p180 p184 p188 p192 p196 p200
+        p204 p208 p207 p203 p199 p195 p191 p187 p183 p179 p143 p139 p135 p131
+        p127 p123 p119 p115
+      )
+      hole = p175 p176 p165 p164
+      hole = p163 p166 p154 p149
+      hole = p159 p160 p156 p155
+      hole = p161 p162 p158 p157
+      hole = p150 p151 p146 p145
+      hole = p152 p153 p148 p147
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p209 p210 p317 p318 p211 p212 p448 p447 p362 p361 p446 p445
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p245 p246 p210 p209
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p246 p335 p317 p210
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p335 p336 p318 p317
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p336 p247 p211 p318
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p247 p248 p212 p211
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p248 p482 p448 p212
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p482 p481 p447 p448
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p481 p378 p362 p447
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p378 p377 p361 p362
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p377 p480 p446 p361
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p480 p479 p445 p446
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p479 p245 p209 p445
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p213 p214 p282 p281 p319 p320 p364 p363 p401 p402 p450 p449
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p249 p250 p214 p213
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p250 p296 p282 p214
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p296 p295 p281 p282
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p295 p337 p319 p281
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p337 p338 p320 p319
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p338 p380 p364 p320
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p380 p379 p363 p364
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p379 p421 p401 p363
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p421 p422 p402 p401
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p422 p484 p450 p402
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p484 p483 p449 p450
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p483 p249 p213 p449
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p215 p216 p284 p283 p403 p404 p452 p451
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p251 p252 p216 p215
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p252 p298 p284 p216
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p298 p297 p283 p284
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p297 p423 p403 p283
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p423 p424 p404 p403
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p424 p486 p452 p404
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p486 p485 p451 p452
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p485 p251 p215 p451
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p217 p218 p313 p219 p220 p353 p456 p455 p393 p454 p453
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p253 p254 p218 p217
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p254 p315 p313 p218
+      ink = #C83020
+    end
+    face
+      points = p315 p255 p219 p313
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p255 p256 p220 p219
+      ink = #C83020
+    end
+    face
+      points = p256 p355 p353 p220
+      ink = #C83020
+    end
+    face
+      points = p355 p490 p456 p353
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p490 p489 p455 p456
+      ink = #C83020
+    end
+    face
+      points = p489 p395 p393 p455
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p395 p488 p454 p393
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p488 p487 p453 p454
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p487 p253 p217 p453
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p221 p222 p286 p285 p321 p322 p366 p365 p405 p406 p458 p457
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p257 p258 p222 p221
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p258 p300 p286 p222
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p300 p299 p285 p286
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p299 p339 p321 p285
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p339 p340 p322 p321
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p340 p382 p366 p322
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p382 p381 p365 p366
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p381 p425 p405 p365
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p425 p426 p406 p405
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p426 p492 p458 p406
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p492 p491 p457 p458
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p491 p257 p221 p457
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p223 p224 p323 p324 p225 p226 p325 p326 p460 p459
+      hole = p367 p407 p408 p368
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p384 p428 p427 p383
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p259 p260 p224 p223
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p260 p341 p323 p224
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p341 p342 p324 p323
+      ink = #C83020
+    end
+    face
+      points = p342 p261 p225 p324
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p261 p262 p226 p225
+      ink = #C83020
+    end
+    face
+      points = p262 p343 p325 p226
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p343 p344 p326 p325
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p344 p494 p460 p326
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p494 p493 p459 p460
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p493 p259 p223 p459
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p383 p427 p407 p367
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p427 p428 p408 p407
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p428 p384 p368 p408
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p384 p383 p367 p368
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p227 p228 p370 p369 p409 p410 p462 p461 p327 p328 p288 p287
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p263 p264 p228 p227
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p264 p386 p370 p228
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p386 p385 p369 p370
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p385 p429 p409 p369
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p429 p430 p410 p409
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p430 p496 p462 p410
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p496 p495 p461 p462
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p495 p345 p327 p461
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p345 p346 p328 p327
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p346 p302 p288 p328
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p302 p301 p287 p288
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p301 p263 p227 p287
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p229 p230 p372 p371 p411 p412 p464 p463 p329 p330 p290 p289
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p265 p266 p230 p229
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p266 p388 p372 p230
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p388 p387 p371 p372
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p387 p431 p411 p371
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p431 p432 p412 p411
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p432 p498 p464 p412
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p498 p497 p463 p464
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p497 p347 p329 p463
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p347 p348 p330 p329
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p348 p304 p290 p330
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p304 p303 p289 p290
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p303 p265 p229 p289
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p231 p232 p314 p233 p234 p354 p468 p467 p394 p466 p465
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p267 p268 p232 p231
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p268 p316 p314 p232
+      ink = #C83020
+    end
+    face
+      points = p316 p269 p233 p314
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p269 p270 p234 p233
+      ink = #C83020
+    end
+    face
+      points = p270 p356 p354 p234
+      ink = #C83020
+    end
+    face
+      points = p356 p502 p468 p354
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p502 p501 p467 p468
+      ink = #C83020
+    end
+    face
+      points = p501 p396 p394 p467
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p396 p500 p466 p394
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p500 p499 p465 p466
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p499 p267 p231 p465
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p235 p236 p292 p291 p331 p332 p374 p373 p413 p414 p470 p469
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p271 p272 p236 p235
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p272 p306 p292 p236
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p306 p305 p291 p292
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p305 p349 p331 p291
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p349 p350 p332 p331
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p350 p390 p374 p332
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p390 p389 p373 p374
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p389 p433 p413 p373
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p433 p434 p414 p413
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p434 p504 p470 p414
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p504 p503 p469 p470
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p503 p271 p235 p469
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p237 p238 p417 p418 p472 p471 p415 p416
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p273 p274 p238 p237
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p274 p437 p417 p238
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p437 p438 p418 p417
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p438 p506 p472 p418
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p506 p505 p471 p472
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p505 p435 p415 p471
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p435 p436 p416 p415
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p436 p273 p237 p416
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p239 p240 p294 p293 p419 p420 p474 p473
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p275 p276 p240 p239
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p276 p308 p294 p240
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p308 p307 p293 p294
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p307 p439 p419 p293
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p439 p440 p420 p419
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p440 p508 p474 p420
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p508 p507 p473 p474
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p507 p275 p239 p473
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p241 p242 p333 p334 p243 p244 p478 p477 p376 p375 p476 p475
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p277 p278 p242 p241
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p278 p351 p333 p242
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p351 p352 p334 p333
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p352 p279 p243 p334
+      ink = #C83020
+    end
+    face   { facing down }
+      points = p279 p280 p244 p243
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p280 p512 p478 p244
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p512 p511 p477 p478
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p511 p392 p376 p477
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p392 p391 p375 p376
+      ink = #C83020
+    end
+    face   { facing east }
+      points = p391 p510 p476 p375
+      ink = #C83020
+    end
+    face   { facing up }
+      points = p510 p509 p475 p476
+      ink = #C83020
+    end
+    face   { facing west }
+      points = p509 p277 p241 p475
+      ink = #C83020
+    end
+    face   { facing south }
+      points = p164 p165 p176 p175
+      hole = p171 p172 p168 p167
+      hole = p173 p174 p170 p169
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p167 p168 p172 p171
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p169 p170 p174 p173
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p149 p154 p166 p163
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p155 p156 p160 p159
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p157 p158 p162 p161
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p145 p146 p151 p150
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = p147 p148 p153 p152
+      paint = #AEB4B8
+      ink = #AEB4B8
+    end
+    face   { facing south }
+      points = (
+        p70 p78 p86 p94 p102 p109 p101 p93 p85 p77 p69 p61 p53 p41 p29 p25 p30
+        p42 p54 p62
+      )
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face   { facing north }
+      points = (
+        p66 p58 p46 p34 p27 p33 p45 p57 p65 p73 p81 p89 p97 p105 p111 p106 p98
+        p90 p82 p74
+      )
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p74 p82 p78 p70
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p82 p90 p86 p78
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p90 p98 p94 p86
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p98 p106 p102 p94
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p106 p111 p109 p102
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p111 p105 p101 p109
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p105 p97 p93 p101
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p97 p89 p85 p93
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p89 p81 p77 p85
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p81 p73 p69 p77
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p73 p65 p61 p69
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p65 p57 p53 p61
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p57 p45 p41 p53
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p45 p33 p29 p41
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p33 p27 p25 p29
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p27 p34 p30 p25
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p34 p46 p42 p30
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p46 p58 p54 p42
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p58 p66 p62 p54
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p66 p74 p70 p62
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face   { facing south }
+      points = (
+        p72 p80 p88 p96 p104 p110 p103 p95 p87 p79 p71 p63 p55 p43 p31 p26 p32
+        p44 p56 p64
+      )
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face   { facing north }
+      points = (
+        p68 p60 p48 p36 p28 p35 p47 p59 p67 p75 p83 p91 p99 p107 p112 p108
+        p100 p92 p84 p76
+      )
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p76 p84 p80 p72
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p84 p92 p88 p80
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p92 p100 p96 p88
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p100 p108 p104 p96
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p108 p112 p110 p104
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p112 p107 p103 p110
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p107 p99 p95 p103
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p99 p91 p87 p95
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p91 p83 p79 p87
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p83 p75 p71 p79
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p75 p67 p63 p71
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p67 p59 p55 p63
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p59 p47 p43 p55
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p47 p35 p31 p43
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p35 p28 p26 p31
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p28 p36 p32 p26
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p36 p48 p44 p32
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p48 p60 p56 p44
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p60 p68 p64 p56
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    face
+      points = p68 p76 p72 p64
+      paint = #EEECE8
+      ink = #EEECE8
+    end
+    noface = p246 p245 p479 p480 p377 p378 p481 p482 p248 p247 p336 p335
+    noface = p250 p249 p483 p484 p422 p421 p379 p380 p338 p337 p295 p296
+    noface = p252 p251 p485 p486 p424 p423 p297 p298
+    noface = p254 p253 p487 p488 p395 p489 p490 p355 p256 p255 p315
+    noface = p258 p257 p491 p492 p426 p425 p381 p382 p340 p339 p299 p300
+    noface = p260 p259 p493 p494 p344 p343 p262 p261 p342 p341
+    noface = p264 p263 p301 p302 p346 p345 p495 p496 p430 p429 p385 p386
+    noface = p266 p265 p303 p304 p348 p347 p497 p498 p432 p431 p387 p388
+    noface = p268 p267 p499 p500 p396 p501 p502 p356 p270 p269 p316
+    noface = p272 p271 p503 p504 p434 p433 p389 p390 p350 p349 p305 p306
+    noface = p274 p273 p436 p435 p505 p506 p438 p437
+    noface = p276 p275 p507 p508 p440 p439 p307 p308
+    noface = p278 p277 p509 p510 p391 p392 p511 p512 p280 p279 p352 p351
+    noface = p368 p408 p407 p367
+    noface = p164..p166 p161 p157 p154..p149 p156 p160 p163
+    line
+      points = p245 to p246
+      ink = #1A1C20
+    end
+    line
+      points = p246 to p335
+      ink = #1A1C20
+    end
+    line
+      points = p335 to p336
+      ink = #1A1C20
+    end
+    line
+      points = p336 to p247
+      ink = #1A1C20
+    end
+    line
+      points = p247 to p248
+      ink = #1A1C20
+    end
+    line
+      points = p248 to p482
+      ink = #1A1C20
+    end
+    line
+      points = p482 to p481
+      ink = #1A1C20
+    end
+    line
+      points = p481 to p378
+      ink = #1A1C20
+    end
+    line
+      points = p378 to p377
+      ink = #1A1C20
+    end
+    line
+      points = p377 to p480
+      ink = #1A1C20
+    end
+    line
+      points = p480 to p479
+      ink = #1A1C20
+    end
+    line
+      points = p479 to p245
+      ink = #1A1C20
+    end
+    line
+      points = p249 to p250
+      ink = #1A1C20
+    end
+    line
+      points = p250 to p296
+      ink = #1A1C20
+    end
+    line
+      points = p296 to p295
+      ink = #1A1C20
+    end
+    line
+      points = p295 to p337
+      ink = #1A1C20
+    end
+    line
+      points = p337 to p338
+      ink = #1A1C20
+    end
+    line
+      points = p338 to p380
+      ink = #1A1C20
+    end
+    line
+      points = p380 to p379
+      ink = #1A1C20
+    end
+    line
+      points = p379 to p421
+      ink = #1A1C20
+    end
+    line
+      points = p421 to p422
+      ink = #1A1C20
+    end
+    line
+      points = p422 to p484
+      ink = #1A1C20
+    end
+    line
+      points = p484 to p483
+      ink = #1A1C20
+    end
+    line
+      points = p483 to p249
+      ink = #1A1C20
+    end
+    line
+      points = p251 to p252
+      ink = #1A1C20
+    end
+    line
+      points = p252 to p298
+      ink = #1A1C20
+    end
+    line
+      points = p298 to p297
+      ink = #1A1C20
+    end
+    line
+      points = p297 to p423
+      ink = #1A1C20
+    end
+    line
+      points = p423 to p424
+      ink = #1A1C20
+    end
+    line
+      points = p424 to p486
+      ink = #1A1C20
+    end
+    line
+      points = p486 to p485
+      ink = #1A1C20
+    end
+    line
+      points = p485 to p251
+      ink = #1A1C20
+    end
+    line
+      points = p253 to p254
+      ink = #1A1C20
+    end
+    line
+      points = p254 to p315
+      ink = #1A1C20
+    end
+    line
+      points = p315 to p255
+      ink = #1A1C20
+    end
+    line
+      points = p255 to p256
+      ink = #1A1C20
+    end
+    line
+      points = p256 to p355
+      ink = #1A1C20
+    end
+    line
+      points = p355 to p490
+      ink = #1A1C20
+    end
+    line
+      points = p490 to p489
+      ink = #1A1C20
+    end
+    line
+      points = p489 to p395
+      ink = #1A1C20
+    end
+    line
+      points = p395 to p488
+      ink = #1A1C20
+    end
+    line
+      points = p488 to p487
+      ink = #1A1C20
+    end
+    line
+      points = p487 to p253
+      ink = #1A1C20
+    end
+    line
+      points = p257 to p258
+      ink = #1A1C20
+    end
+    line
+      points = p258 to p300
+      ink = #1A1C20
+    end
+    line
+      points = p300 to p299
+      ink = #1A1C20
+    end
+    line
+      points = p299 to p339
+      ink = #1A1C20
+    end
+    line
+      points = p339 to p340
+      ink = #1A1C20
+    end
+    line
+      points = p340 to p382
+      ink = #1A1C20
+    end
+    line
+      points = p382 to p381
+      ink = #1A1C20
+    end
+    line
+      points = p381 to p425
+      ink = #1A1C20
+    end
+    line
+      points = p425 to p426
+      ink = #1A1C20
+    end
+    line
+      points = p426 to p492
+      ink = #1A1C20
+    end
+    line
+      points = p492 to p491
+      ink = #1A1C20
+    end
+    line
+      points = p491 to p257
+      ink = #1A1C20
+    end
+    line
+      points = p259 to p260
+      ink = #1A1C20
+    end
+    line
+      points = p260 to p341
+      ink = #1A1C20
+    end
+    line
+      points = p341 to p342
+      ink = #1A1C20
+    end
+    line
+      points = p342 to p261
+      ink = #1A1C20
+    end
+    line
+      points = p261 to p262
+      ink = #1A1C20
+    end
+    line
+      points = p262 to p343
+      ink = #1A1C20
+    end
+    line
+      points = p343 to p344
+      ink = #1A1C20
+    end
+    line
+      points = p344 to p494
+      ink = #1A1C20
+    end
+    line
+      points = p494 to p493
+      ink = #1A1C20
+    end
+    line
+      points = p493 to p259
+      ink = #1A1C20
+    end
+    line
+      points = p263 to p264
+      ink = #1A1C20
+    end
+    line
+      points = p264 to p386
+      ink = #1A1C20
+    end
+    line
+      points = p386 to p385
+      ink = #1A1C20
+    end
+    line
+      points = p385 to p429
+      ink = #1A1C20
+    end
+    line
+      points = p429 to p430
+      ink = #1A1C20
+    end
+    line
+      points = p430 to p496
+      ink = #1A1C20
+    end
+    line
+      points = p496 to p495
+      ink = #1A1C20
+    end
+    line
+      points = p495 to p345
+      ink = #1A1C20
+    end
+    line
+      points = p345 to p346
+      ink = #1A1C20
+    end
+    line
+      points = p346 to p302
+      ink = #1A1C20
+    end
+    line
+      points = p302 to p301
+      ink = #1A1C20
+    end
+    line
+      points = p301 to p263
+      ink = #1A1C20
+    end
+    line
+      points = p265 to p266
+      ink = #1A1C20
+    end
+    line
+      points = p266 to p388
+      ink = #1A1C20
+    end
+    line
+      points = p388 to p387
+      ink = #1A1C20
+    end
+    line
+      points = p387 to p431
+      ink = #1A1C20
+    end
+    line
+      points = p431 to p432
+      ink = #1A1C20
+    end
+    line
+      points = p432 to p498
+      ink = #1A1C20
+    end
+    line
+      points = p498 to p497
+      ink = #1A1C20
+    end
+    line
+      points = p497 to p347
+      ink = #1A1C20
+    end
+    line
+      points = p347 to p348
+      ink = #1A1C20
+    end
+    line
+      points = p348 to p304
+      ink = #1A1C20
+    end
+    line
+      points = p304 to p303
+      ink = #1A1C20
+    end
+    line
+      points = p303 to p265
+      ink = #1A1C20
+    end
+    line
+      points = p267 to p268
+      ink = #1A1C20
+    end
+    line
+      points = p268 to p316
+      ink = #1A1C20
+    end
+    line
+      points = p316 to p269
+      ink = #1A1C20
+    end
+    line
+      points = p269 to p270
+      ink = #1A1C20
+    end
+    line
+      points = p270 to p356
+      ink = #1A1C20
+    end
+    line
+      points = p356 to p502
+      ink = #1A1C20
+    end
+    line
+      points = p502 to p501
+      ink = #1A1C20
+    end
+    line
+      points = p501 to p396
+      ink = #1A1C20
+    end
+    line
+      points = p396 to p500
+      ink = #1A1C20
+    end
+    line
+      points = p500 to p499
+      ink = #1A1C20
+    end
+    line
+      points = p499 to p267
+      ink = #1A1C20
+    end
+    line
+      points = p271 to p272
+      ink = #1A1C20
+    end
+    line
+      points = p272 to p306
+      ink = #1A1C20
+    end
+    line
+      points = p306 to p305
+      ink = #1A1C20
+    end
+    line
+      points = p305 to p349
+      ink = #1A1C20
+    end
+    line
+      points = p349 to p350
+      ink = #1A1C20
+    end
+    line
+      points = p350 to p390
+      ink = #1A1C20
+    end
+    line
+      points = p390 to p389
+      ink = #1A1C20
+    end
+    line
+      points = p389 to p433
+      ink = #1A1C20
+    end
+    line
+      points = p433 to p434
+      ink = #1A1C20
+    end
+    line
+      points = p434 to p504
+      ink = #1A1C20
+    end
+    line
+      points = p504 to p503
+      ink = #1A1C20
+    end
+    line
+      points = p503 to p271
+      ink = #1A1C20
+    end
+    line
+      points = p273 to p274
+      ink = #1A1C20
+    end
+    line
+      points = p274 to p437
+      ink = #1A1C20
+    end
+    line
+      points = p437 to p438
+      ink = #1A1C20
+    end
+    line
+      points = p438 to p506
+      ink = #1A1C20
+    end
+    line
+      points = p506 to p505
+      ink = #1A1C20
+    end
+    line
+      points = p505 to p435
+      ink = #1A1C20
+    end
+    line
+      points = p435 to p436
+      ink = #1A1C20
+    end
+    line
+      points = p436 to p273
+      ink = #1A1C20
+    end
+    line
+      points = p275 to p276
+      ink = #1A1C20
+    end
+    line
+      points = p276 to p308
+      ink = #1A1C20
+    end
+    line
+      points = p308 to p307
+      ink = #1A1C20
+    end
+    line
+      points = p307 to p439
+      ink = #1A1C20
+    end
+    line
+      points = p439 to p440
+      ink = #1A1C20
+    end
+    line
+      points = p440 to p508
+      ink = #1A1C20
+    end
+    line
+      points = p508 to p507
+      ink = #1A1C20
+    end
+    line
+      points = p507 to p275
+      ink = #1A1C20
+    end
+    line
+      points = p277 to p278
+      ink = #1A1C20
+    end
+    line
+      points = p278 to p351
+      ink = #1A1C20
+    end
+    line
+      points = p351 to p352
+      ink = #1A1C20
+    end
+    line
+      points = p352 to p279
+      ink = #1A1C20
+    end
+    line
+      points = p279 to p280
+      ink = #1A1C20
+    end
+    line
+      points = p280 to p512
+      ink = #1A1C20
+    end
+    line
+      points = p512 to p511
+      ink = #1A1C20
+    end
+    line
+      points = p511 to p392
+      ink = #1A1C20
+    end
+    line
+      points = p392 to p391
+      ink = #1A1C20
+    end
+    line
+      points = p391 to p510
+      ink = #1A1C20
+    end
+    line
+      points = p510 to p509
+      ink = #1A1C20
+    end
+    line
+      points = p509 to p277
+      ink = #1A1C20
+    end
+    line
+      points = p245 to p209
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p209 to p210
+      ink = #1A1C20
+    end
+    line
+      points = p246 to p210
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p210 to p317
+      ink = #1A1C20
+    end
+    line
+      points = p335 to p317
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p317 to p318
+      ink = #1A1C20
+    end
+    line
+      points = p336 to p318
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p318 to p211
+      ink = #1A1C20
+    end
+    line
+      points = p247 to p211
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p211 to p212
+      ink = #1A1C20
+    end
+    line
+      points = p248 to p212
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p212 to p448
+      ink = #1A1C20
+    end
+    line
+      points = p482 to p448
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p448 to p447
+      ink = #1A1C20
+    end
+    line
+      points = p481 to p447
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p447 to p362
+      ink = #1A1C20
+    end
+    line
+      points = p378 to p362
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p362 to p361
+      ink = #1A1C20
+    end
+    line
+      points = p377 to p361
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p361 to p446
+      ink = #1A1C20
+    end
+    line
+      points = p480 to p446
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p446 to p445
+      ink = #1A1C20
+    end
+    line
+      points = p479 to p445
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p445 to p209
+      ink = #1A1C20
+    end
+    line
+      points = p249 to p213
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p213 to p214
+      ink = #1A1C20
+    end
+    line
+      points = p250 to p214
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p214 to p282
+      ink = #1A1C20
+    end
+    line
+      points = p296 to p282
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p282 to p281
+      ink = #1A1C20
+    end
+    line
+      points = p295 to p281
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p281 to p319
+      ink = #1A1C20
+    end
+    line
+      points = p337 to p319
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p319 to p320
+      ink = #1A1C20
+    end
+    line
+      points = p338 to p320
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p320 to p364
+      ink = #1A1C20
+    end
+    line
+      points = p380 to p364
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p364 to p363
+      ink = #1A1C20
+    end
+    line
+      points = p379 to p363
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p363 to p401
+      ink = #1A1C20
+    end
+    line
+      points = p421 to p401
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p401 to p402
+      ink = #1A1C20
+    end
+    line
+      points = p422 to p402
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p402 to p450
+      ink = #1A1C20
+    end
+    line
+      points = p484 to p450
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p450 to p449
+      ink = #1A1C20
+    end
+    line
+      points = p483 to p449
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p449 to p213
+      ink = #1A1C20
+    end
+    line
+      points = p251 to p215
+      ink = #1A1C20
+    end
+    line
+      points = p215 to p216
+      ink = #1A1C20
+    end
+    line
+      points = p252 to p216
+      ink = #1A1C20
+    end
+    line
+      points = p216 to p284
+      ink = #1A1C20
+    end
+    line
+      points = p298 to p284
+      ink = #1A1C20
+    end
+    line
+      points = p284 to p283
+      ink = #1A1C20
+    end
+    line
+      points = p297 to p283
+      ink = #1A1C20
+    end
+    line
+      points = p283 to p403
+      ink = #1A1C20
+    end
+    line
+      points = p423 to p403
+      ink = #1A1C20
+    end
+    line
+      points = p403 to p404
+      ink = #1A1C20
+    end
+    line
+      points = p424 to p404
+      ink = #1A1C20
+    end
+    line
+      points = p404 to p452
+      ink = #1A1C20
+    end
+    line
+      points = p486 to p452
+      ink = #1A1C20
+    end
+    line
+      points = p452 to p451
+      ink = #1A1C20
+    end
+    line
+      points = p485 to p451
+      ink = #1A1C20
+    end
+    line
+      points = p451 to p215
+      ink = #1A1C20
+    end
+    line
+      points = p253 to p217
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p217 to p218
+      ink = #1A1C20
+    end
+    line
+      points = p254 to p218
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p218 to p313
+      ink = #1A1C20
+    end
+    line
+      points = p315 to p313
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p313 to p219
+      ink = #1A1C20
+    end
+    line
+      points = p255 to p219
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p219 to p220
+      ink = #1A1C20
+    end
+    line
+      points = p256 to p220
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p220 to p353
+      ink = #1A1C20
+    end
+    line
+      points = p355 to p353
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p353 to p456
+      ink = #1A1C20
+    end
+    line
+      points = p490 to p456
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p456 to p455
+      ink = #1A1C20
+    end
+    line
+      points = p489 to p455
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p455 to p393
+      ink = #1A1C20
+    end
+    line
+      points = p395 to p393
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p393 to p454
+      ink = #1A1C20
+    end
+    line
+      points = p488 to p454
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p454 to p453
+      ink = #1A1C20
+    end
+    line
+      points = p487 to p453
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p453 to p217
+      ink = #1A1C20
+    end
+    line
+      points = p257 to p221
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p221 to p222
+      ink = #1A1C20
+    end
+    line
+      points = p258 to p222
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p222 to p286
+      ink = #1A1C20
+    end
+    line
+      points = p300 to p286
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p286 to p285
+      ink = #1A1C20
+    end
+    line
+      points = p299 to p285
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p285 to p321
+      ink = #1A1C20
+    end
+    line
+      points = p339 to p321
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p321 to p322
+      ink = #1A1C20
+    end
+    line
+      points = p340 to p322
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p322 to p366
+      ink = #1A1C20
+    end
+    line
+      points = p382 to p366
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p366 to p365
+      ink = #1A1C20
+    end
+    line
+      points = p381 to p365
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p365 to p405
+      ink = #1A1C20
+    end
+    line
+      points = p425 to p405
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p405 to p406
+      ink = #1A1C20
+    end
+    line
+      points = p426 to p406
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p406 to p458
+      ink = #1A1C20
+    end
+    line
+      points = p492 to p458
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p458 to p457
+      ink = #1A1C20
+    end
+    line
+      points = p491 to p457
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p457 to p221
+      ink = #1A1C20
+    end
+    line
+      points = p259 to p223
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p223 to p224
+      ink = #1A1C20
+    end
+    line
+      points = p260 to p224
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p224 to p323
+      ink = #1A1C20
+    end
+    line
+      points = p341 to p323
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p323 to p324
+      ink = #1A1C20
+    end
+    line
+      points = p342 to p324
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p324 to p225
+      ink = #1A1C20
+    end
+    line
+      points = p261 to p225
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p225 to p226
+      ink = #1A1C20
+    end
+    line
+      points = p262 to p226
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p226 to p325
+      ink = #1A1C20
+    end
+    line
+      points = p343 to p325
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p325 to p326
+      ink = #1A1C20
+    end
+    line
+      points = p344 to p326
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p326 to p460
+      ink = #1A1C20
+    end
+    line
+      points = p494 to p460
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p460 to p459
+      ink = #1A1C20
+    end
+    line
+      points = p493 to p459
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p459 to p223
+      ink = #1A1C20
+    end
+    line
+      points = p383 to p367
+      ink = #1A1C20
+    end
+    line
+      points = p367 to p407
+      ink = #1A1C20
+    end
+    line
+      points = p427 to p407
+      ink = #1A1C20
+    end
+    line
+      points = p407 to p408
+      ink = #1A1C20
+    end
+    line
+      points = p428 to p408
+      ink = #1A1C20
+    end
+    line
+      points = p408 to p368
+      ink = #1A1C20
+    end
+    line
+      points = p384 to p368
+      ink = #1A1C20
+    end
+    line
+      points = p368 to p367
+      ink = #1A1C20
+    end
+    line
+      points = p263 to p227
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p227 to p228
+      ink = #1A1C20
+    end
+    line
+      points = p264 to p228
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p228 to p370
+      ink = #1A1C20
+    end
+    line
+      points = p386 to p370
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p370 to p369
+      ink = #1A1C20
+    end
+    line
+      points = p385 to p369
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p369 to p409
+      ink = #1A1C20
+    end
+    line
+      points = p429 to p409
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p409 to p410
+      ink = #1A1C20
+    end
+    line
+      points = p430 to p410
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p410 to p462
+      ink = #1A1C20
+    end
+    line
+      points = p496 to p462
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p462 to p461
+      ink = #1A1C20
+    end
+    line
+      points = p495 to p461
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p461 to p327
+      ink = #1A1C20
+    end
+    line
+      points = p345 to p327
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p327 to p328
+      ink = #1A1C20
+    end
+    line
+      points = p346 to p328
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p328 to p288
+      ink = #1A1C20
+    end
+    line
+      points = p302 to p288
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p288 to p287
+      ink = #1A1C20
+    end
+    line
+      points = p301 to p287
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p287 to p227
+      ink = #1A1C20
+    end
+    line
+      points = p265 to p229
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p229 to p230
+      ink = #1A1C20
+    end
+    line
+      points = p266 to p230
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p230 to p372
+      ink = #1A1C20
+    end
+    line
+      points = p388 to p372
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p372 to p371
+      ink = #1A1C20
+    end
+    line
+      points = p387 to p371
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p371 to p411
+      ink = #1A1C20
+    end
+    line
+      points = p431 to p411
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p411 to p412
+      ink = #1A1C20
+    end
+    line
+      points = p432 to p412
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p412 to p464
+      ink = #1A1C20
+    end
+    line
+      points = p498 to p464
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p464 to p463
+      ink = #1A1C20
+    end
+    line
+      points = p497 to p463
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p463 to p329
+      ink = #1A1C20
+    end
+    line
+      points = p347 to p329
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p329 to p330
+      ink = #1A1C20
+    end
+    line
+      points = p348 to p330
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p330 to p290
+      ink = #1A1C20
+    end
+    line
+      points = p304 to p290
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p290 to p289
+      ink = #1A1C20
+    end
+    line
+      points = p303 to p289
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p289 to p229
+      ink = #1A1C20
+    end
+    line
+      points = p267 to p231
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p231 to p232
+      ink = #1A1C20
+    end
+    line
+      points = p268 to p232
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p232 to p314
+      ink = #1A1C20
+    end
+    line
+      points = p316 to p314
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p314 to p233
+      ink = #1A1C20
+    end
+    line
+      points = p269 to p233
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p233 to p234
+      ink = #1A1C20
+    end
+    line
+      points = p270 to p234
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p234 to p354
+      ink = #1A1C20
+    end
+    line
+      points = p356 to p354
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p354 to p468
+      ink = #1A1C20
+    end
+    line
+      points = p502 to p468
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p468 to p467
+      ink = #1A1C20
+    end
+    line
+      points = p501 to p467
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p467 to p394
+      ink = #1A1C20
+    end
+    line
+      points = p396 to p394
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p394 to p466
+      ink = #1A1C20
+    end
+    line
+      points = p500 to p466
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p466 to p465
+      ink = #1A1C20
+    end
+    line
+      points = p499 to p465
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p465 to p231
+      ink = #1A1C20
+    end
+    line
+      points = p271 to p235
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p235 to p236
+      ink = #1A1C20
+    end
+    line
+      points = p272 to p236
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p236 to p292
+      ink = #1A1C20
+    end
+    line
+      points = p306 to p292
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p292 to p291
+      ink = #1A1C20
+    end
+    line
+      points = p305 to p291
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p291 to p331
+      ink = #1A1C20
+    end
+    line
+      points = p349 to p331
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p331 to p332
+      ink = #1A1C20
+    end
+    line
+      points = p350 to p332
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p332 to p374
+      ink = #1A1C20
+    end
+    line
+      points = p390 to p374
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p374 to p373
+      ink = #1A1C20
+    end
+    line
+      points = p389 to p373
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p373 to p413
+      ink = #1A1C20
+    end
+    line
+      points = p433 to p413
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p413 to p414
+      ink = #1A1C20
+    end
+    line
+      points = p434 to p414
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p414 to p470
+      ink = #1A1C20
+    end
+    line
+      points = p504 to p470
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p470 to p469
+      ink = #1A1C20
+    end
+    line
+      points = p503 to p469
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p469 to p235
+      ink = #1A1C20
+    end
+    line
+      points = p273 to p237
+      ink = #1A1C20
+    end
+    line
+      points = p237 to p238
+      ink = #1A1C20
+    end
+    line
+      points = p274 to p238
+      ink = #1A1C20
+    end
+    line
+      points = p238 to p417
+      ink = #1A1C20
+    end
+    line
+      points = p437 to p417
+      ink = #1A1C20
+    end
+    line
+      points = p417 to p418
+      ink = #1A1C20
+    end
+    line
+      points = p438 to p418
+      ink = #1A1C20
+    end
+    line
+      points = p418 to p472
+      ink = #1A1C20
+    end
+    line
+      points = p506 to p472
+      ink = #1A1C20
+    end
+    line
+      points = p472 to p471
+      ink = #1A1C20
+    end
+    line
+      points = p505 to p471
+      ink = #1A1C20
+    end
+    line
+      points = p471 to p415
+      ink = #1A1C20
+    end
+    line
+      points = p435 to p415
+      ink = #1A1C20
+    end
+    line
+      points = p415 to p416
+      ink = #1A1C20
+    end
+    line
+      points = p436 to p416
+      ink = #1A1C20
+    end
+    line
+      points = p416 to p237
+      ink = #1A1C20
+    end
+    line
+      points = p275 to p239
+      ink = #1A1C20
+    end
+    line
+      points = p239 to p240
+      ink = #1A1C20
+    end
+    line
+      points = p276 to p240
+      ink = #1A1C20
+    end
+    line
+      points = p240 to p294
+      ink = #1A1C20
+    end
+    line
+      points = p308 to p294
+      ink = #1A1C20
+    end
+    line
+      points = p294 to p293
+      ink = #1A1C20
+    end
+    line
+      points = p307 to p293
+      ink = #1A1C20
+    end
+    line
+      points = p293 to p419
+      ink = #1A1C20
+    end
+    line
+      points = p439 to p419
+      ink = #1A1C20
+    end
+    line
+      points = p419 to p420
+      ink = #1A1C20
+    end
+    line
+      points = p440 to p420
+      ink = #1A1C20
+    end
+    line
+      points = p420 to p474
+      ink = #1A1C20
+    end
+    line
+      points = p508 to p474
+      ink = #1A1C20
+    end
+    line
+      points = p474 to p473
+      ink = #1A1C20
+    end
+    line
+      points = p507 to p473
+      ink = #1A1C20
+    end
+    line
+      points = p473 to p239
+      ink = #1A1C20
+    end
+    line
+      points = p277 to p241
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p241 to p242
+      ink = #1A1C20
+    end
+    line
+      points = p278 to p242
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p242 to p333
+      ink = #1A1C20
+    end
+    line
+      points = p351 to p333
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p333 to p334
+      ink = #1A1C20
+    end
+    line
+      points = p352 to p334
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p334 to p243
+      ink = #1A1C20
+    end
+    line
+      points = p279 to p243
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p243 to p244
+      ink = #1A1C20
+    end
+    line
+      points = p280 to p244
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p244 to p478
+      ink = #1A1C20
+    end
+    line
+      points = p512 to p478
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p478 to p477
+      ink = #1A1C20
+    end
+    line
+      points = p511 to p477
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p477 to p376
+      ink = #1A1C20
+    end
+    line
+      points = p392 to p376
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p376 to p375
+      ink = #1A1C20
+    end
+    line
+      points = p391 to p375
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p375 to p476
+      ink = #1A1C20
+    end
+    line
+      points = p510 to p476
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p476 to p475
+      ink = #1A1C20
+    end
+    line
+      points = p509 to p475
+      ink = #1A1C20
+      soft = true
+    end
+    line
+      points = p475 to p241
+      ink = #1A1C20
+    end
+    line
+      points = p383 to p427
+      ink = #1A1C20
+    end
+    line
+      points = p427 to p428
+      ink = #1A1C20
+    end
+    line
+      points = p428 to p384
+      ink = #1A1C20
+    end
+    line
+      points = p384 to p383
+      ink = #1A1C20
+    end
+    line
+      points = p164 to p165
+      ink = #1A1C20
+    end
+    line
+      points = p165 to p176
+      ink = #1A1C20
+    end
+    line
+      points = p176 to p175
+      ink = #1A1C20
+    end
+    line
+      points = p175 to p164
+      ink = #1A1C20
+    end
+    line
+      points = p167 to p168
+      ink = #1A1C20
+    end
+    line
+      points = p168 to p172
+      ink = #1A1C20
+    end
+    line
+      points = p172 to p171
+      ink = #1A1C20
+    end
+    line
+      points = p171 to p167
+      ink = #1A1C20
+    end
+    line
+      points = p169 to p170
+      ink = #1A1C20
+    end
+    line
+      points = p170 to p174
+      ink = #1A1C20
+    end
+    line
+      points = p174 to p173
+      ink = #1A1C20
+    end
+    line
+      points = p173 to p169
+      ink = #1A1C20
+    end
+    line
+      points = 0.4" west, 6.73" south, 51.35" up to 0.4" east, 6.73" south, 51.35" up
+      ink = #1A1C20
+    end
+    line
+      points = p149 to p154
+      ink = #1A1C20
+    end
+    line
+      points = p154 to p166
+      ink = #1A1C20
+    end
+    line
+      points = p166 to p163
+      ink = #1A1C20
+    end
+    line
+      points = p163 to p149
+      ink = #1A1C20
+    end
+    line
+      points = p155 to p156
+      ink = #1A1C20
+    end
+    line
+      points = p156 to p160
+      ink = #1A1C20
+    end
+    line
+      points = p160 to p159
+      ink = #1A1C20
+    end
+    line
+      points = p159 to p155
+      ink = #1A1C20
+    end
+    line
+      points = p157 to p158
+      ink = #1A1C20
+    end
+    line
+      points = p158 to p162
+      ink = #1A1C20
+    end
+    line
+      points = p162 to p161
+      ink = #1A1C20
+    end
+    line
+      points = p161 to p157
+      ink = #1A1C20
+    end
+    line
+      points = p145 to p146
+      ink = #1A1C20
+    end
+    line
+      points = p146 to p151
+      ink = #1A1C20
+    end
+    line
+      points = p151 to p150
+      ink = #1A1C20
+    end
+    line
+      points = p150 to p145
+      ink = #1A1C20
+    end
+    line
+      points = p147 to p148
+      ink = #1A1C20
+    end
+    line
+      points = p148 to p153
+      ink = #1A1C20
+    end
+    line
+      points = p153 to p152
+      ink = #1A1C20
+    end
+    line
+      points = p152 to p147
+      ink = #1A1C20
+    end
+  end
+end

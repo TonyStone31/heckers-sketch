@@ -1,0 +1,1499 @@
+unit hsFittings;
+
+{ Duct fittings built from numbers: transitions, elbows and tees.  A
+  transition is the two openings, the length, and one named edge per axis
+  with how far it moves from the entry (see docs/transition-ticket.md).
+  Each side's long edges are kept parallel so every side is a true plane
+  and unfolds flat. }
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, Math, StrUtils, Graphics, hsDrawing;
+
+type
+  { which edge is called out on the width, and on the height }
+  TSideRule = (srCenterd, srLeftIn, srRightIn);
+  { the tape's other end: the floor or the ceiling for height, the left or
+    the right wall for width }
+  TRefHeight = (rhFloor, rhCeiling);
+  TRefWidth = (rwLeft, rwRight);
+  THeightRule = (hrFlatBottom, hrFlatTop, hrCenterd, hrTopUp, hrTopDown,
+    hrBottomUp, hrBottomDown);
+
+  { How an end is finished: raw (cut square), notched (corners cut back for a
+    field slip), flanged out or in, or TDF (roll-formed flange with a fold
+    back).  deTDFCorner fills the TDF corner gaps with corner pieces.  Slip
+    and drive names top and bottom first: slips top and bottom, drives
+    (bent out for the cleat) on the sides. }
+  TDuctEnd = (deRaw, deNotch, deFlangeOut, deFlangeIn, deTDF, deTDFCorner,
+    deSlipDrive, deDriveSlip);
+  { A canvas flex connector: two metal strips with fabric between, named by
+    strip and fabric widths.  Junior is residential, 3-3-3 commercial, 3-6-3
+    for more travel.  Installed, the fabric squashes to about half. }
+  TFlexSize = (fxNone, fxJunior, fx333, fx363);
+
+  TEndSpec = record
+    Kind: TDuctEnd;
+    Amount: Double;         { the notch depth or the flange width }
+    { a flex connector between body and finish; the finish goes on its far
+      strip and the body is that much shorter }
+    Flex: TFlexSize;
+  end;
+
+  { what the wizard builds }
+  TFittingKind = (fkTransition, fkElbow, fkTee);
+  { how a flat panel is kept from drumming: nothing, cross broken on both
+    diagonals, or beaded every foot }
+  TStiffen = (stNone, stAuto, stCrossBreak, stBeads);   { none first, so a
+    spec made in code stiffens nothing unless asked }
+  { which way an elbow turns, seen from the entry }
+  TTurn = (tuRight, tuLeft, tuUp, tuDown);
+  { which wall of a tee the branch comes off }
+  TBranchSide = (bsLeft, bsRight, bsTop, bsBottom);
+
+  TTransitionSpec = record
+    Kind: TFittingKind;
+    W0, H0: Double;         { entry opening, width and height }
+    W1, H1: Double;         { exit opening (a transition) }
+    Len: Double;            { along the run }
+    Side: TSideRule;
+    SideAmount: Double;     { how far the named side comes in }
+    Height: THeightRule;
+    HeightAmount: Double;   { for top up / down, bottom up / down }
+    Ends: array[0..2] of TEndSpec;  { entry, exit, and a tee's branch }
+    Inch: Double;           { one inch in drawing units, for the fixed sizes }
+    Dims: Boolean;          { put the sizes on it as dimensions }
+    Tag: string;            { the name on the ticket, written on the part }
+    { an elbow }
+    Angle: Double;          { of the turn, radians }
+    Turn: TTurn;
+    Throat: Double;         { throat radius; 0 is a square throat }
+    SquareHeel: Boolean;    { the heel mitered rather than rolled }
+    Leg0, Leg1: Double;     { straight collars, entry side and exit side }
+    { a tee: the run is W0 x H0 by Len }
+    BW, BH: Double;         { the branch opening: along the run, and across }
+    BranchOn: TBranchSide;
+    BranchFrom: Double;     { entry to the near edge of the branch }
+    BranchUp: Double;       { bottom (or left, for top and bottom) to the branch }
+    BranchLen: Double;      { the branch collar }
+    { Taped from a floor or ceiling and a wall: one reading per end for each.
+      The rules above are worked out from them, and an amount may then be
+      negative (the exit runs past the reference), shown as "out by". }
+    FromRef: Boolean;
+    RefH: TRefHeight;
+    RefW: TRefWidth;
+    RefH0, RefH1, RefW0, RefW1: Double;
+    { which edge each reading was taken to (top rather than bottom, right
+      rather than left).  The reference is the same for both ends. }
+    RefH0Top, RefH1Top, RefW0Right, RefW1Right: Boolean;
+    { a vertical run off a furnace: the builder's top is the duct's front and
+      bottom is the back.  Only the words change. }
+    Vertical: Boolean;
+    { the gauge (0 for what the size calls for) and how big panels are
+      stiffened }
+    Gauge: Integer;
+    Stiffen: TStiffen;
+  end;
+
+const
+  DRIVE_FLANGE_IN = 0.5;    { the drive edge, bent out: inches }
+  TDF_RETURN_IN = 0.5;      { the fold back on a TDF flange: inches }
+  { The bolt hole in a TDF corner is SQUARE: it holds the carriage bolt's
+    square shoulder so the nut can be run up with one wrench.  A 3/8" bolt
+    wants a shade over 3/8" of hole. }
+  CORNER_BOLT_SQ_IN = 0.44;
+  { Galvanized sheet, a light cool gray.  Every face the fitting builder
+    makes gets it; anything else is changed afterward in the entity panel. }
+  GALV_R = 178;  GALV_G = 185;  GALV_B = 193;
+  { flex connector fabric: near black with a little warmth, so it does not
+    read as a hole in the drawing }
+  CANVAS_R = 38;  CANVAS_G = 36;  CANVAS_B = 34;
+  { A notch is cut on the angle, the way snips do it: from the seam at the
+    notch depth out to the opening edge at this fraction of it from the
+    corner. }
+  NOTCH_EDGE_RATIO = 0.75;
+  DUCT_END_NAMES: array[TDuctEnd] of string = (
+    'Raw', 'Notched all round - slip it in the field', 'Flange out',
+    'Flange in', 'TDF flange',
+    'TDF flange with the corners in',
+    'Slip and drive - slips top and bottom, drives on the sides',
+    'Drive and slip - drives top and bottom, slips on the sides');
+  { the size each kind starts at, in inches: a notch, a flange, the TDF }
+  DUCT_END_DEFAULT_IN: array[TDuctEnd] of Double = (0, 1, 1, 1, 1.375, 1.375, 1, 1);
+  FLEX_NAMES: array[TFlexSize] of string = (
+    'No flex connector', 'Junior flex connector, 1 3/4 - 3 - 1 3/4',
+    'Flex connector 3 - 3 - 3', 'Flex connector 3 - 6 - 3');
+  FLEX_STRIP_IN: array[TFlexSize] of Double = (0, 1.75, 3, 3);
+  STIFFEN_NAMES: array[TStiffen] of string = (
+    'No stiffening', 'Stiffen as needed', 'Cross breaks', 'Beads every 12"');
+  GAUGES: array[0..6] of Integer = (28, 26, 24, 22, 20, 18, 16);
+  { a panel this wide and this long wants stiffening, in inches }
+  STIFFEN_WIDTH_IN = 18;
+  STIFFEN_LENGTH_IN = 12;
+  BEAD_SPACING_IN = 12;
+  { A rolled bead is 3/4" wide, a fat 1/8" high, and round.  A cross break
+    dishes the whole panel into a shallow pyramid, about 3/16" at the middle. }
+  BEAD_WIDTH_IN = 0.75;  BEAD_HEIGHT_IN = 0.19;
+  BEAD_FACETS = 8;
+  CROSS_DISH_IN = 0.19;
+  FLEX_FABRIC_IN: array[TFlexSize] of Double = (0, 3, 3, 6);
+  FITTING_NAMES: array[TFittingKind] of string = ('Transition', 'Elbow', 'Tee');
+  TURN_NAMES: array[TTurn] of string = ('Right', 'Left', 'Up', 'Down');
+  BRANCH_NAMES: array[TBranchSide] of string = ('Left side', 'Right side', 'Top', 'Bottom');
+
+{ whether that end's corners are cut back }
+function EndNotched(const E: TEndSpec): Boolean;
+{ a flex connector's installed length in inches: strip, half the fabric, strip }
+function FlexInstalledIn(F: TFlexSize): Double;
+{ Works out the side and height rules from the tape readings, in shop terms
+  (up or down, in or out).  Sizes and readings must be set. }
+procedure TapeRules(var T: TTransitionSpec);
+{ The gauge for the largest side, from the usual low-pressure commercial
+  table: 26 to 12", 24 to 30", 22 to 54", 20 to 84", 18 beyond.
+  Residential runs a step lighter, which the user can override. }
+function SuggestGauge(const T: TTransitionSpec): Integer;
+{ the gauge in force: chosen, or suggested when 0 }
+function GaugeOf(const T: TTransitionSpec): Integer;
+{ whether a panel this size wants stiffening, and which kind when auto }
+function StiffenFor(const T: TTransitionSpec; WidthIn, LengthIn: Double): TStiffen;
+{ what the metal line of the ticket says }
+function MetalWords(const T: TTransitionSpec): string;
+{ the rules in shop words, like: Bottom up by 4", Right side in by 7" }
+function TapeWords(const T: TTransitionSpec): string;
+
+{ The fitting's corners: entry at y = 0, flow along +Y, entry bottom-left at
+  the origin.  E0..E3 and X0..X3 run anticlockwise seen from the entry side
+  (bottom-left, bottom-right, top-right, top-left). }
+procedure TransitionCorners(const T: TTransitionSpec; out E, X: array of TP3);
+
+{ Adds the fitting as one solid.  Returns its first entity's index;
+  everything from there to Live - 1 is the fitting. }
+function BuildTransition(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+function BuildElbow(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+function BuildTee(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+{ whichever the spec says it is }
+function BuildFitting(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+
+{ What is wrong with the spec, or '' when it can be built. }
+function TransitionProblem(const T: TTransitionSpec): string;
+function FittingProblem(const T: TTransitionSpec): string;
+
+{ The ticket as text, every input in inches, one per line.  Used for the
+  email and the text file beside the pictures. }
+function TicketText(const T: TTransitionSpec): string;
+
+{ an elbow cheek's plan outline for a sketch: throat points then heel
+  points, x across the width and y along the run }
+procedure ElbowCheek(const T: TTransitionSpec; out Pts: TP3Array);
+
+{ An elbow from field measurements, from the throat-side corner of the
+  entry.  Fwd and Over reach the near inside corner of the duct to meet;
+  Theta is that duct's direction off straight ahead, toward the turn, in
+  radians.  With throat radius R fixed, returns '' and the two legs, or
+  what is wrong. }
+function SolveFieldElbow(R, Fwd, Over, Theta: Double; out Leg0, Leg1: Double): string;
+{ the far duct's direction from two points along its inside edge, the
+  second further along }
+function FieldDirection(Fwd1, Over1, Fwd2, Over2: Double): Double;
+
+implementation
+
+function EndNotched(const E: TEndSpec): Boolean;
+begin
+  Result := E.Kind in [deNotch, deSlipDrive, deDriveSlip];
+end;
+
+function FlexInstalledIn(F: TFlexSize): Double;
+begin
+  Result := 2 * FLEX_STRIP_IN[F] + FLEX_FABRIC_IN[F] / 2;
+end;
+
+function SuggestGauge(const T: TTransitionSpec): Integer;
+var
+  Side, Inch: Double;
+begin
+  Inch := T.Inch;
+  if Inch <= 0 then Inch := 1 / 12;
+  Side := Max(Max(T.W0, T.H0), Max(T.W1, T.H1));
+  if T.Kind = fkTee then Side := Max(Side, Max(T.BW, T.BH));
+  Side := Side / Inch;
+  if Side <= 12 then Result := 26
+  else if Side <= 30 then Result := 24
+  else if Side <= 54 then Result := 22
+  else if Side <= 84 then Result := 20
+  else Result := 18;
+end;
+
+function GaugeOf(const T: TTransitionSpec): Integer;
+begin
+  if T.Gauge > 0 then Result := T.Gauge else Result := SuggestGauge(T);
+end;
+
+function StiffenFor(const T: TTransitionSpec; WidthIn, LengthIn: Double): TStiffen;
+begin
+  Result := T.Stiffen;
+  if Result = stNone then Exit;
+  if (WidthIn < STIFFEN_WIDTH_IN) or (LengthIn < STIFFEN_LENGTH_IN) then Exit(stNone);
+  { auto: a cross break up to a yard long, beads beyond, as most shops do }
+  if Result = stAuto then
+    if LengthIn <= 36 then Result := stCrossBreak else Result := stBeads;
+end;
+
+function MetalWords(const T: TTransitionSpec): string;
+var
+  Inch, W, L: Double;
+  K: Integer;
+  S: TStiffen;
+  Names: array[0..3] of string;
+  Breaks, Beads: string;
+begin
+  Inch := T.Inch;
+  if Inch <= 0 then Inch := 1 / 12;
+  Result := Format('%d gauge', [GaugeOf(T)]);
+  if T.Gauge = 0 then Result := Result + ' (what the size calls for)'
+  else if T.Gauge <> SuggestGauge(T) then
+    Result := Result + Format(' (chosen; the size calls for %d)', [SuggestGauge(T)]);
+  if T.Kind <> fkTransition then Exit;
+  Names[0] := 'bottom'; Names[1] := 'right side'; Names[2] := 'top'; Names[3] := 'left side';
+  Breaks := ''; Beads := '';
+  for K := 0 to 3 do
+  begin
+    if K in [0, 2] then W := Max(T.W0, T.W1) else W := Max(T.H0, T.H1);
+    L := T.Len;
+    S := StiffenFor(T, W / Inch, L / Inch);
+    case S of
+      stCrossBreak: Breaks := Breaks + IfThen(Breaks = '', '', ', ') + Names[K];
+      stBeads: Beads := Beads + IfThen(Beads = '', '', ', ') + Names[K];
+    end;
+  end;
+  if (Breaks = '') and (Beads = '') then
+  begin
+    if T.Stiffen = stNone then Result := Result + '; no stiffening'
+    else Result := Result + '; no stiffening needed at this size';
+    Exit;
+  end;
+  if Breaks <> '' then Result := Result + '; cross break the ' + Breaks;
+  if Beads <> '' then Result := Result + Format('; beads every %d" on the ', [BEAD_SPACING_IN]) + Beads;
+end;
+
+procedure TapeRules(var T: TTransitionSpec);
+var
+  A0, A1, Off: Double;
+begin
+  { height: from the floor, everything is stated as the bottom (a reading to
+    the top less the height); from the ceiling, as the top }
+  if T.RefH = rhFloor then
+  begin
+    if T.RefH0Top then A0 := T.RefH0 - T.H0 else A0 := T.RefH0;
+    if T.RefH1Top then A1 := T.RefH1 - T.H1 else A1 := T.RefH1;
+    Off := A1 - A0;
+    if Abs(Off) < 1E-9 then T.Height := hrFlatBottom
+    else if Off > 0 then begin T.Height := hrBottomUp; T.HeightAmount := Off; end
+    else begin T.Height := hrBottomDown; T.HeightAmount := -Off; end;
+  end
+  else
+  begin
+    if T.RefH0Top then A0 := T.RefH0 else A0 := T.RefH0 - T.H0;
+    if T.RefH1Top then A1 := T.RefH1 else A1 := T.RefH1 - T.H1;
+    Off := A1 - A0;
+    if Abs(Off) < 1E-9 then T.Height := hrFlatTop
+    else if Off > 0 then begin T.Height := hrTopDown; T.HeightAmount := Off; end
+    else begin T.Height := hrTopUp; T.HeightAmount := -Off; end;
+  end;
+  { width: the wall side comes in by the difference; if that would be out,
+    use the other side when it comes in }
+  if T.RefW = rwLeft then
+  begin
+    if T.RefW0Right then A0 := T.RefW0 - T.W0 else A0 := T.RefW0;
+    if T.RefW1Right then A1 := T.RefW1 - T.W1 else A1 := T.RefW1;
+    Off := A1 - A0;
+    T.Side := srLeftIn;
+    T.SideAmount := Off;
+    if Off < -1E-9 then
+    begin
+      { the exit runs past the wall side: say it from the other side }
+      if T.W0 - T.W1 - Off >= -1E-9 then
+      begin
+        T.Side := srRightIn;
+        T.SideAmount := T.W0 - T.W1 - Off;
+      end;
+    end;
+  end
+  else
+  begin
+    if T.RefW0Right then A0 := T.RefW0 else A0 := T.RefW0 - T.W0;
+    if T.RefW1Right then A1 := T.RefW1 else A1 := T.RefW1 - T.W1;
+    Off := A1 - A0;
+    T.Side := srRightIn;
+    T.SideAmount := Off;
+    if Off < -1E-9 then
+      if T.W0 - T.W1 - Off >= -1E-9 then
+      begin
+        T.Side := srLeftIn;
+        T.SideAmount := T.W0 - T.W1 - Off;
+      end;
+  end;
+  if Abs(T.SideAmount) < 1E-9 then T.SideAmount := 0;
+end;
+
+function TapeWords(const T: TTransitionSpec): string;
+const
+  SideWords: array[TSideRule] of string = ('Centered', 'Left side in by', 'Right side in by');
+  HeightWords: array[THeightRule] of string = ('Flat bottom (FB)', 'Flat top (FT)',
+    'Centered', 'Top up by', 'Top down by', 'Bottom up by', 'Bottom down by');
+var
+  Inch: Double;
+  function Ins(V: Double): string;
+  begin
+    Result := FormatFloat('0.###', V / Inch) + '"';
+  end;
+begin
+  Inch := T.Inch;
+  if Inch <= 0 then Inch := 1 / 12;
+  Result := HeightWords[T.Height];
+  if T.Height in [hrTopUp, hrTopDown, hrBottomUp, hrBottomDown] then
+    Result := Result + ' ' + Ins(T.HeightAmount);
+  Result := Result + ',  ';
+  if T.Side = srCenterd then Result := Result + 'Centered'
+  else if T.SideAmount < -1E-9 then
+    Result := Result + StringReplace(SideWords[T.Side], ' in by', ' out by', []) + ' ' + Ins(-T.SideAmount)
+  else if Abs(T.SideAmount) < 1E-9 then
+    Result := Result + StringReplace(SideWords[T.Side], ' in by', ' flush', [])
+  else
+    Result := Result + SideWords[T.Side] + ' ' + Ins(T.SideAmount);
+end;
+
+procedure TransitionCorners(const T: TTransitionSpec; out E, X: array of TP3);
+var
+  XL, ZB: Double;
+begin
+  E[0] := P3(0, 0, 0);
+  E[1] := P3(T.W0, 0, 0);
+  E[2] := P3(T.W0, 0, T.H0);
+  E[3] := P3(0, 0, T.H0);
+  { width: the named side moves in by the amount, the other follows from the
+    exit width; centered splits the difference }
+  case T.Side of
+    srLeftIn:  XL := T.SideAmount;
+    srRightIn: XL := (T.W0 - T.SideAmount) - T.W1;
+  else
+    XL := (T.W0 - T.W1) / 2;
+  end;
+  { height: a flat bottom or top stays put, or the named edge moves by the
+    amount and the other follows from the exit height }
+  case T.Height of
+    hrFlatBottom: ZB := 0;
+    hrFlatTop:    ZB := T.H0 - T.H1;
+    hrTopUp:      ZB := (T.H0 + T.HeightAmount) - T.H1;
+    hrTopDown:    ZB := (T.H0 - T.HeightAmount) - T.H1;
+    hrBottomUp:   ZB := T.HeightAmount;
+    hrBottomDown: ZB := -T.HeightAmount;
+  else
+    ZB := (T.H0 - T.H1) / 2;
+  end;
+  X[0] := P3(XL, T.Len, ZB);
+  X[1] := P3(XL + T.W1, T.Len, ZB);
+  X[2] := P3(XL + T.W1, T.Len, ZB + T.H1);
+  X[3] := P3(XL, T.Len, ZB + T.H1);
+end;
+
+function EndProblem(const T: TTransitionSpec; K: Integer; W, H: Double): string;
+begin
+  Result := '';
+  if T.Ends[K].Kind = deRaw then Exit;
+  if T.Ends[K].Amount <= 0 then
+    Exit('The notch or flange on an end needs a size.');
+  if T.Ends[K].Amount * 2 >= Min(W, H) then
+    Exit('The notch or flange on an end is bigger than the opening.');
+end;
+
+function TransitionProblem(const T: TTransitionSpec): string;
+begin
+  Result := '';
+  if (T.W0 <= 0) or (T.H0 <= 0) then Exit('The entry opening needs a width and a height.');
+  if (T.W1 <= 0) or (T.H1 <= 0) then Exit('The exit opening needs a width and a height.');
+  if T.Len <= 0 then Exit('The length has to be more than nothing.');
+  if not T.FromRef then
+  begin
+    if (T.Side in [srLeftIn, srRightIn]) and (T.SideAmount < 0) then
+      Exit('A side comes in by a positive amount - name the other side to go the other way.');
+    if (T.Height in [hrTopUp, hrTopDown, hrBottomUp, hrBottomDown]) and (T.HeightAmount < 0) then
+      Exit('Up and down take a positive amount - name the other way to go the other way.');
+  end;
+  Result := EndProblem(T, 0, T.W0, T.H0);
+  if Result = '' then Result := EndProblem(T, 1, T.W1, T.H1);
+  if (Result = '') and (T.Kind = fkTransition) then
+    if (FlexInstalledIn(T.Ends[0].Flex) + FlexInstalledIn(T.Ends[1].Flex)) * T.Inch >= T.Len then
+      Result := 'The flex connectors take up the whole length - nothing is left for the metal.';
+end;
+
+function ElbowProblem(const T: TTransitionSpec): string;
+var
+  K: Integer;
+  W1, H1: Double;
+begin
+  Result := '';
+  if (T.W0 <= 0) or (T.H0 <= 0) then Exit('The opening needs a width and a height.');
+  { exit opening blank means the same as the entry.  The size across the
+    turn changes through the bend; the other size can only change in
+    straight metal, so it changes in the exit leg }
+  W1 := T.W1; H1 := T.H1;
+  if W1 <= 0 then W1 := T.W0;
+  if H1 <= 0 then H1 := T.H0;
+  if T.Turn in [tuUp, tuDown] then
+  begin
+    if (Abs(W1 - T.W0) > 1E-9) and (T.Leg1 <= 0) then
+      Exit('The width changes in the exit leg, so the exit leg needs a length.');
+  end
+  else if (Abs(H1 - T.H0) > 1E-9) and (T.Leg1 <= 0) then
+    Exit('The height changes in the exit leg, so the exit leg needs a length.');
+  if (T.Angle <= 0) or (T.Angle >= Pi) then Exit('The angle has to be between 0 and 180.');
+  if T.Throat < 0 then Exit('The throat radius cannot be less than nothing - 0 is a square throat.');
+  if (T.Leg0 < 0) or (T.Leg1 < 0) then Exit('A leg cannot be less than nothing.');
+  for K := 0 to 1 do
+  begin
+    Result := EndProblem(T, K, T.W0, T.H0);
+    if Result <> '' then Exit;
+    { a notch or flange is cut from straight metal, so that end needs a leg
+      at least that long }
+    if (T.Ends[K].Kind <> deRaw) and
+       (((K = 0) and (T.Leg0 < T.Ends[K].Amount)) or ((K = 1) and (T.Leg1 < T.Ends[K].Amount))) then
+      Exit('An end with a notch or flange needs a straight leg at least that long.');
+  end;
+end;
+
+function TeeProblem(const T: TTransitionSpec): string;
+var
+  Across: Double;
+begin
+  Result := '';
+  if (T.W0 <= 0) or (T.H0 <= 0) then Exit('The run needs a width and a height.');
+  if T.Len <= 0 then Exit('The run needs a length.');
+  if (T.BW <= 0) or (T.BH <= 0) then Exit('The branch opening needs a width and a height.');
+  if T.BranchLen <= 0 then Exit('The branch needs a length.');
+  if T.BranchFrom < 0 then Exit('The branch cannot start before the entry.');
+  if T.BranchFrom + T.BW > T.Len + 1E-9 then Exit('The branch runs past the exit - lengthen the run.');
+  if T.BranchOn in [bsLeft, bsRight] then Across := T.H0 else Across := T.W0;
+  if T.BranchUp < 0 then Exit('The branch cannot sit below the bottom.');
+  if T.BranchUp + T.BH > Across + 1E-9 then Exit('The branch is taller than the wall it comes off.');
+  Result := EndProblem(T, 0, T.W0, T.H0);
+  if Result = '' then Result := EndProblem(T, 1, T.W0, T.H0);
+  if Result = '' then Result := EndProblem(T, 2, T.BW, T.BH);
+end;
+
+function FittingProblem(const T: TTransitionSpec): string;
+begin
+  case T.Kind of
+    fkElbow: Result := ElbowProblem(T);
+    fkTee: Result := TeeProblem(T);
+  else
+    Result := TransitionProblem(T);
+  end;
+end;
+
+function TicketText(const T: TTransitionSpec): string;
+const
+  SideWords: array[TSideRule] of string = ('Centered', 'Left side in by', 'Right side in by');
+  HeightWords: array[THeightRule] of string = ('Flat bottom (FB)', 'Flat top (FT)',
+    'Centered', 'Top up by', 'Top down by', 'Bottom up by', 'Bottom down by');
+var
+  Inch: Double;
+  function Ins(V: Double): string;
+  begin
+    Result := FormatFloat('0.###', V / Inch) + '"';
+  end;
+  { "Left side in by 4"", or "out by" when the tape readings made the
+    amount negative }
+  function OutBy(const Words: string; HasAmount: Boolean; Amount: Double): string;
+  begin
+    Result := Words;
+    if not HasAmount then Exit;
+    if Amount < -1E-9 then
+      Result := StringReplace(Result, ' in by', ' out by', []);
+    if Amount < -1E-9 then
+    begin
+      Result := StringReplace(Result, 'up by', 'down by', []);
+      if Pos('down by', Words) > 0 then Result := StringReplace(Words, 'down by', 'up by', []);
+      if Pos(' in by', Words) > 0 then Result := StringReplace(Words, ' in by', ' out by', []);
+    end;
+    Result := Result + ' ' + Ins(Abs(Amount));
+  end;
+
+  function Edge(B: Boolean; const Yes, No: string): string;
+  begin
+    if B then Result := Yes else Result := No;
+  end;
+
+  function EndWords(const E: TEndSpec): string;
+  begin
+    Result := DUCT_END_NAMES[E.Kind];
+    if E.Kind <> deRaw then Result := Result + ', ' + Ins(E.Amount);
+    if E.Flex <> fxNone then
+      Result := FLEX_NAMES[E.Flex] + ' (fabric squashed to ' +
+        FormatFloat('0.##', FLEX_FABRIC_IN[E.Flex] / 2) + '", takes ' +
+        FormatFloat('0.##', FlexInstalledIn(E.Flex)) + '" of the length), its far strip ' +
+        LowerCase(Result);
+  end;
+begin
+  Inch := T.Inch;
+  if Inch <= 0 then Inch := 1 / 12;
+  Result := FITTING_NAMES[T.Kind];
+  if T.Tag <> '' then Result := Result + ': ' + T.Tag;
+  Result := Result + LineEnding;
+  case T.Kind of
+    fkElbow:
+      begin
+        Result := Result +
+          'Opening: ' + Ins(T.W0) + ' x ' + Ins(T.H0) + ' (width x height)' + LineEnding;
+        if (Abs(T.W1 - T.W0) > 1E-9) or (Abs(T.H1 - T.H0) > 1E-9) then
+          Result := Result + 'Reduces to: ' + Ins(T.W1) + ' x ' + Ins(T.H1) +
+            ' - across the turn through the turn, the other way in the exit leg' + LineEnding;
+        Result := Result +
+          'Angle: ' + FormatFloat('0.##', RadToDeg(T.Angle)) + ' degrees, turning ' +
+            LowerCase(TURN_NAMES[T.Turn]) + LineEnding;
+        if T.Throat > 0 then Result := Result + 'Throat radius: ' + Ins(T.Throat) + LineEnding
+        else Result := Result + 'Square throat' + LineEnding;
+        if T.SquareHeel then Result := Result + 'Square heel' + LineEnding
+        else Result := Result + 'Heel radius: ' + Ins(T.Throat + T.W0) + ' at the entry' + LineEnding;
+        Result := Result + 'Legs: ' + Ins(T.Leg0) + ' entry, ' + Ins(T.Leg1) + ' exit' + LineEnding;
+      end;
+    fkTee:
+      begin
+        Result := Result +
+          'Run: ' + Ins(T.W0) + ' x ' + Ins(T.H0) + ' (width x height), ' + Ins(T.Len) + ' long' + LineEnding +
+          'Branch: ' + Ins(T.BW) + ' x ' + Ins(T.BH) + ' off the ' + LowerCase(BRANCH_NAMES[T.BranchOn]) +
+            ', ' + Ins(T.BranchLen) + ' long' + LineEnding +
+          'Branch starts ' + Ins(T.BranchFrom) + ' from the entry, ' + Ins(T.BranchUp);
+        if T.BranchOn in [bsLeft, bsRight] then Result := Result + ' up from the bottom' + LineEnding
+        else Result := Result + ' in from the left' + LineEnding;
+      end;
+  else
+    begin
+      Result := Result +
+        'Entry opening: ' + Ins(T.W0) + ' x ' + Ins(T.H0) + ' (width x height)' + LineEnding +
+        'Exit opening: ' + Ins(T.W1) + ' x ' + Ins(T.H1) + LineEnding +
+        'Length, entry to exit: ' + Ins(T.Len) + LineEnding +
+        'Width: ' + OutBy(SideWords[T.Side], T.Side <> srCenterd, T.SideAmount) + LineEnding +
+        'Height: ' + OutBy(HeightWords[T.Height],
+          T.Height in [hrTopUp, hrTopDown, hrBottomUp, hrBottomDown], T.HeightAmount) + LineEnding;
+      if T.FromRef and T.Vertical then
+      begin
+        Result := Result + 'A vertical run, taped standing up - the furnace laid on its back: top is the front, bottom the back' + LineEnding;
+        if T.RefH = rhFloor then Result := Result + 'Taped from the back wall: '
+        else Result := Result + 'Taped from the front: ';
+        Result := Result + Ins(T.RefH0) + ' to the ' + Edge(T.RefH0Top, 'front', 'back') + ' of the entry, ' +
+          Ins(T.RefH1) + ' to the ' + Edge(T.RefH1Top, 'front', 'back') + ' of the exit' + LineEnding;
+        if T.RefW = rwLeft then Result := Result + 'Taped from the left wall: '
+        else Result := Result + 'Taped from the right wall: ';
+        Result := Result + Ins(T.RefW0) + ' to the ' + Edge(T.RefW0Right, 'right side', 'left side') + ' of the entry, ' +
+          Ins(T.RefW1) + ' to the ' + Edge(T.RefW1Right, 'right side', 'left side') + ' of the exit' + LineEnding;
+      end
+      else if T.FromRef then
+      begin
+        if T.RefH = rhFloor then Result := Result + 'Taped from the floor: '
+        else Result := Result + 'Taped from the ceiling: ';
+        Result := Result + Ins(T.RefH0) + ' to the ' + Edge(T.RefH0Top, 'top', 'bottom') + ' of the entry, ' +
+          Ins(T.RefH1) + ' to the ' + Edge(T.RefH1Top, 'top', 'bottom') + ' of the exit' + LineEnding;
+        if T.RefW = rwLeft then Result := Result + 'Taped from the left wall: '
+        else Result := Result + 'Taped from the right wall: ';
+        Result := Result + Ins(T.RefW0) + ' to the ' + Edge(T.RefW0Right, 'right side', 'left side') + ' of the entry, ' +
+          Ins(T.RefW1) + ' to the ' + Edge(T.RefW1Right, 'right side', 'left side') + ' of the exit' + LineEnding;
+      end;
+    end;
+  end;
+  Result := Result + 'Metal: ' + MetalWords(T) + LineEnding;
+  Result := Result +
+    'Entry end: ' + EndWords(T.Ends[0]) + LineEnding +
+    'Exit end: ' + EndWords(T.Ends[1]) + LineEnding;
+  if (T.Kind = fkTransition) and ((T.Ends[0].Flex <> fxNone) or (T.Ends[1].Flex <> fxNone)) then
+    Result := Result + 'Sheet metal body, flex to flex: ' +
+      Ins(T.Len - (FlexInstalledIn(T.Ends[0].Flex) + FlexInstalledIn(T.Ends[1].Flex)) * Inch) + LineEnding;
+  if T.Kind = fkTee then
+    Result := Result + 'Branch end: ' + EndWords(T.Ends[2]) + LineEnding;
+end;
+
+{ ------------------------------------------------------------------------ }
+{ The pieces every fitting is made of.                                     }
+{ ------------------------------------------------------------------------ }
+
+type
+  TP3x4 = array[0..3] of TP3;
+
+  { what is being built into: the drawing, the group, the ink }
+  TBuild = record
+    D: TWorkDoc;
+    G: Integer;
+    Ink: TColor;
+    Weight: Single;
+    Inch: Double;
+    Spec: TTransitionSpec;     { for the stiffening, wall by wall }
+    { face material: galvanized, except flex connector fabric }
+    Mat: TColor;
+  end;
+
+function Add(const A, B: TP3; F: Double): TP3;
+begin
+  Result := P3(A.X + B.X * F, A.Y + B.Y * F, A.Z + B.Z * F);
+end;
+
+function Towards(const A, B: TP3): TP3;
+begin
+  Result := Norm3(P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z));
+end;
+
+procedure BLine(const B: TBuild; const P, Q: TP3);
+begin
+  if Dist(P, Q) < 1E-9 then Exit;
+  B.D.AddLine(P, Q, B.Ink, B.Weight, False);
+  B.D.SetGroup(B.D.Live - 1, B.G);
+end;
+
+{ A soft line, for facet joins on beads and dished panels.  The renderer
+  hides soft edges except on the silhouette, so curves read smooth. }
+procedure BSoft(const B: TBuild; const P, Q: TP3);
+begin
+  if Dist(P, Q) < 1E-9 then Exit;
+  B.D.AddLine(P, Q, B.Ink, B.Weight, False);
+  B.D.SetGroup(B.D.Live - 1, B.G);
+  B.D.SetSoft(B.D.Live - 1, True);
+end;
+
+procedure BFace(const B: TBuild; const P: array of TP3);
+begin
+  B.D.AddFaceRaw(P, B.Ink, True);
+  B.D.SetFaceGroup(B.D.Live - 1, B.G);
+  B.D.SetMaterial(B.D.Live - 1, B.Mat);
+end;
+
+{ A face wound so its normal points along Out.  The renderer colors a
+  face's back differently, so every face here must say which way is out. }
+procedure BFaceOut(const B: TBuild; const P: array of TP3; const Out: TP3);
+var
+  I: Integer;
+begin
+  BFace(B, P);
+  I := B.D.Live - 1;
+  if Dot3(B.D.FaceNormal(I), Out) < 0 then B.D.FlipFace(I);
+end;
+
+{ a flange or lip: a face and its three edges other than the fold }
+procedure BStrip(const B: TBuild; const A, C, C2, A2: TP3; const Out: TP3);
+begin
+  BFaceOut(B, [A, C, C2, A2], Out);
+  BLine(B, C, C2); BLine(B, C2, A2); BLine(B, A2, A);
+end;
+
+procedure BDim(const B: TBuild; const P, Q, Off: TP3);
+begin
+  B.D.AddDim(P, Q, B.Ink, Off);
+  B.D.SetGroup(B.D.Live - 1, B.G);
+end;
+
+{ A straight run between openings E and X, corners bottom-left,
+  bottom-right, top-right, top-left seen from the entry.  Wall K runs from
+  corner K to K + 1 (0 bottom, 1 right, 2 top, 3 left).  Draw says whether
+  an end's opening edges are drawn here or by what it joins.  SkipWall
+  leaves one wall for the caller, so a tee can cut its branch hole. }
+procedure BuildRun(const B: TBuild; const E, X: TP3x4;
+  const Ends: array of TEndSpec; const Draw: array of Boolean; SkipWall: Integer);
+var
+  C: array[0..1] of TP3x4;
+  K, EndIx: Integer;
+  Center: TP3;
+  Poly: array of TP3;
+  P0, P1: array[0..5] of TP3;
+  N0, N1, I: Integer;
+
+  function Notch(EndIx: Integer): Double;
+  begin
+    if EndNotched(Ends[EndIx]) then Result := Ends[EndIx].Amount else Result := 0;
+  end;
+
+  function OutNormal(K: Integer): TP3;
+  var
+    J: Integer;
+    Mid: TP3;
+  begin
+    J := (K + 1) mod 4;
+    Result := Norm3(Cross3(Towards(C[0][K], C[0][J]), Towards(C[0][K], C[1][K])));
+    Mid := P3((C[0][K].X + C[0][J].X + C[1][K].X + C[1][J].X) / 4,
+              (C[0][K].Y + C[0][J].Y + C[1][K].Y + C[1][J].Y) / 4,
+              (C[0][K].Z + C[0][J].Z + C[1][K].Z + C[1][J].Z) / 4);
+    if Dot3(Result, P3(Mid.X - Center.X, Mid.Y - Center.Y, Mid.Z - Center.Z)) < 0 then
+      Result := P3(-Result.X, -Result.Y, -Result.Z);
+  end;
+
+  { Wall K's edge at end E, seam to seam: the two corners if square cut,
+    or with the angled notch cut at each corner if notched. }
+  procedure EndPath(E, K: Integer; var P: array of TP3; out N: Integer);
+  var
+    J: Integer;
+    CI, CJ, U, SI, SJ: TP3;
+    Nt, St: Double;
+  begin
+    J := (K + 1) mod 4;
+    CI := C[E][K]; CJ := C[E][J];
+    Nt := Notch(E);
+    if Nt <= 0 then
+    begin
+      P[0] := CI; P[1] := CJ; N := 2;
+      Exit;
+    end;
+    St := Nt * NOTCH_EDGE_RATIO;
+    U := Towards(CI, CJ);
+    SI := Towards(CI, C[1 - E][K]);
+    SJ := Towards(CJ, C[1 - E][J]);
+    P[0] := Add(CI, SI, Nt);
+    P[1] := Add(CI, U, St);
+    P[2] := Add(CJ, U, -St);
+    P[3] := Add(CJ, SJ, Nt);
+    N := 4;
+  end;
+
+  function DriveWall(E, K: Integer): Boolean;
+  begin
+    case Ends[E].Kind of
+      deSlipDrive: Result := K in [1, 3];
+      deDriveSlip: Result := K in [0, 2];
+    else
+      Result := False;
+    end;
+  end;
+
+  { A rolled bead across a panel: a half-round section in BEAD_FACETS steps.
+    Only the two edges where it leaves the panel are hard; the facet joins
+    are soft so the shading shows the curve. }
+  procedure Ridge(const From, Till: TP3; WidthIn, HeightIn: Double; const Nrm: TP3);
+  var
+    Dir, Side: TP3;
+    PA, PB: array[0..BEAD_FACETS] of TP3;
+    I: Integer;
+    T, Off, Up: Double;
+    Thin: TBuild;
+  begin
+    Dir := Towards(From, Till);
+    Side := Norm3(Cross3(Nrm, Dir));
+    for I := 0 to BEAD_FACETS do
+    begin
+      T := I / BEAD_FACETS;
+      Off := (T - 0.5) * WidthIn;
+      { a half round: nought at both edges, full height over the middle }
+      Up := HeightIn * Sqrt(Max(0, 1 - Sqr(2 * T - 1)));
+      PA[I] := Add(Add(From, Side, Off * B.Inch), Nrm, Up * B.Inch);
+      PB[I] := Add(Add(Till, Side, Off * B.Inch), Nrm, Up * B.Inch);
+    end;
+    Thin := B;
+    Thin.Weight := Max(0.5, B.Weight * 0.6);
+    for I := 0 to BEAD_FACETS - 1 do
+      BFaceOut(B, [PA[I], PB[I], PB[I + 1], PA[I + 1]], Nrm);
+    { where it leaves the flat, hard; everything up and over it, soft }
+    BLine(Thin, PA[0], PB[0]);
+    BLine(Thin, PA[BEAD_FACETS], PB[BEAD_FACETS]);
+    for I := 1 to BEAD_FACETS - 1 do BSoft(Thin, PA[I], PB[I]);
+    for I := 0 to BEAD_FACETS - 1 do
+    begin
+      BSoft(Thin, PA[I], PA[I + 1]);
+      BSoft(Thin, PB[I], PB[I + 1]);
+    end;
+  end;
+
+  { A cross-broken panel: the wall's flat polygon fanned to a middle raised
+    by CROSS_DISH_IN, so it reads as a shallow pyramid.  Fan joins are soft
+    except the four to the panel's real corners, which are the creases. }
+  procedure CrossBreak(const Poly: array of TP3; const Nrm: TP3;
+    const Corner: array of TP3);
+  var
+    I, J: Integer;
+    Mid: TP3;
+    Hard: Boolean;
+    Thin: TBuild;
+  begin
+    if Length(Poly) < 3 then Exit;
+    Mid := P3(0, 0, 0);
+    for I := 0 to High(Poly) do
+      Mid := Add(Mid, Poly[I], 1);
+    Mid := P3(Mid.X / Length(Poly), Mid.Y / Length(Poly), Mid.Z / Length(Poly));
+    Mid := Add(Mid, Nrm, CROSS_DISH_IN * B.Inch);
+    Thin := B;
+    Thin.Weight := Max(0.5, B.Weight * 0.6);
+    for I := 0 to High(Poly) do
+    begin
+      J := (I + 1) mod Length(Poly);
+      BFaceOut(B, [Poly[I], Poly[J], Mid], Nrm);
+      Hard := False;
+      for J := 0 to High(Corner) do
+        if Dist(Poly[I], Corner[J]) < 1E-9 then Hard := True;
+      if Hard then BLine(Thin, Poly[I], Mid) else BSoft(Thin, Poly[I], Mid);
+    end;
+  end;
+
+  { What stiffening wall K wants.  Asked before the wall is drawn, because a
+    cross break replaces the flat wall rather than sitting on it. }
+  function StiffenOn(K: Integer): TStiffen;
+  var
+    J: Integer;
+    Wd, Ln: Double;
+  begin
+    J := (K + 1) mod 4;
+    Wd := Max(Dist(C[0][K], C[0][J]), Dist(C[1][K], C[1][J]));
+    Ln := Min(Dist(C[0][K], C[1][K]), Dist(C[0][J], C[1][J]));
+    Result := StiffenFor(B.Spec, Wd / B.Inch, Ln / B.Inch);
+  end;
+
+  { beads across wall K every foot, a little in from the seams }
+  procedure Stiffen(K: Integer);
+  var
+    J, N, I: Integer;
+    Ln, T: Double;
+    S: TStiffen;
+    Nrm, A, Bp: TP3;
+  begin
+    J := (K + 1) mod 4;
+    Ln := Min(Dist(C[0][K], C[1][K]), Dist(C[0][J], C[1][J]));
+    S := StiffenOn(K);
+    Nrm := OutNormal(K);
+    case S of
+      stBeads:
+        begin
+          N := Trunc(Ln / (BEAD_SPACING_IN * B.Inch));
+          for I := 1 to N do
+          begin
+            T := I * BEAD_SPACING_IN * B.Inch / Ln;
+            if T >= 0.98 then Break;
+            A := Lerp3(C[0][K], C[1][K], T);
+            Bp := Lerp3(C[0][J], C[1][J], T);
+            { an inch in from each seam, where the roll stops }
+            Ridge(Add(A, Towards(A, Bp), B.Inch), Add(Bp, Towards(Bp, A), B.Inch),
+              BEAD_WIDTH_IN, BEAD_HEIGHT_IN, Nrm);
+          end;
+        end;
+    end;
+  end;
+
+  { Which way a flange on wall K points at end E.  It lies in the plane of
+    the end, not square to the wall, or a cleat will not go on straight on a
+    slanted side, so the along-the-run part is removed from the wall's
+    outward direction. }
+  function FlangeOut(E, K: Integer): TP3;
+  var
+    Nrm, EN: TP3;
+  begin
+    Nrm := OutNormal(K);
+    EN := Norm3(Cross3(Towards(C[E][0], C[E][1]), Towards(C[E][0], C[E][3])));
+    Result := Norm3(Add(Nrm, EN, -Dot3(Nrm, EN)));
+  end;
+
+  { A TDF corner piece: the L that fills the square gap left where each
+    flange stops short of the corner.  It ties the flanges together and
+    takes the bolt.  Drawn with the same fold back as the flanges and the
+    square bolt hole (see CORNER_BOLT_SQ_IN). }
+  procedure TDFCorner(E, K: Integer);
+  var
+    Prev, I: Integer;
+    C0, Ua, Ub, Na, Nb, SI, Mid: TP3;
+    F, R, H: Double;
+    Poly: array[0..5] of TP3;
+    Hole: TP3Array;
+  begin
+    SetLength(Hole, 4);
+    Prev := (K + 3) mod 4;
+    { a corner needs both flanges; a skipped wall (a tee's branch) has none }
+    if (K = SkipWall) or (Prev = SkipWall) then Exit;
+    F := Ends[E].Amount;
+    R := TDF_RETURN_IN * B.Inch;
+    C0 := C[E][K];
+    Ua := Towards(C0, C[E][(K + 1) mod 4]);
+    Ub := Towards(C0, C[E][Prev]);
+    Na := FlangeOut(E, K);
+    Nb := FlangeOut(E, Prev);
+    SI := Towards(C0, C[1 - E][K]);
+
+    Poly[0] := Add(C0, Ua, F);
+    Poly[1] := Add(Poly[0], Na, F);
+    Poly[2] := Add(Add(C0, Na, F), Nb, F);
+    Poly[3] := Add(Add(C0, Ub, F), Nb, F);
+    Poly[4] := Add(C0, Ub, F);
+    Poly[5] := C0;
+    BFaceOut(B, Poly, P3(-SI.X, -SI.Y, -SI.Z));
+
+    { the square bolt hole, out past the duct corner where nothing is behind
+      the metal }
+    H := CORNER_BOLT_SQ_IN * B.Inch / 2;
+    Mid := Add(Add(C0, Na, F / 2), Nb, F / 2);
+    Hole[0] := Add(Add(Mid, Na, -H), Nb, -H);
+    Hole[1] := Add(Add(Mid, Na,  H), Nb, -H);
+    Hole[2] := Add(Add(Mid, Na,  H), Nb,  H);
+    Hole[3] := Add(Add(Mid, Na, -H), Nb,  H);
+    B.D.SetFaceHoles(B.D.Live - 1, [Hole]);
+    for I := 0 to 3 do BLine(B, Hole[I], Hole[(I + 1) mod 4]);
+
+    BLine(B, Poly[0], Poly[1]); BLine(B, Poly[1], Poly[2]);
+    BLine(B, Poly[2], Poly[3]); BLine(B, Poly[3], Poly[4]);
+
+    BStrip(B, Poly[1], Poly[2], Add(Poly[2], SI, R), Add(Poly[1], SI, R), Na);
+    BStrip(B, Poly[2], Poly[3], Add(Poly[3], SI, R), Add(Poly[2], SI, R), Nb);
+  end;
+
+  { everything at end E of wall K except the wall: opening edge, notch
+    cuts, flange }
+  procedure FinishEnd(E, K: Integer);
+  var
+    J: Integer;
+    CI, CJ, U, SI, Nrm, A, C2, A2, B2: TP3;
+    Nt, F, R: Double;
+    P: array[0..5] of TP3;
+    N: Integer;
+  begin
+    J := (K + 1) mod 4;
+    CI := C[E][K]; CJ := C[E][J];
+    U := Towards(CI, CJ);
+    SI := Towards(CI, C[1 - E][K]);
+    Nt := Notch(E);
+    Nrm := FlangeOut(E, K);
+    case Ends[E].Kind of
+      deFlangeOut, deFlangeIn, deTDF, deTDFCorner:
+        begin
+          { the fold line is the middle of the opening edge; the flange
+            stops its own width short of each corner so the next side's
+            flange can fold }
+          F := Ends[E].Amount;
+          A := Add(CI, U, F);
+          C2 := Add(CJ, U, -F);
+          if Draw[E] then
+          begin
+            BLine(B, CI, A); BLine(B, A, C2); BLine(B, C2, CJ);
+          end;
+          if Ends[E].Kind = deFlangeIn then
+            Nrm := P3(-Nrm.X, -Nrm.Y, -Nrm.Z);
+          A2 := Add(A, Nrm, F);
+          B2 := Add(C2, Nrm, F);
+          { a flange faces the next piece: away from the body, toward the
+            open end }
+          BStrip(B, A, C2, B2, A2, P3(-SI.X, -SI.Y, -SI.Z));
+          if Ends[E].Kind in [deTDF, deTDFCorner] then
+          begin
+            { the fold back that the corner piece and cleat grip }
+            R := TDF_RETURN_IN * B.Inch;
+            BStrip(B, A2, B2, Add(B2, SI, R), Add(A2, SI, R), Nrm);
+          end;
+        end;
+    else
+      begin
+        EndPath(E, K, P, N);
+        if Nt > 0 then
+        begin
+          { the angled cut at each corner, and the opening edge between }
+          BLine(B, P[0], P[1]); BLine(B, P[1], P[2]); BLine(B, P[2], P[3]);
+        end
+        else if Draw[E] then
+          BLine(B, CI, CJ);
+        if DriveWall(E, K) then
+        begin
+          F := DRIVE_FLANGE_IN * B.Inch;
+          BStrip(B, P[1], P[2], Add(P[2], Nrm, F), Add(P[1], Nrm, F), P3(-SI.X, -SI.Y, -SI.Z));
+        end;
+      end;
+    end;
+  end;
+
+begin
+  C[0] := E; C[1] := X;
+  Center := P3(0, 0, 0);
+  for K := 0 to 3 do
+  begin
+    Center := Add(Center, C[0][K], 1);
+    Center := Add(Center, C[1][K], 1);
+  end;
+  Center := P3(Center.X / 8, Center.Y / 8, Center.Z / 8);
+  { the four walls, wound with normals out of the duct, stepping round the
+    notch cut-outs }
+  for K := 0 to 3 do
+  begin
+    if K = SkipWall then Continue;
+    EndPath(0, K, P0, N0);
+    EndPath(1, K, P1, N1);
+    SetLength(Poly, N0 + N1);
+    for I := 0 to N1 - 1 do Poly[I] := P1[I];
+    for I := 0 to N0 - 1 do Poly[N1 + I] := P0[N0 - 1 - I];
+    { a cross break is drawn instead of the flat face, not on top of it }
+    if StiffenOn(K) = stCrossBreak then
+      CrossBreak(Poly, OutNormal(K),
+        [C[0][K], C[0][(K + 1) mod 4], C[1][(K + 1) mod 4], C[1][K]])
+    else
+    begin
+      BFaceOut(B, Poly, OutNormal(K));
+      Stiffen(K);
+    end;
+  end;
+  { the seams, from the point of one cut to the point of the other }
+  for K := 0 to 3 do
+    BLine(B, Add(C[0][K], Towards(C[0][K], C[1][K]), Notch(0)),
+             Add(C[1][K], Towards(C[1][K], C[0][K]), Notch(1)));
+  { and each end of each wall, finished the way it was asked for }
+  for EndIx := 0 to 1 do
+    for K := 0 to 3 do
+      FinishEnd(EndIx, K);
+  { corner pieces last: each belongs to two walls, so drawing them in the
+    wall loop would double them }
+  for EndIx := 0 to 1 do
+    if Ends[EndIx].Kind = deTDFCorner then
+      for K := 0 to 3 do
+        TDFCorner(EndIx, K);
+end;
+
+function StartBuild(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): TBuild;
+begin
+  Result.D := D;
+  Result.G := D.NewGroup;
+  Result.Ink := Ink;
+  Result.Weight := Weight;
+  Result.Inch := T.Inch;
+  if Result.Inch <= 0 then Result.Inch := 1 / 12;
+  Result.Spec := T;
+  Result.Mat := RGBToColor(GALV_R, GALV_G, GALV_B);
+end;
+
+{ the offset the dimensions and the tag stand off by }
+function StandOff(const B: TBuild; const T: TTransitionSpec): Double;
+begin
+  Result := Max(4 * B.Inch, 0.15 * Max(Max(T.W0, T.H0), Max(T.W1, T.H1)));
+end;
+
+procedure BTag(const B: TBuild; const T: TTransitionSpec; const At: TP3);
+begin
+  if T.Tag = '' then Exit;
+  B.D.AddText(At, T.Tag, B.Ink);
+  B.D.SetGroup(B.D.Live - 1, B.G);
+end;
+
+{ ------------------------------------------------------------------------ }
+
+{ The three pieces of a flex connector on end EndIx (opening corners C):
+  the far strip with the finish, the squashed fabric, and the strip that
+  laps the body. }
+procedure FlexPieces(const B: TBuild; const C: TP3x4; EndIx: Integer; const E: TEndSpec);
+var
+  Dir, Strip, Fabric: Double;
+  Raw: TEndSpec;
+  FB: TBuild;
+  P0, P1: TP3x4;
+
+  procedure Section(var S: TP3x4; At: Double);
+  var
+    J: Integer;
+  begin
+    for J := 0 to 3 do
+    begin
+      S[J] := C[J];
+      S[J].Y := C[J].Y + Dir * At;
+    end;
+  end;
+
+begin
+  { the entry end runs into the body along +Y; the exit end back along -Y }
+  if EndIx = 0 then Dir := 1 else Dir := -1;
+  Strip := FLEX_STRIP_IN[E.Flex] * B.Inch;
+  Fabric := FLEX_FABRIC_IN[E.Flex] / 2 * B.Inch;
+  Raw := Default(TEndSpec);
+  { the far strip, at the opening, the finish on its open end }
+  Section(P0, 0);
+  Section(P1, Strip);
+  if EndIx = 0 then BuildRun(B, P0, P1, [E, Raw], [True, True], -1)
+  else BuildRun(B, P1, P0, [Raw, E], [True, True], -1);
+  { the fabric, in canvas, squashed to half }
+  FB := B;
+  FB.Ink := $00A8C4D8;
+  FB.Mat := RGBToColor(CANVAS_R, CANVAS_G, CANVAS_B);
+  Section(P0, Strip);
+  Section(P1, Strip + Fabric);
+  if EndIx = 0 then BuildRun(FB, P0, P1, [Raw, Raw], [False, True], -1)
+  else BuildRun(FB, P1, P0, [Raw, Raw], [True, False], -1);
+  { the near strip, lapping the body }
+  Section(P0, Strip + Fabric);
+  Section(P1, Strip + Fabric + Strip);
+  if EndIx = 0 then BuildRun(B, P0, P1, [Raw, Raw], [False, False], -1)
+  else BuildRun(B, P1, P0, [Raw, Raw], [False, False], -1);
+end;
+
+function BuildTransition(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+var
+  B: TBuild;
+  E, X, BodyE, BodyX: TP3x4;
+  BodyEnds: array[0..1] of TEndSpec;
+  Off, L0, L1: Double;
+  K: Integer;
+begin
+  Result := D.Live;
+  B := StartBuild(D, T, Ink, Weight);
+  TransitionCorners(T, E, X);
+  { A flex connector shortens the sheet-metal body; the overall length stays
+    what was typed. }
+  L0 := FlexInstalledIn(T.Ends[0].Flex) * B.Inch;
+  L1 := FlexInstalledIn(T.Ends[1].Flex) * B.Inch;
+  BodyE := E;
+  BodyX := X;
+  BodyEnds[0] := T.Ends[0];
+  BodyEnds[1] := T.Ends[1];
+  if L0 > 0 then
+  begin
+    for K := 0 to 3 do BodyE[K].Y := E[K].Y + L0;
+    BodyEnds[0].Kind := deRaw;
+    BodyEnds[0].Flex := fxNone;
+  end;
+  if L1 > 0 then
+  begin
+    for K := 0 to 3 do BodyX[K].Y := X[K].Y - L1;
+    BodyEnds[1].Kind := deRaw;
+    BodyEnds[1].Flex := fxNone;
+  end;
+  BuildRun(B, BodyE, BodyX, [BodyEnds[0], BodyEnds[1]], [True, True], -1);
+  if L0 > 0 then FlexPieces(B, E, 0, T.Ends[0]);
+  if L1 > 0 then FlexPieces(B, X, 1, T.Ends[1]);
+  Off := StandOff(B, T);
+  { its tag above the entry, so parts on a job can be told apart }
+  BTag(B, T, P3(E[3].X, E[3].Y, E[3].Z + Off));
+  { both openings and the run.  The run is entry plane to exit plane, not
+    the seam, which is longer when a side comes in. }
+  if T.Dims then
+  begin
+    BDim(B, E[0], E[1], P3(0, 0, -Off));
+    BDim(B, E[1], E[2], P3(Off, 0, 0));
+    BDim(B, X[3], X[2], P3(0, 0, Off));
+    BDim(B, X[1], X[2], P3(Off, 0, 0));
+    BDim(B, E[1], P3(E[1].X, X[1].Y, E[1].Z), P3(0, 0, -Off));
+  end;
+end;
+
+{ An elbow cheek in its own plane: x across the turn (turning toward +x,
+  throat at x = A), y along the run, entry at the bottom.  Throat points
+  then heel points back, so the list closes the outline. }
+procedure CheekOutline(const T: TTransitionSpec; A, A1: Double;
+  out Throat, Heel: TP3Array; out N: Integer);
+var
+  R, Cx, Cy, Phi, Tt, Aphi: Double;
+  I: Integer;
+  D, H1, Corner: TP3;
+begin
+  R := T.Throat;
+  Cx := A + R; Cy := T.Leg0;
+  N := Max(1, Round(T.Angle / (Pi / 24)));
+  SetLength(Throat, N + 1);
+  SetLength(Heel, N + 1);
+  for I := 0 to N do
+  begin
+    Phi := T.Angle * I / N;
+    { a reducing elbow's heel spirals in from the entry size to the exit
+      size; the throat stays a true arc }
+    Aphi := A + (A1 - A) * I / N;
+    Throat[I] := P3(Cx - R * Cos(Phi), Cy + R * Sin(Phi), 0);
+    Heel[I] := P3(Cx - (R + Aphi) * Cos(Phi), Cy + (R + Aphi) * Sin(Phi), 0);
+  end;
+  if T.SquareHeel then
+  begin
+    { a square heel is the miter where the entry and exit heel lines meet }
+    D := P3(Sin(T.Angle), Cos(T.Angle), 0);
+    H1 := Heel[N];
+    Tt := -H1.X / D.X;
+    Corner := P3(0, H1.Y + Tt * D.Y, 0);
+    SetLength(Heel, 3);
+    Heel[0] := P3(0, Cy, 0);
+    Heel[1] := Corner;
+    Heel[2] := H1;
+  end;
+end;
+
+procedure ElbowCheek(const T: TTransitionSpec; out Pts: TP3Array);
+var
+  Throat, Heel: TP3Array;
+  N, I, K: Integer;
+  A, A1: Double;
+  D: TP3;
+begin
+  if T.Turn in [tuUp, tuDown] then A := T.H0 else A := T.W0;
+  if T.Turn in [tuUp, tuDown] then A1 := T.H1 else A1 := T.W1;
+  if A1 <= 0 then A1 := A;
+  CheekOutline(T, A, A1, Throat, Heel, N);
+  D := P3(Sin(T.Angle), Cos(T.Angle), 0);
+  SetLength(Pts, Length(Throat) + Length(Heel) + 4);
+  K := 0;
+  Pts[K] := P3(A, 0, 0); Inc(K);
+  for I := 0 to High(Throat) do begin Pts[K] := Throat[I]; Inc(K); end;
+  Pts[K] := Add(Throat[High(Throat)], D, T.Leg1); Inc(K);
+  Pts[K] := Add(Heel[High(Heel)], D, T.Leg1); Inc(K);
+  for I := High(Heel) downto 0 do begin Pts[K] := Heel[I]; Inc(K); end;
+  Pts[K] := P3(0, 0, 0); Inc(K);
+  SetLength(Pts, K);
+end;
+
+function BuildElbow(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+var
+  B: TBuild;
+  A, A1, Bc, B1, Off: Double;
+  Throat, Heel: TP3Array;
+  N, I, K: Integer;
+  Dir: TP3;
+  E0, X0, E1, X1: TP3x4;    { the entry leg's ends, the exit leg's ends }
+  Q: TP3x4;
+  Poly: array of TP3;
+  Order: array[0..3] of Integer;
+  Raw: TEndSpec;
+
+  { canonical to world: x across the turn, y along, z the constant side }
+  function W(const P: TP3): TP3;
+  begin
+    case T.Turn of
+      tuLeft: Result := P3(A - P.X, P.Y, P.Z);
+      tuUp:   Result := P3(P.Z, P.Y, P.X);
+      tuDown: Result := P3(P.Z, P.Y, A - P.X);
+    else
+      Result := P;
+    end;
+  end;
+
+  { an opening's four corners from its cheek-plane edge Hp to Tp, in
+    BuildRun's order: bottom-left, bottom-right, top-right, top-left }
+  function Opening(const Hp, Tp: TP3; Bs: Double): TP3x4;
+  var
+    Raw4: TP3x4;
+    J: Integer;
+  begin
+    Raw4[0] := Hp; Raw4[1] := Tp;
+    Raw4[2] := P3(Tp.X, Tp.Y, Bs); Raw4[3] := P3(Hp.X, Hp.Y, Bs);
+    for J := 0 to 3 do Result[J] := W(Raw4[Order[J]]);
+  end;
+
+  procedure Lift(const P: TP3; out Lo, Hi: TP3);
+  begin
+    Lo := W(P);
+    Hi := W(P3(P.X, P.Y, Bc));
+  end;
+
+  { a canonical direction in world terms: the mapping less its shift }
+  function WD(const Dv: TP3): TP3;
+  var
+    O: TP3;
+  begin
+    O := W(P3(0, 0, 0));
+    Result := W(Dv);
+    Result := P3(Result.X - O.X, Result.Y - O.Y, Result.Z - O.Z);
+  end;
+
+  { outward at a throat or heel point: the bend's center is inside the
+    throat and outside the heel }
+  function AwayFromCenter(const P, Q: TP3): TP3;
+  var
+    Mid: TP3;
+  begin
+    Mid := P3((P.X + Q.X) / 2, (P.Y + Q.Y) / 2, 0);
+    Result := WD(P3(Mid.X - (A + T.Throat), Mid.Y - T.Leg0, 0));
+  end;
+
+var
+  Lo, Hi, Lo2, Hi2, Out: TP3;
+begin
+  Result := D.Live;
+  B := StartBuild(D, T, Ink, Weight);
+  if T.Turn in [tuUp, tuDown] then begin A := T.H0; Bc := T.W0; A1 := T.H1; B1 := T.W1; end
+  else begin A := T.W0; Bc := T.H0; A1 := T.W1; B1 := T.H1; end;
+  if A1 <= 0 then A1 := A;
+  if B1 <= 0 then B1 := Bc;
+  case T.Turn of
+    tuLeft: begin Order[0] := 1; Order[1] := 0; Order[2] := 3; Order[3] := 2; end;
+    tuUp, tuDown: begin Order[0] := 0; Order[1] := 3; Order[2] := 2; Order[3] := 1; end;
+  else
+    begin Order[0] := 0; Order[1] := 1; Order[2] := 2; Order[3] := 3; end;
+  end;
+  CheekOutline(T, A, A1, Throat, Heel, N);
+  Dir := P3(Sin(T.Angle), Cos(T.Angle), 0);
+  Raw.Kind := deRaw; Raw.Amount := 0;
+  { the entry leg }
+  E0 := Opening(P3(0, 0, 0), P3(A, 0, 0), Bc);
+  X0 := Opening(Heel[0], Throat[0], Bc);
+  if T.Leg0 > 0 then
+    BuildRun(B, E0, X0, [T.Ends[0], Raw], [True, True], -1);
+  { the exit leg, where the other size changes if it does }
+  E1 := Opening(Heel[High(Heel)], Throat[N], Bc);
+  X1 := Opening(Add(Heel[High(Heel)], Dir, T.Leg1), Add(Throat[N], Dir, T.Leg1), B1);
+  if T.Leg1 > 0 then
+    BuildRun(B, E1, X1, [Raw, T.Ends[1]], [True, True], -1);
+  { the two cheeks: throat points forward, heel points back }
+  for K := 0 to 1 do
+  begin
+    SetLength(Poly, Length(Throat) + Length(Heel));
+    for I := 0 to High(Throat) do
+      if K = 0 then Poly[I] := W(Throat[I]) else Poly[I] := W(P3(Throat[I].X, Throat[I].Y, Bc));
+    for I := 0 to High(Heel) do
+      if K = 0 then Poly[Length(Throat) + I] := W(Heel[High(Heel) - I])
+      else Poly[Length(Throat) + I] := W(P3(Heel[High(Heel) - I].X, Heel[High(Heel) - I].Y, Bc));
+    { a square throat puts every throat point in one place; the doubled
+      points are harmless }
+    if K = 0 then BFaceOut(B, Poly, WD(P3(0, 0, -1)))
+    else BFaceOut(B, Poly, WD(P3(0, 0, 1)));
+  end;
+  { the throat wrap, gore by gore, and its edges }
+  for I := 0 to High(Throat) - 1 do
+  begin
+    if Dist(Throat[I], Throat[I + 1]) < 1E-9 then Continue;
+    Lift(Throat[I], Lo, Hi);
+    Lift(Throat[I + 1], Lo2, Hi2);
+    Out := AwayFromCenter(Throat[I], Throat[I + 1]);
+    BFaceOut(B, [Lo, Lo2, Hi2, Hi], P3(-Out.X, -Out.Y, -Out.Z));
+    BLine(B, Lo, Lo2); BLine(B, Hi, Hi2);
+    if I > 0 then BLine(B, Lo, Hi);
+  end;
+  { the heel wrap }
+  for I := 0 to High(Heel) - 1 do
+  begin
+    Lift(Heel[I], Lo, Hi);
+    Lift(Heel[I + 1], Lo2, Hi2);
+    BFaceOut(B, [Lo, Lo2, Hi2, Hi], AwayFromCenter(Heel[I], Heel[I + 1]));
+    BLine(B, Lo, Lo2); BLine(B, Hi, Hi2);
+    if I > 0 then BLine(B, Lo, Hi);
+  end;
+  { the bend's own opening edges, where no leg draws them }
+  if T.Leg0 <= 0 then
+    for I := 0 to 3 do BLine(B, X0[I], X0[(I + 1) mod 4]);
+  if T.Leg1 <= 0 then
+    for I := 0 to 3 do BLine(B, E1[I], E1[(I + 1) mod 4]);
+  { the square throat is one line where the two legs' throats meet }
+  if T.Throat <= 0 then
+  begin
+    Lift(Throat[0], Lo, Hi);
+    BLine(B, Lo, Hi);
+  end;
+  Off := StandOff(B, T);
+  Q := E0;
+  BTag(B, T, P3(Q[3].X, Q[3].Y, Q[3].Z + Off));
+  if T.Dims then
+  begin
+    BDim(B, Q[0], Q[1], P3(0, 0, -Off));
+    BDim(B, Q[1], Q[2], P3(Off, 0, 0));
+    if T.Leg0 > 0 then BDim(B, Q[1], X0[1], P3(0, 0, -Off));
+    if T.Leg1 > 0 then BDim(B, E1[1], X1[1], P3(0, 0, -Off));
+    if (Abs(A1 - A) > 1E-9) or (Abs(B1 - Bc) > 1E-9) then
+    begin
+      BDim(B, X1[0], X1[1], Add(P3(0, 0, 0), W(P3(0, 0, -1)), Off));
+      BDim(B, X1[1], X1[2], Add(P3(0, 0, 0), W(Dir), Off));
+    end;
+  end;
+end;
+
+function SolveFieldElbow(R, Fwd, Over, Theta: Double; out Leg0, Leg1: Double): string;
+begin
+  Leg0 := 0; Leg1 := 0;
+  Result := '';
+  if (Theta <= 1E-6) or (Theta >= Pi - 1E-6) then
+    Exit('The far duct has to point somewhere between straight ahead and straight back.');
+  if R < 0 then Exit('The throat radius cannot be less than nothing.');
+  { the exit leg covers the sideways distance the arc does not; the entry
+    leg covers the forward distance left after the arc and exit leg }
+  Leg1 := (Over - R * (1 - Cos(Theta))) / Sin(Theta);
+  Leg0 := Fwd - R * Sin(Theta) - Leg1 * Cos(Theta);
+  if Leg1 < -1E-9 then
+    Exit('It cannot get over that far with that throat radius - make the radius smaller, ' +
+      'or the far duct is closer than a turn can reach.');
+  if Leg0 < -1E-9 then
+    Exit('The far duct is too close ahead for the turn - make the throat radius smaller.');
+  if Leg1 < 0 then Leg1 := 0;
+  if Leg0 < 0 then Leg0 := 0;
+end;
+
+function FieldDirection(Fwd1, Over1, Fwd2, Over2: Double): Double;
+begin
+  Result := ArcTan2(Over2 - Over1, Fwd2 - Fwd1);
+end;
+
+function BuildTee(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+var
+  B: TBuild;
+  E, X, BE, BX: TP3x4;
+  Wall: Integer;
+  Nrm, U, V, O: TP3;
+  Raw: TEndSpec;
+  Hole: TP3Array;
+  I: Integer;
+  Off: Double;
+  WallPoly: TP3x4;
+  P0: TP3;
+begin
+  Result := D.Live;
+  B := StartBuild(D, T, Ink, Weight);
+  E[0] := P3(0, 0, 0); E[1] := P3(T.W0, 0, 0); E[2] := P3(T.W0, 0, T.H0); E[3] := P3(0, 0, T.H0);
+  for I := 0 to 3 do X[I] := P3(E[I].X, T.Len, E[I].Z);
+  { the branch wall, its outward direction, and the opening's axes: U along
+    the run, V up the wall (across it for top and bottom) }
+  case T.BranchOn of
+    bsLeft:   begin Wall := 3; Nrm := P3(-1, 0, 0); O := P3(0, 0, 0);     V := P3(0, 0, 1); end;
+    bsRight:  begin Wall := 1; Nrm := P3(1, 0, 0);  O := P3(T.W0, 0, 0);  V := P3(0, 0, 1); end;
+    bsTop:    begin Wall := 2; Nrm := P3(0, 0, 1);  O := P3(0, 0, T.H0);  V := P3(1, 0, 0); end;
+  else
+    begin Wall := 0; Nrm := P3(0, 0, -1); O := P3(0, 0, 0); V := P3(1, 0, 0); end;
+  end;
+  U := P3(0, 1, 0);
+  Raw.Kind := deRaw; Raw.Amount := 0;
+  { the run, less that wall }
+  BuildRun(B, E, X, [T.Ends[0], T.Ends[1]], [True, True], Wall);
+  { the opening: from BranchFrom along the run, BranchUp across the wall }
+  Hole := nil;
+  SetLength(Hole, 4);
+  Hole[0] := Add(Add(O, U, T.BranchFrom), V, T.BranchUp);
+  Hole[1] := Add(Hole[0], U, T.BW);
+  Hole[2] := Add(Hole[1], V, T.BH);
+  Hole[3] := Add(Hole[0], V, T.BH);
+  { the wall with the opening in it }
+  WallPoly[0] := E[Wall]; WallPoly[1] := X[Wall];
+  WallPoly[2] := X[(Wall + 1) mod 4]; WallPoly[3] := E[(Wall + 1) mod 4];
+  BFaceOut(B, WallPoly, Nrm);
+  B.D.SetFaceHoles(B.D.Live - 1, [Hole]);
+  for I := 0 to 3 do BLine(B, Hole[I], Hole[(I + 1) mod 4]);
+  { the branch starts at the opening, corners ordered as BuildRun wants seen
+    from outside; the hole already draws those edges }
+  case T.BranchOn of
+    bsLeft:  begin BE[0] := Hole[1]; BE[1] := Hole[0]; BE[2] := Hole[3]; BE[3] := Hole[2]; end;
+    bsRight: begin BE[0] := Hole[0]; BE[1] := Hole[1]; BE[2] := Hole[2]; BE[3] := Hole[3]; end;
+    bsTop:   begin BE[0] := Hole[0]; BE[1] := Hole[1]; BE[2] := Hole[2]; BE[3] := Hole[3]; end;
+  else
+    begin BE[0] := Hole[1]; BE[1] := Hole[0]; BE[2] := Hole[3]; BE[3] := Hole[2]; end;
+  end;
+  for I := 0 to 3 do BX[I] := Add(BE[I], Nrm, T.BranchLen);
+  BuildRun(B, BE, BX, [Raw, T.Ends[2]], [False, True], -1);
+  Off := StandOff(B, T);
+  BTag(B, T, P3(E[3].X, E[3].Y, E[3].Z + Off));
+  if T.Dims then
+  begin
+    BDim(B, E[0], E[1], P3(0, 0, -Off));
+    BDim(B, E[1], E[2], P3(Off, 0, 0));
+    BDim(B, E[1], X[1], P3(0, 0, -Off));
+    BDim(B, BX[0], BX[1], Add(P3(0, 0, 0), Nrm, Off));
+    BDim(B, BX[1], BX[2], Add(P3(0, 0, 0), Nrm, Off));
+    { where the branch starts: straight along the run from the entry, then
+      up (or in) from the wall's edge }
+    P0 := Add(O, U, T.BranchFrom);
+    BDim(B, O, P0, Add(P3(0, 0, 0), Nrm, Off));
+    BDim(B, P0, Hole[0], Add(P3(0, 0, 0), Nrm, Off));
+  end;
+end;
+
+function BuildFitting(D: TWorkDoc; const T: TTransitionSpec; Ink: TColor;
+  Weight: Single): Integer;
+begin
+  case T.Kind of
+    fkElbow: Result := BuildElbow(D, T, Ink, Weight);
+    fkTee: Result := BuildTee(D, T, Ink, Weight);
+  else
+    Result := BuildTransition(D, T, Ink, Weight);
+  end;
+end;
+
+end.

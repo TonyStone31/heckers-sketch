@@ -1,0 +1,359 @@
+object StairForm: TStairForm
+  Left = 250
+  Height = 700
+  Top = 60
+  Width = 1000
+  BorderStyle = bsDialog
+  Caption = 'Stairs'
+  ClientHeight = 700
+  ClientWidth = 1000
+  KeyPreview = True
+  Position = poOwnerFormCenter
+  OnKeyDown = FormKeyDown
+  object lblTitle: TLabel
+    Left = 20
+    Height = 28
+    Top = 14
+    Width = 320
+    AutoSize = False
+    Caption = 'Stairs'
+    Font.Style = [fsBold]
+    ParentFont = False
+    Font.Height = -20
+    ParentFont = False
+  end
+  object lblHint: TLabel
+    Left = 20
+    Height = 54
+    Top = 48
+    Width = 320
+    AutoSize = False
+    Caption = ''
+    WordWrap = True
+  end
+  object lblFrom: TLabel
+    Left = 20
+    Height = 18
+    Top = 112
+    Width = 96
+    AutoSize = False
+    Caption = 'Width from'
+  end
+  object cbFrom: TComboBox
+    Left = 120
+    Height = 28
+    Top = 106
+    Width = 220
+    ItemHeight = 0
+    Style = csDropDownList
+    TabOrder = 0
+    OnChange = Changed
+  end
+  object lblRise: TLabel
+    Left = 20
+    Height = 18
+    Top = 150
+    Width = 96
+    AutoSize = False
+    Caption = 'Total rise'
+  end
+  object edRise: TEdit
+    Left = 120
+    Height = 28
+    Top = 144
+    Width = 110
+    TabOrder = 1
+    OnChange = Changed
+    Hint = 'floor to landing, finished'
+    ShowHint = True
+  end
+  object lblRun: TLabel
+    Left = 20
+    Height = 18
+    Top = 184
+    Width = 96
+    AutoSize = False
+    Caption = 'Total run'
+  end
+  object edRun: TEdit
+    Left = 120
+    Height = 28
+    Top = 178
+    Width = 110
+    TabOrder = 2
+    OnChange = Changed
+    Hint = 'first riser to the landing edge, across the floor'
+    ShowHint = True
+  end
+  object lblWidth: TLabel
+    Left = 20
+    Height = 18
+    Top = 218
+    Width = 96
+    AutoSize = False
+    Caption = 'Width'
+  end
+  object edWidth: TEdit
+    Left = 120
+    Height = 28
+    Top = 212
+    Width = 110
+    TabOrder = 3
+    OnChange = Changed
+  end
+  object lblUse: TLabel
+    Left = 20
+    Height = 18
+    Top = 262
+    Width = 96
+    AutoSize = False
+    Caption = 'Built for'
+  end
+  object cbUse: TComboBox
+    Left = 120
+    Height = 28
+    Top = 256
+    Width = 220
+    ItemHeight = 0
+    Style = csDropDownList
+    TabOrder = 4
+    OnChange = Changed
+    Items.Strings = (
+      'A house - IRC'
+      'Public - IBC'
+      'Older people - gentler'
+      'Carrying things'
+      'Accessible - ADA'
+      'Emergency exit - IBC'
+      'Service or roof access - OSHA'
+    )
+    ItemIndex = 0
+  end
+  object lblCount: TLabel
+    Left = 20
+    Height = 18
+    Top = 302
+    Width = 96
+    AutoSize = False
+    Caption = 'Risers'
+  end
+  object edCount: TSpinEdit
+    Left = 120
+    Height = 28
+    Top = 296
+    Width = 80
+    MaxValue = 200
+    MinValue = 2
+    TabOrder = 5
+    Value = 14
+    OnChange = Changed
+  end
+  object btnSuggest: TBCButton
+    Left = 210
+    Height = 28
+    Top = 296
+    Width = 130
+    Caption = 'Suggest'
+    OnClick = SuggestClick
+    Hint = 'the riser count that best fits what it is built for'
+    ShowHint = True
+  end
+  object lblThickness: TLabel
+    Left = 20
+    Height = 18
+    Top = 342
+    Width = 96
+    AutoSize = False
+    Caption = 'Board'
+  end
+  object edThickness: TEdit
+    Left = 120
+    Height = 28
+    Top = 336
+    Width = 110
+    TabOrder = 6
+    OnChange = Changed
+    Hint = 'tread and riser board thickness'
+    ShowHint = True
+  end
+  object lblThickHint: TLabel
+    Left = 236
+    Height = 18
+    Top = 342
+    Width = 100
+    AutoSize = False
+    Caption = 'thick'
+  end
+  object lblNosing: TLabel
+    Left = 20
+    Height = 18
+    Top = 376
+    Width = 96
+    AutoSize = False
+    Caption = 'Nosing'
+  end
+  object edNosing: TEdit
+    Left = 120
+    Height = 28
+    Top = 370
+    Width = 110
+    TabOrder = 7
+    OnChange = Changed
+    Hint = 'how far a tread sticks out past the riser below it'
+    ShowHint = True
+  end
+  object lblNosingHint: TLabel
+    Left = 236
+    Height = 18
+    Top = 376
+    Width = 104
+    AutoSize = False
+    Caption = 'past the riser'
+  end
+  object cbClosed: TCheckBox
+    Left = 20
+    Height = 22
+    Top = 414
+    Width = 22
+    TabOrder = 8
+    OnChange = Changed
+  end
+  object lblClosed: TLabel
+    Left = 48
+    Height = 18
+    Top = 416
+    Width = 280
+    AutoSize = False
+    Caption = 'Closed risers - a board at each step'
+    FocusControl = cbClosed
+    OnClick = CheckLabelClick
+  end
+  object cbRound: TCheckBox
+    Left = 20
+    Height = 22
+    Top = 442
+    Width = 22
+    TabOrder = 9
+    OnChange = Changed
+  end
+  object lblRound: TLabel
+    Left = 48
+    Height = 18
+    Top = 444
+    Width = 280
+    AutoSize = False
+    Caption = 'Rounded nose (bullnose)'
+    FocusControl = cbRound
+    OnClick = CheckLabelClick
+  end
+  object btnPick: TBCButton
+    Left = 20
+    Height = 32
+    Top = 478
+    Width = 320
+    Caption = 'Pick on the drawing...'
+    Hint = 'three clicks on the sheet: the top, the landing''s edge; the bottom, where the first riser stands; and the side the width goes'
+    ShowHint = True
+    OnClick = PickClick
+  end
+  object btnSource: TBCButton
+    Left = 20
+    Height = 32
+    Top = 518
+    Width = 320
+    Caption = 'Open the code it checks against'
+    OnClick = SourceClick
+  end
+  object btnStringers: TBCButton
+    Left = 20
+    Height = 32
+    Top = 558
+    Width = 320
+    Caption = 'Stringer sheet (PDF)...'
+    Hint = 'what lumber to buy, and how to mark and cut the stringers for this flight - dots to measure, lines to join, cuts dashed'
+    ShowHint = True
+    OnClick = StringersClick
+  end
+  object lblLimit: TLabel
+    Left = 20
+    Height = 60
+    Top = 600
+    Width = 320
+    AutoSize = False
+    Caption = 'Checks the stair''s proportions against what you picked - not a permit review.  Builds the tread and riser boards; the stringers are on the stringer sheet.'
+    WordWrap = True
+  end
+  object pbSide: TPaintBox
+    Left = 360
+    Height = 300
+    Top = 14
+    Width = 620
+    OnPaint = PaintSide
+  end
+  object lblStatus: TLabel
+    Left = 360
+    Height = 28
+    Top = 320
+    Width = 620
+    AutoSize = False
+    Caption = ''
+    Font.Height = -18
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lblProblems: TLabel
+    Left = 360
+    Height = 96
+    Top = 398
+    Width = 620
+    AutoSize = False
+    Caption = ''
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object lblSummary: TLabel
+    Left = 360
+    Height = 40
+    Top = 354
+    Width = 620
+    AutoSize = False
+    Caption = ''
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object memAdvice: TMemo
+    Left = 360
+    Height = 146
+    Top = 498
+    Width = 620
+    ReadOnly = True
+    ScrollBars = ssAutoVertical
+    TabOrder = 10
+  end
+  object btnCancel: TBCButton
+    Left = 740
+    Height = 32
+    Top = 656
+    Width = 110
+    Caption = 'Cancel'
+    OnClick = CancelClick
+  end
+  object btnBuild: TBCButton
+    Left = 860
+    Height = 32
+    Top = 656
+    Width = 120
+    Caption = 'Build stairs'
+    OnClick = BuildClick
+  end
+  object sdStringers: TSaveDialog
+    Title = 'Save the stringer sheet'
+    DefaultExt = '.pdf'
+    Filter = 'PDF (*.pdf)|*.pdf'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 900
+    Top = 660
+  end
+end

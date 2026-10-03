@@ -1,0 +1,37 @@
+# build output
+lib/
+backup/
+bin/
+dist/
+*.lps
+*.compiled
+*.ppu
+*.or
+*.a
+*.o
+*.dbg
+link*.res
+*.bak
+*~
+
+# what the program writes beside itself when run from here
+heckers-sketch.cfg
+heckers-sketch.lock
+heckers-sketch-draft.hsk*
+heckers-sketch-crash.txt*
+heckers-sketch-*.download
+*-crash.txt
+*.hsk.would-not-open
+/help/
+/help.new/
+/help.old/
+/exports/
+/drawings/
+
+# the example generators, built in place
+examples/make-*
+!examples/make-*.pas
+
+# editor and OS
+.DS_Store
+Thumbs.db

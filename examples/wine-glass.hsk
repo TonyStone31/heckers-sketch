@@ -1,0 +1,5086 @@
+// Written out beside Heckers Sketch, and put back whenever it is missing
+// or untouched.  Draw on it all you like - once you save over it, it is
+// yours and the program leaves it alone.
+HeckersSketch 2
+units = ft in
+
+sheet 'Wine Glass'
+  ink = #C8D8E0
+  width = 1
+  units = ft in
+  scale = '1"'
+  snap = '1/16"'
+  view = 3d
+  camera = -0.785398, 0.45, 6.622258, 640, 562.742
+
+  solid
+    points
+      p1 = 0 east, 1.55" south, 0 up
+      p2 = 0.401172" west, 1.49718" south, 0 up
+      p3 = p2 + 0.802344" east
+      p4 = 0.775" west, 1.342344" south, 0 up
+      p5 = p4 + 1.55" east
+      p6 = 1.09602" west, 1.09602" south, 0 up
+      p7 = p6 + 2.19204" east
+      p8 = 1.342344" west, 0.775" south, 0 up
+      p9 = p8 + 2.684688" east
+      p10 = 1.49718" west, 0.401172" south, 0 up
+      p11 = p10 + 2.99436" east
+      p12 = 1.55" west, 0 north, 0 up
+      p13 = p12 + 1.55" east
+      p14 = p13 + 1.55" east
+      p15 = p10 + 0.802344" north
+      p16 = p15 + 2.99436" east
+      p17 = p8 + 1.55" north
+      p18 = p17 + 2.684688" east
+      p19 = p6 + 2.19204" north
+      p20 = p19 + 2.19204" east
+      p21 = p4 + 2.684688" north
+      p22 = p21 + 1.55" east
+      p23 = p2 + 2.99436" north
+      p24 = p23 + 0.802344" east
+      p25 = p13 + 1.55" north
+      p26 = 0 east, 1.6" south, 0.12" up
+      p27 = 0.414108" west, 1.54548" south, 0.12" up
+      p28 = p27 + 0.828216" east
+      p29 = 0.8" west, 1.38564" south, 0.12" up
+      p30 = p29 + 1.6" east
+      p31 = 1.131372" west, 1.131372" south, 0.12" up
+      p32 = p31 + 2.262744" east
+      p33 = 1.38564" west, 0.8" south, 0.12" up
+      p34 = p33 + 2.77128" east
+      p35 = 1.54548" west, 0.414108" south, 0.12" up
+      p36 = p35 + 3.09096" east
+      p37 = 1.6" west, 0 north, 0.12" up
+      p38 = p37 + 3.2" east
+      p39 = p35 + 0.828216" north
+      p40 = p39 + 3.09096" east
+      p41 = p33 + 1.6" north
+      p42 = p41 + 2.77128" east
+      p43 = p31 + 2.262744" north
+      p44 = p43 + 2.262744" east
+      p45 = p29 + 2.77128" north
+      p46 = p45 + 1.6" east
+      p47 = p27 + 3.09096" north
+      p48 = p47 + 0.828216" east
+      p49 = p26 + 3.2" north
+      p50 = 0 east, 0.34" south, 0.4" up
+      p51 = 0.088" west, 0.328416" south, 0.4" up
+      p52 = p51 + 0.176" east
+      p53 = 0.17" west, 0.294444" south, 0.4" up
+      p54 = p53 + 0.34" east
+      p55 = 0.24042" west, 0.24042" south, 0.4" up
+      p56 = p55 + 0.48084" east
+      p57 = 0.294444" west, 0.17" south, 0.4" up
+      p58 = p57 + 0.588888" east
+      p59 = 0.328416" west, 0.088" south, 0.4" up
+      p60 = p59 + 0.656832" east
+      p61 = 0.34" west, 0 north, 0.4" up
+      p62 = p61 + 0.68" east
+      p63 = p59 + 0.176" north
+      p64 = p63 + 0.656832" east
+      p65 = p57 + 0.34" north
+      p66 = p65 + 0.588888" east
+      p67 = p55 + 0.48084" north
+      p68 = p67 + 0.48084" east
+      p69 = p53 + 0.588888" north
+      p70 = p69 + 0.34" east
+      p71 = p51 + 0.656832" north
+      p72 = p71 + 0.176" east
+      p73 = p50 + 0.68" north
+      p74 = 0 east, 0.17" south, 0.95" up
+      p75 = 0.044" west, 0.164208" south, 0.95" up
+      p76 = p75 + 0.088" east
+      p77 = 0.085" west, 0.147228" south, 0.95" up
+      p78 = p77 + 0.17" east
+      p79 = 0.120204" west, 0.120204" south, 0.95" up
+      p80 = p79 + 0.240408" east
+      p81 = 0.147228" west, 0.085" south, 0.95" up
+      p82 = p81 + 0.294456" east
+      p83 = 0.164208" west, 0.044" south, 0.95" up
+      p84 = p83 + 0.328416" east
+      p85 = 0.17" west, 0 north, 0.95" up
+      p86 = p85 + 0.34" east
+      p87 = p83 + 0.088" north
+      p88 = p87 + 0.328416" east
+      p89 = p81 + 0.17" north
+      p90 = p89 + 0.294456" east
+      p91 = p79 + 0.240408" north
+      p92 = p91 + 0.240408" east
+      p93 = p77 + 0.294456" north
+      p94 = p93 + 0.17" east
+      p95 = p75 + 0.328416" north
+      p96 = p95 + 0.088" east
+      p97 = p74 + 0.34" north
+      p98 = p74 + 2 1/2" up
+      p99 = p75 + 2 1/2" up
+      p100 = p99 + 0.088" east
+      p101 = p77 + 2 1/2" up
+      p102 = p101 + 0.17" east
+      p103 = p79 + 2 1/2" up
+      p104 = p103 + 0.240408" east
+      p105 = p81 + 2 1/2" up
+      p106 = p105 + 0.294456" east
+      p107 = p83 + 2 1/2" up
+      p108 = p107 + 0.328416" east
+      p109 = p85 + 2 1/2" up
+      p110 = p109 + 0.34" east
+      p111 = p107 + 0.088" north
+      p112 = p111 + 0.328416" east
+      p113 = p105 + 0.17" north
+      p114 = p113 + 0.294456" east
+      p115 = p103 + 0.240408" north
+      p116 = p115 + 0.240408" east
+      p117 = p101 + 0.294456" north
+      p118 = p117 + 0.17" east
+      p119 = p99 + 0.328416" north
+      p120 = p119 + 0.088" east
+      p121 = p98 + 0.34" north
+      p122 = p13 + 3.92" up
+      p123 = 0 east, 0.46" south, 4.05" up
+      p124 = 0.119052" west, 0.444324" south, 4.05" up
+      p125 = p124 + 0.238104" east
+      p126 = 0.23" west, 0.398376" south, 4.05" up
+      p127 = p126 + 0.46" east
+      p128 = 0.325272" west, 0.325272" south, 4.05" up
+      p129 = p128 + 0.650544" east
+      p130 = 0.398376" west, 0.23" south, 4.05" up
+      p131 = p130 + 0.796752" east
+      p132 = 0.444324" west, 0.119052" south, 4.05" up
+      p133 = p132 + 0.888648" east
+      p134 = 0.46" west, 0 north, 4.05" up
+      p135 = p134 + 0.92" east
+      p136 = p132 + 0.238104" north
+      p137 = p136 + 0.888648" east
+      p138 = p130 + 0.46" north
+      p139 = p138 + 0.796752" east
+      p140 = p128 + 0.650544" north
+      p141 = p140 + 0.650544" east
+      p142 = p126 + 0.796752" north
+      p143 = p142 + 0.46" east
+      p144 = p124 + 0.888648" north
+      p145 = p144 + 0.238104" east
+      p146 = p123 + 0.92" north
+      p147 = 0 east, 0.33" south, 4.18" up
+      p148 = 0.085416" west, 0.318756" south, 4.18" up
+      p149 = p148 + 0.170832" east
+      p150 = 0.165" west, 0.285792" south, 4.18" up
+      p151 = p150 + 0.33" east
+      p152 = 0.23334" west, 0.23334" south, 4.18" up
+      p153 = p152 + 0.46668" east
+      p154 = 0.285792" west, 0.165" south, 4.18" up
+      p155 = p154 + 0.571584" east
+      p156 = 0.318756" west, 0.085416" south, 4.18" up
+      p157 = p156 + 0.637512" east
+      p158 = 0.33" west, 0 north, 4.18" up
+      p159 = p158 + 0.66" east
+      p160 = p156 + 0.170832" north
+      p161 = p160 + 0.637512" east
+      p162 = p154 + 0.33" north
+      p163 = p162 + 0.571584" east
+      p164 = p152 + 0.46668" north
+      p165 = p164 + 0.46668" east
+      p166 = p150 + 0.571584" north
+      p167 = p166 + 0.33" east
+      p168 = p148 + 0.637512" north
+      p169 = p168 + 0.170832" east
+      p170 = p147 + 0.66" north
+      p171 = 0 east, 0.872028" south, 4.321188" up
+      p172 = 0.225696" west, 0.842316" south, 4.321188" up
+      p173 = p172 + 0.451392" east
+      p174 = 0.43602" west, 0.755196" south, 4.321188" up
+      p175 = p174 + 0.87204" east
+      p176 = 0.61662" west, 0.61662" south, 4.321188" up
+      p177 = p176 + 1.23324" east
+      p178 = 0.755196" west, 0.43602" south, 4.321188" up
+      p179 = p178 + 1.510392" east
+      p180 = 0.842316" west, 0.225696" south, 4.321188" up
+      p181 = p180 + 1.684632" east
+      p182 = 0.872028" west, 0 north, 4.321188" up
+      p183 = p182 + 1.744056" east
+      p184 = p180 + 0.451392" north
+      p185 = p184 + 1.684632" east
+      p186 = p178 + 0.87204" north
+      p187 = p186 + 1.510392" east
+      p188 = p176 + 1.23324" north
+      p189 = p188 + 1.23324" east
+      p190 = p174 + 1.510392" north
+      p191 = p190 + 0.87204" east
+      p192 = p172 + 1.684632" north
+      p193 = p192 + 0.451392" east
+      p194 = p171 + 1.744056" north
+      p195 = 0 east, 0.738744" south, 4.420392" up
+      p196 = 0.191208" west, 0.71358" south, 4.420392" up
+      p197 = p196 + 0.382416" east
+      p198 = 0.369372" west, 0.63978" south, 4.420392" up
+      p199 = p198 + 0.738744" east
+      p200 = 0.522372" west, 0.522372" south, 4.420392" up
+      p201 = p200 + 1.044744" east
+      p202 = 0.63978" west, 0.369372" south, 4.420392" up
+      p203 = p202 + 1.27956" east
+      p204 = 0.71358" west, 0.191208" south, 4.420392" up
+      p205 = p204 + 1.42716" east
+      p206 = 0.738744" west, 0 north, 4.420392" up
+      p207 = p206 + 1.477488" east
+      p208 = p204 + 0.382416" north
+      p209 = p208 + 1.42716" east
+      p210 = p202 + 0.738744" north
+      p211 = p210 + 1.27956" east
+      p212 = p200 + 1.044744" north
+      p213 = p212 + 1.044744" east
+      p214 = p198 + 1.27956" north
+      p215 = p214 + 0.738744" east
+      p216 = p196 + 1.42716" north
+      p217 = p216 + 0.382416" east
+      p218 = p195 + 1.477488" north
+      p219 = 0 east, 1.206252" south, 4.738284" up
+      p220 = 0.312204" west, 1.165152" south, 4.738284" up
+      p221 = p220 + 0.624408" east
+      p222 = 0.60312" west, 1.044648" south, 4.738284" up
+      p223 = p222 + 1.20624" east
+      p224 = 0.852948" west, 0.852948" south, 4.738284" up
+      p225 = p224 + 1.705896" east
+      p226 = 1.044648" west, 0.60312" south, 4.738284" up
+      p227 = p226 + 2.089296" east
+      p228 = 1.165152" west, 0.312204" south, 4.738284" up
+      p229 = p228 + 2.330304" east
+      p230 = 1.206252" west, 0 north, 4.738284" up
+      p231 = p230 + 2.412504" east
+      p232 = p228 + 0.624408" north
+      p233 = p232 + 2.330304" east
+      p234 = p226 + 1.20624" north
+      p235 = p234 + 2.089296" east
+      p236 = p224 + 1.705896" north
+      p237 = p236 + 1.705896" east
+      p238 = p222 + 2.089296" north
+      p239 = p238 + 1.20624" east
+      p240 = p220 + 2.330304" north
+      p241 = p240 + 0.624408" east
+      p242 = p219 + 2.412504" north
+      p243 = 0 east, 1.070628" south, 4.805628" up
+      p244 = 0.277104" west, 1.034148" south, 4.805628" up
+      p245 = p244 + 0.554208" east
+      p246 = 0.535308" west, 0.927192" south, 4.805628" up
+      p247 = p246 + 1.070616" east
+      p248 = 0.757044" west, 0.757044" south, 4.805628" up
+      p249 = p248 + 1.514088" east
+      p250 = 0.927192" west, 0.535308" south, 4.805628" up
+      p251 = p250 + 1.854384" east
+      p252 = 1.034148" west, 0.277104" south, 4.805628" up
+      p253 = p252 + 2.068296" east
+      p254 = 1.070628" west, 0 north, 4.805628" up
+      p255 = p254 + 2.141256" east
+      p256 = p252 + 0.554208" north
+      p257 = p256 + 2.068296" east
+      p258 = p250 + 1.070616" north
+      p259 = p258 + 1.854384" east
+      p260 = p248 + 1.514088" north
+      p261 = p260 + 1.514088" east
+      p262 = p246 + 1.854384" north
+      p263 = p262 + 1.070616" east
+      p264 = p244 + 2.068296" north
+      p265 = p264 + 0.554208" east
+      p266 = p243 + 2.141256" north
+      p267 = 0 east, 1.459848" south, 5.269044" up
+      p268 = 0.377832" west, 1.410096" south, 5.269044" up
+      p269 = p268 + 0.755664" east
+      p270 = 0.729924" west, 1.26426" south, 5.269044" up
+      p271 = p270 + 1.459848" east
+      p272 = 1.032264" west, 1.032264" south, 5.269044" up
+      p273 = p272 + 2.064528" east
+      p274 = 1.26426" west, 0.729924" south, 5.269044" up
+      p275 = p274 + 2.52852" east
+      p276 = 1.410096" west, 0.377832" south, 5.269044" up
+      p277 = p276 + 2.820192" east
+      p278 = 1.459848" west, 0 north, 5.269044" up
+      p279 = p278 + 2.919696" east
+      p280 = p276 + 0.755664" north
+      p281 = p280 + 2.820192" east
+      p282 = p274 + 1.459848" north
+      p283 = p282 + 2.52852" east
+      p284 = p272 + 2.064528" north
+      p285 = p284 + 2.064528" east
+      p286 = p270 + 2.52852" north
+      p287 = p286 + 1.459848" east
+      p288 = p268 + 2.820192" north
+      p289 = p288 + 0.755664" east
+      p290 = p267 + 2.919696" north
+      p291 = 0 east, 1.322808" south, 5.3043" up
+      p292 = 0.342372" west, 1.277736" south, 5.3043" up
+      p293 = p292 + 0.684744" east
+      p294 = 0.661404" west, 1.145592" south, 5.3043" up
+      p295 = p294 + 1.322808" east
+      p296 = 0.935364" west, 0.935364" south, 5.3043" up
+      p297 = p296 + 1.870728" east
+      p298 = 1.145592" west, 0.661404" south, 5.3043" up
+      p299 = p298 + 2.291184" east
+      p300 = 1.277736" west, 0.342372" south, 5.3043" up
+      p301 = p300 + 2.555472" east
+      p302 = 1.322808" west, 0 north, 5.3043" up
+      p303 = p302 + 2.645616" east
+      p304 = p300 + 0.684744" north
+      p305 = p304 + 2.555472" east
+      p306 = p298 + 1.322808" north
+      p307 = p306 + 2.291184" east
+      p308 = p296 + 1.870728" north
+      p309 = p308 + 1.870728" east
+      p310 = p294 + 2.291184" north
+      p311 = p310 + 1.322808" east
+      p312 = p292 + 2.555472" north
+      p313 = p312 + 0.684744" east
+      p314 = p291 + 2.645616" north
+      p315 = 0 east, 1.63" south, 5.881248" up
+      p316 = 27/64" west, 1.57446" south, 5.881248" up
+      p317 = p316 + 27/32" east
+      p318 = 0.815" west, 1.41162" south, 5.881248" up
+      p319 = p318 + 1.63" east
+      p320 = 1.152588" west, 1.152588" south, 5.881248" up
+      p321 = p320 + 2.305176" east
+      p322 = 1.41162" west, 0.815" south, 5.881248" up
+      p323 = p322 + 2.82324" east
+      p324 = 1.57446" west, 27/64" south, 5.881248" up
+      p325 = p324 + 3.14892" east
+      p326 = 1.63" west, 0 north, 5.881248" up
+      p327 = p326 + 3.26" east
+      p328 = p324 + 27/32" north
+      p329 = p328 + 3.14892" east
+      p330 = p322 + 1.63" north
+      p331 = p330 + 2.82324" east
+      p332 = p320 + 2.305176" north
+      p333 = p332 + 2.305176" east
+      p334 = p318 + 2.82324" north
+      p335 = p334 + 1.63" east
+      p336 = p316 + 3.14892" north
+      p337 = p336 + 27/32" east
+      p338 = p315 + 3.26" north
+      p339 = 0 east, 1.4925" south, 5.885" up
+      p340 = 0.386292" west, 1.441644" south, 5.885" up
+      p341 = p340 + 0.772584" east
+      p342 = 0.746256" west, 1.292544" south, 5.885" up
+      p343 = p342 + 1.492512" east
+      p344 = 1.055352" west, 1.055352" south, 5.885" up
+      p345 = p344 + 2.110704" east
+      p346 = 1.292544" east, 0.746256" south, 5.885" up
+      p347 = 1.292544" west, 0.746244" south, 5.885" up
+      p348 = 1.441644" west, 0.386292" south, 5.885" up
+      p349 = p348 + 2.883288" east
+      p350 = 1.4925" west, 0 north, 5.885" up
+      p351 = p350 + 2.985" east
+      p352 = p348 + 0.772584" north
+      p353 = p352 + 2.883288" east
+      p354 = p347 + 1.492488" north
+      p355 = p354 + 2.585088" east
+      p356 = p344 + 2.110704" north
+      p357 = p356 + 2.110704" east
+      p358 = 0.746244" west, 1.292544" north, 5.885" up
+      p359 = p358 + 1.4925" east
+      p360 = p340 + 2.883288" north
+      p361 = p360 + 0.772584" east
+      p362 = p339 + 2.985" north
+      p363 = 0 east, 1.576872" south, 6.516324" up
+      p364 = 0.40812" west, 1.523148" south, 6.516324" up
+      p365 = p364 + 0.81624" east
+      p366 = 0.788436" west, 1.365612" south, 6.516324" up
+      p367 = p366 + 1.576872" east
+      p368 = 1.115016" west, 1.115016" south, 6.516324" up
+      p369 = p368 + 2.230032" east
+      p370 = 1.365612" west, 0.788436" south, 6.516324" up
+      p371 = p370 + 2.731224" east
+      p372 = 1.523148" west, 0.40812" south, 6.516324" up
+      p373 = p372 + 3.046296" east
+      p374 = 1.576872" west, 0 north, 6.516324" up
+      p375 = p374 + 3.153744" east
+      p376 = p372 + 0.81624" north
+      p377 = p376 + 3.046296" east
+      p378 = p370 + 1.576872" north
+      p379 = p378 + 2.731224" east
+      p380 = p368 + 2.230032" north
+      p381 = p380 + 2.230032" east
+      p382 = p366 + 2.731224" north
+      p383 = p382 + 1.576872" east
+      p384 = p364 + 3.046296" north
+      p385 = p384 + 0.81624" east
+      p386 = p363 + 3.153744" north
+      p387 = 0 east, 1.713912" south, 6.542676" up
+      p388 = 0.443592" west, 1.655508" south, 6.542676" up
+      p389 = p388 + 0.887184" east
+      p390 = 0.856956" west, 1.484292" south, 6.542676" up
+      p391 = p390 + 1.713912" east
+      p392 = 1.211916" west, 1.211916" south, 6.542676" up
+      p393 = p392 + 2.423832" east
+      p394 = 1.484292" west, 0.856956" south, 6.542676" up
+      p395 = p394 + 2.968584" east
+      p396 = 1.655508" west, 0.443592" south, 6.542676" up
+      p397 = p396 + 3.311016" east
+      p398 = 1.713912" west, 0 north, 6.542676" up
+      p399 = p398 + 3.427824" east
+      p400 = p396 + 0.887184" north
+      p401 = p400 + 3.311016" east
+      p402 = p394 + 1.713912" north
+      p403 = p402 + 2.968584" east
+      p404 = p392 + 2.423832" north
+      p405 = p404 + 2.423832" east
+      p406 = p390 + 2.968584" north
+      p407 = p406 + 1.713912" east
+      p408 = p388 + 3.311016" north
+      p409 = p408 + 0.887184" east
+      p410 = p387 + 3.427824" north
+      p411 = 0 east, 1.573128" south, 7.16688" up
+      p412 = 0.40716" west, 1.519524" south, 7.16688" up
+      p413 = p412 + 0.81432" east
+      p414 = 0.786564" west, 1.362372" south, 7.16688" up
+      p415 = p414 + 1.573128" east
+      p416 = 1.112364" west, 1.112364" south, 7.16688" up
+      p417 = p416 + 2.224728" east
+      p418 = 1.362372" west, 0.786564" south, 7.16688" up
+      p419 = p418 + 2.724744" east
+      p420 = 1.519524" west, 0.40716" south, 7.16688" up
+      p421 = p420 + 3.039048" east
+      p422 = 1.573128" west, 0 north, 7.16688" up
+      p423 = p422 + 3.146256" east
+      p424 = p420 + 0.81432" north
+      p425 = p424 + 3.039048" east
+      p426 = p418 + 1.573128" north
+      p427 = p426 + 2.724744" east
+      p428 = p416 + 2.224728" north
+      p429 = p428 + 2.224728" east
+      p430 = p414 + 2.724744" north
+      p431 = p430 + 1.573128" east
+      p432 = p412 + 3.039048" north
+      p433 = p432 + 0.81432" east
+      p434 = p411 + 3.146256" north
+      p435 = 0 east, 1.708752" south, 7.221096" up
+      p436 = 0.44226" west, 1.650528" south, 7.221096" up
+      p437 = p436 + 0.88452" east
+      p438 = 0.854376" west, 1.479816" south, 7.221096" up
+      p439 = p438 + 1.708752" east
+      p440 = 1.208268" west, 1.208268" south, 7.221096" up
+      p441 = p440 + 2.416536" east
+      p442 = 1.479816" west, 0.854376" south, 7.221096" up
+      p443 = p442 + 2.959632" east
+      p444 = 1.650528" west, 0.44226" south, 7.221096" up
+      p445 = p444 + 3.301056" east
+      p446 = 1.708752" west, 0 north, 7.221096" up
+      p447 = p446 + 3.417504" east
+      p448 = p444 + 0.88452" north
+      p449 = p448 + 3.301056" east
+      p450 = p442 + 1.708752" north
+      p451 = p450 + 2.959632" east
+      p452 = p440 + 2.416536" north
+      p453 = p452 + 2.416536" east
+      p454 = p438 + 2.959632" north
+      p455 = p454 + 1.708752" east
+      p456 = p436 + 3.301056" north
+      p457 = p456 + 0.88452" east
+      p458 = p435 + 3.417504" north
+      p459 = 0 east, 1.478436" south, 7.805232" up
+      p460 = 0.382644" west, 1.42806" south, 7.805232" up
+      p461 = p460 + 0.765288" east
+      p462 = 0.739224" west, 1.280364" south, 7.805232" up
+      p463 = p462 + 1.478448" east
+      p464 = 1.045416" west, 1.045416" south, 7.805232" up
+      p465 = p464 + 2.090832" east
+      p466 = 1.280364" west, 0.739224" south, 7.805232" up
+      p467 = p466 + 2.560728" east
+      p468 = 1.42806" west, 0.382644" south, 7.805232" up
+      p469 = p468 + 2.85612" east
+      p470 = 1.478436" west, 0 north, 7.805232" up
+      p471 = p470 + 2.956872" east
+      p472 = p468 + 0.765288" north
+      p473 = p472 + 2.85612" east
+      p474 = p466 + 1.478448" north
+      p475 = p474 + 2.560728" east
+      p476 = p464 + 2.090832" north
+      p477 = p476 + 2.090832" east
+      p478 = p462 + 2.560728" north
+      p479 = p478 + 1.478448" east
+      p480 = p460 + 2.85612" north
+      p481 = p480 + 0.765288" east
+      p482 = p459 + 2.956872" north
+      p483 = 0 east, 1.61172" south, 7.884276" up
+      p484 = 0.417144" west, 1.556796" south, 7.884276" up
+      p485 = p484 + 0.834288" east
+      p486 = 0.80586" west, 1.395792" south, 7.884276" up
+      p487 = p486 + 1.61172" east
+      p488 = 1.139652" west, 1.139652" south, 7.884276" up
+      p489 = p488 + 2.279304" east
+      p490 = 1.395792" west, 0.80586" south, 7.884276" up
+      p491 = p490 + 2.791584" east
+      p492 = 1.556796" west, 0.417144" south, 7.884276" up
+      p493 = p492 + 3.113592" east
+      p494 = 1.61172" west, 0 north, 7.884276" up
+      p495 = p494 + 3.22344" east
+      p496 = p492 + 0.834288" north
+      p497 = p496 + 3.113592" east
+      p498 = p490 + 1.61172" north
+      p499 = p498 + 2.791584" east
+      p500 = p488 + 2.279304" north
+      p501 = p500 + 2.279304" east
+      p502 = p486 + 2.791584" north
+      p503 = p502 + 1.61172" east
+      p504 = p484 + 3.113592" north
+      p505 = p504 + 0.834288" east
+      p506 = p483 + 3.22344" north
+      p507 = 0 east, 1.29" south, 8.4" up
+      p508 = 0.333876" west, 1.246044" south, 8.4" up
+      p509 = p508 + 0.667752" east
+      p510 = 0.645" west, 1.117176" south, 8.4" up
+      p511 = p510 + 1.29" east
+      p512 = 0.912168" west, 0.912168" south, 8.4" up
+      p513 = p512 + 1.824336" east
+      p514 = 1.117176" west, 0.645" south, 8.4" up
+      p515 = p514 + 2.234352" east
+      p516 = 1.246044" west, 0.333876" south, 8.4" up
+      p517 = p516 + 2.492088" east
+      p518 = 1.29" west, 0 north, 8.4" up
+      p519 = p518 + 2.58" east
+      p520 = p516 + 0.667752" north
+      p521 = p520 + 2.492088" east
+      p522 = p514 + 1.29" north
+      p523 = p522 + 2.234352" east
+      p524 = p512 + 1.824336" north
+      p525 = p524 + 1.824336" east
+      p526 = p510 + 2.234352" north
+      p527 = p526 + 1.29" east
+      p528 = p508 + 2.492088" north
+      p529 = p528 + 0.667752" east
+      p530 = p507 + 2.58" north
+      p531 = 0 east, 1.42" south, 8 1/2" up
+      p532 = 0.367524" west, 1.371612" south, 8 1/2" up
+      p533 = p532 + 0.735048" east
+      p534 = 0.71" west, 1.22976" south, 8 1/2" up
+      p535 = p534 + 1.42" east
+      p536 = 1.004088" west, 1.004088" south, 8 1/2" up
+      p537 = p536 + 2.008176" east
+      p538 = 1.22976" west, 0.71" south, 8 1/2" up
+      p539 = p538 + 2.45952" east
+      p540 = 1.371612" west, 0.367524" south, 8 1/2" up
+      p541 = p540 + 2.743224" east
+      p542 = 1.42" west, 0 north, 8 1/2" up
+      p543 = p542 + 2.84" east
+      p544 = p540 + 0.735048" north
+      p545 = p544 + 2.743224" east
+      p546 = p538 + 1.42" north
+      p547 = p546 + 2.45952" east
+      p548 = p536 + 2.008176" north
+      p549 = p548 + 2.008176" east
+      p550 = p534 + 2.45952" north
+      p551 = p550 + 1.42" east
+      p552 = p532 + 2.743224" north
+      p553 = p552 + 0.735048" east
+      p554 = p531 + 2.84" north
+    end
+    face = p40 p64 p62 p38
+    face = p42 p66 p64 p40
+    face = p44 p68 p66 p42
+    face = p46 p70 p68 p44
+    face = p48 p72 p70 p46
+    face = p49 p73 p72 p48
+    face = p47 p71 p73 p49
+    face = p45 p69 p71 p47
+    face = p43 p67 p69 p45
+    face = p41 p65 p67 p43
+    face = p39 p63 p65 p41
+    face = p37 p61 p63 p39
+    face = p35 p59 p61 p37
+    face = p33 p57 p59 p35
+    face = p31 p55 p57 p33
+    face = p29 p53 p55 p31
+    face = p27 p51 p53 p29
+    face = p26 p50 p51 p27
+    face = p28 p52 p50 p26
+    face = p30 p54 p52 p28
+    face = p32 p56 p54 p30
+    face = p34 p58 p56 p32
+    face = p36 p60 p58 p34
+    face = p38 p62 p60 p36
+    face = p64 p88 p86 p62
+    face = p66 p90 p88 p64
+    face = p68 p92 p90 p66
+    face = p70 p94 p92 p68
+    face = p72 p96 p94 p70
+    face = p73 p97 p96 p72
+    face = p71 p95 p97 p73
+    face = p69 p93 p95 p71
+    face = p67 p91 p93 p69
+    face = p65 p89 p91 p67
+    face = p63 p87 p89 p65
+    face = p61 p85 p87 p63
+    face = p59 p83 p85 p61
+    face = p57 p81 p83 p59
+    face = p55 p79 p81 p57
+    face = p53 p77 p79 p55
+    face = p51 p75 p77 p53
+    face = p50 p74 p75 p51
+    face = p52 p76 p74 p50
+    face = p54 p78 p76 p52
+    face = p56 p80 p78 p54
+    face = p58 p82 p80 p56
+    face = p60 p84 p82 p58
+    face = p62 p86 p84 p60
+    face = p451 p499 p497 p449
+    face = p457 p505 p503 p455
+    face = p454 p502 p504 p456
+    face = p448 p496 p498 p450
+    face = p442 p490 p492 p444
+    face = p436 p484 p486 p438
+    face = p439 p487 p485 p437
+    face = p445 p493 p491 p443
+    face = p521 p473 p471 p519
+    face = p523 p475 p473 p521
+    face = p525 p477 p475 p523
+    face = p527 p479 p477 p525
+    face = p529 p481 p479 p527
+    face = p530 p482 p481 p529
+    face = p528 p480 p482 p530
+    face = p526 p478 p480 p528
+    face = p524 p476 p478 p526
+    face = p522 p474 p476 p524
+    face = p520 p472 p474 p522
+    face = p518 p470 p472 p520
+    face = p516 p468 p470 p518
+    face = p514 p466 p468 p516
+    face = p512 p464 p466 p514
+    face = p510 p462 p464 p512
+    face = p508 p460 p462 p510
+    face = p507 p459 p460 p508
+    face = p509 p461 p459 p507
+    face = p511 p463 p461 p509
+    face = p513 p465 p463 p511
+    face = p515 p467 p465 p513
+    face = p517 p469 p467 p515
+    face = p519 p471 p469 p517
+    face = p473 p425 p423 p471
+    face = p475 p427 p425 p473
+    face = p477 p429 p427 p475
+    face = p479 p431 p429 p477
+    face = p481 p433 p431 p479
+    face = p482 p434 p433 p481
+    face = p480 p432 p434 p482
+    face = p478 p430 p432 p480
+    face = p476 p428 p430 p478
+    face = p474 p426 p428 p476
+    face = p472 p424 p426 p474
+    face = p470 p422 p424 p472
+    face = p468 p420 p422 p470
+    face = p466 p418 p420 p468
+    face = p464 p416 p418 p466
+    face = p462 p414 p416 p464
+    face = p460 p412 p414 p462
+    face = p459 p411 p412 p460
+    face = p461 p413 p411 p459
+    face = p463 p415 p413 p461
+    face = p465 p417 p415 p463
+    face = p467 p419 p417 p465
+    face = p469 p421 p419 p467
+    face = p471 p423 p421 p469
+    face = p425 p377 p375 p423
+    face = p427 p379 p377 p425
+    face = p429 p381 p379 p427
+    face = p431 p383 p381 p429
+    face = p433 p385 p383 p431
+    face = p434 p386 p385 p433
+    face = p432 p384 p386 p434
+    face = p430 p382 p384 p432
+    face = p428 p380 p382 p430
+    face = p426 p378 p380 p428
+    face = p424 p376 p378 p426
+    face = p422 p374 p376 p424
+    face = p420 p372 p374 p422
+    face = p418 p370 p372 p420
+    face = p416 p368 p370 p418
+    face = p414 p366 p368 p416
+    face = p412 p364 p366 p414
+    face = p411 p363 p364 p412
+    face = p413 p365 p363 p411
+    face = p415 p367 p365 p413
+    face = p417 p369 p367 p415
+    face = p419 p371 p369 p417
+    face = p421 p373 p371 p419
+    face = p423 p375 p373 p421
+    face = p377 p353 p351 p375
+    face = p379 p355 p353 p377
+    face = p381 p357 p355 p379
+    face = p383 p359 p357 p381
+    face = p385 p361 p359 p383
+    face = p386 p362 p361 p385
+    face = p384 p360 p362 p386
+    face = p382 p358 p360 p384
+    face = p380 p356 p358 p382
+    face = p378 p354 p356 p380
+    face = p376 p352 p354 p378
+    face = p374 p350 p352 p376
+    face = p372 p348 p350 p374
+    face = p370 p347 p348 p372
+    face = p368 p344 p347 p370
+    face = p366 p342 p344 p368
+    face = p364 p340 p342 p366
+    face = p363 p339 p340 p364
+    face = p365 p341 p339 p363
+    face = p367 p343 p341 p365
+    face = p369 p345 p343 p367
+    face = p371 p346 p345 p369
+    face = p373 p349 p346 p371
+    face = p375 p351 p349 p373
+    face = p353 p305 p303 p351
+    face = p355 p307 p305 p353
+    face = p357 p309 p307 p355
+    face = p359 p311 p309 p357
+    face = p361 p313 p311 p359
+    face = p362 p314 p313 p361
+    face = p360 p312 p314 p362
+    face = p358 p310 p312 p360
+    face = p356 p308 p310 p358
+    face = p354 p306 p308 p356
+    face = p352 p304 p306 p354
+    face = p350 p302 p304 p352
+    face = p348 p300 p302 p350
+    face = p347 p298 p300 p348
+    face = p344 p296 p298 p347
+    face = p342 p294 p296 p344
+    face = p340 p292 p294 p342
+    face = p339 p291 p292 p340
+    face = p341 p293 p291 p339
+    face = p343 p295 p293 p341
+    face = p345 p297 p295 p343
+    face = p346 p299 p297 p345
+    face = p349 p301 p299 p346
+    face = p351 p303 p301 p349
+    face = p305 p257 p255 p303
+    face = p307 p259 p257 p305
+    face = p309 p261 p259 p307
+    face = p311 p263 p261 p309
+    face = p313 p265 p263 p311
+    face = p314 p266 p265 p313
+    face = p312 p264 p266 p314
+    face = p310 p262 p264 p312
+    face = p308 p260 p262 p310
+    face = p306 p258 p260 p308
+    face = p304 p256 p258 p306
+    face = p302 p254 p256 p304
+    face = p300 p252 p254 p302
+    face = p298 p250 p252 p300
+    face = p296 p248 p250 p298
+    face = p294 p246 p248 p296
+    face = p292 p244 p246 p294
+    face = p291 p243 p244 p292
+    face = p293 p245 p243 p291
+    face = p295 p247 p245 p293
+    face = p297 p249 p247 p295
+    face = p299 p251 p249 p297
+    face = p301 p253 p251 p299
+    face = p303 p255 p253 p301
+    face = p257 p209 p207 p255
+    face = p259 p211 p209 p257
+    face = p261 p213 p211 p259
+    face = p263 p215 p213 p261
+    face = p265 p217 p215 p263
+    face = p266 p218 p217 p265
+    face = p264 p216 p218 p266
+    face = p262 p214 p216 p264
+    face = p260 p212 p214 p262
+    face = p258 p210 p212 p260
+    face = p256 p208 p210 p258
+    face = p254 p206 p208 p256
+    face = p252 p204 p206 p254
+    face = p250 p202 p204 p252
+    face = p248 p200 p202 p250
+    face = p246 p198 p200 p248
+    face = p244 p196 p198 p246
+    face = p243 p195 p196 p244
+    face = p245 p197 p195 p243
+    face = p247 p199 p197 p245
+    face = p249 p201 p199 p247
+    face = p251 p203 p201 p249
+    face = p253 p205 p203 p251
+    face = p255 p207 p205 p253
+    face = p209 p161 p159 p207
+    face = p211 p163 p161 p209
+    face = p213 p165 p163 p211
+    face = p215 p167 p165 p213
+    face = p217 p169 p167 p215
+    face = p218 p170 p169 p217
+    face = p216 p168 p170 p218
+    face = p214 p166 p168 p216
+    face = p212 p164 p166 p214
+    face = p210 p162 p164 p212
+    face = p208 p160 p162 p210
+    face = p206 p158 p160 p208
+    face = p204 p156 p158 p206
+    face = p202 p154 p156 p204
+    face = p200 p152 p154 p202
+    face = p198 p150 p152 p200
+    face = p196 p148 p150 p198
+    face = p195 p147 p148 p196
+    face = p197 p149 p147 p195
+    face = p199 p151 p149 p197
+    face = p201 p153 p151 p199
+    face = p203 p155 p153 p201
+    face = p205 p157 p155 p203
+    face = p207 p159 p157 p205
+    face = p161 p122 p159
+    face = p163 p122 p161
+    face = p165 p122 p163
+    face = p167 p122 p165
+    face = p169 p122 p167
+    face = p170 p122 p169
+    face = p168 p122 p170
+    face = p166 p122 p168
+    face = p164 p122 p166
+    face = p162 p122 p164
+    face = p160 p122 p162
+    face = p158 p122 p160
+    face = p156 p122 p158
+    face = p154 p122 p156
+    face = p152 p122 p154
+    face = p150 p122 p152
+    face = p148 p122 p150
+    face = p147 p122 p148
+    face = p149 p122 p147
+    face = p151 p122 p149
+    face = p153 p122 p151
+    face = p155 p122 p153
+    face = p157 p122 p155
+    face = p159 p122 p157
+    noface = (
+      p14..p12 p37 p61 p85 p109 p134 p182 p230 p278 p326 p398 p446 p494 p542
+      p518 p470 p422 p374 p350 p302 p254 p206 p158 p122 p159 p207 p255 p303
+      p351 p375 p423 p471 p519 p543 p495 p447 p399 p327 p279 p231 p183 p135
+      p110 p86 p62 p38
+    )
+    noface = (
+      p6 p31 p55 p79 p103 p128 p176 p224 p272 p320 p392 p440 p488 p536 p512
+      p464 p416 p368 p344 p296 p248 p200 p152 p122 p165 p213 p261 p309 p357
+      p381 p429 p477 p525 p549 p501 p453 p405 p333 p285 p237 p189 p141 p116
+      p92 p68 p44 p20 p13
+    )
+    noface = (
+      p1 p26 p50 p74 p98 p123 p171 p219 p267 p315 p387 p435 p483 p531 p507
+      p459 p411 p363 p339 p291 p243 p195 p147 p122 p170 p218 p266 p314 p362
+      p386 p434 p482 p530 p554 p506 p458 p410 p338 p290 p242 p194 p146 p121
+      p97 p73 p49 p25 p13
+    )
+    noface = (
+      p7 p32 p56 p80 p104 p129 p177 p225 p273 p321 p393 p441 p489 p537 p513
+      p465 p417 p369 p345 p297 p249 p201 p153 p122 p164 p212 p260 p308 p356
+      p380 p428 p476 p524 p548 p500 p452 p404 p332 p284 p236 p188 p140 p115
+      p91 p67 p43 p19 p13
+    )
+    noface = (
+      p36 p34 p32 p30 p28 p26 p27 p29 p31 p33 p35 p37 p39 p41 p43 p45 p47 p49
+      p48 p46 p44 p42 p40 p38
+    )
+    noface = (
+      p60 p58 p56 p54 p52 p50 p51 p53 p55 p57 p59 p61 p63 p65 p67 p69 p71 p73
+      p72 p70 p68 p66 p64 p62
+    )
+    noface = (
+      p84 p82 p80 p78 p76 p74 p75 p77 p79 p81 p83 p85 p87 p89 p91 p93 p95 p97
+      p96 p94 p92 p90 p88 p86
+    )
+    noface = (
+      p16 p13 p10 p35 p59 p83 p107 p132 p180 p228 p276 p324 p396 p444 p492
+      p540 p516 p468 p420 p372 p348 p300 p252 p204 p156 p122 p161 p209 p257
+      p305 p353 p377 p425 p473 p521 p545 p497 p449 p401 p329 p281 p233 p185
+      p137 p112 p88 p64 p40
+    )
+    noface = (
+      p13 p24 p48 p72 p96 p120 p145 p193 p241 p289 p337 p409 p457 p505 p553
+      p529 p481 p433 p385 p361 p313 p265 p217 p169 p122 p148 p196 p244 p292
+      p340 p364 p412 p460 p508 p532 p484 p436 p388 p316 p268 p220 p172 p124
+      p99 p75 p51 p27 p2
+    )
+    noface = (
+      p3 p28 p52 p76 p100 p125 p173 p221 p269 p317 p389 p437 p485 p533 p509
+      p461 p413 p365 p341 p293 p245 p197 p149 p122 p168 p216 p264 p312 p360
+      p384 p432 p480 p528 p552 p504 p456 p408 p336 p288 p240 p192 p144 p119
+      p95 p71 p47 p23 p13
+    )
+    noface = (
+      p13 p15 p39 p63 p87 p111 p136 p184 p232 p280 p328 p400 p448 p496 p544
+      p520 p472 p424 p376 p352 p304 p256 p208 p160 p122 p157 p205 p253 p301
+      p349 p373 p421 p469 p517 p541 p493 p445 p397 p325 p277 p229 p181 p133
+      p108 p84 p60 p36 p11
+    )
+    noface = (
+      p108 p106 p104 p102 p100 p98 p99 p101 p103 p105 p107 p109 p111 p113 p115
+      p117 p119 p121 p120 p118 p116 p114 p112 p110
+    )
+    noface = (
+      p42 p66 p90 p114 p139 p187 p235 p283 p331 p403 p451 p499 p547 p523 p475
+      p427 p379 p355 p307 p259 p211 p163 p122 p154 p202 p250 p298 p347 p370
+      p418 p466 p514 p538 p490 p442 p394 p322 p274 p226 p178 p130 p105 p81 p57
+      p33 p8 p13 p18
+    )
+    noface = (
+      p4 p29 p53 p77 p101 p126 p174 p222 p270 p318 p390 p438 p486 p534 p510
+      p462 p414 p366 p342 p294 p246 p198 p150 p122 p167 p215 p263 p311 p359
+      p383 p431 p479 p527 p551 p503 p455 p407 p335 p287 p239 p191 p143 p118
+      p94 p70 p46 p22 p13
+    )
+    noface = (
+      p13 p21 p45 p69 p93 p117 p142 p190 p238 p286 p334 p406 p454 p502 p550
+      p526 p478 p430 p382 p358 p310 p262 p214 p166 p122 p151 p199 p247 p295
+      p343 p367 p415 p463 p511 p535 p487 p439 p391 p319 p271 p223 p175 p127
+      p102 p78 p54 p30 p5
+    )
+    noface = (
+      p9 p34 p58 p82 p106 p131 p179 p227 p275 p323 p395 p443 p491 p539 p515
+      p467 p419 p371 p346 p299 p251 p203 p155 p122 p162 p210 p258 p306 p354
+      p378 p426 p474 p522 p546 p498 p450 p402 p330 p282 p234 p186 p138 p113
+      p89 p65 p41 p17 p13
+    )
+    noface = (
+      p133 p131 p129 p127 p125 p123 p124 p126 p128 p130 p132 p134 p136 p138
+      p140 p142 p144 p146 p145 p143 p141 p139 p137 p135
+    )
+    noface = (
+      p181 p179 p177 p175 p173 p171 p172 p174 p176 p178 p180 p182 p184 p186
+      p188 p190 p192 p194 p193 p191 p189 p187 p185 p183
+    )
+    noface = (
+      p229 p227 p225 p223 p221 p219 p220 p222 p224 p226 p228 p230 p232 p234
+      p236 p238 p240 p242 p241 p239 p237 p235 p233 p231
+    )
+    noface = (
+      p279 p281 p283 p285 p287 p289 p290 p288 p286 p284 p282 p280 p278 p276
+      p274 p272 p270 p268 p267 p269 p271 p273 p275 p277
+    )
+    noface = (
+      p327 p329 p331 p333 p335 p337 p338 p336 p334 p332 p330 p328 p326 p324
+      p322 p320 p318 p316 p315 p317 p319 p321 p323 p325
+    )
+    noface = (
+      p399 p401 p403 p405 p407 p409 p410 p408 p406 p404 p402 p400 p398 p396
+      p394 p392 p390 p388 p387 p389 p391 p393 p395 p397
+    )
+    noface = (
+      p447 p449 p451 p453 p455 p457 p458 p456 p454 p452 p450 p448 p446 p444
+      p442 p440 p438 p436 p435 p437 p439 p441 p443 p445
+    )
+    noface = (
+      p495 p497 p499 p501 p503 p505 p506 p504 p502 p500 p498 p496 p494 p492
+      p490 p488 p486 p484 p483 p485 p487 p489 p491 p493
+    )
+    noface = (
+      p543 p545 p547 p549 p551 p553 p554 p552 p550 p548 p546 p544 p542 p540
+      p538 p536 p534 p532 p531 p533 p535 p537 p539 p541
+    )
+    noface = (
+      p519 p521 p523 p525 p527 p529 p530 p528 p526 p524 p522 p520 p518 p516
+      p514 p512 p510 p508 p507 p509 p511 p513 p515 p517
+    )
+    noface = (
+      p471 p473 p475 p477 p479 p481 p482 p480 p478 p476 p474 p472 p470 p468
+      p466 p464 p462 p460 p459 p461 p463 p465 p467 p469
+    )
+    noface = (
+      p423 p425 p427 p429 p431 p433 p434 p432 p430 p428 p426 p424 p422 p420
+      p418 p416 p414 p412 p411 p413 p415 p417 p419 p421
+    )
+    noface = (
+      p375 p377 p379 p381 p383 p385 p386 p384 p382 p380 p378 p376 p374 p372
+      p370 p368 p366 p364 p363 p365 p367 p369 p371 p373
+    )
+    noface = (
+      p351 p353 p355 p357 p359 p361 p362 p360 p358 p356 p354 p352 p350 p348
+      p347 p344 p342 p340 p339 p341 p343 p345 p346 p349
+    )
+    noface = (
+      p303 p305 p307 p309 p311 p313 p314 p312 p310 p308 p306 p304 p302 p300
+      p298 p296 p294 p292 p291 p293 p295 p297 p299 p301
+    )
+    noface = (
+      p253 p251 p249 p247 p245 p243 p244 p246 p248 p250 p252 p254 p256 p258
+      p260 p262 p264 p266 p265 p263 p261 p259 p257 p255
+    )
+    noface = (
+      p205 p203 p201 p199 p197 p195 p196 p198 p200 p202 p204 p206 p208 p210
+      p212 p214 p216 p218 p217 p215 p213 p211 p209 p207
+    )
+    noface = (
+      p157 p155 p153 p151 p149 p147 p148 p150 p152 p154 p156 p158 p160 p162
+      p164 p166 p168 p170 p169 p167 p165 p163 p161 p159
+    )
+    line
+      points = p13 to p14
+      soft = true
+    end
+    line
+      points = p13 to p16
+      soft = true
+    end
+    line
+      points = p13 to p18
+      soft = true
+    end
+    line
+      points = p13 to p20
+      soft = true
+    end
+    line
+      points = p13 to p22
+      soft = true
+    end
+    line
+      points = p13 to p24
+      soft = true
+    end
+    line
+      points = p13 to p25
+      soft = true
+    end
+    line
+      points = p13 to p23
+      soft = true
+    end
+    line
+      points = p13 to p21
+      soft = true
+    end
+    line
+      points = p13 to p19
+      soft = true
+    end
+    line
+      points = p13 to p17
+      soft = true
+    end
+    line
+      points = p13 to p15
+      soft = true
+    end
+    line
+      points = p13 to p12
+      soft = true
+    end
+    line
+      points = p13 to p10
+      soft = true
+    end
+    line
+      points = p13 to p8
+      soft = true
+    end
+    line
+      points = p13 to p6
+      soft = true
+    end
+    line
+      points = p13 to p4
+      soft = true
+    end
+    line
+      points = p13 to p2
+      soft = true
+    end
+    line
+      points = p13 to p1
+      soft = true
+    end
+    line
+      points = p13 to p3
+      soft = true
+    end
+    line
+      points = p13 to p5
+      soft = true
+    end
+    line
+      points = p13 to p7
+      soft = true
+    end
+    line
+      points = p13 to p9
+      soft = true
+    end
+    line
+      points = p13 to p11
+      soft = true
+    end
+    line
+      points = p14 to p38
+      soft = true
+    end
+    line
+      points = p16 to p40
+      soft = true
+    end
+    line
+      points = p18 to p42
+      soft = true
+    end
+    line
+      points = p20 to p44
+      soft = true
+    end
+    line
+      points = p22 to p46
+      soft = true
+    end
+    line
+      points = p24 to p48
+      soft = true
+    end
+    line
+      points = p25 to p49
+      soft = true
+    end
+    line
+      points = p23 to p47
+      soft = true
+    end
+    line
+      points = p21 to p45
+      soft = true
+    end
+    line
+      points = p19 to p43
+      soft = true
+    end
+    line
+      points = p17 to p41
+      soft = true
+    end
+    line
+      points = p15 to p39
+      soft = true
+    end
+    line
+      points = p12 to p37
+      soft = true
+    end
+    line
+      points = p10 to p35
+      soft = true
+    end
+    line
+      points = p8 to p33
+      soft = true
+    end
+    line
+      points = p6 to p31
+      soft = true
+    end
+    line
+      points = p4 to p29
+      soft = true
+    end
+    line
+      points = p2 to p27
+      soft = true
+    end
+    line
+      points = p1 to p26
+      soft = true
+    end
+    line
+      points = p3 to p28
+      soft = true
+    end
+    line
+      points = p5 to p30
+      soft = true
+    end
+    line
+      points = p7 to p32
+      soft = true
+    end
+    line
+      points = p9 to p34
+      soft = true
+    end
+    line
+      points = p11 to p36
+      soft = true
+    end
+    line
+      points = p38 to p62
+      soft = true
+    end
+    line
+      points = p40 to p64
+      soft = true
+    end
+    line
+      points = p42 to p66
+      soft = true
+    end
+    line
+      points = p44 to p68
+      soft = true
+    end
+    line
+      points = p46 to p70
+      soft = true
+    end
+    line
+      points = p48 to p72
+      soft = true
+    end
+    line
+      points = p49 to p73
+      soft = true
+    end
+    line
+      points = p47 to p71
+      soft = true
+    end
+    line
+      points = p45 to p69
+      soft = true
+    end
+    line
+      points = p43 to p67
+      soft = true
+    end
+    line
+      points = p41 to p65
+      soft = true
+    end
+    line
+      points = p39 to p63
+      soft = true
+    end
+    line
+      points = p37 to p61
+      soft = true
+    end
+    line
+      points = p35 to p59
+      soft = true
+    end
+    line
+      points = p33 to p57
+      soft = true
+    end
+    line
+      points = p31 to p55
+      soft = true
+    end
+    line
+      points = p29 to p53
+      soft = true
+    end
+    line
+      points = p27 to p51
+      soft = true
+    end
+    line
+      points = p26 to p50
+      soft = true
+    end
+    line
+      points = p28 to p52
+      soft = true
+    end
+    line
+      points = p30 to p54
+      soft = true
+    end
+    line
+      points = p32 to p56
+      soft = true
+    end
+    line
+      points = p34 to p58
+      soft = true
+    end
+    line
+      points = p36 to p60
+      soft = true
+    end
+    line
+      points = p62 to p86
+      soft = true
+    end
+    line
+      points = p64 to p88
+      soft = true
+    end
+    line
+      points = p66 to p90
+      soft = true
+    end
+    line
+      points = p68 to p92
+      soft = true
+    end
+    line
+      points = p70 to p94
+      soft = true
+    end
+    line
+      points = p72 to p96
+      soft = true
+    end
+    line
+      points = p73 to p97
+      soft = true
+    end
+    line
+      points = p71 to p95
+      soft = true
+    end
+    line
+      points = p69 to p93
+      soft = true
+    end
+    line
+      points = p67 to p91
+      soft = true
+    end
+    line
+      points = p65 to p89
+      soft = true
+    end
+    line
+      points = p63 to p87
+      soft = true
+    end
+    line
+      points = p61 to p85
+      soft = true
+    end
+    line
+      points = p59 to p83
+      soft = true
+    end
+    line
+      points = p57 to p81
+      soft = true
+    end
+    line
+      points = p55 to p79
+      soft = true
+    end
+    line
+      points = p53 to p77
+      soft = true
+    end
+    line
+      points = p51 to p75
+      soft = true
+    end
+    line
+      points = p50 to p74
+      soft = true
+    end
+    line
+      points = p52 to p76
+      soft = true
+    end
+    line
+      points = p54 to p78
+      soft = true
+    end
+    line
+      points = p56 to p80
+      soft = true
+    end
+    line
+      points = p58 to p82
+      soft = true
+    end
+    line
+      points = p60 to p84
+      soft = true
+    end
+    line
+      points = p86 to p110
+      soft = true
+    end
+    line
+      points = p88 to p112
+      soft = true
+    end
+    line
+      points = p90 to p114
+      soft = true
+    end
+    line
+      points = p92 to p116
+      soft = true
+    end
+    line
+      points = p94 to p118
+      soft = true
+    end
+    line
+      points = p96 to p120
+      soft = true
+    end
+    line
+      points = p97 to p121
+      soft = true
+    end
+    line
+      points = p95 to p119
+      soft = true
+    end
+    line
+      points = p93 to p117
+      soft = true
+    end
+    line
+      points = p91 to p115
+      soft = true
+    end
+    line
+      points = p89 to p113
+      soft = true
+    end
+    line
+      points = p87 to p111
+      soft = true
+    end
+    line
+      points = p85 to p109
+      soft = true
+    end
+    line
+      points = p83 to p107
+      soft = true
+    end
+    line
+      points = p81 to p105
+      soft = true
+    end
+    line
+      points = p79 to p103
+      soft = true
+    end
+    line
+      points = p77 to p101
+      soft = true
+    end
+    line
+      points = p75 to p99
+      soft = true
+    end
+    line
+      points = p74 to p98
+      soft = true
+    end
+    line
+      points = p76 to p100
+      soft = true
+    end
+    line
+      points = p78 to p102
+      soft = true
+    end
+    line
+      points = p80 to p104
+      soft = true
+    end
+    line
+      points = p82 to p106
+      soft = true
+    end
+    line
+      points = p84 to p108
+      soft = true
+    end
+    line
+      points = p110 to p135
+      soft = true
+    end
+    line
+      points = p112 to p137
+      soft = true
+    end
+    line
+      points = p114 to p139
+      soft = true
+    end
+    line
+      points = p116 to p141
+      soft = true
+    end
+    line
+      points = p118 to p143
+      soft = true
+    end
+    line
+      points = p120 to p145
+      soft = true
+    end
+    line
+      points = p121 to p146
+      soft = true
+    end
+    line
+      points = p119 to p144
+      soft = true
+    end
+    line
+      points = p117 to p142
+      soft = true
+    end
+    line
+      points = p115 to p140
+      soft = true
+    end
+    line
+      points = p113 to p138
+      soft = true
+    end
+    line
+      points = p111 to p136
+      soft = true
+    end
+    line
+      points = p109 to p134
+      soft = true
+    end
+    line
+      points = p107 to p132
+      soft = true
+    end
+    line
+      points = p105 to p130
+      soft = true
+    end
+    line
+      points = p103 to p128
+      soft = true
+    end
+    line
+      points = p101 to p126
+      soft = true
+    end
+    line
+      points = p99 to p124
+      soft = true
+    end
+    line
+      points = p98 to p123
+      soft = true
+    end
+    line
+      points = p100 to p125
+      soft = true
+    end
+    line
+      points = p102 to p127
+      soft = true
+    end
+    line
+      points = p104 to p129
+      soft = true
+    end
+    line
+      points = p106 to p131
+      soft = true
+    end
+    line
+      points = p108 to p133
+      soft = true
+    end
+    line
+      points = p135 to p183
+      soft = true
+    end
+    line
+      points = p137 to p185
+      soft = true
+    end
+    line
+      points = p139 to p187
+      soft = true
+    end
+    line
+      points = p141 to p189
+      soft = true
+    end
+    line
+      points = p143 to p191
+      soft = true
+    end
+    line
+      points = p145 to p193
+      soft = true
+    end
+    line
+      points = p146 to p194
+      soft = true
+    end
+    line
+      points = p144 to p192
+      soft = true
+    end
+    line
+      points = p142 to p190
+      soft = true
+    end
+    line
+      points = p140 to p188
+      soft = true
+    end
+    line
+      points = p138 to p186
+      soft = true
+    end
+    line
+      points = p136 to p184
+      soft = true
+    end
+    line
+      points = p134 to p182
+      soft = true
+    end
+    line
+      points = p132 to p180
+      soft = true
+    end
+    line
+      points = p130 to p178
+      soft = true
+    end
+    line
+      points = p128 to p176
+      soft = true
+    end
+    line
+      points = p126 to p174
+      soft = true
+    end
+    line
+      points = p124 to p172
+      soft = true
+    end
+    line
+      points = p123 to p171
+      soft = true
+    end
+    line
+      points = p125 to p173
+      soft = true
+    end
+    line
+      points = p127 to p175
+      soft = true
+    end
+    line
+      points = p129 to p177
+      soft = true
+    end
+    line
+      points = p131 to p179
+      soft = true
+    end
+    line
+      points = p133 to p181
+      soft = true
+    end
+    line
+      points = p183 to p231
+      soft = true
+    end
+    line
+      points = p185 to p233
+      soft = true
+    end
+    line
+      points = p187 to p235
+      soft = true
+    end
+    line
+      points = p189 to p237
+      soft = true
+    end
+    line
+      points = p191 to p239
+      soft = true
+    end
+    line
+      points = p193 to p241
+      soft = true
+    end
+    line
+      points = p194 to p242
+      soft = true
+    end
+    line
+      points = p192 to p240
+      soft = true
+    end
+    line
+      points = p190 to p238
+      soft = true
+    end
+    line
+      points = p188 to p236
+      soft = true
+    end
+    line
+      points = p186 to p234
+      soft = true
+    end
+    line
+      points = p184 to p232
+      soft = true
+    end
+    line
+      points = p182 to p230
+      soft = true
+    end
+    line
+      points = p180 to p228
+      soft = true
+    end
+    line
+      points = p178 to p226
+      soft = true
+    end
+    line
+      points = p176 to p224
+      soft = true
+    end
+    line
+      points = p174 to p222
+      soft = true
+    end
+    line
+      points = p172 to p220
+      soft = true
+    end
+    line
+      points = p171 to p219
+      soft = true
+    end
+    line
+      points = p173 to p221
+      soft = true
+    end
+    line
+      points = p175 to p223
+      soft = true
+    end
+    line
+      points = p177 to p225
+      soft = true
+    end
+    line
+      points = p179 to p227
+      soft = true
+    end
+    line
+      points = p181 to p229
+      soft = true
+    end
+    line
+      points = p231 to p279
+      soft = true
+    end
+    line
+      points = p233 to p281
+      soft = true
+    end
+    line
+      points = p235 to p283
+      soft = true
+    end
+    line
+      points = p237 to p285
+      soft = true
+    end
+    line
+      points = p239 to p287
+      soft = true
+    end
+    line
+      points = p241 to p289
+      soft = true
+    end
+    line
+      points = p242 to p290
+      soft = true
+    end
+    line
+      points = p240 to p288
+      soft = true
+    end
+    line
+      points = p238 to p286
+      soft = true
+    end
+    line
+      points = p236 to p284
+      soft = true
+    end
+    line
+      points = p234 to p282
+      soft = true
+    end
+    line
+      points = p232 to p280
+      soft = true
+    end
+    line
+      points = p230 to p278
+      soft = true
+    end
+    line
+      points = p228 to p276
+      soft = true
+    end
+    line
+      points = p226 to p274
+      soft = true
+    end
+    line
+      points = p224 to p272
+      soft = true
+    end
+    line
+      points = p222 to p270
+      soft = true
+    end
+    line
+      points = p220 to p268
+      soft = true
+    end
+    line
+      points = p219 to p267
+      soft = true
+    end
+    line
+      points = p221 to p269
+      soft = true
+    end
+    line
+      points = p223 to p271
+      soft = true
+    end
+    line
+      points = p225 to p273
+      soft = true
+    end
+    line
+      points = p227 to p275
+      soft = true
+    end
+    line
+      points = p229 to p277
+      soft = true
+    end
+    line
+      points = p279 to p327
+      soft = true
+    end
+    line
+      points = p281 to p329
+      soft = true
+    end
+    line
+      points = p283 to p331
+      soft = true
+    end
+    line
+      points = p285 to p333
+      soft = true
+    end
+    line
+      points = p287 to p335
+      soft = true
+    end
+    line
+      points = p289 to p337
+      soft = true
+    end
+    line
+      points = p290 to p338
+      soft = true
+    end
+    line
+      points = p288 to p336
+      soft = true
+    end
+    line
+      points = p286 to p334
+      soft = true
+    end
+    line
+      points = p284 to p332
+      soft = true
+    end
+    line
+      points = p282 to p330
+      soft = true
+    end
+    line
+      points = p280 to p328
+      soft = true
+    end
+    line
+      points = p278 to p326
+      soft = true
+    end
+    line
+      points = p276 to p324
+      soft = true
+    end
+    line
+      points = p274 to p322
+      soft = true
+    end
+    line
+      points = p272 to p320
+      soft = true
+    end
+    line
+      points = p270 to p318
+      soft = true
+    end
+    line
+      points = p268 to p316
+      soft = true
+    end
+    line
+      points = p267 to p315
+      soft = true
+    end
+    line
+      points = p269 to p317
+      soft = true
+    end
+    line
+      points = p271 to p319
+      soft = true
+    end
+    line
+      points = p273 to p321
+      soft = true
+    end
+    line
+      points = p275 to p323
+      soft = true
+    end
+    line
+      points = p277 to p325
+      soft = true
+    end
+    line
+      points = p327 to p399
+      soft = true
+    end
+    line
+      points = p329 to p401
+      soft = true
+    end
+    line
+      points = p331 to p403
+      soft = true
+    end
+    line
+      points = p333 to p405
+      soft = true
+    end
+    line
+      points = p335 to p407
+      soft = true
+    end
+    line
+      points = p337 to p409
+      soft = true
+    end
+    line
+      points = p338 to p410
+      soft = true
+    end
+    line
+      points = p336 to p408
+      soft = true
+    end
+    line
+      points = p334 to p406
+      soft = true
+    end
+    line
+      points = p332 to p404
+      soft = true
+    end
+    line
+      points = p330 to p402
+      soft = true
+    end
+    line
+      points = p328 to p400
+      soft = true
+    end
+    line
+      points = p326 to p398
+      soft = true
+    end
+    line
+      points = p324 to p396
+      soft = true
+    end
+    line
+      points = p322 to p394
+      soft = true
+    end
+    line
+      points = p320 to p392
+      soft = true
+    end
+    line
+      points = p318 to p390
+      soft = true
+    end
+    line
+      points = p316 to p388
+      soft = true
+    end
+    line
+      points = p315 to p387
+      soft = true
+    end
+    line
+      points = p317 to p389
+      soft = true
+    end
+    line
+      points = p319 to p391
+      soft = true
+    end
+    line
+      points = p321 to p393
+      soft = true
+    end
+    line
+      points = p323 to p395
+      soft = true
+    end
+    line
+      points = p325 to p397
+      soft = true
+    end
+    line
+      points = p399 to p447
+      soft = true
+    end
+    line
+      points = p401 to p449
+      soft = true
+    end
+    line
+      points = p403 to p451
+      soft = true
+    end
+    line
+      points = p405 to p453
+      soft = true
+    end
+    line
+      points = p407 to p455
+      soft = true
+    end
+    line
+      points = p409 to p457
+      soft = true
+    end
+    line
+      points = p410 to p458
+      soft = true
+    end
+    line
+      points = p408 to p456
+      soft = true
+    end
+    line
+      points = p406 to p454
+      soft = true
+    end
+    line
+      points = p404 to p452
+      soft = true
+    end
+    line
+      points = p402 to p450
+      soft = true
+    end
+    line
+      points = p400 to p448
+      soft = true
+    end
+    line
+      points = p398 to p446
+      soft = true
+    end
+    line
+      points = p396 to p444
+      soft = true
+    end
+    line
+      points = p394 to p442
+      soft = true
+    end
+    line
+      points = p392 to p440
+      soft = true
+    end
+    line
+      points = p390 to p438
+      soft = true
+    end
+    line
+      points = p388 to p436
+      soft = true
+    end
+    line
+      points = p387 to p435
+      soft = true
+    end
+    line
+      points = p389 to p437
+      soft = true
+    end
+    line
+      points = p391 to p439
+      soft = true
+    end
+    line
+      points = p393 to p441
+      soft = true
+    end
+    line
+      points = p395 to p443
+      soft = true
+    end
+    line
+      points = p397 to p445
+      soft = true
+    end
+    line
+      points = p447 to p495
+      soft = true
+    end
+    line
+      points = p449 to p497
+      soft = true
+    end
+    line
+      points = p451 to p499
+      soft = true
+    end
+    line
+      points = p453 to p501
+      soft = true
+    end
+    line
+      points = p455 to p503
+      soft = true
+    end
+    line
+      points = p457 to p505
+      soft = true
+    end
+    line
+      points = p458 to p506
+      soft = true
+    end
+    line
+      points = p456 to p504
+      soft = true
+    end
+    line
+      points = p454 to p502
+      soft = true
+    end
+    line
+      points = p452 to p500
+      soft = true
+    end
+    line
+      points = p450 to p498
+      soft = true
+    end
+    line
+      points = p448 to p496
+      soft = true
+    end
+    line
+      points = p446 to p494
+      soft = true
+    end
+    line
+      points = p444 to p492
+      soft = true
+    end
+    line
+      points = p442 to p490
+      soft = true
+    end
+    line
+      points = p440 to p488
+      soft = true
+    end
+    line
+      points = p438 to p486
+      soft = true
+    end
+    line
+      points = p436 to p484
+      soft = true
+    end
+    line
+      points = p435 to p483
+      soft = true
+    end
+    line
+      points = p437 to p485
+      soft = true
+    end
+    line
+      points = p439 to p487
+      soft = true
+    end
+    line
+      points = p441 to p489
+      soft = true
+    end
+    line
+      points = p443 to p491
+      soft = true
+    end
+    line
+      points = p445 to p493
+      soft = true
+    end
+    line
+      points = p495 to p543
+      soft = true
+    end
+    line
+      points = p497 to p545
+      soft = true
+    end
+    line
+      points = p499 to p547
+      soft = true
+    end
+    line
+      points = p501 to p549
+      soft = true
+    end
+    line
+      points = p503 to p551
+      soft = true
+    end
+    line
+      points = p505 to p553
+      soft = true
+    end
+    line
+      points = p506 to p554
+      soft = true
+    end
+    line
+      points = p504 to p552
+      soft = true
+    end
+    line
+      points = p502 to p550
+      soft = true
+    end
+    line
+      points = p500 to p548
+      soft = true
+    end
+    line
+      points = p498 to p546
+      soft = true
+    end
+    line
+      points = p496 to p544
+      soft = true
+    end
+    line
+      points = p494 to p542
+      soft = true
+    end
+    line
+      points = p492 to p540
+      soft = true
+    end
+    line
+      points = p490 to p538
+      soft = true
+    end
+    line
+      points = p488 to p536
+      soft = true
+    end
+    line
+      points = p486 to p534
+      soft = true
+    end
+    line
+      points = p484 to p532
+      soft = true
+    end
+    line
+      points = p483 to p531
+      soft = true
+    end
+    line
+      points = p485 to p533
+      soft = true
+    end
+    line
+      points = p487 to p535
+      soft = true
+    end
+    line
+      points = p489 to p537
+      soft = true
+    end
+    line
+      points = p491 to p539
+      soft = true
+    end
+    line
+      points = p493 to p541
+      soft = true
+    end
+    line
+      points = p543 to p519
+      soft = true
+    end
+    line
+      points = p545 to p521
+      soft = true
+    end
+    line
+      points = p547 to p523
+      soft = true
+    end
+    line
+      points = p549 to p525
+      soft = true
+    end
+    line
+      points = p551 to p527
+      soft = true
+    end
+    line
+      points = p553 to p529
+      soft = true
+    end
+    line
+      points = p554 to p530
+      soft = true
+    end
+    line
+      points = p552 to p528
+      soft = true
+    end
+    line
+      points = p550 to p526
+      soft = true
+    end
+    line
+      points = p548 to p524
+      soft = true
+    end
+    line
+      points = p546 to p522
+      soft = true
+    end
+    line
+      points = p544 to p520
+      soft = true
+    end
+    line
+      points = p542 to p518
+      soft = true
+    end
+    line
+      points = p540 to p516
+      soft = true
+    end
+    line
+      points = p538 to p514
+      soft = true
+    end
+    line
+      points = p536 to p512
+      soft = true
+    end
+    line
+      points = p534 to p510
+      soft = true
+    end
+    line
+      points = p532 to p508
+      soft = true
+    end
+    line
+      points = p531 to p507
+      soft = true
+    end
+    line
+      points = p533 to p509
+      soft = true
+    end
+    line
+      points = p535 to p511
+      soft = true
+    end
+    line
+      points = p537 to p513
+      soft = true
+    end
+    line
+      points = p539 to p515
+      soft = true
+    end
+    line
+      points = p541 to p517
+      soft = true
+    end
+    line
+      points = p519 to p471
+      soft = true
+    end
+    line
+      points = p521 to p473
+      soft = true
+    end
+    line
+      points = p523 to p475
+      soft = true
+    end
+    line
+      points = p525 to p477
+      soft = true
+    end
+    line
+      points = p527 to p479
+      soft = true
+    end
+    line
+      points = p529 to p481
+      soft = true
+    end
+    line
+      points = p530 to p482
+      soft = true
+    end
+    line
+      points = p528 to p480
+      soft = true
+    end
+    line
+      points = p526 to p478
+      soft = true
+    end
+    line
+      points = p524 to p476
+      soft = true
+    end
+    line
+      points = p522 to p474
+      soft = true
+    end
+    line
+      points = p520 to p472
+      soft = true
+    end
+    line
+      points = p518 to p470
+      soft = true
+    end
+    line
+      points = p516 to p468
+      soft = true
+    end
+    line
+      points = p514 to p466
+      soft = true
+    end
+    line
+      points = p512 to p464
+      soft = true
+    end
+    line
+      points = p510 to p462
+      soft = true
+    end
+    line
+      points = p508 to p460
+      soft = true
+    end
+    line
+      points = p507 to p459
+      soft = true
+    end
+    line
+      points = p509 to p461
+      soft = true
+    end
+    line
+      points = p511 to p463
+      soft = true
+    end
+    line
+      points = p513 to p465
+      soft = true
+    end
+    line
+      points = p515 to p467
+      soft = true
+    end
+    line
+      points = p517 to p469
+      soft = true
+    end
+    line
+      points = p471 to p423
+      soft = true
+    end
+    line
+      points = p473 to p425
+      soft = true
+    end
+    line
+      points = p475 to p427
+      soft = true
+    end
+    line
+      points = p477 to p429
+      soft = true
+    end
+    line
+      points = p479 to p431
+      soft = true
+    end
+    line
+      points = p481 to p433
+      soft = true
+    end
+    line
+      points = p482 to p434
+      soft = true
+    end
+    line
+      points = p480 to p432
+      soft = true
+    end
+    line
+      points = p478 to p430
+      soft = true
+    end
+    line
+      points = p476 to p428
+      soft = true
+    end
+    line
+      points = p474 to p426
+      soft = true
+    end
+    line
+      points = p472 to p424
+      soft = true
+    end
+    line
+      points = p470 to p422
+      soft = true
+    end
+    line
+      points = p468 to p420
+      soft = true
+    end
+    line
+      points = p466 to p418
+      soft = true
+    end
+    line
+      points = p464 to p416
+      soft = true
+    end
+    line
+      points = p462 to p414
+      soft = true
+    end
+    line
+      points = p460 to p412
+      soft = true
+    end
+    line
+      points = p459 to p411
+      soft = true
+    end
+    line
+      points = p461 to p413
+      soft = true
+    end
+    line
+      points = p463 to p415
+      soft = true
+    end
+    line
+      points = p465 to p417
+      soft = true
+    end
+    line
+      points = p467 to p419
+      soft = true
+    end
+    line
+      points = p469 to p421
+      soft = true
+    end
+    line
+      points = p423 to p375
+      soft = true
+    end
+    line
+      points = p425 to p377
+      soft = true
+    end
+    line
+      points = p427 to p379
+      soft = true
+    end
+    line
+      points = p429 to p381
+      soft = true
+    end
+    line
+      points = p431 to p383
+      soft = true
+    end
+    line
+      points = p433 to p385
+      soft = true
+    end
+    line
+      points = p434 to p386
+      soft = true
+    end
+    line
+      points = p432 to p384
+      soft = true
+    end
+    line
+      points = p430 to p382
+      soft = true
+    end
+    line
+      points = p428 to p380
+      soft = true
+    end
+    line
+      points = p426 to p378
+      soft = true
+    end
+    line
+      points = p424 to p376
+      soft = true
+    end
+    line
+      points = p422 to p374
+      soft = true
+    end
+    line
+      points = p420 to p372
+      soft = true
+    end
+    line
+      points = p418 to p370
+      soft = true
+    end
+    line
+      points = p416 to p368
+      soft = true
+    end
+    line
+      points = p414 to p366
+      soft = true
+    end
+    line
+      points = p412 to p364
+      soft = true
+    end
+    line
+      points = p411 to p363
+      soft = true
+    end
+    line
+      points = p413 to p365
+      soft = true
+    end
+    line
+      points = p415 to p367
+      soft = true
+    end
+    line
+      points = p417 to p369
+      soft = true
+    end
+    line
+      points = p419 to p371
+      soft = true
+    end
+    line
+      points = p421 to p373
+      soft = true
+    end
+    line
+      points = p375 to p351
+      soft = true
+    end
+    line
+      points = p377 to p353
+      soft = true
+    end
+    line
+      points = p379 to p355
+      soft = true
+    end
+    line
+      points = p381 to p357
+      soft = true
+    end
+    line
+      points = p383 to p359
+      soft = true
+    end
+    line
+      points = p385 to p361
+      soft = true
+    end
+    line
+      points = p386 to p362
+      soft = true
+    end
+    line
+      points = p384 to p360
+      soft = true
+    end
+    line
+      points = p382 to p358
+      soft = true
+    end
+    line
+      points = p380 to p356
+      soft = true
+    end
+    line
+      points = p378 to p354
+      soft = true
+    end
+    line
+      points = p376 to p352
+      soft = true
+    end
+    line
+      points = p374 to p350
+      soft = true
+    end
+    line
+      points = p372 to p348
+      soft = true
+    end
+    line
+      points = p370 to p347
+      soft = true
+    end
+    line
+      points = p368 to p344
+      soft = true
+    end
+    line
+      points = p366 to p342
+      soft = true
+    end
+    line
+      points = p364 to p340
+      soft = true
+    end
+    line
+      points = p363 to p339
+      soft = true
+    end
+    line
+      points = p365 to p341
+      soft = true
+    end
+    line
+      points = p367 to p343
+      soft = true
+    end
+    line
+      points = p369 to p345
+      soft = true
+    end
+    line
+      points = p371 to p346
+      soft = true
+    end
+    line
+      points = p373 to p349
+      soft = true
+    end
+    line
+      points = p351 to p303
+      soft = true
+    end
+    line
+      points = p353 to p305
+      soft = true
+    end
+    line
+      points = p355 to p307
+      soft = true
+    end
+    line
+      points = p357 to p309
+      soft = true
+    end
+    line
+      points = p359 to p311
+      soft = true
+    end
+    line
+      points = p361 to p313
+      soft = true
+    end
+    line
+      points = p362 to p314
+      soft = true
+    end
+    line
+      points = p360 to p312
+      soft = true
+    end
+    line
+      points = p358 to p310
+      soft = true
+    end
+    line
+      points = p356 to p308
+      soft = true
+    end
+    line
+      points = p354 to p306
+      soft = true
+    end
+    line
+      points = p352 to p304
+      soft = true
+    end
+    line
+      points = p350 to p302
+      soft = true
+    end
+    line
+      points = p348 to p300
+      soft = true
+    end
+    line
+      points = p347 to p298
+      soft = true
+    end
+    line
+      points = p344 to p296
+      soft = true
+    end
+    line
+      points = p342 to p294
+      soft = true
+    end
+    line
+      points = p340 to p292
+      soft = true
+    end
+    line
+      points = p339 to p291
+      soft = true
+    end
+    line
+      points = p341 to p293
+      soft = true
+    end
+    line
+      points = p343 to p295
+      soft = true
+    end
+    line
+      points = p345 to p297
+      soft = true
+    end
+    line
+      points = p346 to p299
+      soft = true
+    end
+    line
+      points = p349 to p301
+      soft = true
+    end
+    line
+      points = p303 to p255
+      soft = true
+    end
+    line
+      points = p305 to p257
+      soft = true
+    end
+    line
+      points = p307 to p259
+      soft = true
+    end
+    line
+      points = p309 to p261
+      soft = true
+    end
+    line
+      points = p311 to p263
+      soft = true
+    end
+    line
+      points = p313 to p265
+      soft = true
+    end
+    line
+      points = p314 to p266
+      soft = true
+    end
+    line
+      points = p312 to p264
+      soft = true
+    end
+    line
+      points = p310 to p262
+      soft = true
+    end
+    line
+      points = p308 to p260
+      soft = true
+    end
+    line
+      points = p306 to p258
+      soft = true
+    end
+    line
+      points = p304 to p256
+      soft = true
+    end
+    line
+      points = p302 to p254
+      soft = true
+    end
+    line
+      points = p300 to p252
+      soft = true
+    end
+    line
+      points = p298 to p250
+      soft = true
+    end
+    line
+      points = p296 to p248
+      soft = true
+    end
+    line
+      points = p294 to p246
+      soft = true
+    end
+    line
+      points = p292 to p244
+      soft = true
+    end
+    line
+      points = p291 to p243
+      soft = true
+    end
+    line
+      points = p293 to p245
+      soft = true
+    end
+    line
+      points = p295 to p247
+      soft = true
+    end
+    line
+      points = p297 to p249
+      soft = true
+    end
+    line
+      points = p299 to p251
+      soft = true
+    end
+    line
+      points = p301 to p253
+      soft = true
+    end
+    line
+      points = p255 to p207
+      soft = true
+    end
+    line
+      points = p257 to p209
+      soft = true
+    end
+    line
+      points = p259 to p211
+      soft = true
+    end
+    line
+      points = p261 to p213
+      soft = true
+    end
+    line
+      points = p263 to p215
+      soft = true
+    end
+    line
+      points = p265 to p217
+      soft = true
+    end
+    line
+      points = p266 to p218
+      soft = true
+    end
+    line
+      points = p264 to p216
+      soft = true
+    end
+    line
+      points = p262 to p214
+      soft = true
+    end
+    line
+      points = p260 to p212
+      soft = true
+    end
+    line
+      points = p258 to p210
+      soft = true
+    end
+    line
+      points = p256 to p208
+      soft = true
+    end
+    line
+      points = p254 to p206
+      soft = true
+    end
+    line
+      points = p252 to p204
+      soft = true
+    end
+    line
+      points = p250 to p202
+      soft = true
+    end
+    line
+      points = p248 to p200
+      soft = true
+    end
+    line
+      points = p246 to p198
+      soft = true
+    end
+    line
+      points = p244 to p196
+      soft = true
+    end
+    line
+      points = p243 to p195
+      soft = true
+    end
+    line
+      points = p245 to p197
+      soft = true
+    end
+    line
+      points = p247 to p199
+      soft = true
+    end
+    line
+      points = p249 to p201
+      soft = true
+    end
+    line
+      points = p251 to p203
+      soft = true
+    end
+    line
+      points = p253 to p205
+      soft = true
+    end
+    line
+      points = p207 to p159
+      soft = true
+    end
+    line
+      points = p209 to p161
+      soft = true
+    end
+    line
+      points = p211 to p163
+      soft = true
+    end
+    line
+      points = p213 to p165
+      soft = true
+    end
+    line
+      points = p215 to p167
+      soft = true
+    end
+    line
+      points = p217 to p169
+      soft = true
+    end
+    line
+      points = p218 to p170
+      soft = true
+    end
+    line
+      points = p216 to p168
+      soft = true
+    end
+    line
+      points = p214 to p166
+      soft = true
+    end
+    line
+      points = p212 to p164
+      soft = true
+    end
+    line
+      points = p210 to p162
+      soft = true
+    end
+    line
+      points = p208 to p160
+      soft = true
+    end
+    line
+      points = p206 to p158
+      soft = true
+    end
+    line
+      points = p204 to p156
+      soft = true
+    end
+    line
+      points = p202 to p154
+      soft = true
+    end
+    line
+      points = p200 to p152
+      soft = true
+    end
+    line
+      points = p198 to p150
+      soft = true
+    end
+    line
+      points = p196 to p148
+      soft = true
+    end
+    line
+      points = p195 to p147
+      soft = true
+    end
+    line
+      points = p197 to p149
+      soft = true
+    end
+    line
+      points = p199 to p151
+      soft = true
+    end
+    line
+      points = p201 to p153
+      soft = true
+    end
+    line
+      points = p203 to p155
+      soft = true
+    end
+    line
+      points = p205 to p157
+      soft = true
+    end
+    line
+      points = p159 to p122
+      soft = true
+    end
+    line
+      points = p161 to p122
+      soft = true
+    end
+    line
+      points = p163 to p122
+      soft = true
+    end
+    line
+      points = p165 to p122
+      soft = true
+    end
+    line
+      points = p167 to p122
+      soft = true
+    end
+    line
+      points = p169 to p122
+      soft = true
+    end
+    line
+      points = p170 to p122
+      soft = true
+    end
+    line
+      points = p168 to p122
+      soft = true
+    end
+    line
+      points = p166 to p122
+      soft = true
+    end
+    line
+      points = p164 to p122
+      soft = true
+    end
+    line
+      points = p162 to p122
+      soft = true
+    end
+    line
+      points = p160 to p122
+      soft = true
+    end
+    line
+      points = p158 to p122
+      soft = true
+    end
+    line
+      points = p156 to p122
+      soft = true
+    end
+    line
+      points = p154 to p122
+      soft = true
+    end
+    line
+      points = p152 to p122
+      soft = true
+    end
+    line
+      points = p150 to p122
+      soft = true
+    end
+    line
+      points = p148 to p122
+      soft = true
+    end
+    line
+      points = p147 to p122
+      soft = true
+    end
+    line
+      points = p149 to p122
+      soft = true
+    end
+    line
+      points = p151 to p122
+      soft = true
+    end
+    line
+      points = p153 to p122
+      soft = true
+    end
+    line
+      points = p155 to p122
+      soft = true
+    end
+    line
+      points = p157 to p122
+      soft = true
+    end
+    line = p14 to p16
+    line = p16 to p18
+    line = p18 to p20
+    line = p20 to p22
+    line = p22 to p24
+    line = p24 to p25
+    line = p25 to p23
+    line = p23 to p21
+    line = p21 to p19
+    line = p19 to p17
+    line = p17 to p15
+    line = p15 to p12
+    line = p12 to p10
+    line = p10 to p8
+    line = p8 to p6
+    line = p6 to p4
+    line = p4 to p2
+    line = p2 to p1
+    line = p1 to p3
+    line = p3 to p5
+    line = p5 to p7
+    line = p7 to p9
+    line = p9 to p11
+    line = p11 to p14
+    line = p38 to p40
+    line = p40 to p42
+    line = p42 to p44
+    line = p44 to p46
+    line = p46 to p48
+    line = p48 to p49
+    line = p49 to p47
+    line = p47 to p45
+    line = p45 to p43
+    line = p43 to p41
+    line = p41 to p39
+    line = p39 to p37
+    line = p37 to p35
+    line = p35 to p33
+    line = p33 to p31
+    line = p31 to p29
+    line = p29 to p27
+    line = p27 to p26
+    line = p26 to p28
+    line = p28 to p30
+    line = p30 to p32
+    line = p32 to p34
+    line = p34 to p36
+    line = p36 to p38
+    line = p62 to p64
+    line = p64 to p66
+    line = p66 to p68
+    line = p68 to p70
+    line = p70 to p72
+    line = p72 to p73
+    line = p73 to p71
+    line = p71 to p69
+    line = p69 to p67
+    line = p67 to p65
+    line = p65 to p63
+    line = p63 to p61
+    line = p61 to p59
+    line = p59 to p57
+    line = p57 to p55
+    line = p55 to p53
+    line = p53 to p51
+    line = p51 to p50
+    line = p50 to p52
+    line = p52 to p54
+    line = p54 to p56
+    line = p56 to p58
+    line = p58 to p60
+    line = p60 to p62
+    line
+      points = p86 to p88
+      soft = true
+    end
+    line
+      points = p88 to p90
+      soft = true
+    end
+    line
+      points = p90 to p92
+      soft = true
+    end
+    line
+      points = p92 to p94
+      soft = true
+    end
+    line
+      points = p94 to p96
+      soft = true
+    end
+    line
+      points = p96 to p97
+      soft = true
+    end
+    line
+      points = p97 to p95
+      soft = true
+    end
+    line
+      points = p95 to p93
+      soft = true
+    end
+    line
+      points = p93 to p91
+      soft = true
+    end
+    line
+      points = p91 to p89
+      soft = true
+    end
+    line
+      points = p89 to p87
+      soft = true
+    end
+    line
+      points = p87 to p85
+      soft = true
+    end
+    line
+      points = p85 to p83
+      soft = true
+    end
+    line
+      points = p83 to p81
+      soft = true
+    end
+    line
+      points = p81 to p79
+      soft = true
+    end
+    line
+      points = p79 to p77
+      soft = true
+    end
+    line
+      points = p77 to p75
+      soft = true
+    end
+    line
+      points = p75 to p74
+      soft = true
+    end
+    line
+      points = p74 to p76
+      soft = true
+    end
+    line
+      points = p76 to p78
+      soft = true
+    end
+    line
+      points = p78 to p80
+      soft = true
+    end
+    line
+      points = p80 to p82
+      soft = true
+    end
+    line
+      points = p82 to p84
+      soft = true
+    end
+    line
+      points = p84 to p86
+      soft = true
+    end
+    line
+      points = p110 to p112
+      soft = true
+    end
+    line
+      points = p112 to p114
+      soft = true
+    end
+    line
+      points = p114 to p116
+      soft = true
+    end
+    line
+      points = p116 to p118
+      soft = true
+    end
+    line
+      points = p118 to p120
+      soft = true
+    end
+    line
+      points = p120 to p121
+      soft = true
+    end
+    line
+      points = p121 to p119
+      soft = true
+    end
+    line
+      points = p119 to p117
+      soft = true
+    end
+    line
+      points = p117 to p115
+      soft = true
+    end
+    line
+      points = p115 to p113
+      soft = true
+    end
+    line
+      points = p113 to p111
+      soft = true
+    end
+    line
+      points = p111 to p109
+      soft = true
+    end
+    line
+      points = p109 to p107
+      soft = true
+    end
+    line
+      points = p107 to p105
+      soft = true
+    end
+    line
+      points = p105 to p103
+      soft = true
+    end
+    line
+      points = p103 to p101
+      soft = true
+    end
+    line
+      points = p101 to p99
+      soft = true
+    end
+    line
+      points = p99 to p98
+      soft = true
+    end
+    line
+      points = p98 to p100
+      soft = true
+    end
+    line
+      points = p100 to p102
+      soft = true
+    end
+    line
+      points = p102 to p104
+      soft = true
+    end
+    line
+      points = p104 to p106
+      soft = true
+    end
+    line
+      points = p106 to p108
+      soft = true
+    end
+    line
+      points = p108 to p110
+      soft = true
+    end
+    line = p135 to p137
+    line = p137 to p139
+    line = p139 to p141
+    line = p141 to p143
+    line = p143 to p145
+    line = p145 to p146
+    line = p146 to p144
+    line = p144 to p142
+    line = p142 to p140
+    line = p140 to p138
+    line = p138 to p136
+    line = p136 to p134
+    line = p134 to p132
+    line = p132 to p130
+    line = p130 to p128
+    line = p128 to p126
+    line = p126 to p124
+    line = p124 to p123
+    line = p123 to p125
+    line = p125 to p127
+    line = p127 to p129
+    line = p129 to p131
+    line = p131 to p133
+    line = p133 to p135
+    line
+      points = p183 to p185
+      soft = true
+    end
+    line
+      points = p185 to p187
+      soft = true
+    end
+    line
+      points = p187 to p189
+      soft = true
+    end
+    line
+      points = p189 to p191
+      soft = true
+    end
+    line
+      points = p191 to p193
+      soft = true
+    end
+    line
+      points = p193 to p194
+      soft = true
+    end
+    line
+      points = p194 to p192
+      soft = true
+    end
+    line
+      points = p192 to p190
+      soft = true
+    end
+    line
+      points = p190 to p188
+      soft = true
+    end
+    line
+      points = p188 to p186
+      soft = true
+    end
+    line
+      points = p186 to p184
+      soft = true
+    end
+    line
+      points = p184 to p182
+      soft = true
+    end
+    line
+      points = p182 to p180
+      soft = true
+    end
+    line
+      points = p180 to p178
+      soft = true
+    end
+    line
+      points = p178 to p176
+      soft = true
+    end
+    line
+      points = p176 to p174
+      soft = true
+    end
+    line
+      points = p174 to p172
+      soft = true
+    end
+    line
+      points = p172 to p171
+      soft = true
+    end
+    line
+      points = p171 to p173
+      soft = true
+    end
+    line
+      points = p173 to p175
+      soft = true
+    end
+    line
+      points = p175 to p177
+      soft = true
+    end
+    line
+      points = p177 to p179
+      soft = true
+    end
+    line
+      points = p179 to p181
+      soft = true
+    end
+    line
+      points = p181 to p183
+      soft = true
+    end
+    line
+      points = p231 to p233
+      soft = true
+    end
+    line
+      points = p233 to p235
+      soft = true
+    end
+    line
+      points = p235 to p237
+      soft = true
+    end
+    line
+      points = p237 to p239
+      soft = true
+    end
+    line
+      points = p239 to p241
+      soft = true
+    end
+    line
+      points = p241 to p242
+      soft = true
+    end
+    line
+      points = p242 to p240
+      soft = true
+    end
+    line
+      points = p240 to p238
+      soft = true
+    end
+    line
+      points = p238 to p236
+      soft = true
+    end
+    line
+      points = p236 to p234
+      soft = true
+    end
+    line
+      points = p234 to p232
+      soft = true
+    end
+    line
+      points = p232 to p230
+      soft = true
+    end
+    line
+      points = p230 to p228
+      soft = true
+    end
+    line
+      points = p228 to p226
+      soft = true
+    end
+    line
+      points = p226 to p224
+      soft = true
+    end
+    line
+      points = p224 to p222
+      soft = true
+    end
+    line
+      points = p222 to p220
+      soft = true
+    end
+    line
+      points = p220 to p219
+      soft = true
+    end
+    line
+      points = p219 to p221
+      soft = true
+    end
+    line
+      points = p221 to p223
+      soft = true
+    end
+    line
+      points = p223 to p225
+      soft = true
+    end
+    line
+      points = p225 to p227
+      soft = true
+    end
+    line
+      points = p227 to p229
+      soft = true
+    end
+    line
+      points = p229 to p231
+      soft = true
+    end
+    line
+      points = p279 to p281
+      soft = true
+    end
+    line
+      points = p281 to p283
+      soft = true
+    end
+    line
+      points = p283 to p285
+      soft = true
+    end
+    line
+      points = p285 to p287
+      soft = true
+    end
+    line
+      points = p287 to p289
+      soft = true
+    end
+    line
+      points = p289 to p290
+      soft = true
+    end
+    line
+      points = p290 to p288
+      soft = true
+    end
+    line
+      points = p288 to p286
+      soft = true
+    end
+    line
+      points = p286 to p284
+      soft = true
+    end
+    line
+      points = p284 to p282
+      soft = true
+    end
+    line
+      points = p282 to p280
+      soft = true
+    end
+    line
+      points = p280 to p278
+      soft = true
+    end
+    line
+      points = p278 to p276
+      soft = true
+    end
+    line
+      points = p276 to p274
+      soft = true
+    end
+    line
+      points = p274 to p272
+      soft = true
+    end
+    line
+      points = p272 to p270
+      soft = true
+    end
+    line
+      points = p270 to p268
+      soft = true
+    end
+    line
+      points = p268 to p267
+      soft = true
+    end
+    line
+      points = p267 to p269
+      soft = true
+    end
+    line
+      points = p269 to p271
+      soft = true
+    end
+    line
+      points = p271 to p273
+      soft = true
+    end
+    line
+      points = p273 to p275
+      soft = true
+    end
+    line
+      points = p275 to p277
+      soft = true
+    end
+    line
+      points = p277 to p279
+      soft = true
+    end
+    line
+      points = p327 to p329
+      soft = true
+    end
+    line
+      points = p329 to p331
+      soft = true
+    end
+    line
+      points = p331 to p333
+      soft = true
+    end
+    line
+      points = p333 to p335
+      soft = true
+    end
+    line
+      points = p335 to p337
+      soft = true
+    end
+    line
+      points = p337 to p338
+      soft = true
+    end
+    line
+      points = p338 to p336
+      soft = true
+    end
+    line
+      points = p336 to p334
+      soft = true
+    end
+    line
+      points = p334 to p332
+      soft = true
+    end
+    line
+      points = p332 to p330
+      soft = true
+    end
+    line
+      points = p330 to p328
+      soft = true
+    end
+    line
+      points = p328 to p326
+      soft = true
+    end
+    line
+      points = p326 to p324
+      soft = true
+    end
+    line
+      points = p324 to p322
+      soft = true
+    end
+    line
+      points = p322 to p320
+      soft = true
+    end
+    line
+      points = p320 to p318
+      soft = true
+    end
+    line
+      points = p318 to p316
+      soft = true
+    end
+    line
+      points = p316 to p315
+      soft = true
+    end
+    line
+      points = p315 to p317
+      soft = true
+    end
+    line
+      points = p317 to p319
+      soft = true
+    end
+    line
+      points = p319 to p321
+      soft = true
+    end
+    line
+      points = p321 to p323
+      soft = true
+    end
+    line
+      points = p323 to p325
+      soft = true
+    end
+    line
+      points = p325 to p327
+      soft = true
+    end
+    line
+      points = p399 to p401
+      soft = true
+    end
+    line
+      points = p401 to p403
+      soft = true
+    end
+    line
+      points = p403 to p405
+      soft = true
+    end
+    line
+      points = p405 to p407
+      soft = true
+    end
+    line
+      points = p407 to p409
+      soft = true
+    end
+    line
+      points = p409 to p410
+      soft = true
+    end
+    line
+      points = p410 to p408
+      soft = true
+    end
+    line
+      points = p408 to p406
+      soft = true
+    end
+    line
+      points = p406 to p404
+      soft = true
+    end
+    line
+      points = p404 to p402
+      soft = true
+    end
+    line
+      points = p402 to p400
+      soft = true
+    end
+    line
+      points = p400 to p398
+      soft = true
+    end
+    line
+      points = p398 to p396
+      soft = true
+    end
+    line
+      points = p396 to p394
+      soft = true
+    end
+    line
+      points = p394 to p392
+      soft = true
+    end
+    line
+      points = p392 to p390
+      soft = true
+    end
+    line
+      points = p390 to p388
+      soft = true
+    end
+    line
+      points = p388 to p387
+      soft = true
+    end
+    line
+      points = p387 to p389
+      soft = true
+    end
+    line
+      points = p389 to p391
+      soft = true
+    end
+    line
+      points = p391 to p393
+      soft = true
+    end
+    line
+      points = p393 to p395
+      soft = true
+    end
+    line
+      points = p395 to p397
+      soft = true
+    end
+    line
+      points = p397 to p399
+      soft = true
+    end
+    line
+      points = p447 to p449
+      soft = true
+    end
+    line
+      points = p449 to p451
+      soft = true
+    end
+    line
+      points = p451 to p453
+      soft = true
+    end
+    line
+      points = p453 to p455
+      soft = true
+    end
+    line
+      points = p455 to p457
+      soft = true
+    end
+    line
+      points = p457 to p458
+      soft = true
+    end
+    line
+      points = p458 to p456
+      soft = true
+    end
+    line
+      points = p456 to p454
+      soft = true
+    end
+    line
+      points = p454 to p452
+      soft = true
+    end
+    line
+      points = p452 to p450
+      soft = true
+    end
+    line
+      points = p450 to p448
+      soft = true
+    end
+    line
+      points = p448 to p446
+      soft = true
+    end
+    line
+      points = p446 to p444
+      soft = true
+    end
+    line
+      points = p444 to p442
+      soft = true
+    end
+    line
+      points = p442 to p440
+      soft = true
+    end
+    line
+      points = p440 to p438
+      soft = true
+    end
+    line
+      points = p438 to p436
+      soft = true
+    end
+    line
+      points = p436 to p435
+      soft = true
+    end
+    line
+      points = p435 to p437
+      soft = true
+    end
+    line
+      points = p437 to p439
+      soft = true
+    end
+    line
+      points = p439 to p441
+      soft = true
+    end
+    line
+      points = p441 to p443
+      soft = true
+    end
+    line
+      points = p443 to p445
+      soft = true
+    end
+    line
+      points = p445 to p447
+      soft = true
+    end
+    line
+      points = p495 to p497
+      soft = true
+    end
+    line
+      points = p497 to p499
+      soft = true
+    end
+    line
+      points = p499 to p501
+      soft = true
+    end
+    line
+      points = p501 to p503
+      soft = true
+    end
+    line
+      points = p503 to p505
+      soft = true
+    end
+    line
+      points = p505 to p506
+      soft = true
+    end
+    line
+      points = p506 to p504
+      soft = true
+    end
+    line
+      points = p504 to p502
+      soft = true
+    end
+    line
+      points = p502 to p500
+      soft = true
+    end
+    line
+      points = p500 to p498
+      soft = true
+    end
+    line
+      points = p498 to p496
+      soft = true
+    end
+    line
+      points = p496 to p494
+      soft = true
+    end
+    line
+      points = p494 to p492
+      soft = true
+    end
+    line
+      points = p492 to p490
+      soft = true
+    end
+    line
+      points = p490 to p488
+      soft = true
+    end
+    line
+      points = p488 to p486
+      soft = true
+    end
+    line
+      points = p486 to p484
+      soft = true
+    end
+    line
+      points = p484 to p483
+      soft = true
+    end
+    line
+      points = p483 to p485
+      soft = true
+    end
+    line
+      points = p485 to p487
+      soft = true
+    end
+    line
+      points = p487 to p489
+      soft = true
+    end
+    line
+      points = p489 to p491
+      soft = true
+    end
+    line
+      points = p491 to p493
+      soft = true
+    end
+    line
+      points = p493 to p495
+      soft = true
+    end
+    line = p543 to p545
+    line = p545 to p547
+    line = p547 to p549
+    line = p549 to p551
+    line = p551 to p553
+    line = p553 to p554
+    line = p554 to p552
+    line = p552 to p550
+    line = p550 to p548
+    line = p548 to p546
+    line = p546 to p544
+    line = p544 to p542
+    line = p542 to p540
+    line = p540 to p538
+    line = p538 to p536
+    line = p536 to p534
+    line = p534 to p532
+    line = p532 to p531
+    line = p531 to p533
+    line = p533 to p535
+    line = p535 to p537
+    line = p537 to p539
+    line = p539 to p541
+    line = p541 to p543
+    line = p519 to p521
+    line = p521 to p523
+    line = p523 to p525
+    line = p525 to p527
+    line = p527 to p529
+    line = p529 to p530
+    line = p530 to p528
+    line = p528 to p526
+    line = p526 to p524
+    line = p524 to p522
+    line = p522 to p520
+    line = p520 to p518
+    line = p518 to p516
+    line = p516 to p514
+    line = p514 to p512
+    line = p512 to p510
+    line = p510 to p508
+    line = p508 to p507
+    line = p507 to p509
+    line = p509 to p511
+    line = p511 to p513
+    line = p513 to p515
+    line = p515 to p517
+    line = p517 to p519
+    line
+      points = p471 to p473
+      soft = true
+    end
+    line
+      points = p473 to p475
+      soft = true
+    end
+    line
+      points = p475 to p477
+      soft = true
+    end
+    line
+      points = p477 to p479
+      soft = true
+    end
+    line
+      points = p479 to p481
+      soft = true
+    end
+    line
+      points = p481 to p482
+      soft = true
+    end
+    line
+      points = p482 to p480
+      soft = true
+    end
+    line
+      points = p480 to p478
+      soft = true
+    end
+    line
+      points = p478 to p476
+      soft = true
+    end
+    line
+      points = p476 to p474
+      soft = true
+    end
+    line
+      points = p474 to p472
+      soft = true
+    end
+    line
+      points = p472 to p470
+      soft = true
+    end
+    line
+      points = p470 to p468
+      soft = true
+    end
+    line
+      points = p468 to p466
+      soft = true
+    end
+    line
+      points = p466 to p464
+      soft = true
+    end
+    line
+      points = p464 to p462
+      soft = true
+    end
+    line
+      points = p462 to p460
+      soft = true
+    end
+    line
+      points = p460 to p459
+      soft = true
+    end
+    line
+      points = p459 to p461
+      soft = true
+    end
+    line
+      points = p461 to p463
+      soft = true
+    end
+    line
+      points = p463 to p465
+      soft = true
+    end
+    line
+      points = p465 to p467
+      soft = true
+    end
+    line
+      points = p467 to p469
+      soft = true
+    end
+    line
+      points = p469 to p471
+      soft = true
+    end
+    line
+      points = p423 to p425
+      soft = true
+    end
+    line
+      points = p425 to p427
+      soft = true
+    end
+    line
+      points = p427 to p429
+      soft = true
+    end
+    line
+      points = p429 to p431
+      soft = true
+    end
+    line
+      points = p431 to p433
+      soft = true
+    end
+    line
+      points = p433 to p434
+      soft = true
+    end
+    line
+      points = p434 to p432
+      soft = true
+    end
+    line
+      points = p432 to p430
+      soft = true
+    end
+    line
+      points = p430 to p428
+      soft = true
+    end
+    line
+      points = p428 to p426
+      soft = true
+    end
+    line
+      points = p426 to p424
+      soft = true
+    end
+    line
+      points = p424 to p422
+      soft = true
+    end
+    line
+      points = p422 to p420
+      soft = true
+    end
+    line
+      points = p420 to p418
+      soft = true
+    end
+    line
+      points = p418 to p416
+      soft = true
+    end
+    line
+      points = p416 to p414
+      soft = true
+    end
+    line
+      points = p414 to p412
+      soft = true
+    end
+    line
+      points = p412 to p411
+      soft = true
+    end
+    line
+      points = p411 to p413
+      soft = true
+    end
+    line
+      points = p413 to p415
+      soft = true
+    end
+    line
+      points = p415 to p417
+      soft = true
+    end
+    line
+      points = p417 to p419
+      soft = true
+    end
+    line
+      points = p419 to p421
+      soft = true
+    end
+    line
+      points = p421 to p423
+      soft = true
+    end
+    line
+      points = p375 to p377
+      soft = true
+    end
+    line
+      points = p377 to p379
+      soft = true
+    end
+    line
+      points = p379 to p381
+      soft = true
+    end
+    line
+      points = p381 to p383
+      soft = true
+    end
+    line
+      points = p383 to p385
+      soft = true
+    end
+    line
+      points = p385 to p386
+      soft = true
+    end
+    line
+      points = p386 to p384
+      soft = true
+    end
+    line
+      points = p384 to p382
+      soft = true
+    end
+    line
+      points = p382 to p380
+      soft = true
+    end
+    line
+      points = p380 to p378
+      soft = true
+    end
+    line
+      points = p378 to p376
+      soft = true
+    end
+    line
+      points = p376 to p374
+      soft = true
+    end
+    line
+      points = p374 to p372
+      soft = true
+    end
+    line
+      points = p372 to p370
+      soft = true
+    end
+    line
+      points = p370 to p368
+      soft = true
+    end
+    line
+      points = p368 to p366
+      soft = true
+    end
+    line
+      points = p366 to p364
+      soft = true
+    end
+    line
+      points = p364 to p363
+      soft = true
+    end
+    line
+      points = p363 to p365
+      soft = true
+    end
+    line
+      points = p365 to p367
+      soft = true
+    end
+    line
+      points = p367 to p369
+      soft = true
+    end
+    line
+      points = p369 to p371
+      soft = true
+    end
+    line
+      points = p371 to p373
+      soft = true
+    end
+    line
+      points = p373 to p375
+      soft = true
+    end
+    line
+      points = p351 to p353
+      soft = true
+    end
+    line
+      points = p353 to p355
+      soft = true
+    end
+    line
+      points = p355 to p357
+      soft = true
+    end
+    line
+      points = p357 to p359
+      soft = true
+    end
+    line
+      points = p359 to p361
+      soft = true
+    end
+    line
+      points = p361 to p362
+      soft = true
+    end
+    line
+      points = p362 to p360
+      soft = true
+    end
+    line
+      points = p360 to p358
+      soft = true
+    end
+    line
+      points = p358 to p356
+      soft = true
+    end
+    line
+      points = p356 to p354
+      soft = true
+    end
+    line
+      points = p354 to p352
+      soft = true
+    end
+    line
+      points = p352 to p350
+      soft = true
+    end
+    line
+      points = p350 to p348
+      soft = true
+    end
+    line
+      points = p348 to p347
+      soft = true
+    end
+    line
+      points = p347 to p344
+      soft = true
+    end
+    line
+      points = p344 to p342
+      soft = true
+    end
+    line
+      points = p342 to p340
+      soft = true
+    end
+    line
+      points = p340 to p339
+      soft = true
+    end
+    line
+      points = p339 to p341
+      soft = true
+    end
+    line
+      points = p341 to p343
+      soft = true
+    end
+    line
+      points = p343 to p345
+      soft = true
+    end
+    line
+      points = p345 to p346
+      soft = true
+    end
+    line
+      points = p346 to p349
+      soft = true
+    end
+    line
+      points = p349 to p351
+      soft = true
+    end
+    line
+      points = p303 to p305
+      soft = true
+    end
+    line
+      points = p305 to p307
+      soft = true
+    end
+    line
+      points = p307 to p309
+      soft = true
+    end
+    line
+      points = p309 to p311
+      soft = true
+    end
+    line
+      points = p311 to p313
+      soft = true
+    end
+    line
+      points = p313 to p314
+      soft = true
+    end
+    line
+      points = p314 to p312
+      soft = true
+    end
+    line
+      points = p312 to p310
+      soft = true
+    end
+    line
+      points = p310 to p308
+      soft = true
+    end
+    line
+      points = p308 to p306
+      soft = true
+    end
+    line
+      points = p306 to p304
+      soft = true
+    end
+    line
+      points = p304 to p302
+      soft = true
+    end
+    line
+      points = p302 to p300
+      soft = true
+    end
+    line
+      points = p300 to p298
+      soft = true
+    end
+    line
+      points = p298 to p296
+      soft = true
+    end
+    line
+      points = p296 to p294
+      soft = true
+    end
+    line
+      points = p294 to p292
+      soft = true
+    end
+    line
+      points = p292 to p291
+      soft = true
+    end
+    line
+      points = p291 to p293
+      soft = true
+    end
+    line
+      points = p293 to p295
+      soft = true
+    end
+    line
+      points = p295 to p297
+      soft = true
+    end
+    line
+      points = p297 to p299
+      soft = true
+    end
+    line
+      points = p299 to p301
+      soft = true
+    end
+    line
+      points = p301 to p303
+      soft = true
+    end
+    line
+      points = p255 to p257
+      soft = true
+    end
+    line
+      points = p257 to p259
+      soft = true
+    end
+    line
+      points = p259 to p261
+      soft = true
+    end
+    line
+      points = p261 to p263
+      soft = true
+    end
+    line
+      points = p263 to p265
+      soft = true
+    end
+    line
+      points = p265 to p266
+      soft = true
+    end
+    line
+      points = p266 to p264
+      soft = true
+    end
+    line
+      points = p264 to p262
+      soft = true
+    end
+    line
+      points = p262 to p260
+      soft = true
+    end
+    line
+      points = p260 to p258
+      soft = true
+    end
+    line
+      points = p258 to p256
+      soft = true
+    end
+    line
+      points = p256 to p254
+      soft = true
+    end
+    line
+      points = p254 to p252
+      soft = true
+    end
+    line
+      points = p252 to p250
+      soft = true
+    end
+    line
+      points = p250 to p248
+      soft = true
+    end
+    line
+      points = p248 to p246
+      soft = true
+    end
+    line
+      points = p246 to p244
+      soft = true
+    end
+    line
+      points = p244 to p243
+      soft = true
+    end
+    line
+      points = p243 to p245
+      soft = true
+    end
+    line
+      points = p245 to p247
+      soft = true
+    end
+    line
+      points = p247 to p249
+      soft = true
+    end
+    line
+      points = p249 to p251
+      soft = true
+    end
+    line
+      points = p251 to p253
+      soft = true
+    end
+    line
+      points = p253 to p255
+      soft = true
+    end
+    line
+      points = p207 to p209
+      soft = true
+    end
+    line
+      points = p209 to p211
+      soft = true
+    end
+    line
+      points = p211 to p213
+      soft = true
+    end
+    line
+      points = p213 to p215
+      soft = true
+    end
+    line
+      points = p215 to p217
+      soft = true
+    end
+    line
+      points = p217 to p218
+      soft = true
+    end
+    line
+      points = p218 to p216
+      soft = true
+    end
+    line
+      points = p216 to p214
+      soft = true
+    end
+    line
+      points = p214 to p212
+      soft = true
+    end
+    line
+      points = p212 to p210
+      soft = true
+    end
+    line
+      points = p210 to p208
+      soft = true
+    end
+    line
+      points = p208 to p206
+      soft = true
+    end
+    line
+      points = p206 to p204
+      soft = true
+    end
+    line
+      points = p204 to p202
+      soft = true
+    end
+    line
+      points = p202 to p200
+      soft = true
+    end
+    line
+      points = p200 to p198
+      soft = true
+    end
+    line
+      points = p198 to p196
+      soft = true
+    end
+    line
+      points = p196 to p195
+      soft = true
+    end
+    line
+      points = p195 to p197
+      soft = true
+    end
+    line
+      points = p197 to p199
+      soft = true
+    end
+    line
+      points = p199 to p201
+      soft = true
+    end
+    line
+      points = p201 to p203
+      soft = true
+    end
+    line
+      points = p203 to p205
+      soft = true
+    end
+    line
+      points = p205 to p207
+      soft = true
+    end
+    line
+      points = p159 to p161
+      soft = true
+    end
+    line
+      points = p161 to p163
+      soft = true
+    end
+    line
+      points = p163 to p165
+      soft = true
+    end
+    line
+      points = p165 to p167
+      soft = true
+    end
+    line
+      points = p167 to p169
+      soft = true
+    end
+    line
+      points = p169 to p170
+      soft = true
+    end
+    line
+      points = p170 to p168
+      soft = true
+    end
+    line
+      points = p168 to p166
+      soft = true
+    end
+    line
+      points = p166 to p164
+      soft = true
+    end
+    line
+      points = p164 to p162
+      soft = true
+    end
+    line
+      points = p162 to p160
+      soft = true
+    end
+    line
+      points = p160 to p158
+      soft = true
+    end
+    line
+      points = p158 to p156
+      soft = true
+    end
+    line
+      points = p156 to p154
+      soft = true
+    end
+    line
+      points = p154 to p152
+      soft = true
+    end
+    line
+      points = p152 to p150
+      soft = true
+    end
+    line
+      points = p150 to p148
+      soft = true
+    end
+    line
+      points = p148 to p147
+      soft = true
+    end
+    line
+      points = p147 to p149
+      soft = true
+    end
+    line
+      points = p149 to p151
+      soft = true
+    end
+    line
+      points = p151 to p153
+      soft = true
+    end
+    line
+      points = p153 to p155
+      soft = true
+    end
+    line
+      points = p155 to p157
+      soft = true
+    end
+    line
+      points = p157 to p159
+      soft = true
+    end
+  end
+end

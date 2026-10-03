@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dimension - Heckers Sketch</title>
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="../index.html">Help</a> &rsaquo; Dimension</nav>
+<header><h1>Dimension</h1><p class="lead">Put a measurement on the drawing.</p></header>
+<p>Keyboard: <kbd>D</kbd></p><h2 id="how-to-use-it">How to use it</h2>
+<ol>
+<li><b>Click the body of an edge</b> and it dimensions the whole of that edge,
+end to end.  One click, and it is the one to reach for.  Before you click,
+the edge it will take is lit, with a dot at each end and its length beside
+it.</li>
+<li>Or click two points - corners, midpoints, centers, points on an edge - and
+it measures between them.  Both points get a dot, and the distance shows as
+you go.</li>
+<li>Then move away from what you measured and click again to put the line
+where you want it.  It goes the way the mouse goes: off the top edge of a box,
+move up and it stands up above the box, move over the top and it lies on the
+top, move out in front and it goes out in front.  It keeps to the plane it is
+on until the mouse is clearly heading another way.</li>
+</ol>
+
+<h2 id="circles-and-arcs">Circles and arcs</h2>
+<p>Hover a circle and it lights with its diameter; hover an arc and it lights
+with its radius, the center marked.  Click, move round the curve to turn the
+line to where it reads best, and click again.  It is written
+<code>DIA 4'-0"</code> or <code>R 4'-0"</code>.</p>
+<p>A corner of the little straight pieces a curve is drawn with takes the
+curve, not the corner.  Its quadrant points, its center and an arc's two ends
+are still points - click one to measure from it to something else.</p>
+<p>Typing a new size into a radius or a diameter does not resize the circle
+yet: draw the circle again at the size you want.</p>
+
+<figure>
+  <a class="zoom" href="../shots/tool-dim.webp" target="_blank" title="Open larger"><img src="../shots/tool-dim.webp" alt="Two corners clicked, then the dimension line pulled out clear of the box and set down reading thirty feet."></a>
+  <figcaption>Corner, corner, then <b>out</b> - the third click is the one
+  people do not expect, and it is the one that decides where the line
+  sits.</figcaption>
+</figure>
+
+<h2 id="it-has-to-measure-something">It has to measure something</h2>
+<p>A dimension wants a corner, a midpoint, a center, or a point on an edge at
+each end.  It will not lie across blank paper: a number measuring nothing
+cannot be driven by the drawing and will never update when the drawing
+changes, which makes it worse than no number at all.</p>
+<p>In SketchUp the way round that is to draw a temporary line where you need
+it, dimension to that, and rub the line out afterwards - or to use
+<a href="measure.html">the tape measure</a>, which will measure anything
+anywhere and leave a guide behind.</p>
+
+<h2 id="changing-one">Changing one</h2>
+<p>Pick a dimension and type a new length, or use <code>/resize</code>.  The
+drawing moves to match the number - the geometry follows the dimension, not
+the other way round - so a wall told it is 12'-6" becomes 12'-6".</p>
+<p>Drag one with the move tool to shift the line off to one side without
+changing what it measures - it follows the mouse the same way it did when
+it was placed.  A radius or a diameter sits on its curve and does not
+move off it.</p>
+
+<h2 id="how-it-is-written">How it is written</h2>
+<p>In whatever the drawing is set to, rounded to the ROUNDED TO setting along
+the bottom - sixteenths unless you say otherwise.  <code>/units</code> swaps
+between feet-and-inches and millimeters, and every dimension on the sheet
+changes with it.</p>
+
+<h2 id="see-also">See also</h2><ul>
+<li><a href="measure.html">The tape measure</a> - measuring without leaving a number behind</li>
+<li><a href="../typing.html">Typing measurements</a> - what a length can look like</li>
+<li><a href="../units.html">Units</a> - feet and inches, or millimeters</li>
+</ul>
+<footer><a href="../index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

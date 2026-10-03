@@ -1,0 +1,1336 @@
+HeckersSketch 2
+units = ft in
+
+sheet 'Ball'
+  ink = black
+  width = 1
+  units = ft in
+  scale = '1"'
+  snap = '1/16"'
+  view = 3d
+  camera = -0.95, 0.38, 4.52383, 600, 522.62
+
+  solid
+    paint = #161618
+    points
+      p1 = 0 east, 0 north, 7/16" up
+      p2 = 0 east, 0.985068" south, 0.567192" up
+      p3 = 0.254952" west, 0.951504" south, 0.567192" up
+      p4 = p3 + 0.509904" east
+      p5 = 0.492528" west, 0.853092" south, 0.567192" up
+      p6 = p5 + 0.985056" east
+      p7 = 0.696552" west, 0.696552" south, 0.567192" up
+      p8 = p7 + 1.393104" east
+      p9 = 0.853092" west, 0.492528" south, 0.567192" up
+      p10 = p9 + 1.706184" east
+      p11 = 0.951504" west, 0.254952" south, 0.567192" up
+      p12 = p11 + 1.903" east
+      p13 = 0.985068" west, 0 north, 0.567192" up
+      p14 = p13 + 1.970136" east
+      p15 = p11 + 0.509904" north
+      p16 = p15 + 1.903" east
+      p17 = p9 + 0.985056" north
+      p18 = p17 + 1.706184" east
+      p19 = p7 + 1.393104" north
+      p20 = p19 + 1.393104" east
+      p21 = p5 + 1.706184" north
+      p22 = p21 + 0.985056" east
+      p23 = p3 + 1.903" north
+      p24 = p23 + 0.509904" east
+      p25 = p2 + 1.970136" north
+      p26 = 0 east, 1.903" south, 0.947412" up
+      p27 = 0.492528" west, 1.83816" south, 0.947412" up
+      p28 = p27 + 0.985056" east
+      p29 = 0.951504" west, 1.648044" south, 0.947412" up
+      p30 = p29 + 1.903" east
+      p31 = 1.34562" west, 1.34562" south, 0.947412" up
+      p32 = p31 + 2.69124" east
+      p33 = 1.648044" west, 0.951504" south, 0.947412" up
+      p34 = p33 + 3.296088" east
+      p35 = 1.83816" west, 0.492528" south, 0.947412" up
+      p36 = p35 + 3.67632" east
+      p37 = 1.903" west, 0 north, 0.947412" up
+      p38 = p37 + 3.806" east
+      p39 = p35 + 0.985056" north
+      p40 = p39 + 3.67632" east
+      p41 = p33 + 1.903" north
+      p42 = p41 + 3.296088" east
+      p43 = p31 + 2.69124" north
+      p44 = p43 + 2.69124" east
+      p45 = p29 + 3.296088" north
+      p46 = p45 + 1.903" east
+      p47 = p27 + 3.67632" north
+      p48 = p47 + 0.985056" east
+      p49 = p26 + 3.806" north
+      p50 = 0 east, 2.691252" south, 1.55226" up
+      p51 = 0.696552" west, 2.599548" south, 1.55226" up
+      p52 = p51 + 1.393104" east
+      p53 = 1.34562" west, 2.330688" south, 1.55226" up
+      p54 = p53 + 2.69124" east
+      p55 = 1.903" west, 1.903" south, 1.55226" up
+      p56 = p55 + 3.806" east
+      p57 = 2.330688" west, 1.34562" south, 1.55226" up
+      p58 = p57 + 4.661376" east
+      p59 = 2.599548" west, 0.696552" south, 1.55226" up
+      p60 = p59 + 5.199096" east
+      p61 = 2.691252" west, 0 north, 1.55226" up
+      p62 = p61 + 5.382504" east
+      p63 = p59 + 1.393104" north
+      p64 = p63 + 5.199096" east
+      p65 = p57 + 2.69124" north
+      p66 = p65 + 4.661376" east
+      p67 = p55 + 3.806" north
+      p68 = p67 + 3.806" east
+      p69 = p53 + 4.661376" north
+      p70 = p69 + 2.69124" east
+      p71 = p51 + 5.199096" north
+      p72 = p71 + 1.393104" east
+      p73 = p50 + 5.382504" north
+      p74 = 0 east, 3.296088" south, 2.340504" up
+      p75 = 0.853092" west, 3.18378" south, 2.340504" up
+      p76 = p75 + 1.706184" east
+      p77 = 1.648044" west, 2.8545" south, 2.340504" up
+      p78 = p77 + 3.296088" east
+      p79 = 2.330688" west, 2.330688" south, 2.340504" up
+      p80 = p79 + 4.661376" east
+      p81 = 2.8545" west, 1.648044" south, 2.340504" up
+      p82 = p81 + 5.709" east
+      p83 = 3.18378" west, 0.853092" south, 2.340504" up
+      p84 = p83 + 6.36756" east
+      p85 = 3.296088" west, 0 north, 2.340504" up
+      p86 = p85 + 6.592176" east
+      p87 = p83 + 1.706184" north
+      p88 = p87 + 6.36756" east
+      p89 = p81 + 3.296088" north
+      p90 = p89 + 5.709" east
+      p91 = p79 + 4.661376" north
+      p92 = p91 + 4.661376" east
+      p93 = p77 + 5.709" north
+      p94 = p93 + 3.296088" east
+      p95 = p75 + 6.36756" north
+      p96 = p95 + 1.706184" east
+      p97 = p74 + 6.592176" north
+      p98 = 0 east, 3.676308" south, 3.258444" up
+      p99 = 0.951504" west, 3.551052" south, 3.258444" up
+      p100 = p99 + 1.903" east
+      p101 = 1.83816" west, 3.18378" south, 3.258444" up
+      p102 = p101 + 3.67632" east
+      p103 = 2.599548" west, 2.599548" south, 3.258444" up
+      p104 = p103 + 5.199096" east
+      p105 = 3.18378" west, 1.83816" south, 3.258444" up
+      p106 = p105 + 6.36756" east
+      p107 = 3.551052" west, 0.951504" south, 3.258444" up
+      p108 = p107 + 7.102104" east
+      p109 = 3.676308" west, 0 north, 3.258444" up
+      p110 = p109 + 7.352616" east
+      p111 = p107 + 1.903" north
+      p112 = p111 + 7.102104" east
+      p113 = p105 + 3.67632" north
+      p114 = p113 + 6.36756" east
+      p115 = p103 + 5.199096" north
+      p116 = p115 + 5.199096" east
+      p117 = p101 + 6.36756" north
+      p118 = p117 + 3.67632" east
+      p119 = p99 + 7.102104" north
+      p120 = p119 + 1.903" east
+      p121 = p98 + 7.352616" north
+      p122 = 0 east, 3.806" south, 4.2435" up
+      p123 = 0.985068" west, 3.676308" south, 4.2435" up
+      p124 = p123 + 1.970136" east
+      p125 = 1.903" west, 3.296088" south, 4.2435" up
+      p126 = p125 + 3.806" east
+      p127 = 2.691252" west, 2.691252" south, 4.2435" up
+      p128 = p127 + 5.382504" east
+      p129 = 3.296088" west, 1.903" south, 4.2435" up
+      p130 = p129 + 6.592176" east
+      p131 = 3.676308" west, 0.985068" south, 4.2435" up
+      p132 = p131 + 7.352616" east
+      p133 = 3.806" west, 0 north, 4.2435" up
+      p134 = p133 + 7.612" east
+      p135 = p131 + 1.970136" north
+      p136 = p135 + 7.352616" east
+      p137 = p129 + 3.806" north
+      p138 = p137 + 6.592176" east
+      p139 = p127 + 5.382504" north
+      p140 = p139 + 5.382504" east
+      p141 = p125 + 6.592176" north
+      p142 = p141 + 3.806" east
+      p143 = p123 + 7.352616" north
+      p144 = p143 + 1.970136" east
+      p145 = p122 + 7.612" north
+      p146 = p98 + 1.970124" up
+      p147 = p99 + 1.970124" up
+      p148 = p147 + 1.903" east
+      p149 = p101 + 1.970124" up
+      p150 = p149 + 3.67632" east
+      p151 = p103 + 1.970124" up
+      p152 = p151 + 5.199096" east
+      p153 = p105 + 1.970124" up
+      p154 = p153 + 6.36756" east
+      p155 = p107 + 1.970124" up
+      p156 = p155 + 7.102104" east
+      p157 = p109 + 1.970124" up
+      p158 = p157 + 7.352616" east
+      p159 = p155 + 1.903" north
+      p160 = p159 + 7.102104" east
+      p161 = p153 + 3.67632" north
+      p162 = p161 + 6.36756" east
+      p163 = p151 + 5.199096" north
+      p164 = p163 + 5.199096" east
+      p165 = p149 + 6.36756" north
+      p166 = p165 + 3.67632" east
+      p167 = p147 + 7.102104" north
+      p168 = p167 + 1.903" east
+      p169 = p146 + 7.352616" north
+      p170 = p74 + 3.806" up
+      p171 = p75 + 3.806" up
+      p172 = p171 + 1.706184" east
+      p173 = p77 + 3.806" up
+      p174 = p173 + 3.296088" east
+      p175 = p79 + 3.806" up
+      p176 = p175 + 4.661376" east
+      p177 = p81 + 3.806" up
+      p178 = p177 + 5.709" east
+      p179 = p83 + 3.806" up
+      p180 = p179 + 6.36756" east
+      p181 = p85 + 3.806" up
+      p182 = p181 + 6.592176" east
+      p183 = p179 + 1.706184" north
+      p184 = p183 + 6.36756" east
+      p185 = p177 + 3.296088" north
+      p186 = p185 + 5.709" east
+      p187 = p175 + 4.661376" north
+      p188 = p187 + 4.661376" east
+      p189 = p173 + 5.709" north
+      p190 = p189 + 3.296088" east
+      p191 = p171 + 6.36756" north
+      p192 = p191 + 1.706184" east
+      p193 = p170 + 6.592176" north
+      p194 = p50 + 5.382492" up
+      p195 = p51 + 5.382492" up
+      p196 = p195 + 1.393104" east
+      p197 = p53 + 5.382492" up
+      p198 = p197 + 2.69124" east
+      p199 = p55 + 5.382492" up
+      p200 = p199 + 3.806" east
+      p201 = p57 + 5.382492" up
+      p202 = p201 + 4.661376" east
+      p203 = p59 + 5.382492" up
+      p204 = p203 + 5.199096" east
+      p205 = p61 + 5.382492" up
+      p206 = p205 + 5.382504" east
+      p207 = p203 + 1.393104" north
+      p208 = p207 + 5.199096" east
+      p209 = p201 + 2.69124" north
+      p210 = p209 + 4.661376" east
+      p211 = p199 + 3.806" north
+      p212 = p211 + 3.806" east
+      p213 = p197 + 4.661376" north
+      p214 = p213 + 2.69124" east
+      p215 = p195 + 5.199096" north
+      p216 = p215 + 1.393104" east
+      p217 = p194 + 5.382504" north
+      p218 = p26 + 6.592188" up
+      p219 = p27 + 6.592188" up
+      p220 = p219 + 0.985056" east
+      p221 = p29 + 6.592188" up
+      p222 = p221 + 1.903" east
+      p223 = p31 + 6.592188" up
+      p224 = p223 + 2.69124" east
+      p225 = p33 + 6.592188" up
+      p226 = p225 + 3.296088" east
+      p227 = p35 + 6.592188" up
+      p228 = p227 + 3.67632" east
+      p229 = p37 + 6.592188" up
+      p230 = p229 + 3.806" east
+      p231 = p227 + 0.985056" north
+      p232 = p231 + 3.67632" east
+      p233 = p225 + 1.903" north
+      p234 = p233 + 3.296088" east
+      p235 = p223 + 2.69124" north
+      p236 = p235 + 2.69124" east
+      p237 = p221 + 3.296088" north
+      p238 = p237 + 1.903" east
+      p239 = p219 + 3.67632" north
+      p240 = p239 + 0.985056" east
+      p241 = p218 + 3.806" north
+      p242 = p2 + 7.352628" up
+      p243 = p3 + 7.352628" up
+      p244 = p243 + 0.509904" east
+      p245 = p5 + 7.352628" up
+      p246 = p245 + 0.985056" east
+      p247 = p7 + 7.352628" up
+      p248 = p247 + 1.393104" east
+      p249 = p9 + 7.352628" up
+      p250 = p249 + 1.706184" east
+      p251 = p11 + 7.352628" up
+      p252 = p251 + 1.903" east
+      p253 = p13 + 7.352628" up
+      p254 = p253 + 1.970136" east
+      p255 = p251 + 0.509904" north
+      p256 = p255 + 1.903" east
+      p257 = p249 + 0.985056" north
+      p258 = p257 + 1.706184" east
+      p259 = p247 + 1.393104" north
+      p260 = p259 + 1.393104" east
+      p261 = p245 + 1.706184" north
+      p262 = p261 + 0.985056" east
+      p263 = p243 + 1.903" north
+      p264 = p263 + 0.509904" east
+      p265 = p242 + 1.970136" north
+      p266 = p1 + 7.612" up
+    end
+    face = p16 p14 p1
+    face = p18 p16 p1
+    face = p20 p18 p1
+    face = p22 p20 p1
+    face = p24 p22 p1
+    face = p25 p24 p1
+    face = p23 p25 p1
+    face = p21 p23 p1
+    face = p19 p21 p1
+    face = p17 p19 p1
+    face = p15 p17 p1
+    face = p13 p15 p1
+    face = p11 p13 p1
+    face = p9 p11 p1
+    face = p7 p9 p1
+    face = p5 p7 p1
+    face = p3 p5 p1
+    face = p2 p3 p1
+    face = p4 p2 p1
+    face = p6 p4 p1
+    face = p8 p6 p1
+    face = p10 p8 p1
+    face = p12 p10 p1
+    face = p14 p12 p1
+    face = p14 p16 p40 p38
+    face = p16 p18 p42 p40
+    face = p18 p20 p44 p42
+    face = p20 p22 p46 p44
+    face = p22 p24 p48 p46
+    face = p24 p25 p49 p48
+    face = p25 p23 p47 p49
+    face = p23 p21 p45 p47
+    face = p21 p19 p43 p45
+    face = p19 p17 p41 p43
+    face = p17 p15 p39 p41
+    face = p15 p13 p37 p39
+    face = p13 p11 p35 p37
+    face = p11 p9 p33 p35
+    face = p9 p7 p31 p33
+    face = p7 p5 p29 p31
+    face = p5 p3 p27 p29
+    face = p3 p2 p26 p27
+    face = p2 p4 p28 p26
+    face = p4 p6 p30 p28
+    face = p6 p8 p32 p30
+    face = p8 p10 p34 p32
+    face = p10 p12 p36 p34
+    face = p12 p14 p38 p36
+    face = p38 p40 p64 p62
+    face = p40 p42 p66 p64
+    face = p42 p44 p68 p66
+    face = p44 p46 p70 p68
+    face = p46 p48 p72 p70
+    face = p48 p49 p73 p72
+    face = p49 p47 p71 p73
+    face = p47 p45 p69 p71
+    face = p45 p43 p67 p69
+    face = p43 p41 p65 p67
+    face = p41 p39 p63 p65
+    face = p39 p37 p61 p63
+    face = p37 p35 p59 p61
+    face = p35 p33 p57 p59
+    face = p33 p31 p55 p57
+    face = p31 p29 p53 p55
+    face = p29 p27 p51 p53
+    face = p27 p26 p50 p51
+    face = p26 p28 p52 p50
+    face = p28 p30 p54 p52
+    face = p30 p32 p56 p54
+    face = p32 p34 p58 p56
+    face = p34 p36 p60 p58
+    face = p36 p38 p62 p60
+    face = p62 p64 p88 p86
+    face = p64 p66 p90 p88
+    face = p66 p68 p92 p90
+    face = p68 p70 p94 p92
+    face = p70 p72 p96 p94
+    face = p72 p73 p97 p96
+    face = p73 p71 p95 p97
+    face = p71 p69 p93 p95
+    face = p69 p67 p91 p93
+    face = p67 p65 p89 p91
+    face = p65 p63 p87 p89
+    face = p63 p61 p85 p87
+    face = p61 p59 p83 p85
+    face = p59 p57 p81 p83
+    face = p57 p55 p79 p81
+    face = p55 p53 p77 p79
+    face = p53 p51 p75 p77
+    face = p51 p50 p74 p75
+    face = p50 p52 p76 p74
+    face = p52 p54 p78 p76
+    face = p54 p56 p80 p78
+    face = p56 p58 p82 p80
+    face = p58 p60 p84 p82
+    face = p60 p62 p86 p84
+    face = p86 p88 p112 p110
+    face = p88 p90 p114 p112
+    face = p90 p92 p116 p114
+    face = p92 p94 p118 p116
+    face = p94 p96 p120 p118
+    face = p96 p97 p121 p120
+    face = p97 p95 p119 p121
+    face = p95 p93 p117 p119
+    face = p93 p91 p115 p117
+    face = p91 p89 p113 p115
+    face = p89 p87 p111 p113
+    face = p87 p85 p109 p111
+    face = p85 p83 p107 p109
+    face = p83 p81 p105 p107
+    face = p81 p79 p103 p105
+    face = p79 p77 p101 p103
+    face = p77 p75 p99 p101
+    face = p75 p74 p98 p99
+    face = p74 p76 p100 p98
+    face = p76 p78 p102 p100
+    face = p78 p80 p104 p102
+    face = p80 p82 p106 p104
+    face = p82 p84 p108 p106
+    face = p84 p86 p110 p108
+    face = p110 p112 p136 p134
+    face = p112 p114 p138 p136
+    face = p114 p116 p140 p138
+    face = p116 p118 p142 p140
+    face = p118 p120 p144 p142
+    face = p120 p121 p145 p144
+    face = p121 p119 p143 p145
+    face = p119 p117 p141 p143
+    face = p117 p115 p139 p141
+    face = p115 p113 p137 p139
+    face = p113 p111 p135 p137
+    face = p111 p109 p133 p135
+    face = p109 p107 p131 p133
+    face = p107 p105 p129 p131
+    face = p105 p103 p127 p129
+    face = p103 p101 p125 p127
+    face = p101 p99 p123 p125
+    face = p99 p98 p122 p123
+    face = p98 p100 p124 p122
+    face = p100 p102 p126 p124
+    face = p102 p104 p128 p126
+    face = p104 p106 p130 p128
+    face = p106 p108 p132 p130
+    face = p108 p110 p134 p132
+    face = p134 p136 p160 p158
+    face = p136 p138 p162 p160
+    face = p138 p140 p164 p162
+    face = p140 p142 p166 p164
+    face = p142 p144 p168 p166
+    face = p144 p145 p169 p168
+    face = p145 p143 p167 p169
+    face = p143 p141 p165 p167
+    face = p141 p139 p163 p165
+    face = p139 p137 p161 p163
+    face = p137 p135 p159 p161
+    face = p135 p133 p157 p159
+    face = p133 p131 p155 p157
+    face = p131 p129 p153 p155
+    face = p129 p127 p151 p153
+    face = p127 p125 p149 p151
+    face = p125 p123 p147 p149
+    face = p123 p122 p146 p147
+    face = p122 p124 p148 p146
+    face = p124 p126 p150 p148
+    face = p126 p128 p152 p150
+    face = p128 p130 p154 p152
+    face = p130 p132 p156 p154
+    face = p132 p134 p158 p156
+    face = p158 p160 p184 p182
+    face = p160 p162 p186 p184
+    face = p162 p164 p188 p186
+    face = p164 p166 p190 p188
+    face = p166 p168 p192 p190
+    face = p168 p169 p193 p192
+    face = p169 p167 p191 p193
+    face = p167 p165 p189 p191
+    face = p165 p163 p187 p189
+    face = p163 p161 p185 p187
+    face = p161 p159 p183 p185
+    face = p159 p157 p181 p183
+    face = p157 p155 p179 p181
+    face = p155 p153 p177 p179
+    face = p153 p151 p175 p177
+    face = p151 p149 p173 p175
+    face = p149 p147 p171 p173
+    face = p147 p146 p170 p171
+    face = p146 p148 p172 p170
+    face = p148 p150 p174 p172
+    face = p150 p152 p176 p174
+    face = p152 p154 p178 p176
+    face = p154 p156 p180 p178
+    face = p156 p158 p182 p180
+    face = p182 p184 p208 p206
+    face = p184 p186 p210 p208
+    face = p186 p188 p212 p210
+    face = p188 p190 p214 p212
+    face = p190 p192 p216 p214
+    face = p192 p193 p217 p216
+    face = p193 p191 p215 p217
+    face = p191 p189 p213 p215
+    face = p189 p187 p211 p213
+    face = p187 p185 p209 p211
+    face = p185 p183 p207 p209
+    face = p183 p181 p205 p207
+    face = p181 p179 p203 p205
+    face = p179 p177 p201 p203
+    face = p177 p175 p199 p201
+    face = p175 p173 p197 p199
+    face = p173 p171 p195 p197
+    face = p171 p170 p194 p195
+    face = p170 p172 p196 p194
+    face = p172 p174 p198 p196
+    face = p174 p176 p200 p198
+    face = p176 p178 p202 p200
+    face = p178 p180 p204 p202
+    face = p180 p182 p206 p204
+    face = p206 p208 p232 p230
+    face = p208 p210 p234 p232
+    face = p210 p212 p236 p234
+    face = p212 p214 p238 p236
+    face = p214 p216 p240 p238
+    face = p216 p217 p241 p240
+    face = p217 p215 p239 p241
+    face = p215 p213 p237 p239
+    face = p213 p211 p235 p237
+    face = p211 p209 p233 p235
+    face = p209 p207 p231 p233
+    face = p207 p205 p229 p231
+    face = p205 p203 p227 p229
+    face = p203 p201 p225 p227
+    face = p201 p199 p223 p225
+    face = p199 p197 p221 p223
+    face = p197 p195 p219 p221
+    face = p195 p194 p218 p219
+    face = p194 p196 p220 p218
+    face = p196 p198 p222 p220
+    face = p198 p200 p224 p222
+    face = p200 p202 p226 p224
+    face = p202 p204 p228 p226
+    face = p204 p206 p230 p228
+    face = p230 p232 p256 p254
+    face = p232 p234 p258 p256
+    face = p234 p236 p260 p258
+    face = p236 p238 p262 p260
+    face = p238 p240 p264 p262
+    face = p240 p241 p265 p264
+    face = p241 p239 p263 p265
+    face = p239 p237 p261 p263
+    face = p237 p235 p259 p261
+    face = p235 p233 p257 p259
+    face = p233 p231 p255 p257
+    face = p231 p229 p253 p255
+    face = p229 p227 p251 p253
+    face = p227 p225 p249 p251
+    face = p225 p223 p247 p249
+    face = p223 p221 p245 p247
+    face = p221 p219 p243 p245
+    face = p219 p218 p242 p243
+    face = p218 p220 p244 p242
+    face = p220 p222 p246 p244
+    face = p222 p224 p248 p246
+    face = p224 p226 p250 p248
+    face = p226 p228 p252 p250
+    face = p228 p230 p254 p252
+    face = p254 p256 p266
+    face = p256 p258 p266
+    face = p258 p260 p266
+    face = p260 p262 p266
+    face = p262 p264 p266
+    face = p264..p266
+    face = p265 p263 p266
+    face = p263 p261 p266
+    face = p261 p259 p266
+    face = p259 p257 p266
+    face = p257 p255 p266
+    face = p255 p253 p266
+    face = p253 p251 p266
+    face = p251 p249 p266
+    face = p249 p247 p266
+    face = p247 p245 p266
+    face = p245 p243 p266
+    face = p243 p242 p266
+    face = p242 p244 p266
+    face = p244 p246 p266
+    face = p246 p248 p266
+    face = p248 p250 p266
+    face = p250 p252 p266
+    face = p252 p254 p266
+  end
+  solid
+    paint = #222226
+    points
+      a = 0.781956" west, 2.940504" north, 6.954156" up
+      b = a + 1.563912" east
+      c = 0.82992" west, 3.1209" north, 7.120452" up
+      d = c + 1.65984" east
+      e = 1.26522" west, 1.675272" north, 7.736112" up
+      f = e + 2.53044" east
+      g = 1.342848" west, 1.778052" north, 7.950384" up
+      h = g + 2.685696" east
+      i = 0 east, 0.893328" north, 8.219388" up
+      j = 0 east, 0.948132" north, 8.4633" up
+    end
+    face = b f i e a
+    face = c g j h d
+    face = a e g c
+    face = e i j g
+    face = i f h j
+    face = f b d h
+    face = b a c d
+  end
+  solid
+    paint = #222226
+    points
+      a = 0 east, 0.948132" north, 0.023712" up
+      b = 0 east, 0.893328" north, 0.267624" up
+      c = 1.342848" west, 1.778052" north, 0.536628" up
+      d = c + 2.685696" east
+      e = 1.26522" west, 1.675272" north, 0.7509" up
+      f = e + 2.53044" east
+      g = 0.82992" west, 3.1209" north, 1.36656" up
+      h = g + 1.65984" east
+      i = 0.781956" west, 2.940504" north, 1.532856" up
+      j = i + 1.563912" east
+    end
+    face = b f j i e
+    face = c g h d a
+    face = e i g c
+    face = i j h g
+    face = j f d h
+    face = f b a d
+    face = b e c a
+  end
+  solid
+    paint = #222226
+    points
+      a = 0.781956" west, 2.940504" south, 6.954156" up
+      b = a + 1.563912" east
+      c = 0.82992" west, 3.1209" south, 7.120452" up
+      d = c + 1.65984" east
+      e = 1.26522" west, 1.675272" south, 7.736112" up
+      f = e + 2.53044" east
+      g = 1.342848" west, 1.778052" south, 7.950384" up
+      h = g + 2.685696" east
+      i = 0 east, 0.893328" south, 8.219388" up
+      j = 0 east, 0.948132" south, 8.4633" up
+    end
+    face = i f b a e
+    face = g c d h j
+    face = e a c g
+    face = a b d c
+    face = b f h d
+    face = f i j h
+    face = i e g j
+  end
+  solid
+    paint = #222226
+    points
+      a = 0 east, 0.948132" south, 0.023712" up
+      b = 0 east, 0.893328" south, 0.267624" up
+      c = 1.342848" west, 1.778052" south, 0.536628" up
+      d = c + 2.685696" east
+      e = 1.26522" west, 1.675272" south, 0.7509" up
+      f = e + 2.53044" east
+      g = 0.82992" west, 3.1209" south, 1.36656" up
+      h = g + 1.65984" east
+      i = 0.781956" west, 2.940504" south, 1.532856" up
+      j = i + 1.563912" east
+    end
+    face = j f b e i
+    face = g c a d h
+    face = i e c g
+    face = e b a c
+    face = b f d a
+    face = f j h d
+    face = j i g h
+  end
+  solid
+    paint = #222226
+    points
+      a = 1.778052" east, 3.706872" north, 2.900664" up
+      b = 1.675272" east, 3.4926" north, 2.97828" up
+      c = 3.1209" east, 2.876952" north, 3.41358" up
+      d = 2.940504" east, 2.710656" north, 3.461556" up
+      e = 0.893328" east, 3.975876" north, 4.2435" up
+      f = 0.948132" east, 4.2198" north, 4.2435" up
+      g = d + 1.5639" up
+      h = c + 1.659852" up
+      i = b + 2.530452" up
+      j = a + 2.685684" up
+    end
+    face = g i e b d
+    face = c a f j h
+    face = d b a c
+    face = b e f a
+    face = e i j f
+    face = i g h j
+    face = g d c h
+  end
+  solid
+    paint = #222226
+    points
+      a = 1.778052" east, 3.706872" south, 2.900664" up
+      b = 1.675272" east, 3.4926" south, 2.97828" up
+      c = 3.1209" east, 2.876952" south, 3.41358" up
+      d = 2.940504" east, 2.710656" south, 3.461556" up
+      e = 0.948132" east, 4.2198" south, 4.2435" up
+      f = 0.893328" east, 3.975876" south, 4.2435" up
+      g = d + 1.5639" up
+      h = c + 1.659852" up
+      i = b + 2.530452" up
+      j = a + 2.685684" up
+    end
+    face = f i g d b
+    face = a c h j e
+    face = b d c a
+    face = d g h c
+    face = g i j h
+    face = i f e j
+    face = f b a e
+  end
+  solid
+    paint = #222226
+    points
+      a = 1.778052" west, 3.706872" north, 2.900664" up
+      b = 1.675272" west, 3.4926" north, 2.97828" up
+      c = 3.1209" west, 2.876952" north, 3.41358" up
+      d = 2.940504" west, 2.710656" north, 3.461556" up
+      e = 0.893328" west, 3.975876" north, 4.2435" up
+      f = 0.948132" west, 4.2198" north, 4.2435" up
+      g = d + 1.5639" up
+      h = c + 1.659852" up
+      i = b + 2.530452" up
+      j = a + 2.685684" up
+    end
+    face = e i g d b
+    face = a c h j f
+    face = b d c a
+    face = d g h c
+    face = g i j h
+    face = i e f j
+    face = e b a f
+  end
+  solid
+    paint = #222226
+    points
+      a = 1.778052" west, 3.706872" south, 2.900664" up
+      b = 1.675272" west, 3.4926" south, 2.97828" up
+      c = 3.1209" west, 2.876952" south, 3.41358" up
+      d = 2.940504" west, 2.710656" south, 3.461556" up
+      e = 0.948132" west, 4.2198" south, 4.2435" up
+      f = 0.893328" west, 3.975876" south, 4.2435" up
+      g = d + 1.5639" up
+      h = c + 1.659852" up
+      i = b + 2.530452" up
+      j = a + 2.685684" up
+    end
+    face = g i f b d
+    face = c a e j h
+    face = d b a c
+    face = b f e a
+    face = f i j e
+    face = i g h j
+    face = g d c h
+  end
+  solid
+    paint = #222226
+    points
+      a = 3.975876" east, 0 north, 5.136828" up
+      b = 4.2198" east, 0 north, 5.191632" up
+      c = 3.4926" east, 1.26522" south, 5.918784" up
+      d = c + 2.53044" north
+      e = 3.706872" east, 1.342848" south, 6.021564" up
+      f = e + 2.685696" north
+      g = 2.710656" east, 0.781956" south, 7.184" up
+      h = g + 1.563912" north
+      i = 2.876952" east, 0.82992" south, 7.3644" up
+      j = i + 1.65984" north
+    end
+    face = h d a c g
+    face = i e b f j
+    face = g c e i
+    face = c a b e
+    face = a d f b
+    face = d h j f
+    face = h g i j
+  end
+  solid
+    paint = #222226
+    points
+      a = 3.975876" west, 0 north, 5.136828" up
+      b = 4.2198" west, 0 north, 5.191632" up
+      c = 3.4926" west, 1.26522" south, 5.918784" up
+      d = c + 2.53044" north
+      e = 3.706872" west, 1.342848" south, 6.021564" up
+      f = e + 2.685696" north
+      g = 2.710656" west, 0.781956" south, 7.184" up
+      h = g + 1.563912" north
+      i = 2.876952" west, 0.82992" south, 7.3644" up
+      j = i + 1.65984" north
+    end
+    face = a d h g c
+    face = e i j f b
+    face = c g i e
+    face = g h j i
+    face = h d f j
+    face = d a b f
+    face = a c e b
+  end
+  solid
+    paint = #222226
+    points
+      a = 2.876952" east, 0.82992" south, 1.122612" up
+      b = a + 1.65984" north
+      c = 2.710656" east, 0.781956" south, 1.303" up
+      d = c + 1.563912" north
+      e = 3.706872" east, 1.342848" south, 2.465448" up
+      f = e + 2.685696" north
+      g = 3.4926" east, 1.26522" south, 2.568228" up
+      h = g + 2.53044" north
+      i = 4.2198" east, 0 north, 3.29538" up
+      j = 3.975876" east, 0 north, 3.350184" up
+    end
+    face = j h d c g
+    face = e a b f i
+    face = g c a e
+    face = c d b a
+    face = d h f b
+    face = h j i f
+    face = j g e i
+  end
+  solid
+    paint = #222226
+    points
+      a = 2.876952" west, 0.82992" south, 1.122612" up
+      b = a + 1.65984" north
+      c = 2.710656" west, 0.781956" south, 1.303" up
+      d = c + 1.563912" north
+      e = 3.706872" west, 1.342848" south, 2.465448" up
+      f = e + 2.685696" north
+      g = 3.4926" west, 1.26522" south, 2.568228" up
+      h = g + 2.53044" north
+      i = 4.2198" west, 0 north, 3.29538" up
+      j = 3.975876" west, 0 north, 3.350184" up
+    end
+    face = d h j g c
+    face = a e i f b
+    face = c g e a
+    face = g j i e
+    face = j h f i
+    face = h d b f
+    face = d c a b
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 2.610456" east, 0.783864" south, 7.272816" up
+      b = a + 1.567728" north
+      c = 2.770608" east, 0.83196" south, 7.45866" up
+      d = c + 1.66392" north
+      e = 1.34214" east, 1.567728" south, 7.757268" up
+      f = e + 3.135456" north
+      g = 1.424472" east, 1.663908" south, 7.972836" up
+      h = g + 3.327816" north
+      i = 0.073812" east, 0.783864" south, 8.24172" up
+      j = i + 1.567728" north
+      k = 0.078348" east, 0.83196" south, 8.487" up
+      l = k + 1.66392" north
+    end
+    face = j f b a e i
+    face = k g c d h l
+    face = i e g k
+    face = e a c g
+    face = a b d c
+    face = b f h d
+    face = f j l h
+    face = j i k l
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 2.610456" west, 0.783864" south, 7.272816" up
+      b = a + 1.567728" north
+      c = 2.770608" west, 0.83196" south, 7.45866" up
+      d = c + 1.66392" north
+      e = 1.34214" west, 1.567728" south, 7.757268" up
+      f = e + 3.135456" north
+      g = 1.424472" west, 1.663908" south, 7.972836" up
+      h = g + 3.327816" north
+      i = 0.073812" west, 0.783864" south, 8.24172" up
+      j = i + 1.567728" north
+      k = 0.078348" west, 0.83196" south, 8.487" up
+      l = k + 1.66392" north
+    end
+    face = b f j i e a
+    face = c g k l h d
+    face = a e g c
+    face = e i k g
+    face = i j l k
+    face = j f h l
+    face = f b d h
+    face = b a c d
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 0.783864" west, 3.99822" north, 4.317324" up
+      b = a + 1.567728" east
+      c = 0.83196" west, 4.2435" north, 4.321848" up
+      d = c + 1.66392" east
+      e = 1.567728" west, 3.513756" north, 5.58564" up
+      f = e + 3.135456" east
+      g = 1.663908" west, 3.729324" north, 5.667984" up
+      h = g + 3.327816" east
+      i = 0.783864" west, 3.029304" north, 6.853968" up
+      j = i + 1.567728" east
+      k = 0.83196" west, 3.215148" north, 7.014108" up
+      l = k + 1.66392" east
+    end
+    face = b f j i e a
+    face = c g k l h d
+    face = a e g c
+    face = e i k g
+    face = i j l k
+    face = j f h l
+    face = f b d h
+    face = b a c d
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 2.955492" east, 2.65608" north, 5.146812" up
+      b = 3.136812" east, 2.819028" north, 5.202228" up
+      c = 1.687164" east, 3.439944" north, 5.631264" up
+      d = 1.790676" east, 3.651" north, 5.716404" up
+      e = 3.439944" east, 1.387764" north, 5.930676" up
+      f = 3.651" east, 1.472892" north, 6.034176" up
+      g = 0.9033" east, 2.955492" north, 6.89958" up
+      h = 0.958716" east, 3.136812" north, 7.062528" up
+      i = 2.65608" east, 0.9033" north, 7.199" up
+      j = 2.819028" east, 0.958716" north, 7.380312" up
+      k = 1.387764" east, 1.687164" north, 7.683444" up
+      l = 1.472892" east, 1.790676" north, 7.894488" up
+    end
+    face = i k g c a e
+    face = f b d h l j
+    face = e a b f
+    face = a c d b
+    face = c g h d
+    face = g k l h
+    face = k i j l
+    face = i e f j
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 2.955492" west, 2.65608" north, 5.146812" up
+      b = 3.136812" west, 2.819028" north, 5.202228" up
+      c = 1.687164" west, 3.439944" north, 5.631264" up
+      d = 1.790676" west, 3.651" north, 5.716404" up
+      e = 3.439944" west, 1.387764" north, 5.930676" up
+      f = 3.651" west, 1.472892" north, 6.034176" up
+      g = 0.9033" west, 2.955492" north, 6.89958" up
+      h = 0.958716" west, 3.136812" north, 7.062528" up
+      i = 2.65608" west, 0.9033" north, 7.199" up
+      j = 2.819028" west, 0.958716" north, 7.380312" up
+      k = 1.387764" west, 1.687164" north, 7.683444" up
+      l = 1.472892" west, 1.790676" north, 7.894488" up
+    end
+    face = g k i e a c
+    face = d b f j l h
+    face = c a b d
+    face = a e f b
+    face = e i j f
+    face = i k l j
+    face = k g h l
+    face = g c d h
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 0.078348" east, 0.83196" south, 0 up
+      b = a + 1.66392" north
+      c = 0.073812" east, 0.783864" south, 0.245292" up
+      d = c + 1.567728" north
+      e = 1.424472" east, 1.663908" south, 0.514176" up
+      f = e + 3.327816" north
+      g = 1.34214" east, 1.567728" south, 0.729744" up
+      h = g + 3.135456" north
+      i = 2.770608" east, 0.83196" south, 1.028352" up
+      j = i + 1.66392" north
+      k = 2.610456" east, 0.783864" south, 1.214196" up
+      l = k + 1.567728" north
+    end
+    face = l h d c g k
+    face = i e a b f j
+    face = k g e i
+    face = g c a e
+    face = c d b a
+    face = d h f b
+    face = h l j f
+    face = l k i j
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 0.078348" west, 0.83196" south, 0 up
+      b = a + 1.66392" north
+      c = 0.073812" west, 0.783864" south, 0.245292" up
+      d = c + 1.567728" north
+      e = 1.424472" west, 1.663908" south, 0.514176" up
+      f = e + 3.327816" north
+      g = 1.34214" west, 1.567728" south, 0.729744" up
+      h = g + 3.135456" north
+      i = 2.770608" west, 0.83196" south, 1.028352" up
+      j = i + 1.66392" north
+      k = 2.610456" west, 0.783864" south, 1.214196" up
+      l = k + 1.567728" north
+    end
+    face = d h l k g c
+    face = a e i j f b
+    face = c g e a
+    face = g k i e
+    face = k l j i
+    face = l h f j
+    face = h d b f
+    face = d c a b
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 0.83196" west, 3.215148" north, 1.472892" up
+      b = a + 1.66392" east
+      c = 0.783864" west, 3.029304" north, 1.633044" up
+      d = c + 1.567728" east
+      e = 1.663908" west, 3.729324" north, 2.819028" up
+      f = e + 3.327816" east
+      g = 1.567728" west, 3.513756" north, 2.901372" up
+      h = g + 3.135456" east
+      i = 0.83196" west, 4.2435" north, 4.165164" up
+      j = i + 1.66392" east
+      k = 0.783864" west, 3.99822" north, 4.169688" up
+      l = k + 1.567728" east
+    end
+    face = d h l k g c
+    face = a e i j f b
+    face = c g e a
+    face = g k i e
+    face = k l j i
+    face = l h f j
+    face = h d b f
+    face = d c a b
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 1.472892" east, 1.790676" north, 0.592524" up
+      b = 1.387764" east, 1.687164" north, 0.803556" up
+      c = 2.819028" east, 0.958716" north, 1.1067" up
+      d = 2.65608" east, 0.9033" north, 1.28802" up
+      e = 0.958716" east, 3.136812" north, 1.424472" up
+      f = 0.9033" east, 2.955492" north, 1.587432" up
+      g = 3.651" east, 1.472892" north, 2.452824" up
+      h = 3.439944" east, 1.387764" north, 2.556336" up
+      i = 1.790676" east, 3.651" north, 2.770608" up
+      j = 1.687164" east, 3.439944" north, 2.855748" up
+      k = 3.136812" east, 2.819028" north, 3.284784" up
+      l = 2.955492" east, 2.65608" north, 3.3402" up
+    end
+    face = h l j f b d
+    face = c a e i k g
+    face = d b a c
+    face = b f e a
+    face = f j i e
+    face = j l k i
+    face = l h g k
+    face = h d c g
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 1.472892" west, 1.790676" north, 0.592524" up
+      b = 1.387764" west, 1.687164" north, 0.803556" up
+      c = 2.819028" west, 0.958716" north, 1.1067" up
+      d = 2.65608" west, 0.9033" north, 1.28802" up
+      e = 0.958716" west, 3.136812" north, 1.424472" up
+      f = 0.9033" west, 2.955492" north, 1.587432" up
+      g = 3.651" west, 1.472892" north, 2.452824" up
+      h = 3.439944" west, 1.387764" north, 2.556336" up
+      i = 1.790676" west, 3.651" north, 2.770608" up
+      j = 1.687164" west, 3.439944" north, 2.855748" up
+      k = 3.136812" west, 2.819028" north, 3.284784" up
+      l = 2.955492" west, 2.65608" north, 3.3402" up
+    end
+    face = j l h d b f
+    face = e a c g k i
+    face = f b a e
+    face = b d c a
+    face = d h g c
+    face = h l k g
+    face = l j i k
+    face = j f e i
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 0.783864" west, 3.99822" south, 4.317324" up
+      b = a + 1.567728" east
+      c = 0.83196" west, 4.2435" south, 4.321848" up
+      d = c + 1.66392" east
+      e = 1.567728" west, 3.513756" south, 5.58564" up
+      f = e + 3.135456" east
+      g = 1.663908" west, 3.729324" south, 5.667984" up
+      h = g + 3.327816" east
+      i = 0.783864" west, 3.029304" south, 6.853968" up
+      j = i + 1.567728" east
+      k = 0.83196" west, 3.215148" south, 7.014108" up
+      l = k + 1.66392" east
+    end
+    face = j f b a e i
+    face = k g c d h l
+    face = i e g k
+    face = e a c g
+    face = a b d c
+    face = b f h d
+    face = f j l h
+    face = j i k l
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 2.955492" east, 2.65608" south, 5.146812" up
+      b = 3.136812" east, 2.819028" south, 5.202228" up
+      c = 1.687164" east, 3.439944" south, 5.631264" up
+      d = 1.790676" east, 3.651" south, 5.716404" up
+      e = 3.439944" east, 1.387764" south, 5.930676" up
+      f = 3.651" east, 1.472892" south, 6.034176" up
+      g = 0.9033" east, 2.955492" south, 6.89958" up
+      h = 0.958716" east, 3.136812" south, 7.062528" up
+      i = 2.65608" east, 0.9033" south, 7.199" up
+      j = 2.819028" east, 0.958716" south, 7.380312" up
+      k = 1.387764" east, 1.687164" south, 7.683444" up
+      l = 1.472892" east, 1.790676" south, 7.894488" up
+    end
+    face = g k i e a c
+    face = d b f j l h
+    face = c a b d
+    face = a e f b
+    face = e i j f
+    face = i k l j
+    face = k g h l
+    face = g c d h
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 2.955492" west, 2.65608" south, 5.146812" up
+      b = 3.136812" west, 2.819028" south, 5.202228" up
+      c = 1.687164" west, 3.439944" south, 5.631264" up
+      d = 1.790676" west, 3.651" south, 5.716404" up
+      e = 3.439944" west, 1.387764" south, 5.930676" up
+      f = 3.651" west, 1.472892" south, 6.034176" up
+      g = 0.9033" west, 2.955492" south, 6.89958" up
+      h = 0.958716" west, 3.136812" south, 7.062528" up
+      i = 2.65608" west, 0.9033" south, 7.199" up
+      j = 2.819028" west, 0.958716" south, 7.380312" up
+      k = 1.387764" west, 1.687164" south, 7.683444" up
+      l = 1.472892" west, 1.790676" south, 7.894488" up
+    end
+    face = i k g c a e
+    face = f b d h l j
+    face = e a b f
+    face = a c d b
+    face = c g h d
+    face = g k l h
+    face = k i j l
+    face = i e f j
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 0.83196" west, 3.215148" south, 1.472892" up
+      b = a + 1.66392" east
+      c = 0.783864" west, 3.029304" south, 1.633044" up
+      d = c + 1.567728" east
+      e = 1.663908" west, 3.729324" south, 2.819028" up
+      f = e + 3.327816" east
+      g = 1.567728" west, 3.513756" south, 2.901372" up
+      h = g + 3.135456" east
+      i = 0.83196" west, 4.2435" south, 4.165164" up
+      j = i + 1.66392" east
+      k = 0.783864" west, 3.99822" south, 4.169688" up
+      l = k + 1.567728" east
+    end
+    face = l h d c g k
+    face = i e a b f j
+    face = k g e i
+    face = g c a e
+    face = c d b a
+    face = d h f b
+    face = h l j f
+    face = l k i j
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 1.472892" east, 1.790676" south, 0.592524" up
+      b = 1.387764" east, 1.687164" south, 0.803556" up
+      c = 2.819028" east, 0.958716" south, 1.1067" up
+      d = 2.65608" east, 0.9033" south, 1.28802" up
+      e = 0.958716" east, 3.136812" south, 1.424472" up
+      f = 0.9033" east, 2.955492" south, 1.587432" up
+      g = 3.651" east, 1.472892" south, 2.452824" up
+      h = 3.439944" east, 1.387764" south, 2.556336" up
+      i = 1.790676" east, 3.651" south, 2.770608" up
+      j = 1.687164" east, 3.439944" south, 2.855748" up
+      k = 3.136812" east, 2.819028" south, 3.284784" up
+      l = 2.955492" east, 2.65608" south, 3.3402" up
+    end
+    face = j l h d b f
+    face = e a c g k i
+    face = f b a e
+    face = b d c a
+    face = d h g c
+    face = h l k g
+    face = l j i k
+    face = j f e i
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 1.472892" west, 1.790676" south, 0.592524" up
+      b = 1.387764" west, 1.687164" south, 0.803556" up
+      c = 2.819028" west, 0.958716" south, 1.1067" up
+      d = 2.65608" west, 0.9033" south, 1.28802" up
+      e = 0.958716" west, 3.136812" south, 1.424472" up
+      f = 0.9033" west, 2.955492" south, 1.587432" up
+      g = 3.651" west, 1.472892" south, 2.452824" up
+      h = 3.439944" west, 1.387764" south, 2.556336" up
+      i = 1.790676" west, 3.651" south, 2.770608" up
+      j = 1.687164" west, 3.439944" south, 2.855748" up
+      k = 3.136812" west, 2.819028" south, 3.284784" up
+      l = 2.955492" west, 2.65608" south, 3.3402" up
+    end
+    face = h l j f b d
+    face = c a e i k g
+    face = d b a c
+    face = b f e a
+    face = f j i e
+    face = j l k i
+    face = l h g k
+    face = h d c g
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 3.729324" east, 1.424472" north, 2.579592" up
+      b = 3.513756" east, 1.34214" north, 2.675772" up
+      c = 4.2435" east, 0.078348" north, 3.411552" up
+      d = 3.215148" east, 2.770608" north, 3.411552" up
+      e = 3.99822" east, 0.073812" north, 3.459636" up
+      f = 3.029304" east, 2.610456" north, 3.459636" up
+      g = e + 1.56774" up
+      h = f + 1.56774" up
+      i = c + 1.663908" up
+      j = d + 1.663908" up
+      k = b + 3.135468" up
+      l = a + 3.327828" up
+    end
+    face = g k h f b e
+    face = c a d j l i
+    face = e b a c
+    face = b f d a
+    face = f h j d
+    face = h k l j
+    face = k g i l
+    face = g e c i
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 3.729324" east, 1.424472" south, 2.579592" up
+      b = 3.513756" east, 1.34214" south, 2.675772" up
+      c = 3.215148" east, 2.770608" south, 3.411552" up
+      d = 4.2435" east, 0.078348" south, 3.411552" up
+      e = 3.029304" east, 2.610456" south, 3.459636" up
+      f = 3.99822" east, 0.073812" south, 3.459636" up
+      g = e + 1.56774" up
+      h = f + 1.56774" up
+      i = c + 1.663908" up
+      j = d + 1.663908" up
+      k = b + 3.135468" up
+      l = a + 3.327828" up
+    end
+    face = g k h f b e
+    face = c a d j l i
+    face = e b a c
+    face = b f d a
+    face = f h j d
+    face = h k l j
+    face = k g i l
+    face = g e c i
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 3.729324" west, 1.424472" north, 2.579592" up
+      b = 3.513756" west, 1.34214" north, 2.675772" up
+      c = 4.2435" west, 0.078348" north, 3.411552" up
+      d = 3.215148" west, 2.770608" north, 3.411552" up
+      e = 3.99822" west, 0.073812" north, 3.459636" up
+      f = 3.029304" west, 2.610456" north, 3.459636" up
+      g = e + 1.56774" up
+      h = f + 1.56774" up
+      i = c + 1.663908" up
+      j = d + 1.663908" up
+      k = b + 3.135468" up
+      l = a + 3.327828" up
+    end
+    face = h k g e b f
+    face = d a c i l j
+    face = f b a d
+    face = b e c a
+    face = e g i c
+    face = g k l i
+    face = k h j l
+    face = h f d j
+  end
+  solid
+    paint = #EEEEEA
+    points
+      a = 3.729324" west, 1.424472" south, 2.579592" up
+      b = 3.513756" west, 1.34214" south, 2.675772" up
+      c = 3.215148" west, 2.770608" south, 3.411552" up
+      d = 4.2435" west, 0.078348" south, 3.411552" up
+      e = 3.029304" west, 2.610456" south, 3.459636" up
+      f = 3.99822" west, 0.073812" south, 3.459636" up
+      g = e + 1.56774" up
+      h = f + 1.56774" up
+      i = c + 1.663908" up
+      j = d + 1.663908" up
+      k = b + 3.135468" up
+      l = a + 3.327828" up
+    end
+    face = h k g e b f
+    face = d a c i l j
+    face = f b a d
+    face = b e c a
+    face = e g i c
+    face = g k l i
+    face = k h j l
+    face = h f d j
+  end
+end

@@ -1,0 +1,25 @@
+object FlatForm: TFlatForm
+  Left = 300
+  Height = 680
+  Top = 85
+  Width = 900
+  Caption = 'Flat pattern'
+  ClientHeight = 680
+  ClientWidth = 900
+  Color = clWhite
+  DoubleBuffered = True
+  OnCreate = FormCreate
+  OnPaint = FormPaint
+  ParentDoubleBuffered = False
+  Position = poScreenCenter
+  Scaled = False
+  object btnSaveDxf: TBCButton
+    Left = 750
+    Height = 28
+    Top = 644
+    Width = 136
+    Anchors = [akRight, akBottom]
+    Caption = 'Save DXF...'
+    OnClick = SaveDxfClick
+  end
+end

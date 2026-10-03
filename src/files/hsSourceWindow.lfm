@@ -1,0 +1,219 @@
+object SourceForm: TSourceForm
+  Left = 984
+  Height = 863
+  Top = 638
+  Width = 1202
+  BorderStyle = bsSizeToolWin
+  Caption = 'Source'
+  ClientHeight = 863
+  ClientWidth = 1202
+  ShowInTaskBar = stNever
+  LCLVersion = '4.99.0.0'
+  OnActivate = FormActivate
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  object pnlTop: TPanel
+    Left = 0
+    Height = 38
+    Top = 0
+    Width = 1202
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 38
+    ClientWidth = 1202
+    TabOrder = 0
+    object edtFind: TEdit
+      Left = 12
+      Height = 29
+      Top = 6
+      Width = 120
+      TabOrder = 2
+      TextHint = 'Find (Ctrl+F)'
+      OnKeyDown = edtFindKeyDown
+    end
+    object btnFold: TBCButton
+      Left = 138
+      Height = 26
+      Top = 6
+      Width = 56
+      Caption = 'Fold'
+      OnClick = btnFoldClick
+    end
+    object btnUnfold: TBCButton
+      Left = 198
+      Height = 26
+      Top = 6
+      Width = 62
+      Caption = 'Unfold'
+      OnClick = btnUnfoldClick
+    end
+    object btnSample: TBCButton
+      Left = 266
+      Height = 26
+      Top = 6
+      Width = 66
+      Caption = 'Sample'
+      OnClick = btnSampleClick
+    end
+    object btnJigs: TBCButton
+      Left = 336
+      Height = 26
+      Top = 6
+      Width = 74
+      Caption = 'Run jigs'
+      OnClick = btnJigsClick
+    end
+    object btnPick: TBCButton
+      Left = 414
+      Height = 26
+      Top = 6
+      Width = 48
+      Caption = 'Pick'
+      OnClick = btnPickClick
+    end
+    object chkOnTop: TCheckBox
+      Left = 1108
+      Height = 22
+      Top = 7
+      Width = 70
+      Anchors = [akTop, akRight]
+      Caption = 'On top'
+      TabOrder = 7
+      OnChange = chkOnTopChange
+    end
+    object chkOnlyPicked: TCheckBox
+      Left = 979
+      Height = 22
+      Top = 7
+      Width = 101
+      Anchors = [akTop, akRight]
+      Caption = 'Only picked'
+      TabOrder = 0
+      OnChange = chkOnlyPickedChange
+    end
+  end
+  inline Editor: TSynEdit
+    Left = 0
+    Height = 768
+    Top = 38
+    Width = 1202
+    Align = alClient
+    Font.Height = -14
+    Font.Name = 'Courier New'
+    Font.Quality = fqCleartype
+    TabOrder = 1
+    Gutter.CurrentLineColor.BackAlpha = 0
+    Gutter.CurrentLineColor.FrameAlpha = 0
+    RightGutter.CurrentLineColor.BackAlpha = 0
+    RightGutter.CurrentLineColor.FrameAlpha = 0
+    RightEdge = 0
+    ScrollBars = ssAutoBoth
+    SelectedColor.BackAlpha = 0
+    SelectedColor.FrameAlpha = 0
+    IncrementColor.BackAlpha = 0
+    IncrementColor.FrameAlpha = 0
+    HighlightAllColor.BackAlpha = 0
+    HighlightAllColor.FrameAlpha = 0
+    BracketMatchColor.BackAlpha = 0
+    BracketMatchColor.FrameAlpha = 0
+    FoldedCodeColor.BackAlpha = 0
+    FoldedCodeColor.FrameAlpha = 0
+    MouseLinkColor.BackAlpha = 0
+    MouseLinkColor.FrameAlpha = 0
+    LineHighlightColor.BackAlpha = 0
+    LineHighlightColor.FrameAlpha = 0
+    OnSpecialLineColors = EditorSpecialLineColors
+    OnStatusChange = EditorStatusChange
+    inline SynLeftGutterPartList1: TSynGutterPartList
+      object SynGutterLineNumber1: TSynGutterLineNumber
+        MarkupInfoCurrentLine.BackAlpha = 0
+        MarkupInfoCurrentLine.FrameAlpha = 0
+      end
+      object SynGutterCodeFolding1: TSynGutterCodeFolding
+        MarkupInfoCurrentLine.BackAlpha = 0
+        MarkupInfoCurrentLine.FrameAlpha = 0
+      end
+      object SynGutterSeparator1: TSynGutterSeparator
+        MarkupInfoCurrentLine.BackAlpha = 0
+        MarkupInfoCurrentLine.FrameAlpha = 0
+      end
+    end
+  end
+  object pnlApply: TPanel
+    Left = 0
+    Height = 40
+    Top = 806
+    Width = 1202
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 40
+    ClientWidth = 1202
+    Color = 13434879
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 2
+    Visible = False
+    object lblApply: TLabel
+      Left = 12
+      Height = 28
+      Top = 6
+      Width = 972
+      Anchors = [akTop, akLeft, akRight]
+      AutoSize = False
+      Caption = 'Changed.'
+      Font.Color = clBlack
+      Layout = tlCenter
+      ParentFont = False
+      WordWrap = True
+    end
+    object btnApply: TBCButton
+      Left = 996
+      Height = 28
+      Top = 6
+      Width = 96
+      Anchors = [akTop, akRight]
+      Caption = 'Apply'
+      OnClick = btnApplyClick
+    end
+    object btnRevert: TBCButton
+      Left = 1098
+      Height = 28
+      Top = 6
+      Width = 96
+      Anchors = [akTop, akRight]
+      Caption = 'Revert'
+      OnClick = btnRevertClick
+    end
+  end
+  object Status: TStatusBar
+    Left = 0
+    Height = 17
+    Top = 846
+    Width = 1202
+    Panels = <>
+  end
+  object pmEditor: TPopupMenu
+    OnPopup = pmEditorPopup
+    Left = 600
+    Top = 80
+    object miCenter: TMenuItem
+      Caption = 'Center in View'
+      OnClick = miCenterClick
+    end
+    object miGoTo: TMenuItem
+      Caption = 'Go to Definition'
+      OnClick = miGoToClick
+    end
+    object miRunJig: TMenuItem
+      Caption = 'Run the Jig Again'
+      OnClick = miRunJigClick
+    end
+  end
+  object tmrFollow: TTimer
+    Interval = 150
+    OnTimer = tmrFollowTimer
+    Left = 680
+    Top = 80
+  end
+end

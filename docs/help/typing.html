@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Typing measurements - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; Typing measurements</nav>
+<header><h1>Typing measurements</h1><p class="lead">You can type instead of dragging, nearly everywhere.</p></header>
+<ul><li>Feet and inches: 12', 8", 12'6", 12' 6 1/2".</li><li>Plain numbers are in whatever units the drawing is in.</li><li>A rectangle takes 12'x8'.</li><li>An angle takes 34.1, or 8:12 for a slope.</li>
+<li><b>Truss notation.</b>  <code>6-8-15</code> is six foot eight and fifteen
+sixteenths.  Feet, then inches, then sixteenths - the way a truss drawing
+writes a length, and the way the component design software the shops run
+prints it.  Every field is a whole number, there is no foot mark, inch mark
+or slash anywhere in it, and the whole thing goes in from the number pad with
+the minus key.  <code>0-8-8</code> is eight and a half inches; that leading
+nought for the feet is how a truss sheet writes anything under a foot.</li>
+<li>The sixteenths are whatever the drawing is counting in - the ROUNDED TO
+setting along the bottom.  A last field at or above that is refused rather
+than guessed at, because being quietly wrong by a hair on a length somebody
+cuts metal from is worse than being told.</li>
+<li>It works anywhere a length is wanted: a line, a side of a rectangle, a
+radius, a push, a move, the fitting wizards, retyping a dimension.  For a
+rectangle it still wants both sides - <code>6-8-15x4-0-0</code>, or
+<code>6-8-15/4-0-0</code> from the number pad.</li>
+<li><code>12-6</code>, with one dash, is twelve foot six - the older, shorter
+form of the same idea.</li><li>With the circle or arc tool live, a number with an <kbd>s</kbd> on it - 24s - sets how many sides or segments it is drawn with.  <kbd>+</kbd> and <kbd>-</kbd> do the same one at a time.</li><li>A slash starts a command instead of a measurement - see <a href="commands.html">commands</a>.</li></ul><h2 id="sums">A little arithmetic</h2>
+<p>Anywhere a length is typed, it can be worked out as it is typed.  The
+answer shows at the end of the typing box as you go - <code>= 8'-8"</code> -
+and Enter uses it.  Space is a space while you type, so a sum can be
+written with them; Enter is what uses it.</p>
+<p>The typing box, at the right of the command bar, colors what you type
+so it can be read at a glance: the figures in amber, the foot and inch marks
+in green, the operators of a sum - <code>+</code> <code>--</code>
+<code>*</code> <code>/</code> and brackets - in pink, and the <code>x</code>
+between two sizes in violet.  The bar's second line is what the program
+just said, with names, lengths, commands and keys picked out the same way;
+right-click the bar to copy it.</p>
+<table><tr><th>Typed</th><th>Is</th><th>Why</th></tr>
+<tr><td><code>8' + 8"</code></td><td>8'-8"</td><td>plus</td></tr>
+<tr><td><code>8'24" + 3'4"</code></td><td>13'-4"</td><td>8'24" is ten foot - it always was</td></tr>
+<tr><td><code>10' - 3'4"</code></td><td>6'-8"</td><td>a minus with a space either side</td></tr>
+<tr><td><code>6-8-0--2-4-0</code></td><td>4'-4"</td><td>two dashes are always a minus - truss on both sides, all from the number pad</td></tr>
+<tr><td><code>6-8-0+2-4-0</code></td><td>9'</td><td>truss adds too</td></tr>
+<tr><td><code>8'6"-3"</code></td><td>8'-3"</td><td>a dash straight after an inch mark is a minus - a length never goes on past its inches</td></tr>
+<tr><td><code>10'-3'4"</code></td><td>6'-8"</td><td>a dash after feet, with feet of its own on the other side, is a minus</td></tr>
+<tr><td><code>8'17" / 2</code></td><td>4'-8 1/2"</td><td>a slash is divide - unless it sits between two digits</td></tr>
+<tr><td><code>(8' + 4") * 2</code></td><td>16'-8"</td><td>times, and brackets first</td></tr>
+<tr><td><code>3 * 2'6"</code></td><td>7'-6"</td><td>a plain number times a length</td></tr>
+<tr><td><code>8' + 2</code></td><td>10'</td><td>a plain number in a sum is feet, as a bare number always is</td></tr>
+</table>
+<p>What stays a length and is never a sum:</p>
+<ul>
+<li><code>6'-8"</code> and <code>6' - 8"</code> - six foot eight, the way a dimension is written: feet, a dash, then inches with no foot mark.  To take the inches off, give them their feet - <code>6' - 0'8"</code> - or brackets, <code>6' - (8")</code>.</li>
+<li><code>6'-8</code> - six foot eight as well: no mark after the dash, so no sum.</li>
+<li><code>6-8-15</code> and <code>12-6</code> - truss notation, above: no marks at all.</li>
+<li><code>6 1/2"</code> and <code>3/4"</code> - a slash between two digits is a fraction.</li>
+</ul>
+<p>So a dash is a minus when it is <b>two dashes</b> (<code>--</code>), when it has <b>a space either side</b>, when
+it comes <b>straight after an inch mark</b>, or when <b>the other side has feet of its own</b>.  Two dashes is the one
+to remember: truss notation never has two in a row, so <code>--</code> is a minus whatever is either side of it, and
+the whole sum goes in from the number pad.  A length
+times a length is an area, not a length, and is refused; so is dividing by nothing.</p>
+<h2 id="what-it-looks-like">What it looks like</h2><figure>
+  <a class="zoom" href="shots/typing.png" target="_blank" title="Open larger"><img src="shots/typing.png" alt="A rectangle being given its size by typing."></a>
+  <figcaption>One corner clicked, then <code>8x5</code> typed instead of dragging the other.  The hint line says what forms it will take; Enter lands it.</figcaption>
+</figure>
+<footer><a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

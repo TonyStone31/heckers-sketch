@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Measure - Heckers Sketch</title>
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="../index.html">Help</a> &rsaquo; Measure</nav>
+<header><h1>Measure</h1><p class="lead">Read a distance.</p></header>
+<p>Keyboard: <kbd>T</kbd></p><h2 id="how-to-use-it">How to use it</h2><ol><li>Click two points and read the distance between them.</li><li>It leaves a guide behind to snap to - a point, or a dashed line, depending on where you pulled it from.</li></ol><h2 id="guides">Guides</h2>
+<p>What it leaves depends on where you pulled it from - SketchUp's rule:</p>
+<figure>
+  <a class="zoom" href="../shots/tool-measure.webp" target="_blank" title="Open larger"><img src="../shots/tool-measure.webp" alt="A tape pulled off an edge into the face leaves a dashed guide line parallel to that edge, running the width of the drawing."></a>
+  <figcaption>Pulled <b>off</b> an edge into the face: a dashed guide line
+  parallel to that edge, at the distance measured, running the width of the
+  drawing.  Pull <i>along</i> the edge instead and you get a point and no
+  line - a dashed line lying on the edge you measured along would mark
+  nothing.</figcaption>
+</figure>
+<table class="sheet">
+<tr><th>Pulled from</th><th>What you get</th></tr>
+<tr><td>Along an edge - a point in from a corner, say</td><td>A guide point where it landed, and no line.  A dashed line lying on the edge you measured along marks nothing.</td></tr>
+<tr><td>Off an edge, into the face</td><td>A guide line parallel to that edge, at the distance you measured, and a point.</td></tr>
+<tr><td>From a corner, or in mid air</td><td>A line across the run, and a point.  There is no edge to be parallel to.</td></tr>
+</table>
+<p>The line is dashed and has no ends - it runs the width of the drawing.  Where that guide crosses an edge
+is a place the cursor will snap to - which is the whole reason for laying
+one.  Two guides crossing each other make a point as well.</p>
+<p>Guides belong to the tape: it lays them, and it is the only thing that
+erases one.  The select tool, the eraser and the move tool leave guides alone,
+so a click aimed at a line never takes the guide lying on it, and a swipe of
+the eraser never takes a guide you meant to keep.</p>
+<h2 id="what-it-leaves-behind">What it leaves behind</h2>
+<p><kbd>Ctrl</kbd>, with the tape in hand, cycles what a measurement drops:
+both the dashed line and the point, the point on its own, the dashed line on
+its own, or nothing at all.  Both is what you get unless you change it, and
+the bar along the bottom says which mode you are in every time you press it.
+A 1" mark in from the end of a line rarely wants a dashed line running the
+width of the drawing with it - that is what the point-only mode is for.</p>
+<h2 id="erasing-a-guide">Erasing a guide</h2>
+<p>With the tape in hand, <b>right-click</b> a guide.  The menu says what
+it will take before it takes anything - <b>Erase This Guide Point</b> or
+<b>Erase This Guide Line</b> - and the guide is lit while you read it.  A
+point is looked for before the line it sits on, so aiming at the point gets
+the point.  Erasing a guide line leaves the points on it: they were laid on
+their own and are erased on their own.  <kbd>Ctrl+Z</kbd> brings it back.</p>
+<p>The same menu has <b>Hide Guides</b> - put them all away, still in the
+drawing - and <b>Clear Guides</b>, to throw them all away.  Both are on the
+select tool's right-click too.</p>
+<p>A guide is never moved.  Lay a new one where you want it, and keep or
+erase the old one.</p>
+<h2 id="keeping-a-measurement">Keeping a measurement</h2>
+<p>The tape is finished the moment it has measured - the second point ends
+it.  If the run was worth writing on the drawing, <code>/keep</code> turns the
+last one into a dimension.  It is a command rather than another keypress
+because a keypress on a tool that has already finished is how a dimension
+turns up an hour later that nobody asked for.</p>
+<h2 id="see-also">See also</h2><ul>
+<li><a href="dim.html">Dimensions</a> - a measurement written on the drawing rather than a guide</li>
+<li><a href="protractor.html">The protractor</a> - the same idea for an angle</li>
+<li><a href="../snapping.html">Snapping</a> - what a guide is for once it is there</li>
+</ul>
+<footer><a href="../index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

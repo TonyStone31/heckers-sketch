@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="13"/>
+    <General>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="Heckers Sketch"/>
+      <Scaled Value="True"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <XPManifest>
+        <DpiAware Value="True"/>
+      </XPManifest>
+      <Icon Value="0"/>
+    </General>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <StringTable CompanyName="NozelFab Incorporated" FileDescription="Heckers Sketch" LegalCopyright="NozelFab Incorporated" ProductName="Heckers Sketch"/>
+    </VersionInfo>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
+      <Item Name="Debug">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="bin/etchasketch"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);."/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/crypto/vendor-fixes/Interfaces;../CryptoLib4Pascal/CryptoLib/src;../CryptoLib4Pascal/CryptoLib/src/Asn1;../CryptoLib4Pascal/CryptoLib/src/Crypto;../CryptoLib4Pascal/CryptoLib/src/Math;../CryptoLib4Pascal/CryptoLib/src/Security;../CryptoLib4Pascal/CryptoLib/src/Interfaces;../CryptoLib4Pascal/CryptoLib/src/Utils;../CryptoLib4Pascal/CryptoLib/src/Packages;../CryptoLib4Pascal/CryptoLib/src/Include;../CryptoLib4Pascal/CryptoLib/src/Asn1/Iana;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptLib;../CryptoLib4Pascal/CryptoLib/src/Asn1/Oiw;../CryptoLib4Pascal/CryptoLib/src/Asn1/Bsi;../CryptoLib4Pascal/CryptoLib/src/Asn1/Sec;../CryptoLib4Pascal/CryptoLib/src/Asn1/X9;../CryptoLib4Pascal/CryptoLib/src/Asn1/RossStandart;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptoPro;../CryptoLib4Pascal/CryptoLib/src/Asn1/Eac;../CryptoLib4Pascal/CryptoLib/src/Asn1/Pkcs;../CryptoLib4Pascal/CryptoLib/src/Asn1/Misc;../CryptoLib4Pascal/CryptoLib/src/Asn1/Nist;../CryptoLib4Pascal/CryptoLib/src/Asn1/X509;../CryptoLib4Pascal/CryptoLib/src/Asn1/Edec;../CryptoLib4Pascal/CryptoLib/src/Asn1/TeleTrust;../CryptoLib4Pascal/CryptoLib/src/Crypto/EC;../CryptoLib4Pascal/CryptoLib/src/Crypto/Agreement;../CryptoLib4Pascal/CryptoLib/src/Crypto/Paddings;../CryptoLib4Pascal/CryptoLib/src/Crypto/Generators;../CryptoLib4Pascal/CryptoLib/src/Crypto/Engines;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Modes;../CryptoLib4Pascal/CryptoLib/src/Crypto/Prng;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parsers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Digests;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parameters;../CryptoLib4Pascal/CryptoLib/src/Crypto/Macs;../CryptoLib4Pascal/CryptoLib/src/Math/EC;../CryptoLib4Pascal/CryptoLib/src/Math/Raw;../CryptoLib4Pascal/CryptoLib/src/Math/Field;../CryptoLib4Pascal/CryptoLib/src/Utils/Rng;../CryptoLib4Pascal/CryptoLib/src/Utils/Randoms;../CryptoLib4Pascal/CryptoLib/src/Utils/Encoders;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers/SignersEncodings;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Multiplier;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc8032;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc7748;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Endo;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Abc;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Sec;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Djb;../HashLib4Pascal/HashLib/src;../HashLib4Pascal/HashLib/src/Crypto;../HashLib4Pascal/HashLib/src/KDF;../HashLib4Pascal/HashLib/src/Base;../HashLib4Pascal/HashLib/src/Checksum;../HashLib4Pascal/HashLib/src/NullDigest;../HashLib4Pascal/HashLib/src/Interfaces;../HashLib4Pascal/HashLib/src/Nullable;../HashLib4Pascal/HashLib/src/Hash32;../HashLib4Pascal/HashLib/src/Utils;../HashLib4Pascal/HashLib/src/Hash64;../HashLib4Pascal/HashLib/src/Packages;../HashLib4Pascal/HashLib/src/Hash128;../HashLib4Pascal/HashLib/src/Include;../HashLib4Pascal/HashLib/src/Crypto/Blake2BParams;../HashLib4Pascal/HashLib/src/Crypto/Blake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2BParams;../SimpleBaseLib4Pascal/SimpleBaseLib/src;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Interfaces;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Utils;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Packages;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Bases;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Include"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <Checks>
+              <IOChecks Value="True"/>
+              <RangeChecks Value="True"/>
+              <OverflowChecks Value="True"/>
+              <StackChecks Value="True"/>
+            </Checks>
+            <VerifyObjMethodCallValidity Value="True"/>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <DebugInfoType Value="dsDwarf3"/>
+              <UseHeaptrc Value="True"/>
+              <TrashVariables Value="True"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item>
+      <Item Name="Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="bin/etchasketch"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);."/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/crypto/vendor-fixes/Interfaces;../CryptoLib4Pascal/CryptoLib/src;../CryptoLib4Pascal/CryptoLib/src/Asn1;../CryptoLib4Pascal/CryptoLib/src/Crypto;../CryptoLib4Pascal/CryptoLib/src/Math;../CryptoLib4Pascal/CryptoLib/src/Security;../CryptoLib4Pascal/CryptoLib/src/Interfaces;../CryptoLib4Pascal/CryptoLib/src/Utils;../CryptoLib4Pascal/CryptoLib/src/Packages;../CryptoLib4Pascal/CryptoLib/src/Include;../CryptoLib4Pascal/CryptoLib/src/Asn1/Iana;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptLib;../CryptoLib4Pascal/CryptoLib/src/Asn1/Oiw;../CryptoLib4Pascal/CryptoLib/src/Asn1/Bsi;../CryptoLib4Pascal/CryptoLib/src/Asn1/Sec;../CryptoLib4Pascal/CryptoLib/src/Asn1/X9;../CryptoLib4Pascal/CryptoLib/src/Asn1/RossStandart;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptoPro;../CryptoLib4Pascal/CryptoLib/src/Asn1/Eac;../CryptoLib4Pascal/CryptoLib/src/Asn1/Pkcs;../CryptoLib4Pascal/CryptoLib/src/Asn1/Misc;../CryptoLib4Pascal/CryptoLib/src/Asn1/Nist;../CryptoLib4Pascal/CryptoLib/src/Asn1/X509;../CryptoLib4Pascal/CryptoLib/src/Asn1/Edec;../CryptoLib4Pascal/CryptoLib/src/Asn1/TeleTrust;../CryptoLib4Pascal/CryptoLib/src/Crypto/EC;../CryptoLib4Pascal/CryptoLib/src/Crypto/Agreement;../CryptoLib4Pascal/CryptoLib/src/Crypto/Paddings;../CryptoLib4Pascal/CryptoLib/src/Crypto/Generators;../CryptoLib4Pascal/CryptoLib/src/Crypto/Engines;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Modes;../CryptoLib4Pascal/CryptoLib/src/Crypto/Prng;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parsers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Digests;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parameters;../CryptoLib4Pascal/CryptoLib/src/Crypto/Macs;../CryptoLib4Pascal/CryptoLib/src/Math/EC;../CryptoLib4Pascal/CryptoLib/src/Math/Raw;../CryptoLib4Pascal/CryptoLib/src/Math/Field;../CryptoLib4Pascal/CryptoLib/src/Utils/Rng;../CryptoLib4Pascal/CryptoLib/src/Utils/Randoms;../CryptoLib4Pascal/CryptoLib/src/Utils/Encoders;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers/SignersEncodings;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Multiplier;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc8032;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc7748;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Endo;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Abc;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Sec;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Djb;../HashLib4Pascal/HashLib/src;../HashLib4Pascal/HashLib/src/Crypto;../HashLib4Pascal/HashLib/src/KDF;../HashLib4Pascal/HashLib/src/Base;../HashLib4Pascal/HashLib/src/Checksum;../HashLib4Pascal/HashLib/src/NullDigest;../HashLib4Pascal/HashLib/src/Interfaces;../HashLib4Pascal/HashLib/src/Nullable;../HashLib4Pascal/HashLib/src/Hash32;../HashLib4Pascal/HashLib/src/Utils;../HashLib4Pascal/HashLib/src/Hash64;../HashLib4Pascal/HashLib/src/Packages;../HashLib4Pascal/HashLib/src/Hash128;../HashLib4Pascal/HashLib/src/Include;../HashLib4Pascal/HashLib/src/Crypto/Blake2BParams;../HashLib4Pascal/HashLib/src/Crypto/Blake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2BParams;../SimpleBaseLib4Pascal/SimpleBaseLib/src;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Interfaces;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Utils;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Packages;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Bases;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Include"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <DebugInfoType Value="dsDwarf3"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item>
+      <Item Name="Fast">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="bin/etchasketch-release"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);."/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/crypto/vendor-fixes/Interfaces;../CryptoLib4Pascal/CryptoLib/src;../CryptoLib4Pascal/CryptoLib/src/Asn1;../CryptoLib4Pascal/CryptoLib/src/Crypto;../CryptoLib4Pascal/CryptoLib/src/Math;../CryptoLib4Pascal/CryptoLib/src/Security;../CryptoLib4Pascal/CryptoLib/src/Interfaces;../CryptoLib4Pascal/CryptoLib/src/Utils;../CryptoLib4Pascal/CryptoLib/src/Packages;../CryptoLib4Pascal/CryptoLib/src/Include;../CryptoLib4Pascal/CryptoLib/src/Asn1/Iana;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptLib;../CryptoLib4Pascal/CryptoLib/src/Asn1/Oiw;../CryptoLib4Pascal/CryptoLib/src/Asn1/Bsi;../CryptoLib4Pascal/CryptoLib/src/Asn1/Sec;../CryptoLib4Pascal/CryptoLib/src/Asn1/X9;../CryptoLib4Pascal/CryptoLib/src/Asn1/RossStandart;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptoPro;../CryptoLib4Pascal/CryptoLib/src/Asn1/Eac;../CryptoLib4Pascal/CryptoLib/src/Asn1/Pkcs;../CryptoLib4Pascal/CryptoLib/src/Asn1/Misc;../CryptoLib4Pascal/CryptoLib/src/Asn1/Nist;../CryptoLib4Pascal/CryptoLib/src/Asn1/X509;../CryptoLib4Pascal/CryptoLib/src/Asn1/Edec;../CryptoLib4Pascal/CryptoLib/src/Asn1/TeleTrust;../CryptoLib4Pascal/CryptoLib/src/Crypto/EC;../CryptoLib4Pascal/CryptoLib/src/Crypto/Agreement;../CryptoLib4Pascal/CryptoLib/src/Crypto/Paddings;../CryptoLib4Pascal/CryptoLib/src/Crypto/Generators;../CryptoLib4Pascal/CryptoLib/src/Crypto/Engines;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Modes;../CryptoLib4Pascal/CryptoLib/src/Crypto/Prng;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parsers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Digests;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parameters;../CryptoLib4Pascal/CryptoLib/src/Crypto/Macs;../CryptoLib4Pascal/CryptoLib/src/Math/EC;../CryptoLib4Pascal/CryptoLib/src/Math/Raw;../CryptoLib4Pascal/CryptoLib/src/Math/Field;../CryptoLib4Pascal/CryptoLib/src/Utils/Rng;../CryptoLib4Pascal/CryptoLib/src/Utils/Randoms;../CryptoLib4Pascal/CryptoLib/src/Utils/Encoders;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers/SignersEncodings;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Multiplier;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc8032;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc7748;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Endo;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Abc;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Sec;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Djb;../HashLib4Pascal/HashLib/src;../HashLib4Pascal/HashLib/src/Crypto;../HashLib4Pascal/HashLib/src/KDF;../HashLib4Pascal/HashLib/src/Base;../HashLib4Pascal/HashLib/src/Checksum;../HashLib4Pascal/HashLib/src/NullDigest;../HashLib4Pascal/HashLib/src/Interfaces;../HashLib4Pascal/HashLib/src/Nullable;../HashLib4Pascal/HashLib/src/Hash32;../HashLib4Pascal/HashLib/src/Utils;../HashLib4Pascal/HashLib/src/Hash64;../HashLib4Pascal/HashLib/src/Packages;../HashLib4Pascal/HashLib/src/Hash128;../HashLib4Pascal/HashLib/src/Include;../HashLib4Pascal/HashLib/src/Crypto/Blake2BParams;../HashLib4Pascal/HashLib/src/Crypto/Blake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2BParams;../SimpleBaseLib4Pascal/SimpleBaseLib/src;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Interfaces;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Utils;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Packages;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Bases;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Include"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-fast"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <DebugInfoType Value="dsDwarf3"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <DestinationDirectory Value="$(TestDir)/publishedproject/"/>
+      <CompressFinally Value="False"/>
+      <OpenInFileMan Value="True"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="BGRAControls"/>
+      </Item>
+      <Item>
+        <PackageName Value="BGRABitmapPack"/>
+      </Item>
+      <Item>
+        <PackageName Value="Printer4Lazarus"/>
+      </Item>
+      <Item>
+        <PackageName Value="LazInk"/>
+        <DefaultFilename Value="../LazInk/lazink.lpk" Prefer="True"/>
+      </Item>
+      <Item>
+        <PackageName Value="SynEdit"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPackages>
+    <Units>
+      <Unit>
+        <Filename Value="etchasketch.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsMainForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MainForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/draw/hsSurface.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/model/hsTriangulate.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/draw/hsFilm.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsDialogSkin.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/draw/hsRecorder.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RecordWin"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/examples/hsExToy.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/examples/hsExGlass.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/examples/hsExBroom.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/examples/hsExRobot.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/examples/hsExBall.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/examples/hsExamples.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/files/hsExport.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ExportDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/draw/hsSkin.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/model/hsDrawing.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsUpdateForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="UpdateForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsHelpView.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="HelpForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsHelpImage.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="HelpImageForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsHelpDocs.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsWhatsNew.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="WhatsNewForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/shop/hsTransitionWizard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="TransitionForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/shop/hsFieldElbow.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FieldElbowForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/shop/hsSpoolWizard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SpoolForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsSplash.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SplashForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsSysInfo.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsTouch.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/shop/hsTapeWizard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="TapeWizard"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsSendReport.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SendForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsPostcard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="HelloForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/files/hsSourceWindow.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SourceForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsReportDialog.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ReportDialog"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsLongText.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="LongTextForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsAbout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AboutBox"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsFacts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FactsBox"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/draw/hsFlatView.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FlatForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/shop/hsStairWizard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="StairForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/radiant/hsRadiantWizard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RadiantForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/radiant/hsRadiantBusy.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RadiantBusyForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/radiant/hsRadiantHeatForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RadiantHeatForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <Target>
+      <Filename Value="bin/etchasketch"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir);."/>
+      <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/crypto/vendor-fixes/Interfaces;../CryptoLib4Pascal/CryptoLib/src;../CryptoLib4Pascal/CryptoLib/src/Asn1;../CryptoLib4Pascal/CryptoLib/src/Crypto;../CryptoLib4Pascal/CryptoLib/src/Math;../CryptoLib4Pascal/CryptoLib/src/Security;../CryptoLib4Pascal/CryptoLib/src/Interfaces;../CryptoLib4Pascal/CryptoLib/src/Utils;../CryptoLib4Pascal/CryptoLib/src/Packages;../CryptoLib4Pascal/CryptoLib/src/Include;../CryptoLib4Pascal/CryptoLib/src/Asn1/Iana;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptLib;../CryptoLib4Pascal/CryptoLib/src/Asn1/Oiw;../CryptoLib4Pascal/CryptoLib/src/Asn1/Bsi;../CryptoLib4Pascal/CryptoLib/src/Asn1/Sec;../CryptoLib4Pascal/CryptoLib/src/Asn1/X9;../CryptoLib4Pascal/CryptoLib/src/Asn1/RossStandart;../CryptoLib4Pascal/CryptoLib/src/Asn1/CryptoPro;../CryptoLib4Pascal/CryptoLib/src/Asn1/Eac;../CryptoLib4Pascal/CryptoLib/src/Asn1/Pkcs;../CryptoLib4Pascal/CryptoLib/src/Asn1/Misc;../CryptoLib4Pascal/CryptoLib/src/Asn1/Nist;../CryptoLib4Pascal/CryptoLib/src/Asn1/X509;../CryptoLib4Pascal/CryptoLib/src/Asn1/Edec;../CryptoLib4Pascal/CryptoLib/src/Asn1/TeleTrust;../CryptoLib4Pascal/CryptoLib/src/Crypto/EC;../CryptoLib4Pascal/CryptoLib/src/Crypto/Agreement;../CryptoLib4Pascal/CryptoLib/src/Crypto/Paddings;../CryptoLib4Pascal/CryptoLib/src/Crypto/Generators;../CryptoLib4Pascal/CryptoLib/src/Crypto/Engines;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Modes;../CryptoLib4Pascal/CryptoLib/src/Crypto/Prng;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parsers;../CryptoLib4Pascal/CryptoLib/src/Crypto/Digests;../CryptoLib4Pascal/CryptoLib/src/Crypto/Parameters;../CryptoLib4Pascal/CryptoLib/src/Crypto/Macs;../CryptoLib4Pascal/CryptoLib/src/Math/EC;../CryptoLib4Pascal/CryptoLib/src/Math/Raw;../CryptoLib4Pascal/CryptoLib/src/Math/Field;../CryptoLib4Pascal/CryptoLib/src/Utils/Rng;../CryptoLib4Pascal/CryptoLib/src/Utils/Randoms;../CryptoLib4Pascal/CryptoLib/src/Utils/Encoders;../CryptoLib4Pascal/CryptoLib/src/Crypto/Signers/SignersEncodings;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Multiplier;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc8032;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Rfc7748;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Endo;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Abc;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Sec;../CryptoLib4Pascal/CryptoLib/src/Math/EC/Custom/Djb;../HashLib4Pascal/HashLib/src;../HashLib4Pascal/HashLib/src/Crypto;../HashLib4Pascal/HashLib/src/KDF;../HashLib4Pascal/HashLib/src/Base;../HashLib4Pascal/HashLib/src/Checksum;../HashLib4Pascal/HashLib/src/NullDigest;../HashLib4Pascal/HashLib/src/Interfaces;../HashLib4Pascal/HashLib/src/Nullable;../HashLib4Pascal/HashLib/src/Hash32;../HashLib4Pascal/HashLib/src/Utils;../HashLib4Pascal/HashLib/src/Hash64;../HashLib4Pascal/HashLib/src/Packages;../HashLib4Pascal/HashLib/src/Hash128;../HashLib4Pascal/HashLib/src/Include;../HashLib4Pascal/HashLib/src/Crypto/Blake2BParams;../HashLib4Pascal/HashLib/src/Crypto/Blake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2SParams;../HashLib4Pascal/HashLib/src/Interfaces/IBlake2BParams;../SimpleBaseLib4Pascal/SimpleBaseLib/src;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Interfaces;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Utils;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Packages;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Bases;../SimpleBaseLib4Pascal/SimpleBaseLib/src/Include"/>
+      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2Set"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+</CONFIG>

@@ -1,0 +1,207 @@
+object RecordWin: TRecordWin
+  Left = 250
+  Height = 760
+  Top = 45
+  Width = 1000
+  BorderStyle = bsNone
+  Caption = 'Record a move'
+  ClientHeight = 760
+  ClientWidth = 1000
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = KeyDownH
+  Position = poScreenCenter
+  Scaled = False
+  object pnlBar: TBCPanel
+    Tag = 1
+    Left = 12
+    Height = 96
+    Top = 12
+    Width = 976
+    TabOrder = 0
+    OnMouseDown = BarDown
+    OnMouseMove = BarMove
+    OnMouseUp = BarUp
+    object lblTitle: TBCLabel
+      Left = 16
+      Height = 20
+      Top = 8
+      Width = 300
+      Caption = 'Record a move'
+      FontEx.Height = -19
+      FontEx.Style = [fsBold]
+      OnMouseDown = BarDown
+      OnMouseMove = BarMove
+      OnMouseUp = BarUp
+    end
+    object lblStartFrom: TBCLabel
+      Tag = 1
+      Left = 16
+      Height = 20
+      Top = 38
+      Width = 120
+      Caption = 'Start from'
+      FontEx.Height = -12
+    end
+    object cbStart: TComboBox
+      Left = 16
+      Height = 26
+      Top = 58
+      Width = 200
+      ItemHeight = 22
+      Style = csOwnerDrawFixed
+      TabOrder = 0
+      OnChange = StartPicked
+      OnDrawItem = ComboDraw
+    end
+    object lblMove: TBCLabel
+      Tag = 1
+      Left = 232
+      Height = 20
+      Top = 38
+      Width = 200
+      Caption = 'The move'
+      FontEx.Height = -12
+    end
+    object cbWalk: TComboBox
+      Left = 232
+      Height = 26
+      Top = 58
+      Width = 300
+      ItemHeight = 22
+      Style = csOwnerDrawFixed
+      TabOrder = 1
+      OnChange = StartPicked
+      OnDrawItem = ComboDraw
+    end
+    object lblLong: TBCLabel
+      Tag = 1
+      Left = 548
+      Height = 20
+      Top = 38
+      Width = 120
+      Caption = 'How long'
+      FontEx.Height = -12
+    end
+    object cbLen: TComboBox
+      Left = 548
+      Height = 26
+      Top = 58
+      Width = 120
+      ItemHeight = 22
+      ItemIndex = 1
+      Items.Strings = (
+        '3 seconds'
+        '5 seconds'
+        '8 seconds'
+        '12 seconds'
+      )
+      Style = csOwnerDrawFixed
+      TabOrder = 2
+      OnChange = StartPicked
+      OnDrawItem = ComboDraw
+    end
+    object btnGo: TBCButton
+      Tag = 1
+      Left = 692
+      Height = 34
+      Top = 54
+      Width = 130
+      Caption = 'Record'
+      OnClick = DoGo
+    end
+    object btnStop: TBCButton
+      Left = 692
+      Height = 34
+      Top = 54
+      Width = 130
+      Caption = 'Stop'
+      Visible = False
+      OnClick = DoStop
+    end
+    object lblTell: TBCLabel
+      Tag = 1
+      Left = 836
+      Height = 20
+      Top = 62
+      Width = 130
+      Caption = ''
+      FontEx.Height = -12
+    end
+  end
+  object pbView: TPaintBox
+    Left = 12
+    Height = 500
+    Top = 118
+    Width = 976
+    OnMouseDown = Down
+    OnMouseMove = Move_
+    OnMouseUp = Up
+    OnMouseWheel = Wheel
+    OnPaint = PaintView
+  end
+  object pnlFoot: TBCPanel
+    Left = 12
+    Height = 120
+    Top = 628
+    Width = 976
+    TabOrder = 1
+    object pbFilm: TPaintBox
+      Left = 12
+      Height = 76
+      Top = 10
+      Width = 660
+      OnPaint = PaintFilm
+    end
+    object lblClip: TBCLabel
+      Tag = 1
+      Left = 12
+      Height = 20
+      Top = 90
+      Width = 660
+      Caption = 'No clip yet.'
+      FontEx.Height = -12
+    end
+    object btnPlay: TBCButton
+      Left = 686
+      Height = 32
+      Top = 12
+      Width = 88
+      Caption = 'Play'
+      OnClick = DoPlay
+    end
+    object btnClear: TBCButton
+      Left = 782
+      Height = 32
+      Top = 12
+      Width = 88
+      Caption = 'Clear'
+      OnClick = DoClear
+    end
+    object btnTake: TBCButton
+      Tag = 1
+      Left = 686
+      Height = 32
+      Top = 52
+      Width = 184
+      Caption = 'Use this clip'
+      OnClick = DoTake
+    end
+    object btnDrop: TBCButton
+      Left = 878
+      Height = 32
+      Top = 52
+      Width = 86
+      Caption = 'Close'
+      OnClick = DoDrop
+    end
+  end
+  object tmrTick: TTimer
+    Enabled = False
+    Interval = 33
+    OnTimer = Tick
+    Left = 40
+    Top = 140
+  end
+end

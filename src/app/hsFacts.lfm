@@ -1,0 +1,19 @@
+object FactsBox: TFactsBox
+  Left = 370
+  Height = 366
+  Top = 240
+  Width = 760
+  BorderStyle = bsNone
+  Caption = 'Facts'
+  ClientHeight = 366
+  ClientWidth = 760
+  DoubleBuffered = True
+  KeyPreview = True
+  OnClick = FormClick
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnPaint = FormPaint
+  ParentDoubleBuffered = False
+  Position = poMainFormCenter
+end

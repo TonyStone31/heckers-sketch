@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Revolve - Heckers Sketch</title>
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="../index.html">Help</a> &rsaquo; Revolve</nav>
+<header><h1>Revolve</h1><p class="lead">Draw half of a round thing, spin it, and it is solid.</p></header>
+<nav class="jump"><b>On this page:</b> <a href="#the-idea-in-one-picture">The idea in one picture</a> &middot; <a href="#doing-it-step-by-step">Doing it, step by step</a> &middot; <a href="#a-wine-glass">A wine glass</a> &middot; <a href="#when-it-will-not-spin">When it will not spin</a> &middot; <a href="#sweeping-along-a-path">Sweeping along a path</a> &middot; <a href="#a-part-turn">A part turn</a> &middot; <a href="#how-round-it-comes-out">How round it comes out</a></nav>
+
+<p>No letter of its own - <code>/revolve</code>, or pick it from the strip on
+the left.  This is SketchUp's <b>Follow Me</b> under a name that says what it
+does; <code>/followme</code> still works if that is the word you know.</p>
+
+<h2 id="the-idea-in-one-picture">The idea in one picture</h2>
+<p>Anything round on a lathe - a ball, a bowl, a glass, a knob, a pipe
+flange - is one flat outline turned about a line.  You draw the outline
+<i>beside</i> the line, and this spins it.</p>
+<figure>
+  <a class="zoom" href="../shots/tool-revolve-ball.webp" target="_blank" title="Open larger"><img src="../shots/tool-revolve-ball.webp" alt="Half a circle spun about its straight side into a ball."></a>
+  <figcaption>A ball: half a circle, its straight side on the blue axis.  Pick the tool, click the outline, then click twice down the straight side to say which line to spin about.</figcaption>
+</figure>
+
+<h2 id="doing-it-step-by-step">Doing it, step by step</h2>
+<ol>
+<li><b>Get a flat view to draw in.</b>  <code>/right</code> or <code>/front</code>
+looks straight at an upright plane, which is where a profile belongs -
+standing up, not lying on the floor.</li>
+<li><b>Draw half the shape, from the axis outwards and back.</b>  The straight
+side is the axis side.  Half a circle makes a ball; the outline of a glass
+makes a glass.  Close the outline so it fills in - if it does not fill, see
+<a href="../faces.html">faces</a>.</li>
+<li><b>Pick the tool</b> - <code>/revolve</code>.</li>
+<li><b>Click the filled outline.</b></li>
+<li><b>Say which line to spin about</b>: click two points down the straight
+side of the outline.  The blue axis is the usual one, and the corners of the
+outline snap to it.</li>
+</ol>
+<p>The ring the preview draws is what it is about to sweep.  <b>Red means the
+axis cuts through the outline</b>, which cannot make a solid: move the axis
+to the edge of the shape, not through the middle of it.</p>
+
+<h2 id="a-wine-glass">A wine glass</h2>
+<p>Same three clicks, a longer outline.  Draw it as the glass in section: up
+the outside, over the rim, back down the inside, and in to the axis at the
+bottom of the bowl.  What the outline encloses is the glass, so the hollow
+comes out hollow.</p>
+<figure>
+  <a class="zoom" href="../shots/tool-revolve-glass.webp" target="_blank" title="Open larger"><img src="../shots/tool-revolve-glass.webp" alt="A glass profile spun about the blue axis into a wine glass."></a>
+  <figcaption>The outline of the glass, spun about its straight side.  The bowl is hollow because the outline goes over the rim and back down the inside.</figcaption>
+</figure>
+<p>The wine glass in <code>examples/</code> is this drawing - open it and take
+it apart.</p>
+
+<h2 id="when-it-will-not-spin">When it will not spin</h2>
+<table class="sheet">
+<tr><th>What you see</th><th>What it means</th></tr>
+<tr><td>The preview ring is red</td><td>The axis crosses the outline.  Spin about a line at the edge of the shape.</td></tr>
+<tr><td>Nothing happens when you click the shape</td><td>It is lines, not a face.  A closed outline fills in by itself; an open one does not.</td></tr>
+<tr><td>It comes out banded, like a barrel</td><td>The outline is too coarse - every corner in it becomes a crease.  Draw curves with more segments; see below.</td></tr>
+<tr><td>The middle is solid and should be hollow</td><td>The outline has to come back down the inside.  A single line up one side gives a solid of that shape.</td></tr>
+</table>
+
+<h2 id="sweeping-along-a-path">Sweeping along a path</h2>
+<p>Click a circle instead of an axis and the face follows that circle round -
+which is how a ring, a torus or a round handrail gets made.  Any closed
+outline works as the path.</p>
+
+<h2 id="a-part-turn">A part turn</h2>
+<p>Type an angle before the last click and it stops there: <code>90</code> for
+a quarter, <code>180</code> for a half.  A pipe elbow is a circle swept a
+quarter turn about an axis off to one side of it.</p>
+
+<h2 id="how-round-it-comes-out">How round it comes out</h2>
+<p>Two things decide it.  <b>Across</b> the turn it is the number of gores -
+24 unless you say otherwise, the same setting the circle tool uses
+(<kbd>+</kbd> and <kbd>-</kbd>, or type <code>48s</code>).  <b>Along</b> the
+outline it is how many segments you drew the curve with: a bowl drawn with
+three points has three creases in it, and one drawn with ten is smooth.  A
+gentle bend in the outline is softened for you; a real corner stays a
+corner.</p>
+
+<h2 id="see-also">See also</h2><ul>
+<li><a href="circle.html">The circle tool</a> - where the number of sides comes from</li>
+<li><a href="../solids.html">Solids and 3D printing</a> - whether what came out is closed</li>
+<li><a href="push.html">Push/pull</a> - the other way to make a flat shape solid</li>
+</ul>
+<footer><a href="../index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

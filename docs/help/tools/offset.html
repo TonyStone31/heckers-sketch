@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offset - Heckers Sketch</title>
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="../index.html">Help</a> &rsaquo; Offset</nav>
+<header><h1>Offset</h1><p class="lead">A parallel copy of a face&#x27;s edge, in or out.</p></header>
+<p>Keyboard: <kbd>F</kbd></p><h2 id="how-to-use-it">How to use it</h2>
+<ol>
+<li>Click a face.</li>
+<li>Move in or out and click - or type the distance and press
+<kbd>Enter</kbd>.  A minus goes inward.</li>
+</ol>
+
+<h2 id="what-it-is-for">What it is for</h2>
+<p>Wall thickness.  The offset itself does almost nothing on its own - what
+it leaves you is <b>two faces where there was one</b>, a border and a middle,
+and then push/pull decides what they become.</p>
+<figure>
+  <a class="zoom" href="../shots/tool-offset.webp" target="_blank" title="Open larger"><img src="../shots/tool-offset.webp" alt="The top of a box offset inward two feet, then the middle pushed down eight, leaving a tray with two-foot walls."></a>
+  <figcaption><b>Push the middle down and it is a tray.</b>  The top offset
+  in by 2'-0", then the middle pushed down 8'-0" - both sizes typed rather
+  than dragged for, which is how you get the number you meant.</figcaption>
+</figure>
+<figure>
+  <a class="zoom" href="../shots/tool-offset-rim.webp" target="_blank" title="Open larger"><img src="../shots/tool-offset-rim.webp" alt="The same offset, but this time the border is pushed up three feet, leaving a raised rim around the top of the box."></a>
+  <figcaption><b>Push the border up and it is a rim.</b>  The same offset,
+  the same two clicks - the only difference is which of the two faces was
+  picked, and which way it went.  A lid lip, a curb, the top of a wall.</figcaption>
+</figure>
+<p>That is the whole idea.  Offset a floor inward by 8" and push the border
+up and what comes out is a wall with a room inside it, not a solid block -
+the corners stay sharp and the spacing stays exact all the way round, which
+is what makes it a wall rather than a shrunk copy.</p>
+
+<h2 id="worth-knowing">Worth knowing</h2>
+<ul>
+<li><kbd>Alt</kbd> keeps the overlaps.  A rounded corner taken in further
+than its radius is squared off for you; with <kbd>Alt</kbd> held the loops
+are left exactly as they fall, which is SketchUp's behavior and is
+occasionally what you want to see.</li>
+<li>It works on curves too - offset a circle and you get a second circle
+inside or outside the first, at an exact distance all the way round.  The
+band between them is not yet a face of its own, though, so it is not the way
+to make a pipe wall: for that, draw the two circles and push the outer one,
+or use <a href="drill.html">the drill</a> to take the middle out.</li>
+<li>Rounded corners grow rounder going out and tighter going in.  Taken in
+further than a corner's radius, the rounding is used up and the corner
+comes out square - the same as SketchUp.</li>
+<li>The new edge splits the face it came from, so the border and the middle
+are two faces you can push separately.</li>
+<li>SketchUp puts this on <kbd>F</kbd> as well, which is why it is not on
+<kbd>O</kbd>.</li>
+</ul>
+
+<h2 id="see-also">See also</h2><ul>
+<li><a href="push.html">Push/pull</a> - what turns the two faces into something</li>
+<li><a href="../typing.html">Typing measurements</a> - a minus goes inward</li>
+<li><a href="drill.html">The drill</a> - the other way to make a hole through</li>
+</ul>
+<footer><a href="../index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

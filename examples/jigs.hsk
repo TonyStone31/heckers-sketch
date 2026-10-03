@@ -1,0 +1,136 @@
+HeckersSketch 2
+units = ft in
+
+sheet 'Jigs'
+  ink = #1A1C20
+  width = 1
+  units = ft in
+  scale = '1/4"'
+  snap = '1/16"'
+  view = 3d
+  camera = -0.95, 0.5, 1.25, 330, 470
+
+  circle c1
+    center = 2' east, 2' north, 4' up
+    radius = 1'
+    facing = up
+    sides = 48
+  end
+  line = 0 east, 0 north, 0 up to 4' east, 0 north, 0 up
+  line = 4' east, 0 north, 0 up to 4' east, 4' north, 0 up
+  line = 4' east, 4' north, 0 up to 0 east, 4' north, 0 up
+  line = 0 east, 4' north, 0 up to 0 east, 0 north, 0 up
+  line = 0 east, 0 north, 4' up to 4' east, 0 north, 4' up
+  line = 4' east, 0 north, 4' up to 4' east, 4' north, 4' up
+  line = 4' east, 4' north, 4' up to 0 east, 4' north, 4' up
+  line = 0 east, 4' north, 4' up to 0 east, 0 north, 4' up
+  line = 0 east, 0 north, 0 up to 0 east, 0 north, 4' up
+  line = 4' east, 0 north, 0 up to 4' east, 0 north, 4' up
+  line = 4' east, 4' north, 0 up to 4' east, 4' north, 4' up
+  line = 0 east, 4' north, 0 up to 0 east, 4' north, 4' up
+  line = 6' east, 0 north, 0 up to 6' east, 3' north, 0 up
+  line = 6' east, 3' north, 0 up to 8' east, 3' north, 1' 6" up
+  line
+    points = 6' east, 0 north, 0 up to 8' east, 3' north, 1' 6" up
+    ink = red
+    width = 2
+  end
+  noface = (
+    0 east, 11' north, 10.8" up to + 1' 6" up to + 2' east to + 1' 6" down
+  )
+  noface = (
+    2' east, 11' north, 10.8" up to + 1' 6" up to + 2' east to + 1' 6" down
+  )
+  noface = (
+    4' east, 11' north, 10.8" up to + 1' 6" up to + 2' east to + 1' 6" down
+  )
+  noface = (
+    6' east, 11' north, 10.8" up to + 1' 6" up to + 2' east to + 1' 6" down
+  )
+  noface = (
+    8' east, 11' north, 10.8" up to + 1' 6" up to + 2' east to + 1' 6" down
+  )
+  group 'Star'
+    jig = 'star' with Points = 5, Radius = 2', East = 12', North = 2'
+    line = 12' east, 4' north, 0 up to 138.3573" east, 31.766604" north, 0 up
+    line = 138.3573" east, 31.766604" north, 0 up to 121.174596" east, 31.416396" north, 0 up
+    line = 121.174596" east, 31.416396" north, 0 up to 134.869896" east, 21.033396" north, 0 up
+    line = 134.869896" east, 21.033396" north, 0 up to 129.893196" east, 4.583604" north, 0 up
+    line = 129.893196" east, 4.583604" north, 0 up to 12' east, 14.4" north, 0 up
+    line = 12' east, 14.4" north, 0 up to 158.106804" east, 4.583604" north, 0 up
+    line = 158.106804" east, 4.583604" north, 0 up to 153.130104" east, 21.033396" north, 0 up
+    line = 153.130104" east, 21.033396" north, 0 up to 166.825404" east, 31.416396" north, 0 up
+    line = 166.825404" east, 31.416396" north, 0 up to 149.6427" east, 31.766604" north, 0 up
+    line = 149.6427" east, 31.766604" north, 0 up to 12' east, 4' north, 0 up
+  end
+  group 'Balloon'
+    jig = 'balloon' with Radius = 1' 6", East = 12', North = 7', Height = 6'
+    circle c2
+      center = 12' east, 7' north, 6' up
+      radius = 1' 6"
+      facing = south
+      sides = 48
+      ink = red
+    end
+    line = 12' east, 7' north, 4' 6" up to 11' 9 3/4" east, 7' north, 4' 3 3/4" up
+    line = 11' 9 3/4" east, 7' north, 4' 3 3/4" up to 12' 2 1/4" east, 7' north, 4' 3 3/4" up
+    line = 12' 2 1/4" east, 7' north, 4' 3 3/4" up to 12' east, 7' north, 4' 6" up
+    line = 12' east, 7' north, 4' 3 3/4" up to 146.598096" east, 7' north, 3' 11 7/16" up
+    line = 146.598096" east, 7' north, 3' 11 7/16" up to 146.598096" east, 7' north, 3' 7 1/8" up
+    line = 146.598096" east, 7' north, 3' 7 1/8" up to 12' east, 7' north, 3' 2 13/16" up
+    line = 12' east, 7' north, 3' 2 13/16" up to 141.401904" east, 7' north, 2' 10 1/2" up
+    line = 141.401904" east, 7' north, 2' 10 1/2" up to 141.401904" east, 7' north, 2' 6 3/16" up
+    line = 141.401904" east, 7' north, 2' 6 3/16" up to 12' east, 7' north, 2' 1 7/8" up
+    line = 12' east, 7' north, 2' 1 7/8" up to 146.598096" east, 7' north, 1' 9 9/16" up
+    line = 146.598096" east, 7' north, 1' 9 9/16" up to 146.598096" east, 7' north, 1' 5 1/4" up
+    line = 146.598096" east, 7' north, 1' 5 1/4" up to 12' east, 7' north, 1' 15/16" up
+    line = 12' east, 7' north, 1' 15/16" up to 141.401904" east, 7' north, 8 5/8" up
+    line = 141.401904" east, 7' north, 8 5/8" up to 141.401904" east, 7' north, 4 5/16" up
+    line = 141.401904" east, 7' north, 4 5/16" up to 12' east, 7' north, 0 up
+  end
+  group 'Fence'
+    jig = 'fence' with Posts = 6, Spacing = 2', Height = 3', North = 11'
+    line = 0 east, 11' north, 0 up to 0 east, 11' north, 3' up
+    line = 2' east, 11' north, 0 up to 2' east, 11' north, 3' up
+    line = 4' east, 11' north, 0 up to 4' east, 11' north, 3' up
+    line = 6' east, 11' north, 0 up to 6' east, 11' north, 3' up
+    line = 8' east, 11' north, 0 up to 8' east, 11' north, 3' up
+    line = 10' east, 11' north, 0 up to 10' east, 11' north, 3' up
+    line = 0 east, 11' north, 10.8" up to 10' east, 11' north, 10.8" up
+    line = 0 east, 11' north, 28.8" up to 10' east, 11' north, 28.8" up
+  end
+  group 'Steps'
+    jig = 'steps' with Steps = 5, Rise = 7 1/2", Run = 10", Width = 3', East = 6', North = 5'
+    line = 6' east, 5' north, 0 up to 6' east, 5' north, 7 1/2" up
+    line = 6' east, 5' north, 7 1/2" up to 6' 10" east, 5' north, 7 1/2" up
+    line = 6' 10" east, 5' north, 7 1/2" up to 6' 10" east, 5' north, 1' 3" up
+    line = 6' 10" east, 5' north, 1' 3" up to 7' 8" east, 5' north, 1' 3" up
+    line = 7' 8" east, 5' north, 1' 3" up to 7' 8" east, 5' north, 1' 10 1/2" up
+    line = 7' 8" east, 5' north, 1' 10 1/2" up to 8' 6" east, 5' north, 1' 10 1/2" up
+    line = 8' 6" east, 5' north, 1' 10 1/2" up to 8' 6" east, 5' north, 2' 6" up
+    line = 8' 6" east, 5' north, 2' 6" up to 9' 4" east, 5' north, 2' 6" up
+    line = 9' 4" east, 5' north, 2' 6" up to 9' 4" east, 5' north, 3' 1 1/2" up
+    line = 9' 4" east, 5' north, 3' 1 1/2" up to 10' 2" east, 5' north, 3' 1 1/2" up
+    line = 6' east, 8' north, 0 up to 6' east, 8' north, 7 1/2" up
+    line = 6' east, 8' north, 7 1/2" up to 6' 10" east, 8' north, 7 1/2" up
+    line = 6' 10" east, 8' north, 7 1/2" up to 6' 10" east, 8' north, 1' 3" up
+    line = 6' 10" east, 8' north, 1' 3" up to 7' 8" east, 8' north, 1' 3" up
+    line = 7' 8" east, 8' north, 1' 3" up to 7' 8" east, 8' north, 1' 10 1/2" up
+    line = 7' 8" east, 8' north, 1' 10 1/2" up to 8' 6" east, 8' north, 1' 10 1/2" up
+    line = 8' 6" east, 8' north, 1' 10 1/2" up to 8' 6" east, 8' north, 2' 6" up
+    line = 8' 6" east, 8' north, 2' 6" up to 9' 4" east, 8' north, 2' 6" up
+    line = 9' 4" east, 8' north, 2' 6" up to 9' 4" east, 8' north, 3' 1 1/2" up
+    line = 9' 4" east, 8' north, 3' 1 1/2" up to 10' 2" east, 8' north, 3' 1 1/2" up
+    line = 6' east, 5' north, 0 up to 6' east, 8' north, 0 up
+    line = 6' east, 5' north, 7 1/2" up to 6' east, 8' north, 7 1/2" up
+    line = 6' 10" east, 5' north, 7 1/2" up to 6' 10" east, 8' north, 7 1/2" up
+    line = 6' 10" east, 5' north, 1' 3" up to 6' 10" east, 8' north, 1' 3" up
+    line = 7' 8" east, 5' north, 1' 3" up to 7' 8" east, 8' north, 1' 3" up
+    line = 7' 8" east, 5' north, 1' 10 1/2" up to 7' 8" east, 8' north, 1' 10 1/2" up
+    line = 8' 6" east, 5' north, 1' 10 1/2" up to 8' 6" east, 8' north, 1' 10 1/2" up
+    line = 8' 6" east, 5' north, 2' 6" up to 8' 6" east, 8' north, 2' 6" up
+    line = 9' 4" east, 5' north, 2' 6" up to 9' 4" east, 8' north, 2' 6" up
+    line = 9' 4" east, 5' north, 3' 1 1/2" up to 9' 4" east, 8' north, 3' 1 1/2" up
+    line = 10' 2" east, 5' north, 3' 1 1/2" up to 10' 2" east, 8' north, 3' 1 1/2" up
+  end
+end

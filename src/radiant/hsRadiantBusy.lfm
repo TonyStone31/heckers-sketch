@@ -1,0 +1,230 @@
+object RadiantBusyForm: TRadiantBusyForm
+  Left = 520
+  Height = 464
+  Top = 240
+  Width = 1100
+  BorderIcons = []
+  Caption = 'Searching for a layout'
+  ClientHeight = 464
+  ClientWidth = 1100
+  Constraints.MinHeight = 300
+  Constraints.MinWidth = 480
+  Position = poOwnerFormCenter
+  OnShow = FormShow
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  object lblStage: TLabel
+    Left = 24
+    Height = 26
+    Top = 18
+    Width = 652
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    Caption = 'Searching'
+    Font.Height = -17
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lblDetail: TLabel
+    Left = 24
+    Height = 36
+    Top = 48
+    Width = 652
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    WordWrap = True
+  end
+  object pbProgress: TProgressBar
+    Left = 24
+    Height = 22
+    Top = 88
+    Width = 652
+    Anchors = [akTop, akLeft, akRight]
+    Max = 100
+    TabOrder = 0
+  end
+  object lblGoals: TLabel
+    Left = 24
+    Height = 18
+    Top = 125
+    Width = 44
+    Caption = 'Goals:'
+  end
+  object edBusyCover: TSpinEdit
+    Left = 76
+    Height = 28
+    Top = 120
+    Width = 64
+    MaxValue = 100
+    Hint = 'change it while it searches - it works to the new goal from the next layout'
+    ShowHint = True
+    TabOrder = 4
+  end
+  object lblBusyCover: TLabel
+    Left = 146
+    Height = 18
+    Top = 125
+    Width = 150
+    Caption = '% covered, loops within'
+  end
+  object edBusyEven: TSpinEdit
+    Left = 300
+    Height = 28
+    Top = 120
+    Width = 64
+    MaxValue = 100
+    Hint = 'change it while it searches - it works to the new goal from the next layout'
+    ShowHint = True
+    TabOrder = 5
+  end
+  object lblBusyEven: TLabel
+    Left = 370
+    Height = 18
+    Top = 125
+    Width = 14
+    Caption = '%'
+  end
+  object lblGiveUp: TLabel
+    Left = 404
+    Height = 18
+    Top = 125
+    Width = 90
+    Caption = 'Give up after'
+  end
+  object cbGiveUp: TComboBox
+    Left = 496
+    Height = 28
+    Top = 120
+    Width = 180
+    ItemHeight = 0
+    ItemIndex = 0
+    Items.Strings = (
+      'never'
+      '1 minute a zone'
+      '5 minutes a zone'
+      '15 minutes a zone'
+      '30 minutes a zone'
+      '1 hour a zone'
+    )
+    Style = csDropDownList
+    TabOrder = 6
+    Text = 'never'
+  end
+  object cbBusyLess: TCheckBox
+    Left = 24
+    Height = 22
+    Top = 156
+    Width = 22
+    Hint = 'off, the search keeps to layouts an installer lays easily (85 of 100 or better) - change it while it searches'
+    ShowHint = True
+    TabOrder = 7
+  end
+  object lblBusyLess: TLabel
+    Left = 52
+    Height = 18
+    Top = 158
+    Width = 306
+    AutoSize = False
+    Caption = 'Less friendly layouts too, to meet the goals'
+    FocusControl = cbBusyLess
+    Hint = 'off, the search keeps to layouts an installer lays easily (85 of 100 or better) - change it while it searches'
+    ShowHint = True
+    OnClick = CheckLabelClick
+  end
+  object cbBusyHooks: TCheckBox
+    Left = 370
+    Height = 22
+    Top = 156
+    Width = 22
+    Checked = True
+    Hint = 'a loop run on over its neighbor''s first two rows to even the loops - four bends; off, never tried'
+    ShowHint = True
+    State = cbChecked
+    TabOrder = 8
+  end
+  object lblBusyHooks: TLabel
+    Left = 398
+    Height = 18
+    Top = 158
+    Width = 282
+    AutoSize = False
+    Caption = 'Hooks at the far wall'
+    FocusControl = cbBusyHooks
+    Hint = 'a loop run on over its neighbor''s first two rows to even the loops - four bends; off, never tried'
+    ShowHint = True
+    OnClick = CheckLabelClick
+  end
+  object lblFound: TLabel
+    Left = 24
+    Height = 36
+    Top = 184
+    Width = 652
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    WordWrap = True
+    Caption = 'Found so far, best first - apart is how far the shortest loop falls short of the longest, easy how friendly it is to lay (of 100).  Click one to keep it; double-click to stop and keep it.'
+  end
+  object lbFound: TListBox
+    Left = 24
+    Height = 178
+    Top = 224
+    Width = 652
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Font.Name = 'Monospace'
+    ItemHeight = 0
+    OnClick = lbFoundClick
+    OnDblClick = lbFoundDblClick
+    ParentFont = False
+    TabOrder = 3
+  end
+  object btnStopAll: TBCButton
+    Left = 766
+    Height = 32
+    Top = 418
+    Width = 100
+    Anchors = [akRight, akBottom]
+    Caption = 'Stop all'
+    Hint = 'keep the best of this zone and search no more zones'
+    OnClick = btnStopAllClick
+    ShowHint = True
+  end
+  object btnStop: TBCButton
+    Left = 876
+    Height = 32
+    Top = 418
+    Width = 200
+    Anchors = [akRight, akBottom]
+    Caption = 'Stop - keep the best'
+    Hint = 'keep the best layout of this zone so far and go on to the next zone'
+    OnClick = btnStopClick
+    ShowHint = True
+  end
+  object pbPreview: TPaintBox
+    Left = 690
+    Height = 364
+    Top = 18
+    Width = 386
+    Anchors = [akTop, akRight, akBottom]
+    OnPaint = pbPreviewPaint
+  end
+  object lblPreview: TLabel
+    Tag = 1
+    Left = 690
+    Height = 18
+    Top = 388
+    Width = 386
+    Anchors = [akRight, akBottom]
+    AutoSize = False
+    Caption = 'The best so far - click a layout in the list to see it'
+    Font.Color = clGrayText
+    ParentFont = False
+  end
+  object tmrStart: TTimer
+    Enabled = False
+    Interval = 30
+    OnTimer = tmrStartTimer
+    Left = 8
+    Top = 418
+  end
+end

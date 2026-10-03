@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exporting - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; Exporting</nav>
+<header><h1>Exporting</h1><p class="lead">Getting the drawing out - pictures, film, and shapes.</p></header>
+<p><kbd>Ctrl</kbd>+<kbd>E</kbd>, or
+<code>/export</code>.</p>
+
+<h2 id="pictures">Pictures</h2>
+<ul>
+<li><b>PNG</b> - any size, or one of the ready-made sizes for wherever you
+are posting it.  It can have nothing behind it, so it drops onto a page
+cleanly.</li>
+<li><b>JPEG</b> - smaller, and always on a solid background.</li>
+<li><b>WebP</b> - a little film that swings round the model, lossless,
+so every line is as sharp as it is on screen.  See
+<a href="recording.html">recording a move</a>.</li>
+</ul>
+
+<h2 id="pdf">PDF plans</h2>
+<p>Choose PDF in the export dialog, then the paper, portrait or landscape,
+and print scale. ISO A0–A5, ANSI A–E, ARCH A–E and E1/E2/E3, Legal and
+Engineering F are available. The drawing's print scale is selected initially.
+The preview shows the drawing area: right-drag to position the drawing.
+Anything outside it is cropped; it is never silently shrunk to fit.</p>
+<p>Use PLAN or a square-on elevation for measurable plans. A turned view
+shows projected lengths. The PDF includes a matching scale bar, 10 mm
+margins and a footer. Print using <b>100% / Actual size</b>, not Fit to page.</p>
+<p>PDF uses the same vector geometry as SVG: lines, segmented arcs, face
+outlines and holes, notes and dimension labels. It stays sharp when enlarged,
+and text remains selectable. Like SVG, it exports entities in drawing order,
+not the shaded screen renderer's hidden-line result. The preview is a framing
+view; shading and hidden edges can differ. Output is one sheet; tiling is not
+implemented yet.</p>
+
+<h2 id="lines">Lines</h2>
+<ul>
+<li><b>SVG</b> - this view as vectors, <b>at true size</b>.  The file says
+how many inches or millimeters across it is, so it opens at the right size in
+a drawing program, at a print shop, or on a cutting machine, with nothing to
+scale by hand.  Export from PLAN and the size on the paper is the size of the
+thing.</li>
+<li><b>DXF</b> - this view flat, or the whole model in three dimensions, for
+somebody else's CAD.</li>
+</ul>
+
+<h2 id="shapes-to-print">Shapes to print</h2>
+<ul>
+<li><b>STL</b> - triangles in millimeters, which is what a 3D printer's
+slicer wants.  It tells you whether the shape is closed before you find out
+from the printer.</li>
+<li><b>OpenSCAD</b> - a polyhedron per solid, to cut and union in
+OpenSCAD.</li>
+</ul>
+<p>Both arrive <b>centered on the bed and standing on it</b> - middled across
+X and Y, bottom at Z zero - which is where a slicer expects to find a thing.
+There is nothing to move before printing.  See
+<a href="solids.html">solids and 3D printing</a> for what makes a shape
+printable in the first place.</p>
+<p>PDF support uses Free Pascal's library with its
+<a href="licenses/FPC-linking-exception.txt">linking exception</a> and
+<a href="licenses/FPC-COPYING.txt">library license</a>. The application remains MIT.</p>
+<footer><a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

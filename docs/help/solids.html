@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solids and 3D printing - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; Solids and 3D printing</nav>
+<header><h1>Solids and 3D printing</h1><p class="lead">Why a shape does or does not print.</p></header>
+<h2 id="what-closed-means">What "closed" means</h2>
+<p>A shape prints when every edge is shared by exactly two faces.  Then there
+is a definite inside and a definite outside, and a slicer knows which part to
+fill.  One missing face, or one edge with three faces on it, and it has to
+guess - and guesses come out as holes, blobs, or nothing at all.</p>
+
+<h2 id="finding-out">Finding out</h2>
+<ol>
+<li>Export STL.  It says <i>closed and ready to slice</i>, or that a slicer
+will have to guess.</li>
+<li>If it is open, <code>/holes</code> draws every edge that nothing meets in
+red, over the model - so you can see <i>where</i> it is open rather than only
+that it is.  It checks what you have selected, or every solid if nothing
+is.</li>
+<li>Fix it and run <code>/holes</code> again.  No red, and it is shut.</li>
+</ol>
+
+<figure>
+  <a class="zoom" href="shots/solids-holes.webp" target="_blank" title="Open larger"><img src="shots/solids-holes.webp" alt="One edge rubbed off a closed box opens it, and /holes then draws every unmatched edge in red all round the opening."></a>
+  <figcaption>One edge off a closed box and it is not closed any more.
+  <code>/holes</code> draws every edge that nothing meets in red, so you can
+  see <i>where</i> the hole is - here, all round the opening the two missing
+  faces left.</figcaption>
+</figure>
+
+<h2 id="the-usual-causes">The usual causes</h2>
+<ul>
+<li><b>A face missing.</b>  Draw the line that would close it and the face
+comes back - see <a href="tools/line.html">the line tool</a>.</li>
+<li><b>A face pointing the wrong way</b>, drawn in the back-face color.  Pick
+it and choose <b>Reverse Face</b> on the right button.</li>
+<li><b>Loose faces that never settled against their neighbors.</b>
+<code>/rebuild</code> works the flat areas out again.</li>
+</ul>
+
+<h2 id="where-it-lands-on-the-bed">Where it lands on the bed</h2>
+<ul>
+<li><code>/center</code>, or <b>Center on the Origin</b> on the right button
+- middles the selection across X and Y and stands it on Z zero.  Where a
+slicer expects it.</li>
+<li><code>/tozero</code>, or <b>Into the Corner at 0,0,0</b> - puts the near
+bottom corner there instead, so the thing stands on the floor with its edges
+against zero.  What you want when you are measuring rather than printing.</li>
+</ul>
+<p>STL and OpenSCAD exports do the centering for you, so there is nothing to
+move in the slicer.</p>
+
+<h2 id="see-also">See also</h2><ul>
+<li><a href="faces.html">Faces, front and back</a> - which way a face points, and why the back is blue</li>
+<li><a href="tools/erase.html">The eraser</a> - how a face goes missing in the first place</li>
+<li><a href="export.html">Exporting</a> - STL, and what it says about the shape</li>
+</ul>
+<footer><a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

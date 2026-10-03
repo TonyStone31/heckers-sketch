@@ -1,0 +1,489 @@
+object ExportDlg: TExportDlg
+  Left = 310
+  Height = 604
+  Top = 123
+  Width = 880
+  BorderStyle = bsNone
+  Caption = 'Export'
+  ClientHeight = 604
+  ClientWidth = 880
+  OnCloseQuery = AskClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  Position = poScreenCenter
+  Scaled = False
+  object pnlHead: TBCPanel
+    Tag = 1
+    Left = 0
+    Height = 44
+    Top = 0
+    Width = 880
+    TabOrder = 0
+    OnMouseDown = HeadDown
+    OnMouseMove = HeadMove
+    OnMouseUp = HeadUp
+    object lblTitle: TBCLabel
+      Left = 16
+      Height = 20
+      Top = 11
+      Width = 300
+      Caption = 'Export'
+      FontEx.Height = -19
+      FontEx.Style = [fsBold]
+      OnMouseDown = HeadDown
+      OnMouseMove = HeadMove
+      OnMouseUp = HeadUp
+    end
+    object btnShut: TBCButton
+      Tag = 2
+      Left = 836
+      Height = 28
+      Top = 8
+      Width = 28
+      Caption = 'X'
+      OnClick = DoCancel
+    end
+  end
+  object pnlRail: TBCPanel
+    Left = 12
+    Height = 452
+    Top = 56
+    Width = 132
+    TabOrder = 1
+    object btnPng: TBCButton
+      Left = 10
+      Height = 34
+      Top = 10
+      Width = 112
+      Caption = 'PNG'
+      OnClick = PickKind
+    end
+    object btnJpeg: TBCButton
+      Left = 10
+      Height = 34
+      Top = 48
+      Width = 112
+      Caption = 'JPEG'
+      OnClick = PickKind
+    end
+    object btnWebP: TBCButton
+      Left = 10
+      Height = 34
+      Top = 86
+      Width = 112
+      Caption = 'WebP'
+      OnClick = PickKind
+    end
+    object btnSvg: TBCButton
+      Left = 10
+      Height = 34
+      Top = 136
+      Width = 112
+      Caption = 'SVG'
+      OnClick = PickKind
+    end
+    object btnDxfView: TBCButton
+      Left = 10
+      Height = 34
+      Top = 174
+      Width = 112
+      Caption = 'DXF view'
+      OnClick = PickKind
+    end
+    object btnDxfModel: TBCButton
+      Left = 10
+      Height = 34
+      Top = 212
+      Width = 112
+      Caption = 'DXF model'
+      OnClick = PickKind
+    end
+    object btnStl: TBCButton
+      Left = 10
+      Height = 34
+      Top = 250
+      Width = 112
+      Caption = 'STL'
+      OnClick = PickKind
+    end
+    object btnScad: TBCButton
+      Left = 10
+      Height = 34
+      Top = 288
+      Width = 112
+      Caption = 'OpenSCAD'
+      OnClick = PickKind
+    end
+    object btnPdf: TBCButton
+      Left = 10
+      Height = 34
+      Top = 326
+      Width = 112
+      Caption = 'PDF'
+      OnClick = PickKind
+    end
+  end
+  object pnlMid: TBCPanel
+    Left = 156
+    Height = 452
+    Top = 56
+    Width = 440
+    TabOrder = 2
+    object pbPrev: TPaintBox
+      Left = 10
+      Height = 396
+      Top = 10
+      Width = 420
+      OnMouseDown = PrevDown
+      OnMouseMove = PrevMove
+      OnMouseUp = PrevUp
+      OnMouseWheel = PrevWheel
+      OnPaint = PrevPaint
+    end
+    object lblHint: TLabel
+      Tag = 1
+      Left = 10
+      Height = 34
+      Top = 412
+      Width = 420
+      AutoSize = False
+      Caption = 'Middle-drag turns it, right-drag slides it, wheel zooms - the same as the drawing.  This is the shot.'
+      Font.Height = -12
+      ParentFont = False
+      Transparent = True
+      WordWrap = True
+    end
+  end
+  object pnlOpt: TBCPanel
+    Left = 608
+    Height = 452
+    Top = 56
+    Width = 260
+    TabOrder = 3
+    object lblOptTitle: TBCLabel
+      Left = 14
+      Height = 20
+      Top = 12
+      Width = 232
+      Caption = 'PNG'
+      FontEx.Height = -17
+      FontEx.Style = [fsBold]
+    end
+    object lblNote: TLabel
+      Tag = 1
+      Left = 14
+      Height = 52
+      Top = 38
+      Width = 232
+      AutoSize = False
+      Caption = ''
+      Font.Height = -12
+      ParentFont = False
+      Transparent = True
+      WordWrap = True
+    end
+    object lblSize: TBCLabel
+      Tag = 1
+      Left = 14
+      Height = 20
+      Top = 96
+      Width = 232
+      Caption = 'Size'
+      FontEx.Height = -12
+    end
+    object cbSize: TComboBox
+      Left = 14
+      Height = 26
+      Top = 116
+      Width = 232
+      ItemHeight = 22
+      Style = csOwnerDrawFixed
+      TabOrder = 4
+      OnChange = SizeChanged
+      OnDrawItem = ComboDraw
+    end
+    object edW: TEdit
+      Left = 14
+      Height = 26
+      Top = 148
+      Width = 100
+      TabOrder = 5
+    end
+    object edH: TEdit
+      Left = 146
+      Height = 26
+      Top = 148
+      Width = 100
+      TabOrder = 6
+    end
+    object lblBy: TBCLabel
+      Tag = 1
+      Left = 122
+      Height = 20
+      Top = 150
+      Width = 16
+      Caption = 'x'
+    end
+    object cbPaper: TComboBox
+      Left = 14
+      Height = 26
+      Top = 116
+      Width = 232
+      ItemHeight = 22
+      Style = csOwnerDrawFixed
+      TabOrder = 7
+      OnChange = SizeChanged
+      OnDrawItem = ComboDraw
+    end
+    object cbOrientation: TComboBox
+      Left = 14
+      Height = 26
+      Top = 150
+      Width = 232
+      ItemHeight = 22
+      Items.Strings = (
+        'Portrait'
+        'Landscape'
+      )
+      ItemIndex = 1
+      Style = csOwnerDrawFixed
+      TabOrder = 8
+      OnChange = SizeChanged
+      OnDrawItem = ComboDraw
+    end
+    object cbScale: TComboBox
+      Left = 14
+      Height = 26
+      Top = 184
+      Width = 232
+      ItemHeight = 22
+      Style = csOwnerDrawFixed
+      TabOrder = 9
+      OnChange = SizeChanged
+      OnDrawItem = ComboDraw
+    end
+    object btnTransp: TBCButton
+      Left = 14
+      Height = 26
+      Top = 212
+      Width = 232
+      Caption = ''
+      OnClick = Ticked
+    end
+    object lblQual: TBCLabel
+      Tag = 1
+      Left = 14
+      Height = 20
+      Top = 212
+      Width = 232
+      Caption = 'Quality 88'
+      FontEx.Height = -12
+    end
+    object tbQual: TTrackBar
+      Left = 10
+      Height = 34
+      Top = 232
+      Width = 240
+      Max = 100
+      Min = 20
+      OnChange = SizeChanged
+      Position = 88
+      TabOrder = 10
+    end
+    object btnLoop: TBCButton
+      Left = 14
+      Height = 26
+      Top = 208
+      Width = 232
+      Caption = ''
+      OnClick = Ticked
+    end
+    object btnBounce: TBCButton
+      Left = 14
+      Height = 26
+      Top = 236
+      Width = 232
+      Caption = ''
+      OnClick = Ticked
+    end
+    object cbSecs: TComboBox
+      Left = 14
+      Height = 26
+      Top = 268
+      Width = 232
+      ItemHeight = 22
+      Items.Strings = (
+        'As it was recorded'
+        '3 seconds'
+        '5 seconds'
+        '8 seconds'
+        '12 seconds'
+      )
+      ItemIndex = 0
+      Style = csOwnerDrawFixed
+      TabOrder = 11
+      OnChange = Ticked
+      OnDrawItem = ComboDraw
+    end
+    object btnRec: TBCButton
+      Tag = 1
+      Left = 14
+      Height = 32
+      Top = 302
+      Width = 232
+      Caption = 'Record a move...'
+      OnClick = DoRecord
+    end
+    object btnPlay: TBCButton
+      Left = 14
+      Height = 30
+      Top = 378
+      Width = 232
+      Caption = 'Play it'
+      OnClick = DoPlay
+    end
+    object btnMid: TBCButton
+      Left = 14
+      Height = 26
+      Top = 116
+      Width = 232
+      Caption = ''
+      OnClick = Ticked
+    end
+    object btnAxes: TBCButton
+      Left = 14
+      Height = 26
+      Top = 180
+      Width = 232
+      Caption = ''
+      OnClick = Ticked
+    end
+    object lblClip: TLabel
+      Tag = 1
+      Left = 14
+      Height = 36
+      Top = 338
+      Width = 232
+      AutoSize = False
+      Caption = ''
+      Font.Height = -12
+      ParentFont = False
+      Transparent = True
+      WordWrap = True
+    end
+    object lblShot: TLabel
+      Tag = 1
+      Left = 14
+      Height = 40
+      Top = 412
+      Width = 232
+      AutoSize = False
+      Caption = ''
+      Font.Height = -12
+      ParentFont = False
+      Transparent = True
+      WordWrap = True
+    end
+    object cbDxfWhat: TComboBox
+      Left = 14
+      Height = 26
+      Top = 116
+      Width = 232
+      ItemHeight = 22
+      Items.Strings = (
+        'This view, flat'
+        'The model, in three dimensions'
+      )
+      ItemIndex = 0
+      Style = csOwnerDrawFixed
+      TabOrder = 12
+      OnDrawItem = ComboDraw
+    end
+  end
+  object pnlFoot: TBCPanel
+    Left = 12
+    Height = 72
+    Top = 520
+    Width = 856
+    TabOrder = 13
+    object lblSave: TBCLabel
+      Tag = 1
+      Left = 14
+      Height = 20
+      Top = 10
+      Width = 120
+      Caption = 'Save it as'
+      FontEx.Height = -12
+    end
+    object edPath: TEdit
+      Left = 14
+      Height = 28
+      Top = 32
+      Width = 560
+      TabOrder = 14
+    end
+    object lblTellBad: TLabel
+      Tag = 1
+      Left = 14
+      Height = 34
+      Top = 2
+      Width = 700
+      AutoSize = False
+      Caption = ''
+      Font.Height = -12
+      ParentFont = False
+      Transparent = True
+      Visible = False
+      WordWrap = True
+    end
+    object btnSay: TBCButton
+      Left = 584
+      Height = 22
+      Top = 4
+      Width = 268
+      Caption = 'Send a bug report about this'
+      Visible = False
+      OnClick = DoSay
+    end
+    object btnBrowse: TBCButton
+      Left = 584
+      Height = 28
+      Top = 32
+      Width = 96
+      Caption = 'Choose...'
+      OnClick = DoBrowse
+    end
+    object btnCancel: TBCButton
+      Left = 690
+      Height = 28
+      Top = 32
+      Width = 76
+      Caption = 'Cancel'
+      OnClick = DoCancel
+    end
+    object btnGo: TBCButton
+      Tag = 1
+      Left = 776
+      Height = 28
+      Top = 32
+      Width = 76
+      Caption = 'Export'
+      OnClick = DoGo
+    end
+    object pbBar: TPaintBox
+      Left = 14
+      Height = 52
+      Top = 10
+      Width = 560
+      Visible = False
+      OnPaint = BarPaint
+    end
+  end
+  object tmrPlay: TTimer
+    Enabled = False
+    Interval = 40
+    OnTimer = Tick
+    Left = 40
+    Top = 560
+  end
+end

@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Radiant heat layout - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css"><script src="theme.js"></script></head>
+<body><div class="wrap"><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; Radiant heat layout</nav>
+<header><h1>Radiant heat layout</h1><p class="lead">PEX loops laid out over a slab, a manifold to a zone, with the
+material list, a heat load if you want one, and a submittal to hand in and to lay the tube from.</p></header>
+<p>Open it from <b>Shop &gt; Radiant heat layout...</b> or type <code>/radiant</code> (<code>/pex</code> and
+<code>/hydronic</code> do the same).  Select the floor first.  Nothing goes on the drawing until you press
+<b>Build it</b>, and Cancel or <kbd>Esc</kbd> leaves the drawing as it was.</p>
+
+<h2 id="what-it-does">What it does</h2>
+<p>You give it the floor and where each manifold hangs.  It lays the tube in rows at the spacing you ask for,
+parallel to the manifold's wall, in loops that go out and come back on neighboring rows.  Every loop is a round
+trip from the manifold and back, and its length - both leads included - is kept under the longest loop you allow.
+No loop crosses another, and the tube stays 6" off every wall and obstacle.</p>
+<p>It does not lay one layout and stop.  It searches: it tries many layouts for each zone and keeps the best ones,
+ranked by how much of the floor they reach, how close the loop lengths come to each other, and how easy they are
+to lay.  You pick the one to build, or take the best.</p>
+
+<h2 id="before-you-start">Before you start</h2>
+<ol>
+<li>Draw the floor.  Any closed shape works - a rectangle, an L, a room with a curved wall.</li>
+<li>Split it into zones by drawing lines across it.  <b>Every face is a zone, with a manifold of its own.</b>  A
+barn drawn as one big rectangle with lines across it is four faces, so four zones.</li>
+<li>Cut out what the tube must stay out of - a column, a shaft, a chase - so it is a hole in the floor's face.
+The tube is routed around it.</li>
+<li>Select the floor.  Clicking the faces, a drag, or <kbd>Ctrl</kbd>+<kbd>A</kbd> all work: only faces are
+used, and the lines that come along are ignored.</li>
+<li>Open the wizard.</li>
+</ol>
+<p>A face that is the same shape as a hole in another selected face is left out on its own - it is the column drawn
+inside the slab, not a zone.  With nothing selected, the wizard does not open and says to select the floor
+first.</p>
+
+<h2 id="the-settings">The settings</h2>
+<p>The column on the left.  A bare number is inches for the spacing and feet for a loop - <code>9</code> is
+9", <code>300</code> is 300 ft.  A foot or inch mark, or a metric size, is read as written.</p>
+<table><tr><th>Setting</th><th>What it is</th></tr>
+<tr><td>Tube</td><td>3/8", 1/2", 5/8" or 3/4" PEX.</td></tr>
+<tr><td>Spacing, on center</td><td>How far apart the rows are.  9" to start.</td></tr>
+<tr><td>Longest loop</td><td>The most tube in one loop, manifold and back.  Blank is the tube's own: 200 ft for
+3/8", 300 ft for 1/2", 400 ft for 5/8", 500 ft for 3/4".</td></tr>
+<tr><td>Waste on the coil</td><td>Percent added to the order.  10% to start.  It changes the order only, never the
+layout, so it needs no new search.</td></tr>
+<tr><td>Most loops a manifold</td><td>2 to 64, 12 to start - most makers stop at twelve.  A zone that wants more is
+yours to split in two; the wizard does not put a second manifold in it.</td></tr>
+<tr><td>Search until ... % of the floor covered, and the loops within ... % of each other</td><td>The goals.  A
+search keeps going until its best layout meets both, or you stop it.  0 is no goal.  97% and 10% to
+start.</td></tr>
+<tr><td>Loops in hooked pairs, to even them</td><td>Two neighboring loops share their rows, split by one hook at the
+far wall.  Ticked, the search tries these alongside plain layouts.</td></tr>
+<tr><td>Show the labels</td><td>The loop and manifold notes on the drawing.  Unticked, they are still built, but put
+away - <code>/show labels</code> brings them back, <code>/hide labels</code> puts them away again.</td></tr>
+<tr><td>Job name</td><td>Goes on the submittal and names the zones' groups - <i>Smith residence</i>.</td></tr>
+</table>
+<p>The settings are remembered from one job to the next; the job name is remembered for the floor it was given
+to.  Changing the tube, the spacing, the longest loop or the most loops a manifold throws away every zone's layout,
+since the tube can no longer go where it went: search again.</p>
+<p>The slab is not asked about.  The wizard takes a 4" concrete slab, the tube centered in the pour, R-15 under it,
+and says so on the material list and the submittal.</p>
+
+<h2 id="zones-and-manifolds">Zones and manifolds</h2>
+<p>The plan in the middle shows the floor north up, with a compass in the corner.  Each zone is outlined, holes
+are shaded gray, and each manifold is a small numbered box - the one you are working on is yellow.  Once a zone
+is searched, every loop is drawn in its own color, so you can follow one run by eye.</p>
+<p>When the wizard opens, it puts a manifold in every zone, on a wall and a foot in from it, toward the middle of
+all the zones - where the boiler most likely is.  <b>Suggest manifolds</b> puts them all back there.</p>
+<h3>Tabs</h3>
+<p>Under the plan there is a tab for each zone, and <b>All zones</b> when there is more than one.  Click a zone on the
+plan and its tab comes up.  A zone's tab has:</p>
+<ul>
+<li><b>Name</b> - <i>Kitchen</i>, <i>barn east bay</i>.  It shows on the tab, the plan, the material list, the
+submittal and the zone's group on the drawing, and is remembered for that floor.</li>
+<li><b>Keep the manifold where I put it</b> - see below.</li>
+<li>A line saying where the manifold is and how the zone stands: not searched yet, or the size of manifold its
+layout takes, how many layouts were searched in how long, and how installer friendly it is.  Before you search, it
+warns you when your coverage goal is out of reach for this tube, or when the zone wants more loops than one
+manifold takes.</li>
+<li><b>Search this zone</b>, <b>Clear it</b> (throws away its layout), and <b>Not a zone</b>.</li>
+<li><b>Layouts found, best first</b> - see <a href="#picking">picking a layout</a>.</li>
+<li><b>Material list</b> - this zone's.  On the All zones tab, every zone's together, with the totals.</li>
+</ul>
+<h3>Moving and turning a manifold</h3>
+<ul>
+<li><b>Drag</b> a manifold's box to move it.  It stays inside its own zone.</li>
+<li>Drag it within about a foot and a half of a straight wall and it turns to lie along that wall - and keeps
+that heading when you drag it away again.  That is the quick way to turn one and then move it out into the
+floor.</li>
+<li>Right-click it for <b>Rotate manifold 90 degrees</b>, or <b>Square the manifold</b>: long side east - west,
+north - south, at 45 degrees, or at 135 degrees.</li>
+</ul>
+<p>Moving or turning a manifold throws away that zone's layout.  The other zones keep theirs.</p>
+<h3>Keep the manifold where I put it</h3>
+<p>When a search is stuck, as a last resort it may slide the manifold along its wall a few feet, and the material
+list says how far it moved it.  Tick <b>Keep the manifold where I put it</b> when the spot you picked is the only
+place it can hang.  It is remembered for that zone.</p>
+<h3>Not a zone, and bringing it back</h3>
+<p>A closed shape in the selection that is not floor to heat - a chase, a column against a wall - can be left out.
+Pick its tab and press <b>Not a zone</b>, or right-click it on the plan for <b>Zone N is not a zone - leave it
+bare</b>.  It turns gray on the plan, gets no tube, and stays out the next time you open this floor.  The last zone
+cannot be left out.</p>
+<p>To bring them back, right-click the plan: <b>Bring back the shapes left out</b>.  Every one left out comes back
+as a zone, with its manifold where Suggest would put it.</p>
+<h3>The plan's right-click menu</h3>
+<p>Right-click a manifold, or inside a zone, and the menu acts on that zone:</p>
+<ul>
+<li><b>Search zone N</b>, and <b>Search all zones</b>.</li>
+<li><b>Zone N is not a zone - leave it bare</b>, and <b>Bring back the shapes left out</b>.</li>
+<li><b>Rotate manifold 90 degrees</b>, and <b>Square the manifold</b>.</li>
+<li><b>Clear zone N</b>, and <b>Clear all zones</b> - their layouts, not the zones.</li>
+</ul>
+
+<h2 id="searching">Searching</h2>
+<p>A search takes seconds a zone on a real floor, longer on a big one, so nothing is searched until you ask.
+Press <b>Search this zone</b> on its tab, <b>Search all zones</b>, or use the plan's right-click menu.  A zone not
+searched shows no tube, and <b>Build it</b> stays off until every zone has been searched.</p>
+<h3>What a search does</h3>
+<ol>
+<li>It lays a set of layouts first: the rows both ways, the first loops given more or less of the longest loop,
+different distances for the tube to fan out from the manifold.  With no goals, that is the whole search.</li>
+<li>With goals, it keeps going: more layouts tried at random - loops of different lengths, lanes nudged, rows
+turned - until the best one meets the goals, or you stop it, or it reaches its give-up time.</li>
+<li>Along the way, and more as it gets stuck, it may even up the rows at the far wall by closing them up an inch or
+so, lay loops with hooks at the far wall, and - unless you told it not to - slide the manifold along its wall.
+The material list and the submittal say when any of this was done.</li>
+</ol>
+<p>A layout only meets the goals when it covers enough, its loops are within the spread you gave, no join runs
+through an obstacle, it needs no more loops than a manifold takes, and it is friendly enough to lay (below).  Each
+search starts from a new random point, so searching a zone again can find a different layout.</p>
+<p>When a coverage goal is more than the tube can reach - say twelve loops of 300 ft at 9" on a 3,000 sq ft zone -
+the zone's tab says so before you search, with what to change: a wider spacing, a longer loop, more loops a
+manifold, or the zone split.  The search then works toward what the tube can reach.</p>
+<h3>The search window</h3>
+<p>While it searches, a window stays up over the wizard.  It shows which zone it is on (and which of how many), a
+bar, the layouts laid a second, and the best so far - how much it covers, how close its loops come, and how many
+loops.  Everything in it can be changed while it runs:</p>
+<table><tr><th>Control</th><th>What it does</th></tr>
+<tr><td>Goals</td><td>The same two goals as the wizard's.  Change them here and the search works to the new goals
+from the next layout.  What you leave here is the wizard's goals afterward.</td></tr>
+<tr><td>Give up after</td><td>Never, or 1, 5, 15 or 30 minutes, or 1 hour, a zone.  Past it, the zone keeps the
+best it found and the next zone starts.</td></tr>
+<tr><td>Less friendly layouts too, to meet the goals</td><td>Off, the search keeps to layouts an installer lays
+easily - 85 of 100 or better.  Tick it to let it lay harder loops when that is the only way to meet the
+goals.</td></tr>
+<tr><td>Hooks at the far wall</td><td>A loop run on over its neighbor's first two rows, to even the loop lengths -
+four bends.  Untick it and hooks are never tried.</td></tr>
+<tr><td>Found so far, best first</td><td>The layouts it has kept.  Click one to see it drawn beside the list and to
+keep it as the zone's layout; double-click one to stop and keep it.</td></tr>
+<tr><td>Stop - keep the best</td><td>Ends this zone with the best it has, and goes on to the next zone.</td></tr>
+<tr><td>Stop all</td><td>The same, and searches no more zones.</td></tr>
+</table>
+<p>Give up after, less friendly and hooks are remembered for next time.  While the window is up, the wizard cannot
+be changed or closed.</p>
+<h3 id="picking">Picking a layout</h3>
+<p>A search keeps up to 24 layouts a zone.  Each line in the list, best first, reads:</p>
+<ul>
+<li>how much of the floor it covers, percent;</li>
+<li>how far apart its loops are - how much shorter the shortest is than the longest, percent and then feet;</li>
+<li>how many loops, and how many bends;</li>
+<li>how installer friendly it is, of 100;</li>
+<li><b>ok</b> when it meets the goals.</li>
+</ul>
+<p>Click a line in the zone's <b>Layouts found</b> list and that is the layout the zone shows and will build.  The
+material list says which of how many it is.</p>
+<h3 id="friendly">Installer friendly</h3>
+<p>Each loop is scored out of 100 for the person laying it.  A plain serpentine block, set out from two
+measurements, is 100.  A loop loses points for every measurement past two it takes to set out - where its rows stop
+short of a wall, and where its lead runs - for bends past a plain serpentine's, and for reaching out past its own
+block of floor into the others'.  A layout's score is the average of its loops'.</p>
+
+<h2 id="gauges">The gauges and the material list</h2>
+<p>Two bars over the plan, over the zones searched so far:</p>
+<ul>
+<li><b>Coverage</b> - how much of the floor the tube actually reaches.</li>
+<li><b>Evenness</b> - how close the loop lengths come, in the zone where they are furthest apart, as a percent
+and in feet.</li>
+</ul>
+<p>Green is good, amber is part way, red is poor.</p>
+<p>The material list for a zone gives the tube and spacing, the floor area, the loops, the manifold's size and about
+how much wall it takes, every loop's length, and then:</p>
+<ul>
+<li>total tube with no waste, and the order with the waste added;</li>
+<li>ties or staples, one every 15";</li>
+<li>how many bends, and how much of the tube runs in long straights;</li>
+<li>how far out from the manifold every tube is on the grid;</li>
+<li>whether the turn at the end of each row - the spacing - is tighter than the tube bends, and which PEX (A, or B
+and C) can make it;</li>
+<li>any join that runs through an obstacle - route those by hand;</li>
+<li>floor not reached, the slab assumed, how friendly it is to lay, and the search's record;</li>
+<li><b>SHORT OF THE GOALS</b>, <b>OUT OF REACH</b> or <b>MORE LOOPS THAN ... A MANIFOLD IS SET TO TAKE</b>
+where that is so, with what to change.</li>
+</ul>
+<p>The line in red just above <b>Build it</b> says what stops a build: a size that does not read, or a zone with no
+layout.</p>
+
+<h2 id="heat-load">The heat load</h2>
+<p><b>Heat load...</b> opens a window of its own.  It is optional: a layout builds without it, and the submittal
+only carries a heat load once you use one.  Once you do, the button reads <b>Heat load - in</b>.</p>
+<p>It is a simplified heat loss - walls, glass, doors, ceiling, the slab's edge and the air that leaks in - at the
+code U-values for the climate zone, worked out as you type.  The answers are remembered for that floor.</p>
+<h3>The building</h3>
+<table><tr><th>Setting</th><th>What it is</th></tr>
+<tr><td>Outdoor design</td><td>The 99% winter low for the town, degrees F - ask the supplier or look it up
+(ASHRAE).</td></tr>
+<tr><td>Indoor</td><td>68 F to start.</td></tr>
+<tr><td>Climate zone</td><td>The IECC climate zone, 1 to 8.  <b>?</b> opens the Department of Energy's guide in your
+browser, which lists every county's zone.</td></tr>
+<tr><td>Glycol</td><td>Percent propylene glycol in the water.  It carries less heat and is thicker, so the flow and
+head go up.</td></tr>
+<tr><td>Altitude</td><td>Feet.  Past 2,000 ft the boiler is derated 4% for every 1,000.</td></tr>
+<tr><td>The boiler makes the hot water too</td><td>A combination boiler.  Tick it and give the number of bathrooms;
+the boiler is sized for whichever is larger, the heating or the hot water.</td></tr>
+</table>
+<h3>The outside walls</h3>
+<p>The plan shows the zones.  Click a wall to change it, round and round: <b>blue</b> is an outside wall,
+<b>orange</b> a wall to a space not heated - a garage - and <b>gray</b> an inside wall.  A wall two zones share is
+always inside.  To start, every wall no other zone shares is taken as outside.  Click inside a zone, or pick it from
+the list, to fill in that zone.</p>
+<h3>Each zone</h3>
+<table><tr><th>Setting</th><th>Choices</th></tr>
+<tr><td>What it is</td><td>Slab on grade; slab over a heated space; joists with plates, over a crawlspace; snow
+melt.</td></tr>
+<tr><td>Above it</td><td>Attic, insulated to code; roof, insulated to code; heated space; bare metal roof.</td></tr>
+<tr><td>Outside walls</td><td>Up to code; older - R-11; bare metal.</td></tr>
+<tr><td>Slab insulation</td><td>Under it all, to code; R-10 at the edge only; none.  Slab on grade only.</td></tr>
+<tr><td>Floor covering</td><td>Bare concrete; tile or stone; vinyl or laminate; wood; carpet and pad.</td></tr>
+<tr><td>Air tightness</td><td>Tight - new, sealed; average; leaky - old, drafty.</td></tr>
+<tr><td>Snow melt</td><td>Residential walks and drives; commercial; must stay clear - ramps, hospitals.  Snow melt
+only.</td></tr>
+<tr><td>Header to boiler</td><td>How far the pipe runs from this zone's manifold to the boiler, one way: up to 20 ft,
+20 to 50, 50 to 75, 75 to 100, 100 to 150.</td></tr>
+<tr><td>Ceiling height</td><td>Feet.</td></tr>
+<tr><td>Windows</td><td>Square feet of glass in the zone's outside walls, all told.</td></tr>
+<tr><td>Overhead doors</td><td>Square feet of them.</td></tr>
+</table>
+<p>A snow melt zone asks only for its class; it is a rate over the surface, not a loss, and is kept apart from the
+heating load.</p>
+<h3>What it works out</h3>
+<p>For the zone you are on:</p>
+<ul>
+<li>the loss by where it goes - walls, windows, doors, ceiling, slab edge, floor down, air - and the total in
+BTU/hr;</li>
+<li>what the floor has to give, BTU/hr a square foot, and its surface temperature.  Past what a floor gives at
+85 F it says <b>SHORT</b>, and how much has to come from other heat;</li>
+<li>the water: supply and return temperatures, and the zone's GPM;</li>
+<li>the loop that needs the most head, its GPM and feet of head - once the zone has been searched;</li>
+<li>the copper pipe size from the header to the boiler;</li>
+<li>the pump: GPM at feet of head.</li>
+</ul>
+<p>And the boiler for all the zones: the heating, 5% for the piping, the hot water if it makes it, the altitude
+derate, the rated output it needs at least, the input at about 95% efficiency, how far down it should modulate (the
+smallest zone), and the snow melt, alone and with one boiler doing both.</p>
+<p><b>Use it</b> puts the heat load in the submittal.  <b>Leave the heat load out</b> takes it out.  Cancel keeps
+what was there before.</p>
+
+<h2 id="submittal">The submittal</h2>
+<p><b>Export the submittal...</b> saves the job as a PDF - on letter paper, or A4 for a metric drawing - or as plain
+text if you pick a <code>.txt</code> file.  It is named for the job to start with.  <b>Preview the PDF</b> writes
+the same PDF where nothing is kept and opens it in your PDF reader, so you can look it over first.</p>
+<p>It covers the zones searched so far; a zone not searched says it has no layout.  In order:</p>
+<ul>
+<li><b>The system</b> - the tube and spacing, the longest loop allowed, the zones and manifolds, the loops, the
+floor and how much of it the tube reaches, the tube and the order, ties, the goals, how many layouts were tried in
+how long, installer friendly, and the slab.</li>
+<li><b>Material list</b> - the tube to order, the manifolds by size with the wall each takes, ties or staples, and
+the insulation under the slab.</li>
+<li><b>Zones</b> - a line each: floor, loops, manifold, wall space, tube, reached, loops within, bends, easy, and
+whether it met the goals.</li>
+<li><b>The plan</b> of every zone, north up, with a scale bar.</li>
+<li><b>A page for each zone</b> - its plan with the manifold dimensioned to the walls, a table of its loops (length,
+measurements to set out, color), what it takes, the heat, water and pump when there is a heat load, anything out of
+the ordinary (the manifold moved, rows closed up, a tight turn, short of the goals, too many loops), and how it was
+found.</li>
+<li><b>A setting-out sheet for every loop</b>, a loop to a page for the binder: the loop by itself in its color with
+the others faint, the dimensions to mark it out from the walls - to the first row, across the rows, to where the
+rows turn, to the far wall, each lead from its nearest wall - where the manifold goes, a warning when it takes more
+than two measurements, a scale bar, and an <b>installer checklist</b>: rows marked, tube laid and tied, both ends
+tagged, supply and return connected, pressure tested, flow set (to the design GPM when there is a heat load), then
+laid by, date and checked by.  Every loop of a zone is at the same scale.</li>
+<li><b>Heat load, water and the boiler</b>, when one is used - the design conditions, the boiler, a line for each
+zone, where the loss goes, what was asked, anything to watch (a floor short of its load, water over 120 F for a
+slab, a pump past 25 ft of head, snow melt without glycol), how it was worked out, and every table value used, with
+its source.</li>
+<li><b>Design record</b> - for each zone, when it was searched, how many layouts in how long, what happened on the
+way (stopped by hand, gave up, picked by hand, goals met at which layout), and the layouts it kept, the chosen one
+marked.</li>
+<li><b>How this layout was made</b> - the rules the layout keeps, in a few lines.</li>
+</ul>
+<p>Every sheet has a title block: the job, the date, the program's version, and sheet N of M.  A scale bar reads
+true even printed "fit to page", where a stated scale would not.</p>
+
+<h2 id="building">Building it</h2>
+<p><b>Build it</b> puts the layout on the drawing exactly where the floor is - nothing to place afterward - and
+leaves what it built selected.  It builds the layouts the wizard showed; it does not search again.  For each
+zone:</p>
+<ul>
+<li>A group named for the job (or <i>Radiant</i>), the zone and its name, and what was laid - the tube, the
+spacing, the number of loops and the total length: <i>1/2" PEX at 9" o.c. - 11 loops</i> and so on.</li>
+<li>Inside it, <b>every loop a group of its own</b>, named <i>Z1 L3</i> with its length.  Click one and you have the
+whole run from port to port; the entity panel gives its length.  Each loop is drawn in its own color, as on the
+wizard's plan.</li>
+<li>The manifold as a box, turned the way it hangs, in a group of its own - <i>Z1 manifold - 11 loops</i>.</li>
+<li>A labels group: each loop's name and length, <i>no tube - obstacle</i> on every hole, and a note by the
+manifold with the zone's summary.  <code>/hide labels</code> and <code>/show labels</code> put them away and back.</li>
+</ul>
+<p>The runs are reference lines, like a dimension's own line: they draw in full but never close faces with the
+floor.  Undo takes the whole build back in one step.</p>
+
+<h2 id="after">After it is built</h2>
+<p>The drawing keeps the whole job in the zones' groups - the settings, every zone and manifold, the names, the heat
+load and each zone's layout.  Click a zone's group and right-click it for:</p>
+<ul>
+<li><b>Open in the Radiant Wizard...</b> - the wizard, titled <i>as it was built</i>, on the job just as it was:
+its zones, manifolds, settings, names and layouts, searched already.  Change what you like.  <b>Build it</b> puts
+the new layout in place of every one of the job's old zone groups, in one undo step; Cancel leaves the drawing
+alone.  A zone whose group was erased comes back not searched.</li>
+<li><b>Print the Submittal Again...</b> - the submittal as it was built, PDF or text, with no search and no
+wizard.</li>
+</ul>
+<p>Only the layout each zone built keeps its loop paths.  The other layouts its search kept are kept as a record -
+how much they covered, their bends and lengths - for the design record.  Pick one of those in a reopened wizard and
+it says <i>Only the built layout was kept - search again for the rest.</i></p>
+<p>Layouts built before 28 September 2026 did not keep their job, so these two items do not show for them.  Select
+the floor and run the wizard again.</p>
+
+<h2 id="limits">Limits</h2>
+<ul>
+<li><b>It is not an engineered design.</b>  The layout is geometry at the spacing and lengths you gave it.  The heat
+load is a simplified estimate for choosing the boiler, the pumps and the pipe - not a Manual J, and not a
+room-by-room load calculation where a permit asks for one.  Check the design against the tube and manifold
+maker's instructions and the code where the job is.</li>
+<li>The search is bounded.  It does not promise to reach every corner of an odd floor; the material list says how
+much was not reached.</li>
+<li>The slab is not asked about: 4" thick, tube centered, R-15 under it.</li>
+<li>One manifold to a zone.  A zone that wants more loops than a manifold takes is for you to split.</li>
+</ul>
+<h3>Where the numbers come from</h3>
+<table><tr><th>Number</th><th>Value</th><th>Where from</th></tr>
+<tr><td>Longest loop</td><td>3/8" 200 ft, 1/2" 300 ft, 5/8" 400 ft, 3/4" 500 ft</td><td>Tubing makers' install
+manuals and Radiant Professionals Alliance guidance - the low end of each quoted range</td></tr>
+<tr><td>Tightest bend</td><td>8 times the tube's outside diameter for PEX-B and PEX-C, 6 times for PEX-A</td><td>The
+same</td></tr>
+<tr><td>Spacing</td><td>6" to 12" covers most slabs; 9" the everyday default</td><td>The same</td></tr>
+<tr><td>Under the slab</td><td>R-15 at least</td><td>The same</td></tr>
+<tr><td>Tube off walls and obstacles</td><td>6"</td><td>Trade practice</td></tr>
+<tr><td>Manifold sizes</td><td>2 to 12 loops</td><td>What the makers offer</td></tr>
+<tr><td>Manifold wall space</td><td>2" between connections, supply and return side by side, and 12" for the valves
+and end caps</td><td>A rule of thumb</td></tr>
+<tr><td>Waste on the coil</td><td>10%</td><td>An estimate</td></tr>
+<tr><td>Ties or staples</td><td>One every 15"</td><td>An estimate</td></tr>
+<tr><td>Heat load tables</td><td>U-values, slab edge F-factors, air changes, floor output, pipe sizing</td><td>IECC 2021,
+ASHRAE Fundamentals and HVAC Applications, ASHRAE 90.1, EN 1264, ASTM F876 - listed value by value in the
+submittal</td></tr>
+</table>
+
+<footer><a href="index.html">Back to the contents</a></footer></div></body></html>

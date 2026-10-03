@@ -1,0 +1,139 @@
+object ReportDialog: TReportDialog
+  Left = 400
+  Height = 560
+  Top = 160
+  Width = 600
+  BorderStyle = bsDialog
+  Caption = 'Report a problem'
+  ClientHeight = 560
+  ClientWidth = 600
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  Position = poMainFormCenter
+  object lblSay: TLabel
+    Left = 12
+    Height = 62
+    Top = 10
+    Width = 576
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'What were you doing, and what happened?  A line or two is plenty.  Added automatically: what the program was doing - the tool, the view, the last few dozen things that happened - and what machine this is: RAM, processor, graphics, operating system.  Nothing about you.'
+    Constraints.MinHeight = 62
+    WordWrap = True
+  end
+  object memNote: TMemo
+    AnchorSideTop.Control = lblSay
+    AnchorSideTop.Side = asrBottom
+    Left = 12
+    Height = 180
+    Top = 78
+    Width = 576
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+    WordWrap = True
+  end
+  object cbDrawing: TCheckBox
+    AnchorSideTop.Control = memNote
+    AnchorSideTop.Side = asrBottom
+    Left = 12
+    Height = 22
+    Top = 268
+    Width = 576
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    BorderSpacing.Top = 10
+    Caption = 'Send the drawing too'
+    Checked = True
+    State = cbChecked
+    TabOrder = 1
+  end
+  object lblFine: TLabel
+    AnchorSideTop.Control = cbDrawing
+    AnchorSideTop.Side = asrBottom
+    Left = 30
+    Height = 40
+    Top = 290
+    Width = 558
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    Caption = 'The surest way to find a fault.  Untick it if you would rather not send your work.'
+    WordWrap = True
+  end
+  object imgShot: TImage
+    AnchorSideTop.Control = lblFine
+    AnchorSideTop.Side = asrBottom
+    Left = 12
+    Height = 170
+    Top = 336
+    Width = 576
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    Center = True
+    Proportional = True
+    Stretch = True
+  end
+  object lblNoPic: TLabel
+    AnchorSideTop.Control = lblFine
+    AnchorSideTop.Side = asrBottom
+    Left = 12
+    Height = 22
+    Top = 410
+    Width = 576
+    Alignment = taCenter
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    BorderSpacing.Top = 80
+    Caption = 'No picture with this report.'
+    Visible = False
+  end
+  object btnAgain: TBCButton
+    Left = 12
+    Height = 30
+    Top = 518
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = 'Snap now'
+    OnClick = btnAgainClick
+  end
+  object btnLater: TBCButton
+    Left = 120
+    Height = 30
+    Top = 518
+    Width = 110
+    Anchors = [akLeft, akBottom]
+    Caption = 'Snap in 10 s'
+    OnClick = btnLaterClick
+  end
+  object btnDrop: TBCButton
+    Left = 238
+    Height = 30
+    Top = 518
+    Width = 120
+    Anchors = [akLeft, akBottom]
+    Caption = 'Discard picture'
+    OnClick = btnDropClick
+  end
+  object btnSend: TBCButton
+    Tag = 1
+    Left = 376
+    Height = 30
+    Top = 518
+    Width = 100
+    Anchors = [akRight, akBottom]
+    Caption = 'Send'
+    OnClick = btnSendClick
+  end
+  object btnCancel: TBCButton
+    Tag = 2
+    Left = 488
+    Height = 30
+    Top = 518
+    Width = 100
+    Anchors = [akRight, akBottom]
+    Caption = 'Cancel'
+    OnClick = btnCancelClick
+  end
+end

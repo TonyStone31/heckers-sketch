@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Files and sheets - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; Files and sheets</nav>
+<header><h1>Files and sheets</h1><p class="lead">Every tab is a sheet, every sheet is part of a file, and the
+tabs say which.</p></header>
+<nav class="jump"><b>On this page:</b> <a href="#the-menu">The menu</a> &middot; <a href="#files-and-sheets">Files and
+sheets</a> &middot; <a href="#starting">Starting</a> &middot; <a href="#saving">Saving</a> &middot; <a
+href="#closing">Closing</a> &middot; <a href="#moving-work-between-sheets">Moving work between sheets</a> &middot; <a
+href="#recovery">When it does not close properly</a> &middot; <a href="#through-an-update">Through an update</a>
+&middot; <a href="#undo">Undo</a></nav>
+
+<h2 id="the-menu">The menu</h2>
+<p><b>MENU</b>, top left, has everything to do with files - the only other buttons up there are UNDO and REDO.</p>
+<table><tr><th>Row</th><th>What it does</th><th>Key</th></tr>
+<tr><td>New Drawing</td><td>A new, empty drawing in a tab of its own - a file of one sheet, not saved yet.</td><td><kbd>Ctrl</kbd>+<kbd>N</kbd>, <kbd>Ctrl</kbd>+<kbd>T</kbd></td></tr>
+<tr><td>Open...</td><td>A drawing from disk, in tabs after the ones already open.  Nothing open is closed.  A file
+already open comes to the front instead.</td><td><kbd>Ctrl</kbd>+<kbd>O</kbd></td></tr>
+<tr><td>Open Recent</td><td>The last ten files opened or saved, newest first.  One that has gone from the disk is
+taken off the list when you pick it.</td><td></td></tr>
+<tr><td>Save</td><td>The file in front, back where it came from.  Never saved, it asks where.</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td></tr>
+<tr><td>Save As...</td><td>The file in front under a new name - from then on, that file.</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd></td></tr>
+<tr><td>Save All</td><td>Every file with changes.</td><td></td></tr>
+<tr><td>Add a Sheet to This File</td><td>Another sheet in the file in front.</td><td></td></tr>
+<tr><td>Delete This Sheet from the File</td><td>Takes one sheet out of a file of several, after asking - there is no undo
+for it.</td><td></td></tr>
+<tr><td>Export...</td><td>A picture or a drawing file - see <a href="export.html">exporting</a>.</td><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td></tr>
+<tr><td>Print...</td><td>See <a href="printing.html">printing</a>.</td><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td></tr>
+<tr><td>Open the Example</td><td>The etch-a-sketch example, as a new drawing to poke at.</td><td></td></tr>
+<tr><td>Close This File</td><td>The file in front - every sheet of it.</td><td><kbd>Ctrl</kbd>+<kbd>W</kbd></td></tr>
+<tr><td>Exit</td><td>Closes the program, asking about each file with changes first.</td><td></td></tr>
+</table>
+<p><kbd>Ctrl</kbd>+<kbd>M</kbd> opens the menu from the keyboard.</p>
+
+<h2 id="files-and-sheets">Files and sheets</h2>
+<p>A file - <code>.hsk</code> - holds one sheet, or several: a floor plan and its details, say, kept together.
+Each sheet has its own geometry, view and scale.  Along the top, each sheet is a tab:</p>
+<ul>
+<li>A file of one sheet shows the file's name - <b>shop</b>.</li>
+<li>A file of several shows the file and the sheet - <b>house: Ground floor</b>, <b>house: Upstairs</b> - and its
+tabs sit close together, with a wider gap before the next file.</li>
+<li>A drawing not saved yet is <b>Untitled 1</b>, <b>Untitled 2</b>...</li>
+<li>A star - <b>shop *</b> - is work not saved yet.  Every tab of the file shows it.</li>
+</ul>
+<p><kbd>Ctrl</kbd>+<kbd>Tab</kbd> steps to the next tab.  <code>/clear</code> empties the sheet in front and keeps
+it.  <code>/sheet</code> adds a sheet to this file, <code>/new</code> starts a new drawing.</p>
+
+<h2 id="starting">Starting</h2>
+<p>The program starts on an empty drawing, Untitled 1.  It does not open the last drawing by itself - Open Recent
+is one click away.  Opening a file straight away replaces that empty drawing, as long as nothing has been drawn on
+it.</p>
+
+<h2 id="saving">Saving</h2>
+<p>Saving writes the whole file - every sheet of it - in one go, and only once it is all written does it take the
+old file's place, so a full disk or a pulled stick leaves the old file whole.  A file can be open in one tab group
+only: Save As onto a file open in another tab is refused.</p>
+<p>The file is <a href="heck.html">Heck</a> - the drawing written as text you can read: a block for each sheet, a
+line or a block for each thing, lengths in feet and inches.  You can read it, diff it, and keep it in version
+control.  Nothing in it is compressed or binary.  Files saved by a version before 30 September - a line of numbers
+per thing - still open, and are Heck the next time they are saved.</p>
+
+<h2 id="closing">Closing</h2>
+<p>Closing a file - the cross on its tab, <kbd>Ctrl</kbd>+<kbd>W</kbd>, or Close This File - closes every sheet of
+it.  If it has changes it asks first: <b>Save</b>, <b>Don't save</b>, or <b>Cancel</b>.  A drawing never saved, with
+nothing on it, goes without a word.  Closing the last file leaves a new empty drawing.</p>
+<p>Closing the program asks the same about each file with changes, one after another; <b>Cancel</b> at any of them
+keeps the program open.  <b>Don't save</b> means it: nothing comes back next time.</p>
+
+<h2 id="moving-work-between-sheets">Moving work between sheets</h2>
+<p><kbd>Ctrl</kbd>+<kbd>C</kbd> copies what is picked, <kbd>Ctrl</kbd>+<kbd>X</kbd>
+cuts it, <kbd>Ctrl</kbd>+<kbd>V</kbd> pastes.  The paste arrives on the
+cursor and a click puts it down, so you choose where it lands rather than
+finding out.</p>
+<p>It works across sheets, and that is the point of it: draw a fitting on one
+sheet, copy it, and put it into the assembly on another.  A pasted solid is
+its own solid - push a face on the copy and the original does not move.</p>
+
+<h2 id="through-an-update">Through an update</h2>
+<p>When the program updates itself it has to stop and start again, and it does not make you deal with that.
+Everything open is written out first - every file and its sheets, which tab you were on, and which files had
+unsaved work - and put back afterwards exactly as it was, still marked unsaved if it was unsaved.</p>
+
+<h2 id="recovery">When it does not close properly</h2>
+<p>While a file has changes not saved, a copy of the work is written beside the program every few seconds.  Close
+the program properly and the copy is thrown away - it is only there in case it goes down: a crash, a power cut, a
+kill.  Then the next start asks: <b>Recover them</b> brings every drawing back as the file it was, with its changes
+still marked unsaved, so Save writes it where it belongs; <b>Start without them</b> starts empty and keeps the copy
+beside the settings as <code>heckers-sketch-draft-not-recovered.hsk</code>, which can be opened.</p>
+
+<h2 id="undo">Undo</h2>
+<p><kbd>Ctrl</kbd>+<kbd>Z</kbd> and <kbd>Ctrl</kbd>+<kbd>Y</kbd>, as far back
+as you like.  Undo covers the geometry, not the view - spinning the model is
+not something to undo.</p>
+
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="export.html">Exporting</a> - getting a drawing out to something else</li>
+<li><a href="printing.html">Printing</a></li>
+</ul>
+<footer><a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

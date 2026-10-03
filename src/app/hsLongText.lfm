@@ -1,0 +1,56 @@
+object LongTextForm: TLongTextForm
+  Left = 250
+  Height = 640
+  Top = 100
+  Width = 1000
+  Caption = 'Long text'
+  ClientHeight = 640
+  ClientWidth = 1000
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  Position = poMainFormCenter
+  object pnlBar: TPanel
+    Left = 0
+    Height = 48
+    Top = 592
+    Width = 1000
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 48
+    ClientWidth = 1000
+    TabOrder = 1
+    object btnCopy: TBCButton
+      Left = 750
+      Height = 32
+      Top = 8
+      Width = 122
+      Anchors = [akTop, akRight]
+      Caption = 'Copy it all'
+      OnClick = btnCopyClick
+    end
+    object btnClose: TBCButton
+      Tag = 1
+      Left = 880
+      Height = 32
+      Top = 8
+      Width = 110
+      Anchors = [akTop, akRight]
+      Caption = 'Close'
+      OnClick = btnCloseClick
+    end
+  end
+  object memText: TMemo
+    Left = 0
+    Height = 592
+    Top = 0
+    Width = 1000
+    Align = alClient
+    Font.Height = -13
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssBoth
+    TabOrder = 0
+    WordWrap = False
+  end
+end

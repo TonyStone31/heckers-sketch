@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Straight stairs - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css"><script src="theme.js"></script></head>
+<body><div class="wrap"><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; Straight stairs</nav>
+<header><h1>Straight stairs</h1><p class="lead">A straight flight of tread and riser boards, laid out to
+the code it is built for, placed where you want it, and remembered so it can be changed later.</p></header>
+<p>Open it from <b>Shop &gt; Stair calculator...</b> or type <code>/stairs</code>.  What it builds is one
+group called Stairs: a board for every tread, and a board at every riser unless the risers are left open.
+Stringers are not drawn yet, but the <a href="#stringer-sheet">stringer sheet</a> says how to cut them; rails,
+landings and structure are not built.</p>
+
+<h2 id="three-ways">Three ways to lay out a flight</h2>
+<h3>1. Typed, then placed</h3>
+<ol>
+<li>With nothing picked, open the stair calculator.</li>
+<li>Type the <b>total rise</b> (floor to landing), the <b>width</b>, and what it is <b>built for</b>.
+<b>Suggest</b> works out the number of steps and the run that goes with them.</li>
+<li><b>Build stairs</b>.  The flight arrives on the cursor, held by the foot of its first riser - click to put it
+down.</li>
+</ol>
+<h3>2. Between two lines</h3>
+<ol>
+<li>Draw a level line where the first riser will stand, and another at the landing's edge, at the landing's
+height.  They must be parallel; they need not be the same length or lined up.</li>
+<li>Pick both lines and open the stair calculator.  The rise, run and width come from the lines and cannot be
+typed.</li>
+<li><b>Width from</b> says which line sets the width.  <i>The lower line</i>: the flight goes up from it, square,
+and lands wherever the upper line is.  <i>The upper line</i>: it comes down from it, square, to the lower line's
+distance.</li>
+<li>The flight is built in place.</li>
+</ol>
+<h3>3. Picked on the drawing</h3>
+<ol>
+<li>In the dialog, press <b>Pick on the drawing...</b>.  The dialog steps aside.</li>
+<li>Click the <b>top</b> - the landing's edge, at its height.  Then the <b>bottom</b> - where the first riser
+stands.  Then the <b>side</b> the width goes, as far out as the stairs are wide.</li>
+<li>Beside the cursor a small orange flight shows which point the next click is for - <b>1 TOP</b>, <b>2
+BOTTOM</b>, <b>3 SIDE</b> - and the points picked carry their names on the drawing.  After the top, a dashed line runs
+to the cursor; after the bottom, the stairs themselves follow the cursor, every step at its height, so the third
+click is made looking at what it will build.</li>
+<li>The sizes show as you go: the run and the rise while you look for the bottom; the width, the run, the rise
+and the steps - how many risers, of what, and the tread - while you look for the side.  Instead of clicking, type a
+length and press Enter, as with any other tool: after the top it is the <b>run</b>, toward the cursor; after the
+bottom it is the <b>width</b>, on the cursor's side.  Arithmetic works here too.</li>
+<li>Whichever of the two points is lower is the bottom, so clicking them the other way round cannot turn the stairs
+upside down.  Picked level - both on the floor, in plan - the rise is the one typed in the dialog.</li>
+<li>The dialog comes back with the number of steps that fits your points.  <kbd>Esc</kbd> at any point goes back
+to the dialog without picking - and so does picking another tool: the stairs are built or given up on first, so no
+tool starts with the cursor still picking stairs.</li>
+</ol>
+
+<h2 id="the-dialog">The dialog</h2>
+<table><tr><th>Setting</th><th>What it is</th></tr>
+<tr><td>Total rise</td><td>Floor to the top of the landing.  Divided evenly among the risers.</td></tr>
+<tr><td>Total run</td><td>The face of the first riser to the landing's edge.  Divided evenly among the treads.</td></tr>
+<tr><td>Width</td><td>The boards' length across the flight - not the clear width between rails.</td></tr>
+<tr><td>Built for</td><td>Which rules it is checked against: a house (IRC), public (IBC), older people (gentler),
+carrying things, accessible (ADA), emergency exit (IBC), service or roof access (OSHA).  See the table below.</td></tr>
+<tr><td>Risers</td><td>How many.  The landing is the last step, so 14 risers is 13 treads.</td></tr>
+<tr><td>Suggest</td><td>Picks the best count for what it is built for.  Typed, it sets the run as well.  Between
+lines or picked points it <b>only changes the count</b> - your lines and points stay exactly where you put
+them.</td></tr>
+<tr><td>Board</td><td>How thick the tread and riser boards are.</td></tr>
+<tr><td>Nosing</td><td>How far each tread reaches past the riser below it.  It makes the board deeper without
+changing the rise or the going.</td></tr>
+<tr><td>Closed risers</td><td>A board at each riser.  Off, the risers are open.</td></tr>
+<tr><td>Rounded nose</td><td>A half-round front edge, radius half the board's thickness.</td></tr>
+<tr><td>Open the code it checks against</td><td>Opens the official source for the rules chosen.</td></tr>
+</table>
+<p>The side view draws the flight as it stands.  Under it, in large type:</p>
+<ul>
+<li><b style="color:#50c050">Meets</b> the rules chosen - in green.</li>
+<li><b style="color:#e84040">Does not meet</b> them - in red, with each miss on a line of its own: the rise too
+tall, the tread too short, too narrow.  When some other count would fit, it says Suggest finds one.</li>
+<li><b style="color:#e84040">Does not fit between your points</b> (or lines) - no number of steps meets the rules
+in the run you gave it.  It says how much run the stairs want and how much more that is than you have: move the
+bottom out, or turn at a landing.</li>
+</ul>
+<p>The box at the bottom carries the notes: the rule in a line, the best fit, the run a target layout wants.</p>
+
+<h2 id="changing">Changing a flight later</h2>
+<p>The Stairs group remembers how it was made.  Right-click it for:</p>
+<ul>
+<li><b>Change the Stairs...</b> - the dialog on its own values; change anything and it is built again where it
+stands.</li>
+<li><b>Print the Stringer Sheet...</b> - the <a href="#stringer-sheet">stringer sheet</a> for the flight as it
+is.</li>
+<li><b>Build the Stairs Again</b> - puts back anything changed by hand since.  Moved since it was made, it is
+built where it is now.</li>
+<li><b>Show It in the Source</b> - the line in the drawing's text that says how it was made.</li>
+</ul>
+<p>Undo takes the whole flight back in one step.  Erasing the group takes only the stairs - a wall or floor face
+their boards touch stays.</p>
+
+<h2 id="stringer-sheet">The stringer sheet</h2>
+<p><b>Stringer sheet (PDF)...</b> in the dialog, or <b>Print the Stringer Sheet...</b> on a built flight's
+right-click, writes a few pages to take to the saw, worked out for that flight:</p>
+<ul>
+<li><b>The numbers</b> - unit rise and run, the step along the pitch, how much the bottom step is cut short (the
+tread's thickness), and how far the stringers stand back of closed risers.</li>
+<li><b>What to buy</b> - 2x12 stringers and the board length each needs (and the stock length to buy), how many
+across the width and how far apart, the throat a cut stringer keeps and whether that is enough, the kicker and the
+hangers, and the cleats, glue, pins and fasteners for the second way.</li>
+<li><b>The first way: cut stringers.</b>  Get a board at least so long.  Every step's outer corner is a dot on the
+top edge, measured from the squared bottom end; every inside corner is a dot on one chalk line snapped a set distance
+in.  A table gives every dot - along from the end, in from the edge - and the drawing shows the board in rows with
+the dots numbered, the lines joining them, the waste gray and the cuts dashed red.  Connect the dots in order; cut
+the red lines.</li>
+<li><b>The second way: solid stringers with cleats.</b>  Nothing notched: the same layout, a little lower on the
+board, marks where a 2x4 cleat goes under every tread and a 1x2 or 2x2 behind every riser - glued, pinned, then
+nailed or screwed.  Only the two ends are cut.</li>
+</ul>
+<p>It lays out the cut; it is not an engineered design.  Check spans and fastening against the code where the stairs
+are built.</p>
+
+<h2 id="the-numbers">How the numbers work</h2>
+<p>Total rise is divided by the number of risers; total run by the number of treads, one fewer.  Going is measured
+between riser faces.  Nosing adds to the board's depth, not to the going.  The last riser board carries on behind
+the landing's edge into the landing.  Every length box takes <a href="typing.html">typed arithmetic</a> -
+<code>8'1" - 3/4"</code> for a floor to be finished later.</p>
+<h2>Recommendations and reference profiles</h2>
+<p>The dialog searches whole riser counts against the available rise and run.
+It reports whether any count fits the selected rise/going/pitch limits, ranks
+fits near the preferred proportions, and shows the run needed for a target
+layout. Between lines or points picked, <b>Suggest</b> changes only the count; it never moves your
+lines or points. If no count fits, the dialog says so even after applying the
+target count. Building geometry does not certify the design.</p>
+<table><tr><th>Profile</th><th>Reference or preference</th></tr>
+<tr><td>A house</td><td>2021 IRC R311.7: 7 3/4 inch rise at most, 10 inch tread at least, 36 inches wide;
+with a tread under 11 inches, a 3/4 to 1 1/4 inch nosing.</td></tr>
+<tr><td>Retail / public; emergency egress</td><td>2024 IBC general stair dimensions:
+4–7 inch rise and 11 inch minimum going. Emergency use does not relax these
+limits. Width, capacity, exceptions and accessible egress need separate evaluation.</td></tr>
+<tr><td>ADA stair dimensions</td><td>2010 ADA section 504: 4–7 inch rise,
+11 inch minimum going, closed risers; nosing projection and edge-radius checks.</td></tr>
+<tr><td>Older users</td><td>Application comfort preference: target 6 inch rise,
+12 inch going; candidate range 4–6.5 inch rise and 12–16 inch going. Width preference 42 inches.</td></tr>
+<tr><td>Carrying items</td><td>Application comfort preference: target 6 inch rise,
+13 inch going; candidate range 4–6.5 inch rise and 12.5–16 inch going. Width preference 48 inches.</td></tr>
+<tr><td>Roof / attic workplace service</td><td>OSHA standard-stair screening:
+30–50 degree pitch, rise no greater than 9.5 inches, going at least 9.5 inches.
+This is workplace access, not a residential attic-code profile or emergency egress.</td></tr></table>
+<p>Comfort targets and widths are design preferences, not official prescriptions
+for every older person or load. Rise/going matches do not verify width after
+handrails, occupant capacity, headroom, landings, load capacity or structural
+support. The selected lines establish board width, not clear width between rails.
+Where nosing is used, the landing-edge detail must continue the same projection
+to maintain uniform nose-to-nose going; the landing itself is not modeled.</p>
+<p>OSHA's June 17, 2025 interpretation does not allow extra nosing to compensate
+for inadequate going. Rounded usable tread surfaces require further checking.
+Ship stairs and alternating treads are not built by this tool; infrequent access
+alone does not authorize replacing a standard workplace stair with one.</p>
+<h2>Official sources</h2>
+<p>US reference snapshot checked September 28, 2026. Use the edition and amendments
+adopted for the project. The dialog's reference button opens the relevant official source.</p>
+<ul>
+<li><a href="https://codes.iccsafe.org/content/IRC2021P2/chapter-3-building-planning">2021 IRC, chapter 3 (R311.7 stairways)</a></li>
+<li><a href="https://www.access-board.gov/ada/guides/chapter-5-stairways/">US Access Board: ADA stairways, section 504</a></li>
+<li><a href="https://codes.iccsafe.org/content/IBC2024V2.0/chapter-10-means-of-egress">2024 IBC, chapter 10 (1011.2 and 1011.5.2)</a></li>
+<li><a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.25">OSHA 1910.25 stairways</a></li>
+<li><a href="https://www.osha.gov/laws-regs/standardinterpretations/2025-06-17">OSHA: measuring tread depth, June 17, 2025</a></li>
+<li><a href="https://www.hse.gov.uk/PuBns/priced/l23.pdf">HSE manual handling guidance</a> (carrying-use context, not US stair dimensions)</li>
+</ul>
+<p>The tool builds tread boards and optional riser boards.  Stringers, handrails, turns, headroom checks and
+structural sizing are not included yet.</p>
+<footer><a href="index.html">Back to the contents</a></footer></div></body></html>

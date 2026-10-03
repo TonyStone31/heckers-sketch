@@ -1,0 +1,28 @@
+object AboutBox: TAboutBox
+  Left = 400
+  Height = 770
+  Top = 40
+  Width = 700
+  BorderStyle = bsNone
+  Caption = 'About Heckers Sketch'
+  ClientHeight = 770
+  ClientWidth = 700
+  DoubleBuffered = True
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnPaint = FormPaint
+  ParentDoubleBuffered = False
+  Position = poMainFormCenter
+  object Page: TInkPage
+    Left = 26
+    Height = 718
+    Top = 26
+    Width = 648
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    DragScroll = True
+    TabOrder = 0
+    OnLinkClick = PageLinkClick
+  end
+end
