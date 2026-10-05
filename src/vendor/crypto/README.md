@@ -15,7 +15,6 @@ not.
 | | |
 |---|---|
 | `hsReportCrypto.pas` | ours - the public key, and the one function the shipped program calls: `EncryptReportBytes`. |
-| `vendor-fixes/` | one file, and why it exists - see below. |
 
 ## Whose code this stands on
 
@@ -35,37 +34,10 @@ Not vendored - referenced as sibling clones, the same arrangement as
   relationship: pulled in, never called from here.
 
 Clone all three next to this folder - `../CryptoLib4Pascal`,
-`../HashLib4Pascal`, `../SimpleBaseLib4Pascal` - and `build.sh` finds them.
-Nothing is shipped: these are FPC units, compiled into the one executable
-like any other unit in this repository.  A user's copy of the program is
+`../HashLib4Pascal`, `../SimpleBaseLib4Pascal`.  `etchasketch.lpi` uses
+their own Lazarus packages from there, and lazbuild compiles them with the
+program.  Nothing extra is shipped: they end up inside the one executable.  A user's copy of the program is
 exactly as small as it always was.
-
-## The one thing we had to fix to build it on Linux
-
-`vendor-fixes/Interfaces/ClpIPreCompCallback.pas` exists because
-CryptoLib4Pascal's own `ClpECC.pas` asks for a unit called
-`ClpIPreCompCallback`, and the file that answers to that name on disk is
-spelled `ClpIPreCompCallBack.pas` - a capital B in "Back" the `uses` clause
-does not have.  Pascal identifiers are case-insensitive, so the two
-spellings are the same unit to the compiler, and this builds without a
-murmur on Windows, where the filesystem agrees with the compiler.  On Linux
-it does not: FPC opens files by the exact name it is given, and the unit is
-reported "not found" - not broken, just spelled two ways at once by its own
-author.
-
-The fix is the file spelled the other way, and it works only because of
-where `etchasketch.lpi` puts it: `src/vendor/crypto/vendor-fixes/Interfaces` is listed
-in the search path *ahead of* CryptoLib4Pascal's own `Interfaces` folder, so
-a build finds our correctly-spelled copy first and never goes looking for
-the real one.  Its two include files are trimmed copies of
-`CryptoLib4Pascal/CryptoLib/src/Include/{CryptoLib,CryptoLibHelper}.inc` -
-kept to what a Linux/FPC build actually reads, MIT, Xor-el's - which the
-shim needs beside it because its own `{$I ../Include/...}` line has to find
-something.
-
-Worth reporting upstream; hasn't been yet.  Nothing here depends on that -
-if it is ever fixed there, this file becomes dead weight that can be
-deleted, and nothing else changes.
 
 ## How a report actually travels
 

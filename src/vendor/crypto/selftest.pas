@@ -20,20 +20,18 @@ program selftest;
 uses
   SysUtils,
   hsReportCrypto,
-  ClpECC, ClpIECC,
   ClpIHMac, ClpHMac,
-  ClpIESEngine, ClpIIESEngine,
+  ClpIesEngine, ClpIIesEngine,
   ClpIECDHBasicAgreement, ClpECDHBasicAgreement,
   ClpParametersWithIV, ClpIParametersWithIV,
   ClpKdf2BytesGenerator, ClpIKdf2BytesGenerator,
-  ClpECPrivateKeyParameters, ClpIECPrivateKeyParameters,
-  ClpIESWithCipherParameters, ClpIIESWithCipherParameters,
+  ClpECParameters, ClpIECParameters,
+  ClpIesParameters, ClpIIesParameters,
   ClpECIESPublicKeyParser, ClpIECIESPublicKeyParser,
   ClpPaddedBufferedBlockCipher, ClpIBufferedBlockCipher,
-  ClpBlockCipherModes, ClpIBlockCipherModes, ClpAesEngine, ClpIAesEngine,
+  ClpCbcBlockCipher, ClpICbcBlockCipher, ClpAesEngine, ClpIAesEngine,
   ClpDigestUtilities, ClpBigInteger,
-  ClpECDomainParameters, ClpIECDomainParameters,
-  ClpCustomNamedCurves, ClpIX9ECParameters;
+  ClpCustomNamedCurves, ClpIX9ECAsn1Objects;
 
 function HexToBytes(const S: string): TBytes;
 var
@@ -47,9 +45,9 @@ end;
 { The mirror of EncryptReportBytes's engine setup - kept separate and
   duplicated on purpose, so a bug in one is not hidden by the same mistake
   in the other. }
-function MakeEngine: IIESEngine;
+function MakeEngine: IIesEngine;
 begin
-  Result := TIESEngine.Create(
+  Result := TIesEngine.Create(
     TECDHBasicAgreement.Create as IECDHBasicAgreement,
     TKdf2BytesGenerator.Create(TDigestUtilities.GetDigest('SHA-256'))
       as IKdf2BytesGenerator,
@@ -66,8 +64,8 @@ var
   Domain: IECDomainParameters;
   D: TBigInteger;
   Priv: IECPrivateKeyParameters;
-  Eng: IIESEngine;
-  Params: IIESWithCipherParameters;
+  Eng: IIesEngine;
+  Params: IIesWithCipherParameters;
   IV, Body: TBytes;
 begin
   Result := False;
@@ -84,8 +82,8 @@ begin
   if Length(Body) > 0 then Move(Envelope[16], Body[0], Length(Body));
 
   Eng := MakeEngine;
-  Params := TIESWithCipherParameters.Create(nil, nil, 256, 256)
-    as IIESWithCipherParameters;
+  Params := TIesWithCipherParameters.Create(nil, nil, 256, 256)
+    as IIesWithCipherParameters;
   try
     Eng.Init(Priv, TParametersWithIV.Create(Params, IV) as IParametersWithIV,
       TECIESPublicKeyParser.Create(Domain) as IECIESPublicKeyParser);

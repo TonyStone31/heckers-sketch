@@ -39,26 +39,24 @@ function EncryptReportBytes(const Plain: TBytes): TBytes;
 implementation
 
 uses
-  ClpECC, ClpIECC,
+  ClpIECCommon,
   ClpIHMac, ClpHMac,
-  ClpIESEngine, ClpIIESEngine,
+  ClpIesEngine, ClpIIesEngine,
   ClpICipherParameters,
   ClpIECDHBasicAgreement, ClpECDHBasicAgreement,
   ClpParametersWithIV, ClpIParametersWithIV,
   ClpKdf2BytesGenerator, ClpIKdf2BytesGenerator,
-  ClpECKeyPairGenerator, ClpIECKeyPairGenerator,
-  ClpECKeyGenerationParameters, ClpIECKeyGenerationParameters,
-  ClpECPublicKeyParameters, ClpIECPublicKeyParameters,
+  ClpECGenerators, ClpIECGenerators,
+  ClpECParameters, ClpIECParameters,
   ClpSecureRandom, ClpISecureRandom,
-  ClpECDomainParameters, ClpIECDomainParameters,
   ClpIBufferedBlockCipher, ClpPaddedBufferedBlockCipher,
-  ClpIESWithCipherParameters, ClpIIESWithCipherParameters,
+  ClpIesParameters, ClpIIesParameters,
   ClpEphemeralKeyPairGenerator, ClpIEphemeralKeyPairGenerator,
-  ClpBlockCipherModes, ClpIBlockCipherModes,
-  ClpKeyEncoder, ClpIKeyEncoder,
+  ClpCbcBlockCipher, ClpICbcBlockCipher,
+  ClpECKeyEncoder, ClpIKeyEncoder,
   ClpAesEngine, ClpIAesEngine,
   ClpDigestUtilities,
-  ClpCustomNamedCurves, ClpIX9ECParameters;
+  ClpCustomNamedCurves, ClpIX9ECAsn1Objects;
 
 const
   { secp256r1 (NIST P-256).  Any curve CryptoLib4Pascal's custom table
@@ -88,9 +86,9 @@ begin
     Result[I] := StrToInt('$' + Copy(S, I * 2 + 1, 2));
 end;
 
-function MakeEngine: IIESEngine;
+function MakeEngine: IIesEngine;
 begin
-  Result := TIESEngine.Create(
+  Result := TIesEngine.Create(
     TECDHBasicAgreement.Create as IECDHBasicAgreement,
     TKdf2BytesGenerator.Create(TDigestUtilities.GetDigest('SHA-256'))
       as IKdf2BytesGenerator,
@@ -108,8 +106,8 @@ var
   Pub: IECPublicKeyParameters;
   Gen: IECKeyPairGenerator;
   EphGen: IEphemeralKeyPairGenerator;
-  Eng: IIESEngine;
-  Params: IIESWithCipherParameters;
+  Eng: IIesEngine;
+  Params: IIesWithCipherParameters;
   Rnd: ISecureRandom;
   IV, Body: TBytes;
 begin
@@ -130,7 +128,7 @@ begin
       key rather than 65 - the reader on the other end knows the curve, so
       an X and a sign bit is all the point needs }
     EphGen := TEphemeralKeyPairGenerator.Create(Gen,
-      TKeyEncoder.Create(True) as IKeyEncoder);
+      TECKeyEncoder.Create(True) as IKeyEncoder);
 
     Rnd := TSecureRandom.Create as ISecureRandom;
     SetLength(IV, 16);
@@ -141,8 +139,8 @@ begin
       between exactly two parties who already agree on everything the
       scheme needs, and there is nothing further to bind into the key
       derivation that either side could not already forge if they wanted to }
-    Params := TIESWithCipherParameters.Create(nil, nil, 256, 256)
-      as IIESWithCipherParameters;
+    Params := TIesWithCipherParameters.Create(nil, nil, 256, 256)
+      as IIesWithCipherParameters;
     Eng.Init(Pub, TParametersWithIV.Create(Params, IV) as IParametersWithIV,
       EphGen);
     Body := Eng.ProcessBlock(Plain, 0, Length(Plain));
