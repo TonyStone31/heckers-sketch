@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, StrUtils, Menus, Spin, BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantBusy,
-  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin;
+  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox;
 
 type
 
@@ -47,7 +47,7 @@ type
     btnNotZone: TBCButton;
     miNotZone: TMenuItem;
     miBringBack: TMenuItem;
-    cbTube: TComboBox;
+    cbTube: TBCComboBox;
     edMaxLoop: TEdit;
     edGoalCover: TSpinEdit;
     edGoalEven: TSpinEdit;
@@ -363,7 +363,8 @@ begin
       TSpinEdit(C).Font.Height := -13;
     end
     else if C is TEdit then hsDialogSkin.SkinEdit(TEdit(C))
-    else if (C is TListBox) or (C is TMemo) or (C is TComboBox) then
+    else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
+    else if (C is TListBox) or (C is TMemo) then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
@@ -421,7 +422,7 @@ begin
         if (C = edTag) or (C = edZoneName) or (C = cbPinManifold) then Continue;
         if C is TSpinEdit then Ini.WriteString('radiant', C.Name, IntToStr(TSpinEdit(C).Value))
         else if C is TEdit then Ini.WriteString('radiant', C.Name, TEdit(C).Text)
-        else if C is TComboBox then Ini.WriteInteger('radiant', C.Name, TComboBox(C).ItemIndex)
+        else if C is TBCComboBox then Ini.WriteInteger('radiant', C.Name, TBCComboBox(C).ItemIndex)
         else if C is TBGRAThemeCheckBox then Ini.WriteBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);
       end;
       Ini.WriteInteger('radiant', 'GiveUp', FGiveUpIdx);
@@ -459,8 +460,8 @@ begin
           if C is TSpinEdit then
             TSpinEdit(C).Value := Round(StrToFloatDef(Ini.ReadString('radiant', C.Name, ''), TSpinEdit(C).Value))
           else if C is TEdit then TEdit(C).Text := Ini.ReadString('radiant', C.Name, TEdit(C).Text)
-          else if C is TComboBox then
-            TComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('radiant', C.Name, 0), 0, TComboBox(C).Items.Count - 1)
+          else if C is TBCComboBox then
+            TBCComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('radiant', C.Name, 0), 0, TBCComboBox(C).Items.Count - 1)
           else if C is TBGRAThemeCheckBox then TBGRAThemeCheckBox(C).Checked := Ini.ReadBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);
         end;
       finally

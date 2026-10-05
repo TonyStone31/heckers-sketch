@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Spin, LCLType,
-  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat;
+  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat, BCComboBox;
 
 type
 
@@ -22,18 +22,18 @@ type
     btnClimateHelp: TBCButton;
     btnOff: TBCButton;
     btnOk: TBCButton;
-    cbAbove: TComboBox;
-    cbClimate: TComboBox;
-    cbCover: TComboBox;
+    cbAbove: TBCComboBox;
+    cbClimate: TBCComboBox;
+    cbCover: TBCComboBox;
     cbDhw: TBGRAThemeCheckBox;
     lblDhw: TLabel;
-    cbRun: TComboBox;
-    cbSlab: TComboBox;
-    cbSnow: TComboBox;
-    cbTight: TComboBox;
-    cbUse: TComboBox;
-    cbWalls: TComboBox;
-    cbZone: TComboBox;
+    cbRun: TBCComboBox;
+    cbSlab: TBCComboBox;
+    cbSnow: TBCComboBox;
+    cbTight: TBCComboBox;
+    cbUse: TBCComboBox;
+    cbWalls: TBCComboBox;
+    cbZone: TBCComboBox;
     edAltitude: TSpinEdit;
     edBaths: TSpinEdit;
     edCeiling: TSpinEdit;
@@ -151,11 +151,11 @@ begin
       TSpinEdit(C).Font.Color := PixToColor(DlgTheme.Text);
       TSpinEdit(C).Font.Height := -13;
     end
-    else if (C is TMemo) or (C is TComboBox) then
+    else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
+    else if C is TMemo then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
-      if C is TComboBox then TComboBox(C).Font.Height := -13;
     end
     else if C is TBGRAThemeCheckBox then hsDialogSkin.SkinCheck(TBGRAThemeCheckBox(C))
     else if C is TLabel then

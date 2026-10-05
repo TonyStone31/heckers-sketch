@@ -40,14 +40,13 @@ object SpoolForm: TSpoolForm
     Width = 80
     Caption = 'Pipe size'
   end
-  object cbSize: TComboBox
+  object cbSize: TBCComboBox
     Left = 16
     Height = 28
     Top = 104
     Width = 120
     ItemHeight = 0
     OnChange = AnyChange
-    Style = csDropDownList
     TabOrder = 0
   end
   object lblFinish: TLabel
@@ -57,14 +56,13 @@ object SpoolForm: TSpoolForm
     Width = 80
     Caption = 'Material'
   end
-  object cbFinish: TComboBox
+  object cbFinish: TBCComboBox
     Left = 150
     Height = 28
     Top = 104
     Width = 116
     ItemHeight = 0
     OnChange = AnyChange
-    Style = csDropDownList
     TabOrder = 20
   end
   object rgRadius: TPanel
@@ -110,14 +108,13 @@ object SpoolForm: TSpoolForm
     Width = 80
     Caption = 'Start end'
   end
-  object cbEnd0: TComboBox
+  object cbEnd0: TBCComboBox
     Left = 16
     Height = 28
     Top = 220
     Width = 250
     ItemHeight = 0
     OnChange = AnyChange
-    Style = csDropDownList
     TabOrder = 2
   end
   object lblEnd1: TLabel
@@ -127,14 +124,13 @@ object SpoolForm: TSpoolForm
     Width = 80
     Caption = 'Far end'
   end
-  object cbEnd1: TComboBox
+  object cbEnd1: TBCComboBox
     Left = 16
     Height = 28
     Top = 274
     Width = 250
     ItemHeight = 0
     OnChange = AnyChange
-    Style = csDropDownList
     TabOrder = 3
   end
   object lblLen: TLabel
@@ -161,14 +157,13 @@ object SpoolForm: TSpoolForm
     Width = 16
     Caption = 'in'
   end
-  object cbMeasure: TComboBox
+  object cbMeasure: TBCComboBox
     Left = 16
     Height = 28
     Top = 370
     Width = 250
     ItemHeight = 0
     OnChange = MeasureChange
-    Style = csDropDownList
     TabOrder = 16
   end
   object lblMeasureHint: TLabel
@@ -181,24 +176,22 @@ object SpoolForm: TSpoolForm
     Font.Color = clGray
     ParentFont = False
   end
-  object cbAfter: TComboBox
+  object cbAfter: TBCComboBox
     Left = 16
     Height = 28
     Top = 420
     Width = 158
     ItemHeight = 0
     OnChange = AfterChange
-    Style = csDropDownList
     TabOrder = 18
   end
-  object cbNewSize: TComboBox
+  object cbNewSize: TBCComboBox
     Left = 180
     Height = 28
     Top = 420
     Width = 86
     ItemHeight = 0
     OnChange = AfterChange
-    Style = csDropDownList
     TabOrder = 19
   end
   object btnLeg: TBCButton

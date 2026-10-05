@@ -48,14 +48,13 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Tube'
     end
-    object cbTube: TComboBox
+    object cbTube: TBCComboBox
       Left = 96
       Height = 28
       Top = 86
       Width = 150
       ItemHeight = 0
       OnChange = RoutingChange
-      Style = csDropDownList
       TabOrder = 0
     end
     object lblSpacing: TLabel

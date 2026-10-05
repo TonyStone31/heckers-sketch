@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Types, Spin, LCLType,
-  Dialogs, BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsStairs;
+  Dialogs, BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsStairs, BCComboBox;
 
 type
   { on two picked lines; typed and placed afterward by a click; or at a
@@ -43,9 +43,9 @@ type
     btnStringers: TBCButton;
     btnSuggest: TBCButton;
     cbClosed: TBGRAThemeCheckBox;
-    cbFrom: TComboBox;
+    cbFrom: TBCComboBox;
     cbRound: TBGRAThemeCheckBox;
-    cbUse: TComboBox;
+    cbUse: TBCComboBox;
     edCount: TSpinEdit;
     edNosing: TEdit;
     edRise: TEdit;
@@ -121,7 +121,8 @@ begin
     C := Components[I];
     if C is TEdit then SkinEdit(TEdit(C))
     else if C is TBGRAThemeCheckBox then SkinCheck(TBGRAThemeCheckBox(C))
-    else if (C is TSpinEdit) or (C is TComboBox) or (C is TMemo) then
+    else if C is TBCComboBox then SkinCombo(TBCComboBox(C))
+    else if (C is TSpinEdit) or (C is TMemo) then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);

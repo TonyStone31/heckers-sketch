@@ -92,7 +92,7 @@ object RadiantBusyForm: TRadiantBusyForm
     Width = 90
     Caption = 'Give up after'
   end
-  object cbGiveUp: TComboBox
+  object cbGiveUp: TBCComboBox
     Left = 496
     Height = 28
     Top = 120
@@ -107,9 +107,7 @@ object RadiantBusyForm: TRadiantBusyForm
       '30 minutes a zone'
       '1 hour a zone'
     )
-    Style = csDropDownList
     TabOrder = 6
-    Text = 'never'
   end
   object cbBusyLess: TBGRAThemeCheckBox
     Left = 24

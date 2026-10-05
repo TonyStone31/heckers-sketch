@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, LCLIntf, LCLType, Types, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsPaths, hsDrawing,
-  hsPipe, hsPreview, hsDialogSkin;
+  hsPipe, hsPreview, hsDialogSkin, BCComboBox;
 
 type
   TSpoolForm = class(TForm)
@@ -25,14 +25,14 @@ type
     btnUndo: TBCButton;
     cbDims: TBGRAThemeCheckBox;
     cbLines: TBGRAThemeCheckBox;
-    cbMeasure: TComboBox;
+    cbMeasure: TBCComboBox;
     lblMeasureHint: TLabel;
-    cbAfter: TComboBox;
-    cbNewSize: TComboBox;
-    cbEnd0: TComboBox;
-    cbEnd1: TComboBox;
-    cbSize: TComboBox;
-    cbFinish: TComboBox;
+    cbAfter: TBCComboBox;
+    cbNewSize: TBCComboBox;
+    cbEnd0: TBCComboBox;
+    cbEnd1: TBCComboBox;
+    cbSize: TBCComboBox;
+    cbFinish: TBCComboBox;
     lblFinish: TLabel;
     edLen: TEdit;
     edTag: TEdit;

@@ -15,7 +15,7 @@ uses
   Classes, SysUtils, Math, Types, Graphics, Controls, Forms, StdCtrls,
   ExtCtrls, ComCtrls, Dialogs, LCLType,
   BCButton, BCPanel, BCLabel,
-  hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder;
+  hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder, BCComboBox;
 
 type
   TExportKind = (exPng, exJpeg, exWebP, exSvg, exDxfView, exDxfModel, exStl,
@@ -75,20 +75,20 @@ type
       and clips both ends of a long sentence. }
     lblNote: TLabel;
     lblSize: TBCLabel;
-    cbSize: TComboBox;
+    cbSize: TBCComboBox;
     edW: TEdit;
     lblBy: TBCLabel;
     edH: TEdit;
-    cbPaper: TComboBox;
-    cbOrientation: TComboBox;
-    cbScale: TComboBox;
+    cbPaper: TBCComboBox;
+    cbOrientation: TBCComboBox;
+    cbScale: TBCComboBox;
     btnTransp: TBCButton;
     lblQual: TBCLabel;
     tbQual: TTrackBar;
     btnLoop: TBCButton;
     btnBounce: TBCButton;
     { How long the film runs, which sets its speed. }
-    cbSecs: TComboBox;
+    cbSecs: TBCComboBox;
     btnRec: TBCButton;
     { two lines, so the note about a closing clip is never cut off }
     lblClip: TLabel;
@@ -96,7 +96,7 @@ type
     btnMid: TBCButton;
     btnAxes: TBCButton;
     lblShot: TLabel;
-    cbDxfWhat: TComboBox;
+    cbDxfWhat: TBCComboBox;
     { where it goes }
     pnlFoot: TBCPanel;
     lblSave: TBCLabel;
@@ -112,8 +112,6 @@ type
     tmrPlay: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure ComboDraw(Control: TWinControl; Index: Integer;
-      ARect: TRect; State: TOwnerDrawState);
     procedure PickKind(Sender: TObject);
     procedure PrevPaint(Sender: TObject);
     procedure PrevDown(Sender: TObject; Button: TMouseButton;
@@ -260,12 +258,6 @@ begin
   hsDialogSkin.SkinPanel(pnlMid, False, 12);
   hsDialogSkin.SkinPanel(pnlOpt, False, 12);
   hsDialogSkin.SkinPanel(pnlFoot, False, 12);
-  { The lists draw their own rows (see ComboDraw) on the same color they are
-    filled with, so a row and its box read as one. }
-  Field := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Shell2);
-  for I := 0 to ComponentCount - 1 do
-    if Components[I] is TComboBox then
-      TComboBox(Components[I]).Color := Field;
 
   FKindBtn[exPng] := btnPng;
   FKindBtn[exJpeg] := btnJpeg;
@@ -419,28 +411,6 @@ end;
 
 { Windows paints a themed combo box itself and ignores Font.Color, so on a
   dark dialog the text comes out black on near-black.  Draw the rows ourselves. }
-procedure TExportDlg.ComboDraw(Control: TWinControl; Index: Integer;
-  ARect: TRect; State: TOwnerDrawState);
-var
-  C: TComboBox;
-  Cv: TCanvas;
-begin
-  C := Control as TComboBox;
-  Cv := C.Canvas;
-  if odSelected in State then
-    Cv.Brush.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Accent)
-  else
-    Cv.Brush.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Shell2);
-  Cv.FillRect(ARect);
-  if odSelected in State then
-    Cv.Font.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Shell2)
-  else
-    Cv.Font.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Text);
-  Cv.Brush.Style := bsClear;
-  if (Index >= 0) and (Index < C.Items.Count) then
-    Cv.TextOut(ARect.Left + 6, ARect.Top + 3, C.Items[Index]);
-end;
-
 procedure TExportDlg.PickKind(Sender: TObject);
 var
   K: TExportKind;

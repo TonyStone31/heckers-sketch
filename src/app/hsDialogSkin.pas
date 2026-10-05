@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -99,6 +99,7 @@ procedure SkinLabel(L: TBCLabel; Dim: Boolean = False; FontH: Integer = 0;
   Bold: Boolean = False);
 procedure SkinEdit(E: TEdit);
 procedure SkinCheck(C: TBGRAThemeControl);
+procedure SkinCombo(C: TBCComboBox);
 procedure SkinTrack(T: TTrackBar);
 { Themes every control on a form by kind, colors only; sizes and fonts stay
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
@@ -344,6 +345,41 @@ begin
   E.BorderStyle := bsSingle;
 end;
 
+{ A combo box is a drawn button and a list that drops down inside the
+  dialog: a separate window can be disabled along with everything else
+  while a modal dialog is up. }
+procedure SkinCombo(C: TBCComboBox);
+var
+  Fill, Edge, Txt: TColor;
+  St: TBCButtonState;
+begin
+  Fill := FieldColor;
+  Edge := PixToColor(DlgTheme.Bezel1);
+  Txt := PixToColor(DlgTheme.Text);
+  C.Rounding.RoundX := 6;
+  C.Rounding.RoundY := 6;
+  OneState(C.StateNormal, Fill, Edge, Txt);
+  OneState(C.StateHover, Shade(Fill, 0.08), PixToColor(DlgTheme.Accent), Txt);
+  OneState(C.StateClicked, Shade(Fill, -0.08), PixToColor(DlgTheme.Accent), Txt);
+  for St in [C.StateNormal, C.StateHover, C.StateClicked] do
+  begin
+    { a BGRA font height is the glyph's, a little smaller than an LCL
+      font's of the same number; this matches the edits beside it }
+    St.FontEx.Height := -16;
+    St.FontEx.Name := 'default';
+    St.FontEx.TextAlignment := bcaLeftCenter;
+    St.FontEx.PaddingLeft := 8;
+  end;
+  C.DropDownOnSameForm := True;
+  C.DropDownColor := Fill;
+  C.DropDownFontColor := Txt;
+  C.DropDownBorderColor := Edge;
+  C.DropDownHighlight := PixToColor(DlgTheme.Accent);
+  C.DropDownFontHighlight := PixToColor(OnPix(DlgTheme.Accent));
+  if CornerFix = nil then CornerFix := TCornerFix.Create;
+  C.Button.OnAfterRenderBCButton := @CornerFix.AfterRender;
+end;
+
 procedure SkinCheck(C: TBGRAThemeControl);
 begin
   C.Theme := BoxTheme;
@@ -390,15 +426,8 @@ begin
       else TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
       TLabel(C).Transparent := True;
     end
-    { A combo box keeps the system's colors.  Its drop-down list is a system
-      window that takes the box's color but not its text color on Windows,
-      and GTK draws the box inconsistently. }
-    else if C is TCustomComboBox then
-    begin
-      { and the system's text color, or a dark theme's pale text vanishes }
-      TCustomComboBox(C).Color := clWindow;
-      TCustomComboBox(C).Font.Color := clWindowText;
-    end
+    else if C is TBCComboBox then
+      SkinCombo(TBCComboBox(C))
     else if C is TCustomEdit then
     begin
       TWinControl(C).Color := FieldColor;

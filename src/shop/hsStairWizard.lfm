@@ -39,13 +39,12 @@ object StairForm: TStairForm
     AutoSize = False
     Caption = 'Width from'
   end
-  object cbFrom: TComboBox
+  object cbFrom: TBCComboBox
     Left = 120
     Height = 28
     Top = 106
     Width = 220
     ItemHeight = 0
-    Style = csDropDownList
     TabOrder = 0
     OnChange = Changed
   end
@@ -109,13 +108,12 @@ object StairForm: TStairForm
     AutoSize = False
     Caption = 'Built for'
   end
-  object cbUse: TComboBox
+  object cbUse: TBCComboBox
     Left = 120
     Height = 28
     Top = 256
     Width = 220
     ItemHeight = 0
-    Style = csDropDownList
     TabOrder = 4
     OnChange = Changed
     Items.Strings = (

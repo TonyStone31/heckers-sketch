@@ -327,14 +327,13 @@ object TransitionForm: TTransitionForm
     Width = 70
     Caption = 'Entry end'
   end
-  object cbEntryEnd: TComboBox
+  object cbEntryEnd: TBCComboBox
     Left = 100
     Height = 28
     Top = 560
     Width = 250
     ItemHeight = 0
     OnChange = EndKindChange
-    Style = csDropDownList
     TabOrder = 12
   end
   object edEntryEndAmt: TEdit
@@ -359,14 +358,13 @@ object TransitionForm: TTransitionForm
     Width = 70
     Caption = 'Exit end'
   end
-  object cbExitEnd: TComboBox
+  object cbExitEnd: TBCComboBox
     Left = 100
     Height = 28
     Top = 594
     Width = 250
     ItemHeight = 0
     OnChange = EndKindChange
-    Style = csDropDownList
     TabOrder = 14
   end
   object edExitEndAmt: TEdit
@@ -899,16 +897,14 @@ object TransitionForm: TTransitionForm
     Caption = 'Branch end'
     Visible = False
   end
-  object cbBranchEnd: TComboBox
+  object cbBranchEnd: TBCComboBox
     Left = 100
     Height = 28
     Top = 628
     Width = 250
     ItemHeight = 0
     OnChange = EndKindChange
-    Style = csDropDownList
     TabOrder = 35
-    Visible = False
   end
   object edBranchEndAmt: TEdit
     Left = 358
@@ -968,23 +964,21 @@ object TransitionForm: TTransitionForm
     Font.Color = clGrayText
     ParentFont = False
   end
-  object cbEntryFlex: TComboBox
+  object cbEntryFlex: TBCComboBox
     Left = 440
     Height = 28
     Top = 560
     Width = 340
     ItemHeight = 0
-    Style = csDropDownList
     OnChange = AnyChange
     TabOrder = 37
   end
-  object cbExitFlex: TComboBox
+  object cbExitFlex: TBCComboBox
     Left = 440
     Height = 28
     Top = 594
     Width = 340
     ItemHeight = 0
-    Style = csDropDownList
     OnChange = AnyChange
     TabOrder = 38
   end
@@ -1003,23 +997,21 @@ object TransitionForm: TTransitionForm
     Width = 40
     Caption = 'Metal'
   end
-  object cbGauge: TComboBox
+  object cbGauge: TBCComboBox
     Left = 484
     Height = 28
     Top = 626
     Width = 140
     ItemHeight = 0
-    Style = csDropDownList
     OnChange = AnyChange
     TabOrder = 44
   end
-  object cbStiffen: TComboBox
+  object cbStiffen: TBCComboBox
     Left = 632
     Height = 28
     Top = 626
     Width = 148
     ItemHeight = 0
-    Style = csDropDownList
     OnChange = AnyChange
     TabOrder = 45
   end

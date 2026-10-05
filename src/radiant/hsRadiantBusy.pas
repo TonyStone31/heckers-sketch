@@ -12,7 +12,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, ExtCtrls, Graphics, Spin,
-  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin;
+  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin, BCComboBox;
 
 type
   { draws a layout the search has found into the preview: the one whose
@@ -24,7 +24,7 @@ type
   TRadiantBusyForm = class(TForm)
     btnStop: TBCButton;
     btnStopAll: TBCButton;
-    cbGiveUp: TComboBox;
+    cbGiveUp: TBCComboBox;
     cbBusyLess: TBGRAThemeCheckBox;
     cbBusyHooks: TBGRAThemeCheckBox;
     lblBusyLess: TLabel;

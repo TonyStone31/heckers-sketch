@@ -11,15 +11,15 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, LCLIntf, IniFiles, LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsPaths, hsDrawing,
-  hsFittings, hsFieldElbow, hsTapeWizard, hsDialogSkin;
+  hsFittings, hsFieldElbow, hsTapeWizard, hsDialogSkin, BCComboBox;
 
 type
   TTransitionForm = class(TForm)
     btnBuild: TBCButton;
     btnCancel: TBCButton;
     btnReport: TBCButton;
-    cbEntryEnd: TComboBox;
-    cbExitEnd: TComboBox;
+    cbEntryEnd: TBCComboBox;
+    cbExitEnd: TBCComboBox;
     cbDims: TBGRAThemeCheckBox;
     edEntryEndAmt: TEdit;
     edExitEndAmt: TEdit;
@@ -64,7 +64,7 @@ type
     lblBLen: TLabel;
     edBLen: TEdit;
     lblBranchEnd: TLabel;
-    cbBranchEnd: TComboBox;
+    cbBranchEnd: TBCComboBox;
     edBranchEndAmt: TEdit;
     lblEndUnit3: TLabel;
     btnField: TBCButton;
@@ -93,11 +93,11 @@ type
     btnTape: TBCButton;
     lblFlex: TLabel;
     lblMetal: TLabel;
-    cbGauge: TComboBox;
-    cbStiffen: TComboBox;
+    cbGauge: TBCComboBox;
+    cbStiffen: TBCComboBox;
     lblMetalHint: TLabel;
-    cbEntryFlex: TComboBox;
-    cbExitFlex: TComboBox;
+    cbEntryFlex: TBCComboBox;
+    cbExitFlex: TBCComboBox;
     rgSideCaption: TLabel;
     rgSide1: TBGRAThemeRadioButton;
     rgSide2: TBGRAThemeRadioButton;
@@ -506,7 +506,7 @@ begin
   if Sender = cbEntryEnd then Ed := edEntryEndAmt
   else if Sender = cbBranchEnd then Ed := edBranchEndAmt
   else Ed := edExitEndAmt;
-  K := TDuctEnd(Max(0, TComboBox(Sender).ItemIndex));
+  K := TDuctEnd(Max(0, TBCComboBox(Sender).ItemIndex));
   Ed.Enabled := K <> deRaw;
   if K = deRaw then Ed.Text := ''
   else Ed.Text := FormatFloat('0.###', DUCT_END_DEFAULT_IN[K]);
@@ -784,7 +784,7 @@ begin
         C := Components[I];
         if C = edTag then Continue;
         if C is TEdit then Ini.WriteString('fitting', C.Name, TEdit(C).Text)
-        else if C is TComboBox then Ini.WriteInteger('fitting', C.Name, TComboBox(C).ItemIndex)
+        else if C is TBCComboBox then Ini.WriteInteger('fitting', C.Name, TBCComboBox(C).ItemIndex)
         else if IsRadioPanel(C) then Ini.WriteInteger('fitting', C.Name, RadioIndex(TWinControl(C)))
         else if C is TBGRAThemeCheckBox then Ini.WriteBool('fitting', C.Name, TBGRAThemeCheckBox(C).Checked);
       end;
@@ -812,8 +812,8 @@ begin
         if C = edTag then Continue;
         if not Ini.ValueExists('fitting', C.Name) then Continue;
         if C is TEdit then TEdit(C).Text := Ini.ReadString('fitting', C.Name, TEdit(C).Text)
-        else if C is TComboBox then
-          TComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, TComboBox(C).Items.Count - 1)
+        else if C is TBCComboBox then
+          TBCComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, TBCComboBox(C).Items.Count - 1)
         else if IsRadioPanel(C) then
           SetRadioIndex(TWinControl(C), EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, RadioCount(TWinControl(C)) - 1))
         else if C is TBGRAThemeCheckBox then TBGRAThemeCheckBox(C).Checked := Ini.ReadBool('fitting', C.Name, TBGRAThemeCheckBox(C).Checked);

@@ -100,14 +100,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Climate zone'
     end
-    object cbClimate: TComboBox
+    object cbClimate: TBCComboBox
       Left = 150
       Height = 28
       Top = 176
       Width = 120
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 3
     end
     object btnClimateHelp: TBCButton
@@ -300,14 +299,13 @@ object RadiantHeatForm: TRadiantHeatForm
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object cbZone: TComboBox
+    object cbZone: TBCComboBox
       Left = 16
       Height = 28
       Top = 40
       Width = 290
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 10
     end
     object lblUse: TLabel
@@ -318,14 +316,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'What it is'
     end
-    object cbUse: TComboBox
+    object cbUse: TBCComboBox
       Left = 126
       Height = 28
       Top = 80
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 11
     end
     object lblAbove: TLabel
@@ -336,14 +333,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Above it'
     end
-    object cbAbove: TComboBox
+    object cbAbove: TBCComboBox
       Left = 126
       Height = 28
       Top = 114
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 12
     end
     object lblWalls: TLabel
@@ -354,14 +350,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Outside walls'
     end
-    object cbWalls: TComboBox
+    object cbWalls: TBCComboBox
       Left = 126
       Height = 28
       Top = 148
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 13
     end
     object lblSlab: TLabel
@@ -372,14 +367,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Slab insulation'
     end
-    object cbSlab: TComboBox
+    object cbSlab: TBCComboBox
       Left = 126
       Height = 28
       Top = 182
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 14
     end
     object lblCover: TLabel
@@ -390,14 +384,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Floor covering'
     end
-    object cbCover: TComboBox
+    object cbCover: TBCComboBox
       Left = 126
       Height = 28
       Top = 216
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 15
     end
     object lblTight: TLabel
@@ -408,14 +401,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Air tightness'
     end
-    object cbTight: TComboBox
+    object cbTight: TBCComboBox
       Left = 126
       Height = 28
       Top = 250
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 16
     end
     object lblSnow: TLabel
@@ -426,14 +418,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Snow melt'
     end
-    object cbSnow: TComboBox
+    object cbSnow: TBCComboBox
       Left = 126
       Height = 28
       Top = 284
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 17
     end
     object lblRun: TLabel
@@ -444,14 +435,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Header to boiler'
     end
-    object cbRun: TComboBox
+    object cbRun: TBCComboBox
       Left = 126
       Height = 28
       Top = 318
       Width = 180
       ItemHeight = 0
       OnChange = FieldChange
-      Style = csDropDownList
       TabOrder = 18
     end
     object lblCeiling: TLabel

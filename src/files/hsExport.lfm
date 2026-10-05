@@ -191,16 +191,14 @@ object ExportDlg: TExportDlg
       Caption = 'Size'
       FontEx.Height = -12
     end
-    object cbSize: TComboBox
+    object cbSize: TBCComboBox
       Left = 14
       Height = 26
       Top = 116
       Width = 232
       ItemHeight = 22
-      Style = csOwnerDrawFixed
       TabOrder = 4
       OnChange = SizeChanged
-      OnDrawItem = ComboDraw
     end
     object edW: TEdit
       Left = 14
@@ -224,18 +222,16 @@ object ExportDlg: TExportDlg
       Width = 16
       Caption = 'x'
     end
-    object cbPaper: TComboBox
+    object cbPaper: TBCComboBox
       Left = 14
       Height = 26
       Top = 116
       Width = 232
       ItemHeight = 22
-      Style = csOwnerDrawFixed
       TabOrder = 7
       OnChange = SizeChanged
-      OnDrawItem = ComboDraw
     end
-    object cbOrientation: TComboBox
+    object cbOrientation: TBCComboBox
       Left = 14
       Height = 26
       Top = 150
@@ -246,21 +242,17 @@ object ExportDlg: TExportDlg
         'Landscape'
       )
       ItemIndex = 1
-      Style = csOwnerDrawFixed
       TabOrder = 8
       OnChange = SizeChanged
-      OnDrawItem = ComboDraw
     end
-    object cbScale: TComboBox
+    object cbScale: TBCComboBox
       Left = 14
       Height = 26
       Top = 184
       Width = 232
       ItemHeight = 22
-      Style = csOwnerDrawFixed
       TabOrder = 9
       OnChange = SizeChanged
-      OnDrawItem = ComboDraw
     end
     object btnTransp: TBCButton
       Left = 14
@@ -306,7 +298,7 @@ object ExportDlg: TExportDlg
       Caption = ''
       OnClick = Ticked
     end
-    object cbSecs: TComboBox
+    object cbSecs: TBCComboBox
       Left = 14
       Height = 26
       Top = 268
@@ -320,10 +312,8 @@ object ExportDlg: TExportDlg
         '12 seconds'
       )
       ItemIndex = 0
-      Style = csOwnerDrawFixed
       TabOrder = 11
       OnChange = Ticked
-      OnDrawItem = ComboDraw
     end
     object btnRec: TBCButton
       Tag = 1
@@ -384,7 +374,7 @@ object ExportDlg: TExportDlg
       Transparent = True
       WordWrap = True
     end
-    object cbDxfWhat: TComboBox
+    object cbDxfWhat: TBCComboBox
       Left = 14
       Height = 26
       Top = 116
@@ -395,9 +385,7 @@ object ExportDlg: TExportDlg
         'The model, in three dimensions'
       )
       ItemIndex = 0
-      Style = csOwnerDrawFixed
       TabOrder = 12
-      OnDrawItem = ComboDraw
     end
   end
   object pnlFoot: TBCPanel

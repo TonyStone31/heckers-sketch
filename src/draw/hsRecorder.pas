@@ -15,7 +15,7 @@ interface
 uses
   Classes, SysUtils, Math, Types, Graphics, Controls, Forms, ExtCtrls,
   StdCtrls, LCLType, BCPanel, BCLabel, BCButton,
-  hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm;
+  hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, BCComboBox;
 
 { Recently used moves, most recent first, as a comma list of TWalk ordinals.
   The caller saves it between sessions (see LoadSettings). }
@@ -62,11 +62,11 @@ type
     pnlBar: TBCPanel;
     lblTitle: TBCLabel;
     lblStartFrom: TBCLabel;
-    cbStart: TComboBox;
+    cbStart: TBCComboBox;
     lblMove: TBCLabel;
-    cbWalk: TComboBox;
+    cbWalk: TBCComboBox;
     lblLong: TBCLabel;
-    cbLen: TComboBox;
+    cbLen: TBCComboBox;
     btnGo: TBCButton;
     btnStop: TBCButton;
     lblTell: TBCLabel;
@@ -106,8 +106,6 @@ type
     procedure DoClear(Sender: TObject);
     procedure DoTake(Sender: TObject);
     procedure DoDrop(Sender: TObject);
-    procedure ComboDraw(Control: TWinControl; Index: Integer; ARect: TRect;
-      State: TOwnerDrawState);
   private
     FDoc: TWorkDoc;
     FUnits: TUnitSystem;
@@ -206,11 +204,6 @@ begin
   hsDialogSkin.ThemeForm(Self);
   hsDialogSkin.SkinPanel(pnlBar, True, 12);
   hsDialogSkin.SkinPanel(pnlFoot, False, 12);
-  { the lists draw their own rows (see ComboDraw) on this color }
-  Field := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Shell2);
-  for I := 0 to ComponentCount - 1 do
-    if Components[I] is TComboBox then
-      TComboBox(Components[I]).Color := Field;
   for V := Low(TStartView) to High(TStartView) do
     cbStart.Items.Add(START_NAME[V]);
   cbStart.ItemIndex := 0;
@@ -224,28 +217,6 @@ begin
   FillWalks;
   tmrTick.Enabled := True;
   StartPicked(nil);
-end;
-
-procedure TRecordWin.ComboDraw(Control: TWinControl; Index: Integer;
-  ARect: TRect; State: TOwnerDrawState);
-var
-  C: TComboBox;
-  Cv: TCanvas;
-begin
-  C := Control as TComboBox;
-  Cv := C.Canvas;
-  if odSelected in State then
-    Cv.Brush.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Accent)
-  else
-    Cv.Brush.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Shell2);
-  Cv.FillRect(ARect);
-  if odSelected in State then
-    Cv.Font.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Shell2)
-  else
-    Cv.Font.Color := hsSurface.PixToColor(hsDialogSkin.DlgTheme.Text);
-  Cv.Brush.Style := bsClear;
-  if (Index >= 0) and (Index < C.Items.Count) then
-    Cv.TextOut(ARect.Left + 6, ARect.Top + 3, C.Items[Index]);
 end;
 
 { The move list: up to three recent moves, a divider, then every move in

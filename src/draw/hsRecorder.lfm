@@ -44,16 +44,14 @@ object RecordWin: TRecordWin
       Caption = 'Start from'
       FontEx.Height = -12
     end
-    object cbStart: TComboBox
+    object cbStart: TBCComboBox
       Left = 16
       Height = 26
       Top = 58
       Width = 200
       ItemHeight = 22
-      Style = csOwnerDrawFixed
       TabOrder = 0
       OnChange = StartPicked
-      OnDrawItem = ComboDraw
     end
     object lblMove: TBCLabel
       Tag = 1
@@ -64,16 +62,14 @@ object RecordWin: TRecordWin
       Caption = 'The move'
       FontEx.Height = -12
     end
-    object cbWalk: TComboBox
+    object cbWalk: TBCComboBox
       Left = 232
       Height = 26
       Top = 58
       Width = 300
       ItemHeight = 22
-      Style = csOwnerDrawFixed
       TabOrder = 1
       OnChange = StartPicked
-      OnDrawItem = ComboDraw
     end
     object lblLong: TBCLabel
       Tag = 1
@@ -84,7 +80,7 @@ object RecordWin: TRecordWin
       Caption = 'How long'
       FontEx.Height = -12
     end
-    object cbLen: TComboBox
+    object cbLen: TBCComboBox
       Left = 548
       Height = 26
       Top = 58
@@ -97,10 +93,8 @@ object RecordWin: TRecordWin
         '8 seconds'
         '12 seconds'
       )
-      Style = csOwnerDrawFixed
       TabOrder = 2
       OnChange = StartPicked
-      OnDrawItem = ComboDraw
     end
     object btnGo: TBCButton
       Tag = 1
