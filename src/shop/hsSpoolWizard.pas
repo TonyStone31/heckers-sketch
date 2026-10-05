@@ -518,8 +518,9 @@ begin
   O := Origin;
   if cbLines.Checked then
   begin
-    { iso paper: light lines along the three axes through every lattice point }
-    C.Pen.Color := $00E4E4E4;
+    { iso paper: pale blue lines along the three axes through every lattice
+      point, like an iso pad.  A pale gray vanished on some screens. }
+    C.Pen.Color := $00E8CEB2;
     for I := -80 to 80 do
     begin
       A := Scr(P3(I, -80, 0)); B := Scr(P3(I, 80, 0)); C.Line(A.X, A.Y, B.X, B.Y);
