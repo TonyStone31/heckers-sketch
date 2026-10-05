@@ -1107,7 +1107,7 @@ begin
     if (Slot = 'size') or (Slot = 'by') or (Slot = 'step') then
     begin
       if FPickLine = Y then
-        Add := Place2(P3(P.X - FPickFirst.X, P.Y - FPickFirst.Y, P.Z - FPickFirst.Z), U, True)
+        Add := Place2(Sub3(P, FPickFirst), U, True)
       else Add := Place2(P, U, True);
     end
     else if Slot = 'radius' then
@@ -1152,7 +1152,7 @@ begin
   else if (Key = 'box') or (Key = 'rect') or (Key = 'pull') or (Key = 'size') or (Key = 'by') then
   begin
     if (Pos(';', T) > 0) or (FPickLine <> Y) then Add := ' ' + Place2(P, U, False)
-    else Add := '; ' + Place2(P3(P.X - FPickFirst.X, P.Y - FPickFirst.Y, P.Z - FPickFirst.Z), U, True);
+    else Add := '; ' + Place2(Sub3(P, FPickFirst), U, True);
   end
   else if Key = 'circle' then
   begin

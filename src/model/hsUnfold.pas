@@ -362,8 +362,7 @@ begin
     for J := 0 to High(Poly) do
     begin
       Pan[NP].V[J] := WeldVertex(Poly[J]);
-      D3 := P3(Poly[J].X - Poly[0].X, Poly[J].Y - Poly[0].Y,
-               Poly[J].Z - Poly[0].Z);
+      D3 := Sub3(Poly[J], Poly[0]);
       Pan[NP].L[J].X := Dot3(D3, U);
       Pan[NP].L[J].Y := Dot3(D3, V);
     end;
@@ -374,9 +373,7 @@ begin
       SetLength(Pan[NP].LH[H], Length(Doc[F].Holes[H]));
       for J := 0 to High(Doc[F].Holes[H]) do
       begin
-        D3 := P3(Doc[F].Holes[H][J].X - Poly[0].X,
-                 Doc[F].Holes[H][J].Y - Poly[0].Y,
-                 Doc[F].Holes[H][J].Z - Poly[0].Z);
+        D3 := Sub3(Doc[F].Holes[H][J], Poly[0]);
         Pan[NP].LH[H][J].X := Dot3(D3, U);
         Pan[NP].LH[H][J].Y := Dot3(D3, V);
       end;
@@ -514,9 +511,7 @@ begin
       if O = T then O := Edges[I].F[0];
       Dot := EnsureRange(Dot3(Pan[T].Nm, Pan[O].Nm), -1, 1);
       Ang := ArcCos(Dot);
-      D3 := P3(Verts[Edges[I].B].X - Verts[Edges[I].A].X,
-               Verts[Edges[I].B].Y - Verts[Edges[I].A].Y,
-               Verts[Edges[I].B].Z - Verts[Edges[I].A].Z);
+      D3 := Sub3(Verts[Edges[I].B], Verts[Edges[I].A]);
       if Dot3(Cross3(Pan[T].Nm, Pan[O].Nm), D3) < 0 then Ang := -Ang;
       Result.Edges[K].Angle := Ang;
       if (Parent[O] = T) or (Parent[T] = O) then

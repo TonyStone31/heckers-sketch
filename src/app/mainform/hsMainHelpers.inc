@@ -71,7 +71,7 @@ begin
     { laid out along the plane's own two directions, not world axes, so a
       rectangle can be drawn on a roof }
     GetFreePlane(FO, FU, FV, FN);
-    D := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+    D := Sub3(B, A);
     Du := D.X * FU.X + D.Y * FU.Y + D.Z * FU.Z;
     Dv := D.X * FV.X + D.Y * FV.Y + D.Z * FV.Z;
     Result[0] := A;
@@ -114,7 +114,7 @@ begin
   if Pl = plFree then
   begin
     GetFreePlane(FO, FU, FV, FN);
-    D := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+    D := Sub3(B, A);
     W := Abs(D.X * FU.X + D.Y * FU.Y + D.Z * FU.Z);
     H := Abs(D.X * FV.X + D.Y * FV.Y + D.Z * FV.Z);
     Exit;
@@ -269,7 +269,7 @@ var
     if Sqr(AD.X) + Sqr(AD.Y) + Sqr(AD.Z) < 0.5 then Exit;
     PR := ScreenOf(R);
     begin
-      PA := ScreenOf(P3(R.X + AD.X, R.Y + AD.Y, R.Z + AD.Z));
+      PA := ScreenOf(Add3(R, AD));
       UX := PA.X - PR.X;
       UY := PA.Y - PR.Y;
       LenSq := UX * UX + UY * UY;
@@ -315,8 +315,8 @@ var
       1: D := P3(0, 1, 0);
     else D := P3(0, 0, 1);
     end;
-    E := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
-    W := P3(A.X - R.X, A.Y - R.Y, A.Z - R.Z);
+    E := Sub3(B, A);
+    W := Sub3(A, R);
     DD := Dot3(D, D); EE := Dot3(E, E); DE := Dot3(D, E);
     Den := DD * EE - DE * DE;
     if (EE < 1E-18) or (Abs(Den) < 1E-12 * DD * EE) then Exit;   { parallel }
@@ -668,7 +668,7 @@ begin
   if (FSnapKind = snGrid) and FD.Doc.FaceUnder(Proj, SX, SY, HF, HP) then
   begin
     N := Norm3(FD.Doc.FaceNormal(HF));
-    if Abs(Dot3(N, P3(Result.X - HP.X, Result.Y - HP.Y, Result.Z - HP.Z))) < 1E-6 then
+    if Abs(Dot3(N, Sub3(Result, HP))) < 1E-6 then
       FSnapKind := snOnFace;
   end;
 end;

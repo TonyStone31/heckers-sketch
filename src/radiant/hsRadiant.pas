@@ -548,8 +548,7 @@ begin
     if L > BestL then begin BestL := L; Best := I; end;
   end;
   J := (Best + 1) mod Length(Outline);
-  Result.U := VNorm(P3(Outline[J].X - Outline[Best].X, Outline[J].Y - Outline[Best].Y,
-    Outline[J].Z - Outline[Best].Z));
+  Result.U := VNorm(Sub3(Outline[J], Outline[Best]));
   Result.V := VNorm(Cross3(Result.N, Result.U));
 end;
 
@@ -573,7 +572,7 @@ function RadiantTo2(const F: TRadiantFrame; const P: TP3): T2;
 var
   D: TP3;
 begin
-  D := P3(P.X - F.Origin.X, P.Y - F.Origin.Y, P.Z - F.Origin.Z);
+  D := Sub3(P, F.Origin);
   Result.X := Dot3(D, F.U);
   Result.Y := Dot3(D, F.V);
 end;
@@ -1198,14 +1197,13 @@ begin
   end;
   J := (Best + 1) mod Length(Outline);
   Result.Origin := Outline[Best];
-  Result.U := VNorm(P3(Outline[J].X - Outline[Best].X, Outline[J].Y - Outline[Best].Y,
-    Outline[J].Z - Outline[Best].Z));
+  Result.U := VNorm(Sub3(Outline[J], Outline[Best]));
   Result.V := VNorm(Cross3(Result.N, Result.U));
   { V into the floor: the outline's middle is on the positive side }
   A := P3(0, 0, 0);
   for I := 0 to High(Outline) do A := P3(A.X + Outline[I].X / Length(Outline),
     A.Y + Outline[I].Y / Length(Outline), A.Z + Outline[I].Z / Length(Outline));
-  if Dot3(P3(A.X - Result.Origin.X, A.Y - Result.Origin.Y, A.Z - Result.Origin.Z), Result.V) < 0 then
+  if Dot3(Sub3(A, Result.Origin), Result.V) < 0 then
   begin
     Result.V := P3(-Result.V.X, -Result.V.Y, -Result.V.Z);
     Result.N := P3(-Result.N.X, -Result.N.Y, -Result.N.Z);
@@ -3888,8 +3886,8 @@ var
   { the frame's own coordinates of a point: along U, along V }
   function Along(const Q: TP3): T2;
   begin
-    Result.X := Dot3(P3(Q.X - F.Origin.X, Q.Y - F.Origin.Y, Q.Z - F.Origin.Z), U);
-    Result.Y := Dot3(P3(Q.X - F.Origin.X, Q.Y - F.Origin.Y, Q.Z - F.Origin.Z), V);
+    Result.X := Dot3(Sub3(Q, F.Origin), U);
+    Result.Y := Dot3(Sub3(Q, F.Origin), V);
   end;
 
   { the distance from Q to the nearest wall or obstacle edge }

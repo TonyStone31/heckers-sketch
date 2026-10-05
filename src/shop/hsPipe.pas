@@ -309,7 +309,7 @@ begin
     Nrm := Norm3(P3(B.X - A.X * Dot3(A, B), B.Y - A.Y * Dot3(A, B), B.Z - A.Z * Dot3(A, B)));
     O := P3(T1.X + Nrm.X * R, T1.Y + Nrm.Y * R, T1.Z + Nrm.Z * R);
     W := Norm3(Cross3(A, B));
-    Rv := P3(T1.X - O.X, T1.Y - O.Y, T1.Z - O.Z);
+    Rv := Sub3(T1, O);
     N := Max(2, Round(Turn / BEND_STEP));
     for K := 0 to N do
     begin
@@ -424,7 +424,7 @@ begin
       begin
         SetLength(Run, RunEnd - RunStart + 1);
         for K := RunStart to RunEnd do Run[K - RunStart] := Path[K];
-        A := Norm3(P3(Run[1].X - Run[0].X, Run[1].Y - Run[0].Y, Run[1].Z - Run[0].Z));
+        A := Norm3(Sub3(Run[1], Run[0]));
         CircleAt(Run[0], A, NPS_OD[EnsureRange(Size[RunStart], 0, High(NPS_OD))] * Inch(S), Circle);
         D.AddFaceRaw(Circle, Ink, False);
         Face := D.Live - 1;

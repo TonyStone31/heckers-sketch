@@ -1229,7 +1229,7 @@ begin
     if Length(Pts) > 0 then
     begin
       P := P3(0, 0, 0);
-      for F := 0 to High(Pts) do P := P3(P.X + Pts[F].X, P.Y + Pts[F].Y, P.Z + Pts[F].Z);
+      for F := 0 to High(Pts) do P := Add3(P, Pts[F]);
       P := P3(P.X / Length(Pts), P.Y / Length(Pts), P.Z / Length(Pts));
       if Grabbable(P) then Exit(P);
     end;
@@ -2584,7 +2584,7 @@ var
   N: Integer;
   V: array[0..2] of Double;
 begin
-  Result := P3(FCur.X - FP1.X, FCur.Y - FP1.Y, FCur.Z - FP1.Z);
+  Result := Sub3(FCur, FP1);
 
   Txt := Trim(FInput);
   Abs_ := (Length(Txt) >= 2) and (Txt[1] = '[');
@@ -2608,7 +2608,7 @@ begin
     L := Result.X * D.X + Result.Y * D.Y + Result.Z * D.Z;
     if (Txt <> '') and ParseLen(Txt, FD.Units, Len) then
       L := Sign(IfThen(L = 0, 1, L)) * Len;
-    Result := P3(D.X * L, D.Y * L, D.Z * L);
+    Result := Mul3(D, L);
     Exit;
   end;
 
@@ -2828,7 +2828,7 @@ var
 
   function OnPlane(const P, Org, Nm: TP3): Boolean;
   begin
-    Result := Abs(Dot3(Nm, P3(P.X - Org.X, P.Y - Org.Y, P.Z - Org.Z))) <= Tol;
+    Result := Abs(Dot3(Nm, Sub3(P, Org))) <= Tol;
   end;
 
 begin
@@ -2945,8 +2945,8 @@ begin
       Lo := P3(Min(Lo.X, FMoveVerts[I].X), Min(Lo.Y, FMoveVerts[I].Y), Min(Lo.Z, FMoveVerts[I].Z));
       Hi3 := P3(Max(Hi3.X, FMoveVerts[I].X), Max(Hi3.Y, FMoveVerts[I].Y), Max(Hi3.Z, FMoveVerts[I].Z));
     end;
-    Lo := P3(Lo.X + D.X, Lo.Y + D.Y, Lo.Z + D.Z);
-    Hi3 := P3(Hi3.X + D.X, Hi3.Y + D.Y, Hi3.Z + D.Z);
+    Lo := Add3(Lo, D);
+    Hi3 := Add3(Hi3, D);
     Crate[0] := P3(Lo.X, Lo.Y, Lo.Z); Crate[1] := P3(Hi3.X, Lo.Y, Lo.Z);
     Crate[2] := P3(Hi3.X, Hi3.Y, Lo.Z); Crate[3] := P3(Lo.X, Hi3.Y, Lo.Z);
     for K := 0 to 3 do Crate[K + 4] := P3(Crate[K].X, Crate[K].Y, Hi3.Z);
@@ -2973,7 +2973,7 @@ begin
 
   { the travel line, in the axis color when one is locked }
   PA := ScreenOf(FP1);
-  PB := ScreenOf(P3(FP1.X + D.X, FP1.Y + D.Y, FP1.Z + D.Z));
+  PB := ScreenOf(Add3(FP1, D));
   C.Pen.Style := psDash;
   { the lock is a direction code, two per axis; the color is per axis }
   if FDirLock >= 0 then
@@ -2994,7 +2994,7 @@ var
 begin
   AxesFromNormal(FRotAxis, AU, AV);
   if FStage < 2 then Exit(AU);
-  D := P3(FRotRef.X - FP1.X, FRotRef.Y - FP1.Y, FRotRef.Z - FP1.Z);
+  D := Sub3(FRotRef, FP1);
   { flattened into the plane, since the click may have been off it }
   L := Dot3(D, FRotAxis);
   D := P3(D.X - FRotAxis.X * L, D.Y - FRotAxis.Y * L, D.Z - FRotAxis.Z * L);
@@ -3010,7 +3010,7 @@ var
   L, Deg, Snap: Double;
 begin
   Ref := RotRefDir;
-  D := P3(FCur.X - FP1.X, FCur.Y - FP1.Y, FCur.Z - FP1.Z);
+  D := Sub3(FCur, FP1);
   L := Dot3(D, FRotAxis);
   D := P3(D.X - FRotAxis.X * L, D.Y - FRotAxis.Y * L, D.Z - FRotAxis.Z * L);
   if (FStage < 2) or (Dist(D, P3(0, 0, 0)) < 1E-9) then
@@ -3505,8 +3505,8 @@ var
   K: Integer;
 begin
   if not FD.Doc.PartBounds(Id, Lo, Hi) then Exit;
-  Lo := P3(Lo.X + Shift.X, Lo.Y + Shift.Y, Lo.Z + Shift.Z);
-  Hi := P3(Hi.X + Shift.X, Hi.Y + Shift.Y, Hi.Z + Shift.Z);
+  Lo := Add3(Lo, Shift);
+  Hi := Add3(Hi, Shift);
   P[0] := ScreenOf(P3(Lo.X, Lo.Y, Lo.Z)); P[1] := ScreenOf(P3(Hi.X, Lo.Y, Lo.Z));
   P[2] := ScreenOf(P3(Hi.X, Hi.Y, Lo.Z)); P[3] := ScreenOf(P3(Lo.X, Hi.Y, Lo.Z));
   P[4] := ScreenOf(P3(Lo.X, Lo.Y, Hi.Z)); P[5] := ScreenOf(P3(Hi.X, Lo.Y, Hi.Z));
@@ -3765,9 +3765,7 @@ begin
   Have := (FMeasEdge >= 0) and (FMeasEdge < FD.Doc.Live) and
           (FD.Doc[FMeasEdge].Kind = ekLine);
   if Have then
-    E := P3(FD.Doc[FMeasEdge].B.X - FD.Doc[FMeasEdge].A.X,
-            FD.Doc[FMeasEdge].B.Y - FD.Doc[FMeasEdge].A.Y,
-            FD.Doc[FMeasEdge].B.Z - FD.Doc[FMeasEdge].A.Z)
+    E := Sub3(FD.Doc[FMeasEdge].B, FD.Doc[FMeasEdge].A)
   else
     E := P3(0, 0, 0);
   Kind := TapeGuide(Have, E, FP1, FP2, Nm, D);
@@ -3780,7 +3778,7 @@ begin
     mode }
   if (FTapeDrop <> 1) and ((Kind <> tgPointOnly) or (FTapeDrop = 2)) and
      (Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z) > 1E-18) then
-    FD.Doc.AddGuide(FP2, P3(FP2.X + D.X, FP2.Y + D.Y, FP2.Z + D.Z));
+    FD.Doc.AddGuide(FP2, Add3(FP2, D));
   if FTapeDrop <> 2 then FD.Doc.AddGuide(FP2, FP2);
 
   if (Kind = tgPointOnly) and (FTapeDrop <> 2) then
@@ -3882,8 +3880,7 @@ begin
   N := Length(R.Outer);
   Result.Mid := P3(0, 0, 0);
   for K := 0 to N - 1 do
-    Result.Mid := P3(Result.Mid.X + R.Outer[K].X, Result.Mid.Y + R.Outer[K].Y,
-                     Result.Mid.Z + R.Outer[K].Z);
+    Result.Mid := Add3(Result.Mid, R.Outer[K]);
   if N > 0 then
     Result.Mid := P3(Result.Mid.X / N, Result.Mid.Y / N, Result.Mid.Z / N);
   Result.D := Dot3(Result.Mid, Result.Nm);
@@ -4271,9 +4268,7 @@ var
       if (FD.Doc[E].Kind = ekFace) and (FD.Doc[E].Grp = G) then
         for K := 0 to High(FD.Doc[E].Poly) do
         begin
-          Result := P3(Result.X + FD.Doc[E].Poly[K].X,
-                       Result.Y + FD.Doc[E].Poly[K].Y,
-                       Result.Z + FD.Doc[E].Poly[K].Z);
+          Result := Add3(Result, FD.Doc[E].Poly[K]);
           Inc(N);
         end;
     if N > 0 then Result := P3(Result.X / N, Result.Y / N, Result.Z / N);
@@ -4302,8 +4297,7 @@ var
   function OnPlaneOf(W: Integer): Boolean;
   begin
     Result := (Abs(Abs(Dot3(Was[W].Nm, R[I].Normal)) - 1) < 1E-6) and
-      (Abs(Dot3(Was[W].Nm, P3(Mid.X - Was[W].Poly[0].X, Mid.Y - Was[W].Poly[0].Y,
-                              Mid.Z - Was[W].Poly[0].Z))) < 1E-4);
+      (Abs(Dot3(Was[W].Nm, Sub3(Mid, Was[W].Poly[0]))) < 1E-4);
   end;
 
   { Did the old face cover this point: inside its outline and not inside one
@@ -4396,9 +4390,7 @@ begin
          (Mid.Y < FLo.Y - 1E-4) or (Mid.Y > FHi.Y + 1E-4) or
          (Mid.Z < FLo.Z - 1E-4) or (Mid.Z > FHi.Z + 1E-4) then Continue;
       if Abs(Abs(Dot3(Norm3(R[I].Normal), FN)) - 1) > 1E-6 then Continue;
-      if Abs(Dot3(FN, P3(Mid.X - FE.Poly[0].X,
-                          Mid.Y - FE.Poly[0].Y,
-                          Mid.Z - FE.Poly[0].Z))) > 1E-4 then Continue;
+      if Abs(Dot3(FN, Sub3(Mid, FE.Poly[0]))) > 1E-4 then Continue;
       if not PointInLoop(Mid, FE.Poly, FN) then Continue;
       { the whole face as a region is not a division }
       if Abs(Abs(LoopArea(R[I].Outer, R[I].Normal)) - FArea) < 1E-3 then
@@ -4460,8 +4452,7 @@ begin
       Was[NWas].MatSet := FD.Doc[I].MatSet;
       Mid := P3(0, 0, 0);
       for K := 0 to High(Was[NWas].Poly) do
-        Mid := P3(Mid.X + Was[NWas].Poly[K].X, Mid.Y + Was[NWas].Poly[K].Y,
-                  Mid.Z + Was[NWas].Poly[K].Z);
+        Mid := Add3(Mid, Was[NWas].Poly[K]);
       K := Length(Was[NWas].Poly);
       Was[NWas].Mid := P3(Mid.X / K, Mid.Y / K, Mid.Z / K);
       Inc(NWas);
@@ -4512,7 +4503,7 @@ begin
     SolidP0[J] := FE.Poly[0];
     Mid := P3(0, 0, 0);
     for K := 0 to High(FE.Poly) do
-      Mid := P3(Mid.X + FE.Poly[K].X, Mid.Y + FE.Poly[K].Y, Mid.Z + FE.Poly[K].Z);
+      Mid := Add3(Mid, FE.Poly[K]);
     K := Length(FE.Poly);
     SolidMid[J] := P3(Mid.X / K, Mid.Y / K, Mid.Z / K);
     SolidRad[J] := 0;
@@ -4564,9 +4555,7 @@ begin
         Other := SolidN[SI];
         if Abs(Abs(Dot3(Other, R[I].Normal)) - 1) > 1E-6 then Continue;
         { the same plane, not merely a parallel one }
-        if Abs(Dot3(Other, P3(SolidP0[SI].X - R[I].Outer[0].X,
-                              SolidP0[SI].Y - R[I].Outer[0].Y,
-                              SolidP0[SI].Z - R[I].Outer[0].Z))) > 1E-4
+        if Abs(Dot3(Other, Sub3(SolidP0[SI], R[I].Outer[0]))) > 1E-4
           then Continue;
         { Outline against outline, holes ignored: the outline is what makes
           it the same face, and holes change between rebuilds (so a window
@@ -4665,7 +4654,7 @@ begin
       end;
       Mid := SolidMidOf(HealGrp);
       if Dot3(FD.Doc.FaceNormal(FD.Doc.Live - 1),
-              P3(RMid[I].X - Mid.X, RMid[I].Y - Mid.Y, RMid[I].Z - Mid.Z)) < 0 then
+              Sub3(RMid[I], Mid)) < 0 then
         FD.Doc.FlipFace(FD.Doc.Live - 1);
     end;
     Inc(Made);
@@ -4754,7 +4743,7 @@ var
   L: Double;
 begin
   Extra := nil;
-  D := P3(FP2.X - FP1.X, FP2.Y - FP1.Y, FP2.Z - FP1.Z);
+  D := Sub3(FP2, FP1);
   for I := 0 to FD.Doc.Live - 1 do
   begin
     if FD.Doc[I].Kind <> ekFace then Continue;
@@ -4798,7 +4787,7 @@ begin
                  P3(ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).X - E.C.X,
                     ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).Y - E.C.Y,
                     ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).Z - E.C.Z));
-    if Abs(Dot3(Nm, P3(P.X - E.C.X, P.Y - E.C.Y, P.Z - E.C.Z))) > 1E-6 * Max(1, E.R) then Continue;
+    if Abs(Dot3(Nm, Sub3(P, E.C))) > 1E-6 * Max(1, E.R) then Continue;
     if (Abs(E.Sweep) < 2 * Pi - 1E-9) and
        ((Dist(P, E.A) < 1E-6) or (Dist(P, E.B) < 1E-6)) then Continue;
     Exit(I);

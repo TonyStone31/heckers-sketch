@@ -1231,7 +1231,7 @@ begin
     for K := 0 to N - 1 do
     begin
       Tmp := Cross3(Lp[K], Lp[(K + 1) mod N]);
-      Nrm := P3(Nrm.X + Tmp.X, Nrm.Y + Tmp.Y, Nrm.Z + Tmp.Z);
+      Nrm := Add3(Nrm, Tmp);
     end;
     if Dot3(Nrm, F) < 0 then
       for K := 0 to N div 2 - 1 do
@@ -1306,8 +1306,8 @@ begin
       opposite to their face.  Reverse a copy: the loop is the circle's own, and
       a later "face = c1" needs it unchanged. }
     for K := 0 to High(Holes) do
-      if Dot3(Cross3(P3(Holes[K][1].X - Holes[K][0].X, Holes[K][1].Y - Holes[K][0].Y, Holes[K][1].Z - Holes[K][0].Z),
-                     P3(Holes[K][2].X - Holes[K][1].X, Holes[K][2].Y - Holes[K][1].Y, Holes[K][2].Z - Holes[K][1].Z)),
+      if Dot3(Cross3(Sub3(Holes[K][1], Holes[K][0]),
+                     Sub3(Holes[K][2], Holes[K][1])),
               D.FaceNormal(Idx)) > 0 then
       begin
         Holes[K] := Copy(Holes[K]);
@@ -1757,7 +1757,7 @@ begin
     end;
   for K := 0 to N - 1 do
   begin
-    Top := P3(Lp[K].X + By.X, Lp[K].Y + By.Y, Lp[K].Z + By.Z);
+    Top := Add3(Lp[K], By);
     D.AddLine(Top, P3(Lp[(K + 1) mod N].X + By.X, Lp[(K + 1) mod N].Y + By.Y, Lp[(K + 1) mod N].Z + By.Z),
       Ink, Wd, False);
     D.SetLineGroup(D.Live - 1, G);
@@ -1779,9 +1779,9 @@ begin
   else if Abs(Size.Y) < 1E-9 then begin EU := P3(Size.X, 0, 0); EV := P3(0, 0, Size.Z); end
   else begin EU := P3(0, Size.Y, 0); EV := P3(0, 0, Size.Z); end;
   C[0] := Corner;
-  C[1] := P3(Corner.X + EU.X, Corner.Y + EU.Y, Corner.Z + EU.Z);
-  C[2] := P3(C[1].X + EV.X, C[1].Y + EV.Y, C[1].Z + EV.Z);
-  C[3] := P3(Corner.X + EV.X, Corner.Y + EV.Y, Corner.Z + EV.Z);
+  C[1] := Add3(Corner, EU);
+  C[2] := Add3(C[1], EV);
+  C[3] := Add3(Corner, EV);
   for I := 0 to 3 do D.AddLine(C[I], C[(I + 1) mod 4], DefInk, DefWidth, False);
   if HasPaint then
   begin
@@ -1868,7 +1868,7 @@ begin
   if Cur >= Src.Count then Fail('the bore is never closed: an "end" is missing');
   Inc(Cur);
   if Length(Lp) < 3 then Fail('a bore wants three corners or more');
-  D.AddBore(Lp, P3(Lp[0].X + Goes.X, Lp[0].Y + Goes.Y, Lp[0].Z + Goes.Z), Solid);
+  D.AddBore(Lp, Add3(Lp[0], Goes), Solid);
 end;
 
 { A circle drawn on a face cuts it, as the tool does, and the writer relies
@@ -1915,7 +1915,7 @@ begin
       Inside := True;
       for K := 0 to N - 1 do
       begin
-        Q := P3(Lp[K].X - P0.X, Lp[K].Y - P0.Y, Lp[K].Z - P0.Z);
+        Q := Sub3(Lp[K], P0);
         if Abs(Dot3(Q, Nm)) > 1E-6 then begin Inside := False; Break; end;
         if not PointInLoop(Lp[K], D[F].Poly, Nm) then begin Inside := False; Break; end;
       end;
@@ -1931,8 +1931,8 @@ begin
       SetLength(Holes, Length(D[F].Holes) + 1);
       for J := 0 to High(D[F].Holes) do Holes[J] := D[F].Holes[J];
       Holes[High(Holes)] := Copy(Lp);
-      E1 := P3(Lp[1].X - Lp[0].X, Lp[1].Y - Lp[0].Y, Lp[1].Z - Lp[0].Z);
-      E2 := P3(Lp[2].X - Lp[1].X, Lp[2].Y - Lp[1].Y, Lp[2].Z - Lp[1].Z);
+      E1 := Sub3(Lp[1], Lp[0]);
+      E2 := Sub3(Lp[2], Lp[1]);
       if Dot3(Cross3(E1, E2), Nm) > 0 then
         for K := 0 to N div 2 - 1 do
         begin

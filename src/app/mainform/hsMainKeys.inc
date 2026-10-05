@@ -221,9 +221,9 @@ var
       if Step <= 0 then Step := 1 / 12;
       if ssShift in Shift then
       begin
-        JumpSnap(Round(Sign(ScreenOf(P3(FCur.X + D.X, FCur.Y + D.Y, FCur.Z + D.Z)).X
+        JumpSnap(Round(Sign(ScreenOf(Add3(FCur, D)).X
                              - ScreenOf(FCur).X)),
-                 Round(Sign(ScreenOf(P3(FCur.X + D.X, FCur.Y + D.Y, FCur.Z + D.Z)).Y
+                 Round(Sign(ScreenOf(Add3(FCur, D)).Y
                              - ScreenOf(FCur).Y)));
         Exit;
       end;

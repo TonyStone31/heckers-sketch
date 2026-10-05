@@ -645,7 +645,7 @@ end;
 
 function Towards(const A, B: TP3): TP3;
 begin
-  Result := Norm3(P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z));
+  Result := Norm3(Sub3(B, A));
 end;
 
 procedure BLine(const B: TBuild; const P, Q: TP3);
@@ -726,7 +726,7 @@ var
     Mid := P3((C[0][K].X + C[0][J].X + C[1][K].X + C[1][J].X) / 4,
               (C[0][K].Y + C[0][J].Y + C[1][K].Y + C[1][J].Y) / 4,
               (C[0][K].Z + C[0][J].Z + C[1][K].Z + C[1][J].Z) / 4);
-    if Dot3(Result, P3(Mid.X - Center.X, Mid.Y - Center.Y, Mid.Z - Center.Z)) < 0 then
+    if Dot3(Result, Sub3(Mid, Center)) < 0 then
       Result := P3(-Result.X, -Result.Y, -Result.Z);
   end;
 
@@ -1285,7 +1285,7 @@ var
   begin
     O := W(P3(0, 0, 0));
     Result := W(Dv);
-    Result := P3(Result.X - O.X, Result.Y - O.Y, Result.Z - O.Z);
+    Result := Sub3(Result, O);
   end;
 
   { outward at a throat or heel point: the bend's center is inside the

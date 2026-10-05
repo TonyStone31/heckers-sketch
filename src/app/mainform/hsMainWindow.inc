@@ -85,7 +85,7 @@ begin
     if Abs(L) > 1E-9 then
     begin
       Mv := FD.Doc.FaceNormal(FPushFace);
-      Mv := P3(Mv.X * L, Mv.Y * L, Mv.Z * L);
+      Mv := Mul3(Mv, L);
       if (Abs(Mv.X) >= Abs(Mv.Y)) and (Abs(Mv.X) >= Abs(Mv.Z)) then
         Ai := 0
       else if Abs(Mv.Y) >= Abs(Mv.Z) then

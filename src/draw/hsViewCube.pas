@@ -421,10 +421,10 @@ begin
         { which of the twenty-six this cell is: the face itself in the
           middle, an edge along a side, a corner in a corner }
         Cell := N;
-        if I = 0 then Cell := P3(Cell.X - Face.A.X, Cell.Y - Face.A.Y, Cell.Z - Face.A.Z)
-        else if I = 2 then Cell := P3(Cell.X + Face.A.X, Cell.Y + Face.A.Y, Cell.Z + Face.A.Z);
-        if J = 0 then Cell := P3(Cell.X - Face.B.X, Cell.Y - Face.B.Y, Cell.Z - Face.B.Z)
-        else if J = 2 then Cell := P3(Cell.X + Face.B.X, Cell.Y + Face.B.Y, Cell.Z + Face.B.Z);
+        if I = 0 then Cell := Sub3(Cell, Face.A)
+        else if I = 2 then Cell := Add3(Cell, Face.A);
+        if J = 0 then Cell := Sub3(Cell, Face.B)
+        else if J = 2 then Cell := Add3(Cell, Face.B);
 
         Hot := HaveHot and (Abs(Cell.X - HotDir.X) < 0.01) and
                (Abs(Cell.Y - HotDir.Y) < 0.01) and (Abs(Cell.Z - HotDir.Z) < 0.01);

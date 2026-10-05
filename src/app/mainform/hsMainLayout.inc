@@ -271,9 +271,9 @@ begin
     AxesFromNormal(Nm, AU, AV);
     O := FD.Doc[Face].Poly[0];
     SO := ScreenOf(O);
-    W := P3(O.X + AU.X, O.Y + AU.Y, O.Z + AU.Z);
+    W := Add3(O, AU);
     SU := ScreenOf(W); SU := PtF(SU.X - SO.X, SU.Y - SO.Y);
-    W := P3(O.X + AV.X, O.Y + AV.Y, O.Z + AV.Z);
+    W := Add3(O, AV);
     SV := ScreenOf(W); SV := PtF(SV.X - SO.X, SV.Y - SO.Y);
     Det := SU.X * SV.Y - SU.Y * SV.X;
     Deep := Abs(Det) > 1E-6;
@@ -411,7 +411,7 @@ begin
   if Snapped then
   begin
     P := FCur;
-    D := Dot3(N, P3(P.X - Loop[0].X, P.Y - Loop[0].Y, P.Z - Loop[0].Z));
+    D := Dot3(N, Sub3(P, Loop[0]));
     P := P3(P.X - N.X * D, P.Y - N.Y * D, P.Z - N.Z * D);
   end
   else
@@ -423,8 +423,8 @@ begin
     J := (I + 1) mod Cnt;
     A := Loop[I];
     B := Loop[J];
-    V := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
-    W := P3(P.X - A.X, P.Y - A.Y, P.Z - A.Z);
+    V := Sub3(B, A);
+    W := Sub3(P, A);
     L2 := V.X * V.X + V.Y * V.Y + V.Z * V.Z;
     if L2 < 1E-18 then T := 0
     else T := EnsureRange((W.X * V.X + W.Y * V.Y + W.Z * V.Z) / L2, 0, 1);
@@ -1381,7 +1381,7 @@ begin
     about Z.  Measure the drag along the normal as drawn on screen: the
     projected normal gives pixels per world unit. }
   PA := ScreenOf(FP1);
-  PN := ScreenOf(P3(FP1.X + Nm.X, FP1.Y + Nm.Y, FP1.Z + Nm.Z));
+  PN := ScreenOf(Add3(FP1, Nm));
   DirX := PN.X - PA.X;
   DirY := PN.Y - PA.Y;
   Len2 := DirX * DirX + DirY * DirY;

@@ -1466,8 +1466,7 @@ var
           V := Sub3(D[Faces[J]].Poly[C], D[Faces[I]].Poly[0]);
           Ok_ := AxesUsed(V) > 0;
           for K := 0 to N - 1 do
-            if Ok_ and (CornerAt(P3(D[Faces[I]].Poly[K].X + V.X, D[Faces[I]].Poly[K].Y + V.Y,
-                                    D[Faces[I]].Poly[K].Z + V.Z), D[Faces[J]].Poly) < 0) then Ok_ := False;
+            if Ok_ and (CornerAt(Add3(D[Faces[I]].Poly[K], V), D[Faces[J]].Poly) < 0) then Ok_ := False;
           if Ok_ and (Dot3(D.FaceNormal(Faces[I]), V) < 0) and (Dot3(D.FaceNormal(Faces[J]), V) > 0) then
           begin
             { Either end could be the bottom.  Prefer the circle (the tool pulled the
@@ -1496,8 +1495,8 @@ var
       SetLength(Q, 4);
       Q[0] := D[Bottom].Poly[K];
       Q[1] := D[Bottom].Poly[(K + 1) mod N];
-      Q[2] := P3(Q[1].X + By.X, Q[1].Y + By.Y, Q[1].Z + By.Z);
-      Q[3] := P3(Q[0].X + By.X, Q[0].Y + By.Y, Q[0].Z + By.Z);
+      Q[2] := Add3(Q[1], By);
+      Q[3] := Add3(Q[0], By);
       Hit := False;
       for I := 0 to NF - 1 do
         if not Used[I] and (Length(D[Faces[I]].Poly) = 4) and SameLoop(D[Faces[I]].Poly, Q) then
@@ -1535,9 +1534,9 @@ var
       end;
       Ok_ := False;
       if (J >= 0) and (CornerAt(D[I].B, D[Top].Poly) >= 0) then
-        Ok_ := SameP(D[I].B, P3(D[I].A.X + By.X, D[I].A.Y + By.Y, D[I].A.Z + By.Z))
+        Ok_ := SameP(D[I].B, Add3(D[I].A, By))
       else if (K >= 0) and (CornerAt(D[I].A, D[Top].Poly) >= 0) then
-        Ok_ := SameP(D[I].A, P3(D[I].B.X + By.X, D[I].B.Y + By.Y, D[I].B.Z + By.Z));
+        Ok_ := SameP(D[I].A, Add3(D[I].B, By));
       if Ok_ then
       begin
         if D[I].Soft <> Round_ then Exit;      { an upright }

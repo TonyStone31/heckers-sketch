@@ -78,7 +78,7 @@ var
   K: Integer;
 begin
   C := P3(0, 0, 0);
-  for K := 0 to High(L) do C := P3(C.X + L[K].X, C.Y + L[K].Y, C.Z + L[K].Z);
+  for K := 0 to High(L) do C := Add3(C, L[K]);
   K := Length(L);
   if K = 0 then Exit('-');
   Result := Format('%d %d %d %d', [Round(C.X / K * 100) + DX, Round(C.Y / K * 100) + DY,
@@ -259,7 +259,7 @@ begin
   if InSolid then
   begin
     Inner := InnerPoint(R.Outer, R.Normal);
-    Flip := Dot3(Nm, P3(Inner.X - Mid.X, Inner.Y - Mid.Y, Inner.Z - Mid.Z)) < 0;
+    Flip := Dot3(Nm, Sub3(Inner, Mid)) < 0;
   end
   else
   begin

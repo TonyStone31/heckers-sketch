@@ -1911,8 +1911,8 @@ begin
   UY := (PB.Y - PA.Y) / L;
 
   { the line, shifted bodily by the offset - everything else hangs off it }
-  G.LA := Project(V, P3(A.X + Off.X, A.Y + Off.Y, A.Z + Off.Z));
-  G.LB := Project(V, P3(B.X + Off.X, B.Y + Off.Y, B.Z + Off.Z));
+  G.LA := Project(V, Add3(A, Off));
+  G.LB := Project(V, Add3(B, Off));
 
   { which way the offset went on screen, so the ticks and the text can lean
     away from the geometry rather than into it }
@@ -1992,7 +1992,7 @@ var
 
 begin
   Result := P3(0, 0, 0);
-  D := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+  D := Sub3(B, A);
   L := Sqrt(Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z));
   if L < 1E-9 then Exit;
   D := P3(D.X / L, D.Y / L, D.Z / L);
@@ -2016,7 +2016,7 @@ begin
   Best := -1; BestK := -1; BestT := 0;
   for K := 0 to High(Cands) do
   begin
-    S := Project(V, P3(Mid.X + Cands[K].X, Mid.Y + Cands[K].Y, Mid.Z + Cands[K].Z));
+    S := Project(V, Add3(Mid, Cands[K]));
     S := PtF(S.X - PM.X, S.Y - PM.Y);
     SL := Sqrt(S.X * S.X + S.Y * S.Y);
     { a direction straight at the camera, or along AB on screen, cannot be
@@ -2040,7 +2040,7 @@ begin
     end;
   end;
   if BestK < 0 then Exit;
-  Result := P3(Cands[BestK].X * BestT, Cands[BestK].Y * BestT, Cands[BestK].Z * BestT);
+  Result := Mul3(Cands[BestK], BestT);
 end;
 
 function DimTextTopLeft(const G: TDimGeom; TW, TH: Integer;
@@ -2168,7 +2168,7 @@ var
   L: Double;
 begin
   Dir := P3(0, 0, 0);
-  Run := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+  Run := Sub3(B, A);
   L := Sqrt(Sqr(Run.X) + Sqr(Run.Y) + Sqr(Run.Z));
   if L < 1E-9 then Exit(tgPointOnly);
   Run := P3(Run.X / L, Run.Y / L, Run.Z / L);
@@ -2474,8 +2474,8 @@ function RotP(const P, C, Axis: TP3; Ang: Double): TP3;
 var
   V: TP3;
 begin
-  V := RotV(P3(P.X - C.X, P.Y - C.Y, P.Z - C.Z), Axis, Ang);
-  Result := P3(C.X + V.X, C.Y + V.Y, C.Z + V.Z);
+  V := RotV(Sub3(P, C), Axis, Ang);
+  Result := Add3(C, V);
 end;
 
 function ArcFromChord(const A, B: TP3; Bulge: Double; Pl: TPlane;
@@ -2625,7 +2625,7 @@ var
   var
     W, F: TP3;
   begin
-    W := P3(Q.X - A.X, Q.Y - A.Y, Q.Z - A.Z);
+    W := Sub3(Q, A);
     Result := Dot3(W, U);
     F := P3(W.X - U.X * Result, W.Y - U.Y * Result, W.Z - U.Z * Result);
     Off := Sqrt(F.X * F.X + F.Y * F.Y + F.Z * F.Z);
@@ -3914,7 +3914,7 @@ begin
         Mid := Middle(FEnts[Cand[K]].Poly);
         Vol := Vol + (Mid.X * Acc.X + Mid.Y * Acc.Y + Mid.Z * Acc.Z) / 6;
         Ar := Sqrt(Acc.X * Acc.X + Acc.Y * Acc.Y + Acc.Z * Acc.Z) / 2;
-        Nm := P3(Mid.X - Cen.X, Mid.Y - Cen.Y, Mid.Z - Cen.Z);
+        Nm := Sub3(Mid, Cen);
         W := W + Ar * (Nm.X * Acc.X + Nm.Y * Acc.Y + Nm.Z * Acc.Z);
       end;
       if Abs(Vol) > 1E-6 then Sgn := Vol else Sgn := W;
@@ -4280,7 +4280,7 @@ begin
   for K := 0 to N - 1 do Cen := P3(Cen.X + Poly[K].X / N, Cen.Y + Poly[K].Y / N, Cen.Z + Poly[K].Z / N);
   { which way the sweep moves off the profile: along the tangent of the
     turn at the profile's middle }
-  Tang := Cross3(Ax, P3(Cen.X - AxisP.X, Cen.Y - AxisP.Y, Cen.Z - AxisP.Z));
+  Tang := Cross3(Ax, Sub3(Cen, AxisP));
   if Angle < 0 then Tang := P3(-Tang.X, -Tang.Y, -Tang.Z);
   First := FLive;
   G := NewGroup;
@@ -4289,7 +4289,7 @@ begin
   SetLength(OnAxis, N);
   for K := 0 to N - 1 do
   begin
-    E := P3(Poly[K].X - AxisP.X, Poly[K].Y - AxisP.Y, Poly[K].Z - AxisP.Z);
+    E := Sub3(Poly[K], AxisP);
     E := P3(E.X - Ax.X * Dot3(E, Ax), E.Y - Ax.Y * Dot3(E, Ax), E.Z - Ax.Z * Dot3(E, Ax));
     OnAxis[K] := Dist(E, P3(0, 0, 0)) < 1E-9;
   end;
@@ -4304,7 +4304,7 @@ begin
   begin
     K2 := (K + 1) mod N;
     if OnAxis[K] and OnAxis[K2] then Continue;
-    E := P3(Poly[K2].X - Poly[K].X, Poly[K2].Y - Poly[K].Y, Poly[K2].Z - Poly[K].Z);
+    E := Sub3(Poly[K2], Poly[K]);
     { Which way is out of the profile at this edge: the edge crossed into the
       Newell normal.  That holds for a concave profile too, where pointing
       away from the middle fails - a thin C like a wine glass. }
@@ -4337,7 +4337,7 @@ begin
     K2 := (K + 1) mod N;
     PrevE := Norm3(P3(Poly[K].X - Poly[(K + N - 1) mod N].X, Poly[K].Y - Poly[(K + N - 1) mod N].Y,
                       Poly[K].Z - Poly[(K + N - 1) mod N].Z));
-    E := Norm3(P3(Poly[K2].X - Poly[K].X, Poly[K2].Y - Poly[K].Y, Poly[K2].Z - Poly[K].Z));
+    E := Norm3(Sub3(Poly[K2], Poly[K]));
     Turn := ArcCos(EnsureRange(Dot3(PrevE, E), -1.0, 1.0));
     for S := 0 to Steps - 1 do
       Edge(Rings[S][K], Rings[S + 1][K], Turn < SOFT_TURN);
@@ -4501,7 +4501,7 @@ begin
     if Closed or (S < M - 1) then
     begin
       DirOut := Norm3(Sub3(Pts[(S + 1) mod M], Pts[S mod M]));
-      B := P3(DirIn.X + DirOut.X, DirIn.Y + DirOut.Y, DirIn.Z + DirOut.Z);
+      B := Add3(DirIn, DirOut);
       if Dist(B, P3(0, 0, 0)) < 1E-9 then B := DirIn else B := Norm3(B);
       Turn := ArcCos(EnsureRange(Dot3(DirIn, DirOut), -1.0, 1.0));
     end
@@ -5211,12 +5211,11 @@ begin
     { Where the cursor meets this face's plane.  The basis is normalized
       first so the short sides of a circle's polygon do not cost accuracy. }
     Org := FEnts[I].Poly[0];
-    U := Norm3(P3(FEnts[I].Poly[1].X - Org.X, FEnts[I].Poly[1].Y - Org.Y,
-                  FEnts[I].Poly[1].Z - Org.Z));
+    U := Norm3(Sub3(FEnts[I].Poly[1], Org));
     W := Norm3(Cross3(FaceNormal(I), U));
     P0 := ProjectAt(PC, Org);
-    P1 := ProjectAt(PC, P3(Org.X + U.X, Org.Y + U.Y, Org.Z + U.Z));
-    P2 := ProjectAt(PC, P3(Org.X + W.X, Org.Y + W.Y, Org.Z + W.Z));
+    P1 := ProjectAt(PC, Add3(Org, U));
+    P2 := ProjectAt(PC, Add3(Org, W));
     AX := P1.X - P0.X; AY := P1.Y - P0.Y;
     BX := P2.X - P0.X; BY := P2.Y - P0.Y;
     Det := AX * BY - AY * BX;
@@ -5331,8 +5330,8 @@ begin
   UB := FarEnd(F.LineB, Corner);
   LenA := Dist(UA, Corner);
   LenB := Dist(UB, Corner);
-  UA := Norm3(P3(UA.X - Corner.X, UA.Y - Corner.Y, UA.Z - Corner.Z));
-  UB := Norm3(P3(UB.X - Corner.X, UB.Y - Corner.Y, UB.Z - Corner.Z));
+  UA := Norm3(Sub3(UA, Corner));
+  UB := Norm3(Sub3(UB, Corner));
   Th := ArcCos(EnsureRange(Dot3(UA, UB), -1, 1));
   if (Th < 1E-6) or (Th > Pi - 1E-6) then Exit;
   F.R := R;
@@ -5706,9 +5705,9 @@ var
     Aa, Bb, Cc, Ee, Ff, Den: Double;
   begin
     SS := 0; TT := 0; DD := 1E30;
-    D1 := P3(P2.X - P1.X, P2.Y - P1.Y, P2.Z - P1.Z);
-    D2 := P3(Q2.X - Q1.X, Q2.Y - Q1.Y, Q2.Z - Q1.Z);
-    R := P3(P1.X - Q1.X, P1.Y - Q1.Y, P1.Z - Q1.Z);
+    D1 := Sub3(P2, P1);
+    D2 := Sub3(Q2, Q1);
+    R := Sub3(P1, Q1);
     Aa := Dot3(D1, D1);
     Ee := Dot3(D2, D2);
     if (Aa < 1E-24) or (Ee < 1E-24) then Exit;
@@ -5923,26 +5922,26 @@ begin
   Org := Src[0];
 
   { the cut has to lie in the face's plane }
-  W := P3(A.X - Org.X, A.Y - Org.Y, A.Z - Org.Z);
+  W := Sub3(A, Org);
   if Abs(Dot3(W, Nm)) > 1E-6 then Exit;
-  W := P3(B.X - Org.X, B.Y - Org.Y, B.Z - Org.Z);
+  W := Sub3(B, Org);
   if Abs(Dot3(W, Nm)) > 1E-6 then Exit;
 
   { a basis in that plane }
-  U := Norm3(P3(Src[1].X - Org.X, Src[1].Y - Org.Y, Src[1].Z - Org.Z));
+  U := Norm3(Sub3(Src[1], Org));
   V := Cross3(Nm, U);
 
   SetLength(PX, N);
   SetLength(PY, N);
   for I := 0 to N - 1 do
   begin
-    W := P3(Src[I].X - Org.X, Src[I].Y - Org.Y, Src[I].Z - Org.Z);
+    W := Sub3(Src[I], Org);
     PX[I] := Dot3(W, U);
     PY[I] := Dot3(W, V);
   end;
-  W := P3(A.X - Org.X, A.Y - Org.Y, A.Z - Org.Z);
+  W := Sub3(A, Org);
   AX := Dot3(W, U); AY := Dot3(W, V);
-  W := P3(B.X - Org.X, B.Y - Org.Y, B.Z - Org.Z);
+  W := Sub3(B, Org);
   BX := Dot3(W, U); BY := Dot3(W, V);
 
   RX := BX - AX;
@@ -6120,7 +6119,7 @@ begin
       running out along the normal belongs to a taller neighbor, and sliding
       the face would shear it. }
     for K := 0 to M - 1 do
-      if Dot3(Nm, P3(B[K].X - A[0].X, B[K].Y - A[0].Y, B[K].Z - A[0].Z)) > TOL then
+      if Dot3(Nm, Sub3(B[K], A[0])) > TOL then
         Exit(False);
   end;
 end;
@@ -6142,7 +6141,7 @@ begin
   begin
     if (FEnts[I].Kind <> ekFace) or (Length(FEnts[I].Poly) < 3) then Continue;
     Nm := FaceNormal(I);
-    W := P3(P.X - FEnts[I].Poly[0].X, P.Y - FEnts[I].Poly[0].Y, P.Z - FEnts[I].Poly[0].Z);
+    W := Sub3(P, FEnts[I].Poly[0]);
     if Abs(Dot3(W, Nm)) > TOL then Continue;
     if not LoopContains(P, FEnts[I].Poly, Nm) then Continue;
     InHole := False;
@@ -6173,8 +6172,7 @@ begin
     if FEnts[I].Kind <> ekFace then Continue;
     if Length(FEnts[I].Poly) < 3 then Continue;
     Nm := FaceNormal(I);
-    W := P3(P.X - FEnts[I].Poly[0].X, P.Y - FEnts[I].Poly[0].Y,
-            P.Z - FEnts[I].Poly[0].Z);
+    W := Sub3(P, FEnts[I].Poly[0]);
     if Abs(Dot3(W, Nm)) > TOL then Continue;
     for K := 0 to High(FEnts[I].Poly) do
       if Dist(P, FEnts[I].Poly[K]) < 1E-5 then Exit(I);
@@ -6215,7 +6213,7 @@ var
     var
       W: TP3;
     begin
-      W := P3(R.X - Was[0].X, R.Y - Was[0].Y, R.Z - Was[0].Z);
+      W := Sub3(R, Was[0]);
       CU := Dot3(W, BU);
       CV := Dot3(W, BV);
     end;
@@ -6261,7 +6259,7 @@ var
   procedure Shift(var P: TP3);
   begin
     if OnFace(P) then
-      P := P3(P.X + D.X, P.Y + D.Y, P.Z + D.Z);
+      P := Add3(P, D);
   end;
 
 begin
@@ -6274,7 +6272,7 @@ begin
 
   Nm := FaceNormal(Index);
   PlaneD := Dot3(Nm, Was[0]);
-  BU := Norm3(P3(Was[1].X - Was[0].X, Was[1].Y - Was[0].Y, Was[1].Z - Was[0].Z));
+  BU := Norm3(Sub3(Was[1], Was[0]));
   BV := Cross3(Nm, BU);
 
   for I := 0 to FLive - 1 do
@@ -6308,13 +6306,13 @@ begin
   if L < TOL then Exit;
   U := P3((Q1.X - P1.X) / L, (Q1.Y - P1.Y) / L, (Q1.Z - P1.Z) / L);
 
-  W := P3(P2.X - P1.X, P2.Y - P1.Y, P2.Z - P1.Z);
+  W := Sub3(P2, P1);
   TA := Dot3(W, U);
   F := P3(W.X - U.X * TA, W.Y - U.Y * TA, W.Z - U.Z * TA);
   Off := Sqrt(F.X * F.X + F.Y * F.Y + F.Z * F.Z);
   if Off > TOL then Exit;
 
-  W := P3(Q2.X - P1.X, Q2.Y - P1.Y, Q2.Z - P1.Z);
+  W := Sub3(Q2, P1);
   TB := Dot3(W, U);
   F := P3(W.X - U.X * TB, W.Y - U.Y * TB, W.Z - U.Z * TB);
   Off := Sqrt(F.X * F.X + F.Y * F.Y + F.Z * F.Z);
@@ -6351,7 +6349,7 @@ var
       L := Dist(A, B);
       if L < TOL then Continue;
       U := P3((B.X - A.X) / L, (B.Y - A.Y) / L, (B.Z - A.Z) / L);
-      W := P3(P.X - A.X, P.Y - A.Y, P.Z - A.Z);
+      W := Sub3(P, A);
       T := Dot3(W, U);
       if (T < -TOL) or (T > L + TOL) then Continue;
       F := P3(W.X - U.X * T, W.Y - U.Y * T, W.Z - U.Z * T);
@@ -6548,7 +6546,7 @@ var
   begin
     Moved := Moving.Has(P, TOL);
     if Moved then
-      Result := P3(P.X + D.X, P.Y + D.Y, P.Z + D.Z)
+      Result := Add3(P, D)
     else
       Result := P;
   end;
@@ -6597,12 +6595,12 @@ var
 
   procedure Shift(var P: TP3);
   begin
-    if Moving.Has(P, TOL) then P := P3(P.X + D.X, P.Y + D.Y, P.Z + D.Z);
+    if Moving.Has(P, TOL) then P := Add3(P, D);
   end;
 
   procedure Bump(var P: TP3);
   begin
-    P := P3(P.X + D.X, P.Y + D.Y, P.Z + D.Z);
+    P := Add3(P, D);
   end;
 
   { is Q on the segment from E to F, within a hair }
@@ -6689,7 +6687,7 @@ var
 
   procedure Put(const P: TP3);
   begin
-    if Dot3(P3(P.X - Base.X, P.Y - Base.Y, P.Z - Base.Z), Dir) < -TOL then Exit;
+    if Dot3(Sub3(P, Base), Dir) < -TOL then Exit;
     if N >= Length(Pts) then SetLength(Pts, Max(16, N * 2));
     Pts[N] := P;
     Inc(N);
@@ -6736,8 +6734,7 @@ begin
   RHi := 0;
   for K := 0 to High(FEnts[Face].Poly) do
   begin
-    E := P3(FEnts[Face].Poly[K].X - AxisP.X, FEnts[Face].Poly[K].Y - AxisP.Y,
-            FEnts[Face].Poly[K].Z - AxisP.Z);
+    E := Sub3(FEnts[Face].Poly[K], AxisP);
     { how far off the axis, square to it - the radius this corner sweeps }
     Perp := P3(E.X - D.X * Dot3(E, D), E.Y - D.Y * Dot3(E, D),
                E.Z - D.Z * Dot3(E, D));
@@ -6781,7 +6778,7 @@ begin
   if MoveB then
   begin
     VertsBeyond(B, D, Pts);
-    Delta := P3(D.X * Grow, D.Y * Grow, D.Z * Grow);
+    Delta := Mul3(D, Grow);
   end
   else
   begin
@@ -6838,8 +6835,7 @@ begin
     FEnts[I].Plane := plFree;
     FEnts[I].Nm := N;
     AxesFromNormal(N, AU, AV);
-    D := P3(FEnts[I].A.X - FEnts[I].C.X, FEnts[I].A.Y - FEnts[I].C.Y,
-            FEnts[I].A.Z - FEnts[I].C.Z);
+    D := Sub3(FEnts[I].A, FEnts[I].C);
     FEnts[I].A0 := ArcTan2(Dot3(D, AV), Dot3(D, AU));
     Exit;
   end;
@@ -6880,7 +6876,7 @@ begin
   begin
     if Divide then F := K / N else F := K;
     Base := FLive;
-    Duplicate(Src, P3(D.X * F, D.Y * F, D.Z * F));
+    Duplicate(Src, Mul3(D, F));
     M := Length(Made);
     SetLength(Made, M + (FLive - Base));
     for I := Base to FLive - 1 do Made[M + I - Base] := I;
@@ -6977,7 +6973,7 @@ var
 
   function Sh(const P: TP3): TP3;
   begin
-    Result := P3(P.X + D.X, P.Y + D.Y, P.Z + D.Z);
+    Result := Add3(P, D);
   end;
 
 begin
@@ -7112,8 +7108,7 @@ begin
     FEnts[FLive] := FEnts[I];
     SetLength(FEnts[FLive].Poly, Length(FEnts[I].Poly));
     for K := 0 to High(FEnts[I].Poly) do
-      FEnts[FLive].Poly[K] := P3(FEnts[I].Poly[K].X + D.X,
-        FEnts[I].Poly[K].Y + D.Y, FEnts[I].Poly[K].Z + D.Z);
+      FEnts[FLive].Poly[K] := Add3(FEnts[I].Poly[K], D);
     { The holes, deep and shifted, or the copy shares the original's window. }
     FEnts[FLive].Holes := nil;
     SetLength(FEnts[FLive].Holes, Length(FEnts[I].Holes));
@@ -7121,12 +7116,11 @@ begin
     begin
       SetLength(FEnts[FLive].Holes[H], Length(FEnts[I].Holes[H]));
       for K := 0 to High(FEnts[I].Holes[H]) do
-        FEnts[FLive].Holes[H][K] := P3(FEnts[I].Holes[H][K].X + D.X,
-          FEnts[I].Holes[H][K].Y + D.Y, FEnts[I].Holes[H][K].Z + D.Z);
+        FEnts[FLive].Holes[H][K] := Add3(FEnts[I].Holes[H][K], D);
     end;
-    FEnts[FLive].A := P3(FEnts[I].A.X + D.X, FEnts[I].A.Y + D.Y, FEnts[I].A.Z + D.Z);
-    FEnts[FLive].B := P3(FEnts[I].B.X + D.X, FEnts[I].B.Y + D.Y, FEnts[I].B.Z + D.Z);
-    FEnts[FLive].C := P3(FEnts[I].C.X + D.X, FEnts[I].C.Y + D.Y, FEnts[I].C.Z + D.Z);
+    FEnts[FLive].A := Add3(FEnts[I].A, D);
+    FEnts[FLive].B := Add3(FEnts[I].B, D);
+    FEnts[FLive].C := Add3(FEnts[I].C, D);
     { a record's Grp is its group id, not a solid's }
     if FEnts[I].Kind = ekPart then G := RemapPart(FEnts[I].Grp)
     else G := Remap(FEnts[I].Grp);
@@ -7205,7 +7199,7 @@ var
 
   procedure Shift(var P: TP3);
   begin
-    P := P3(P.X + D.X, P.Y + D.Y, P.Z + D.Z);
+    P := Add3(P, D);
   end;
 
 begin
@@ -7559,7 +7553,7 @@ var
     begin
       A := Poly[Q];
       B := Poly[(Q + 1) mod N];
-      D := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+      D := Sub3(B, A);
       L2 := D.X * D.X + D.Y * D.Y + D.Z * D.Z;
       if L2 < 1E-18 then Continue;
       T := ((P.X - A.X) * D.X + (P.Y - A.Y) * D.Y + (P.Z - A.Z) * D.Z) / L2;
@@ -7645,8 +7639,7 @@ begin
   begin
     Mid := P3(0, 0, 0);
     for I := 0 to High(FEnts[Index].Poly) do
-      Mid := P3(Mid.X + FEnts[Index].Poly[I].X, Mid.Y + FEnts[Index].Poly[I].Y,
-                Mid.Z + FEnts[Index].Poly[I].Z);
+      Mid := Add3(Mid, FEnts[Index].Poly[I]);
     I := Length(FEnts[Index].Poly);
     Mid := P3(Mid.X / I, Mid.Y / I, Mid.Z / I);
     for F := 0 to FLive - 1 do
@@ -7655,8 +7648,7 @@ begin
          (FEnts[F].Grp = 0) or (Length(FEnts[F].Poly) < 3) then Continue;
       FN := FaceNormal(F);
       if Abs(Abs(Dot3(FN, Nm)) - 1) > 1E-6 then Continue;
-      if Abs(Dot3(FN, P3(Mid.X - FEnts[F].Poly[0].X, Mid.Y - FEnts[F].Poly[0].Y,
-                         Mid.Z - FEnts[F].Poly[0].Z))) > 1E-6 then Continue;
+      if Abs(Dot3(FN, Sub3(Mid, FEnts[F].Poly[0]))) > 1E-6 then Continue;
       if LoopContains(Mid, FEnts[F].Poly, FN) then
       begin
         G := FEnts[F].Grp;
@@ -7676,7 +7668,7 @@ begin
   { the face the push lands on: same solid, parallel, in the plane the far
     end has reached, and big enough to hold the whole opening }
   Mid := P3(0, 0, 0);
-  for I := 0 to N - 1 do Mid := P3(Mid.X + Top[I].X, Mid.Y + Top[I].Y, Mid.Z + Top[I].Z);
+  for I := 0 to N - 1 do Mid := Add3(Mid, Top[I]);
   Mid := P3(Mid.X / N, Mid.Y / N, Mid.Z / N);
   Far := -1;
   for F := 0 to FLive - 1 do
@@ -7685,8 +7677,7 @@ begin
     if Length(FEnts[F].Poly) < 3 then Continue;
     FN := FaceNormal(F);
     if Abs(Abs(Dot3(FN, Nm)) - 1) > 1E-6 then Continue;
-    if Abs(Dot3(FN, P3(Top[0].X - FEnts[F].Poly[0].X, Top[0].Y - FEnts[F].Poly[0].Y,
-                       Top[0].Z - FEnts[F].Poly[0].Z))) > Tol then Continue;
+    if Abs(Dot3(FN, Sub3(Top[0], FEnts[F].Poly[0]))) > Tol then Continue;
     K := 0;
     for I := 0 to N - 1 do
       if LoopContains(Top[I], FEnts[F].Poly, FN) then Inc(K);
@@ -7716,8 +7707,7 @@ begin
     Opened := False;
     Mid := P3(0, 0, 0);
     for I := 0 to High(FEnts[Index].Poly) do
-      Mid := P3(Mid.X + FEnts[Index].Poly[I].X, Mid.Y + FEnts[Index].Poly[I].Y,
-                Mid.Z + FEnts[Index].Poly[I].Z);
+      Mid := Add3(Mid, FEnts[Index].Poly[I]);
     I := Length(FEnts[Index].Poly);
     Mid := P3(Mid.X / I, Mid.Y / I, Mid.Z / I);
     FN := FaceNormal(Near);
@@ -7755,8 +7745,7 @@ begin
     turning each wall to face it. }
   Mid := P3(0, 0, 0);
   for I := 0 to N - 1 do
-    Mid := P3(Mid.X + FEnts[Index].Poly[I].X, Mid.Y + FEnts[Index].Poly[I].Y,
-              Mid.Z + FEnts[Index].Poly[I].Z);
+    Mid := Add3(Mid, FEnts[Index].Poly[I]);
   Mid := P3(Mid.X / N, Mid.Y / N, Mid.Z / N);
   for I := 0 to N - 1 do
   begin
@@ -7765,9 +7754,9 @@ begin
     Quad[2] := Top[J];              Quad[3] := Top[I];
     { wound to look into the tunnel, whichever way the push went and the
       opening was drawn }
-    FN := Cross3(P3(Quad[1].X - Quad[0].X, Quad[1].Y - Quad[0].Y, Quad[1].Z - Quad[0].Z),
-                 P3(Quad[3].X - Quad[0].X, Quad[3].Y - Quad[0].Y, Quad[3].Z - Quad[0].Z));
-    if Dot3(FN, P3(Mid.X - Quad[0].X, Mid.Y - Quad[0].Y, Mid.Z - Quad[0].Z)) < 0 then
+    FN := Cross3(Sub3(Quad[1], Quad[0]),
+                 Sub3(Quad[3], Quad[0]));
+    if Dot3(FN, Sub3(Mid, Quad[0])) < 0 then
     begin
       Quad[1] := FEnts[Index].Poly[I]; Quad[0] := FEnts[Index].Poly[J];
       Quad[3] := Top[J];              Quad[2] := Top[I];
@@ -7826,8 +7815,7 @@ begin
          (FEnts[F].Grp = 0) or (Length(FEnts[F].Poly) < 3) then Continue;
       FN := FaceNormal(F);
       if Abs(Abs(Dot3(FN, Nm)) - 1) > 1E-6 then Continue;
-      if Abs(Dot3(FN, P3(Mid.X - FEnts[F].Poly[0].X, Mid.Y - FEnts[F].Poly[0].Y,
-                         Mid.Z - FEnts[F].Poly[0].Z))) > 1E-6 then Continue;
+      if Abs(Dot3(FN, Sub3(Mid, FEnts[F].Poly[0]))) > 1E-6 then Continue;
       if LoopContains(Mid, FEnts[F].Poly, FN) then
       begin
         G := FEnts[F].Grp;
@@ -7850,9 +7838,7 @@ begin
     if Abs(Abs(Dot3(FN, Nm)) - 1) > 1E-6 then Continue;
     { how far along the push this face's plane is - it has to be ahead of
       us, in the direction we are going }
-    D := Dot3(Nm, P3(FEnts[F].Poly[0].X - FEnts[Face].Poly[0].X,
-                     FEnts[F].Poly[0].Y - FEnts[Face].Poly[0].Y,
-                     FEnts[F].Poly[0].Z - FEnts[Face].Poly[0].Z));
+    D := Dot3(Nm, Sub3(FEnts[F].Poly[0], FEnts[Face].Poly[0]));
     if D * Sgn <= Tol then Continue;
     { and big enough to take the whole opening, which TunnelThrough asks }
     All := True;
@@ -8012,7 +7998,7 @@ begin
   Plug := FEnts[Index].Solid and (IsPatch(Index) or not WallsSquareTo(Index));
   if FEnts[Index].Solid and not Plug then
   begin
-    MoveFaceWith(Index, P3(Nm.X * Dist, Nm.Y * Dist, Nm.Z * Dist));
+    MoveFaceWith(Index, Mul3(Nm, Dist));
     LastFlattened := FlattenedAway(Index);
     Exit(True);
   end;
@@ -8454,9 +8440,7 @@ begin
     Reach := Dist(BLo, BHi) + 1;
     for I := 0 to NGuide - 1 do
     begin
-      GDir := Norm3(P3(FEnts[GIdx[I]].B.X - FEnts[GIdx[I]].A.X,
-                       FEnts[GIdx[I]].B.Y - FEnts[GIdx[I]].A.Y,
-                       FEnts[GIdx[I]].B.Z - FEnts[GIdx[I]].A.Z));
+      GDir := Norm3(Sub3(FEnts[GIdx[I]].B, FEnts[GIdx[I]].A));
       GLo[I] := P3(FEnts[GIdx[I]].A.X - GDir.X * Reach,
                    FEnts[GIdx[I]].A.Y - GDir.Y * Reach,
                    FEnts[GIdx[I]].A.Z - GDir.Z * Reach);
@@ -8639,7 +8623,7 @@ var
     U, V, Nrm, D: TP3;
   begin
     Axes(E, U, V, Nrm);
-    D := P3(Pt.X - E.C.X, Pt.Y - E.C.Y, Pt.Z - E.C.Z);
+    D := Sub3(Pt, E.C);
     Result := ArcTan2(Dot3(D, V), Dot3(D, U));
   end;
 
@@ -8678,9 +8662,7 @@ var
     Axes(FEnts[Idx[AJ]], UJ, VJ, NJ);
     A := FEnts[Idx[AJ]].R * Dot3(NI, UJ);
     B := FEnts[Idx[AJ]].R * Dot3(NI, VJ);
-    Cc := Dot3(NI, P3(FEnts[Idx[AI]].C.X - FEnts[Idx[AJ]].C.X,
-                      FEnts[Idx[AI]].C.Y - FEnts[Idx[AJ]].C.Y,
-                      FEnts[Idx[AI]].C.Z - FEnts[Idx[AJ]].C.Z));
+    Cc := Dot3(NI, Sub3(FEnts[Idx[AI]].C, FEnts[Idx[AJ]].C));
     Rr := Sqrt(A * A + B * B);
     if (Rr < 1E-12) or (Abs(Cc) > Rr) then Exit;
     Phi := ArcTan2(B, A);
@@ -8705,9 +8687,7 @@ var
     RI := FEnts[Idx[AI]].R; RJ := FEnts[Idx[AJ]].R;
     D := Dist(FEnts[Idx[AI]].C, FEnts[Idx[AJ]].C);
     if (D < 1E-9) or (D > RI + RJ + 1E-9) or (D < Abs(RI - RJ) - 1E-9) then Exit;
-    U := Norm3(P3(FEnts[Idx[AJ]].C.X - FEnts[Idx[AI]].C.X,
-                  FEnts[Idx[AJ]].C.Y - FEnts[Idx[AI]].C.Y,
-                  FEnts[Idx[AJ]].C.Z - FEnts[Idx[AI]].C.Z));
+    U := Norm3(Sub3(FEnts[Idx[AJ]].C, FEnts[Idx[AI]].C));
     Wv := Norm3(Cross3(NI, U));
     A := (RI * RI - RJ * RJ + D * D) / (2 * D);
     H := Sqrt(Max(0, RI * RI - A * A));
@@ -8739,7 +8719,7 @@ var
     E := FEnts[Idx[AI]];
     Axes(E, U, V, Nrm);
     Tol := 1E-6 * (1 + E.R);
-    W := P3(LA.X - E.C.X, LA.Y - E.C.Y, LA.Z - E.C.Z);
+    W := Sub3(LA, E.C);
     Dn := Dot3(LD, Nrm);
     Off := Dot3(W, Nrm);
     if Abs(Dn) < 1E-9 then
@@ -8775,9 +8755,7 @@ var
     Axes(FEnts[Idx[AI]], UI, VI, NI);
     Axes(FEnts[Idx[AJ]], UJ, VJ, NJ);
     Result := (Abs(Abs(Dot3(NI, NJ)) - 1) < 1E-9) and
-      (Abs(Dot3(NI, P3(FEnts[Idx[AJ]].C.X - FEnts[Idx[AI]].C.X,
-                       FEnts[Idx[AJ]].C.Y - FEnts[Idx[AI]].C.Y,
-                       FEnts[Idx[AJ]].C.Z - FEnts[Idx[AI]].C.Z))) < 1E-9);
+      (Abs(Dot3(NI, Sub3(FEnts[Idx[AJ]].C, FEnts[Idx[AI]].C))) < 1E-9);
   end;
 
 begin
@@ -8815,8 +8793,7 @@ begin
     begin
       if (FEnts[G].Kind <> ekGuide) or
          (Dist(FEnts[G].A, FEnts[G].B) < 1E-9) then Continue;
-      GDir := Norm3(P3(FEnts[G].B.X - FEnts[G].A.X, FEnts[G].B.Y - FEnts[G].A.Y,
-                       FEnts[G].B.Z - FEnts[G].A.Z));
+      GDir := Norm3(Sub3(FEnts[G].B, FEnts[G].A));
       for I := 0 to ArcCount - 1 do
         GuideMeetsArc(FEnts[G].A, GDir, I);
     end;
@@ -9084,7 +9061,7 @@ begin
     D := Abs((SX - O.X) * U.Y - (SY - O.Y) * U.X) / Len;
     if D >= Best then Continue;
 
-    Q := P3(Dir.X * T, Dir.Y * T, Dir.Z * T);
+    Q := Mul3(Dir, T);
     Best := D;
     Axis := K;
     P := Q;
@@ -9279,7 +9256,7 @@ begin
     Result := Sqrt(Sqr(SX - PA.X) + Sqr(SY - PA.Y));
     Exit;
   end;
-  D := P3(E.B.X - E.A.X, E.B.Y - E.A.Y, E.B.Z - E.A.Z);
+  D := Sub3(E.B, E.A);
   L := Sqrt(Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z));
   if L < 1E-9 then Exit(1E30);
   PA := Project(V, P3(E.A.X - D.X / L * 5000, E.A.Y - D.Y / L * 5000,
@@ -9332,7 +9309,7 @@ var
     LL: Double;
   begin
     if (Dist(A, P) < TOL) or (Dist(A, Q) < TOL) then Exit(True);
-    D := P3(Q.X - P.X, Q.Y - P.Y, Q.Z - P.Z);
+    D := Sub3(Q, P);
     LL := Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z);
     if LL < 1E-18 then Exit(False);
     T := ((A.X - P.X) * D.X + (A.Y - P.Y) * D.Y + (A.Z - P.Z) * D.Z) / LL;
@@ -9342,7 +9319,7 @@ var
 
 begin
   Result := False;
-  Run := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+  Run := Sub3(B, A);
   L := Sqrt(Sqr(Run.X) + Sqr(Run.Y) + Sqr(Run.Z));
   if L < 1E-9 then Exit;
   Run := P3(Run.X / L, Run.Y / L, Run.Z / L);
@@ -9351,8 +9328,7 @@ begin
     if FEnts[I].Kind <> ekLine then Continue;
     if FEnts[I].Dim then Continue;
     if not Touches(FEnts[I].A, FEnts[I].B) then Continue;
-    E := P3(FEnts[I].B.X - FEnts[I].A.X, FEnts[I].B.Y - FEnts[I].A.Y,
-            FEnts[I].B.Z - FEnts[I].A.Z);
+    E := Sub3(FEnts[I].B, FEnts[I].A);
     L := Sqrt(Sqr(E.X) + Sqr(E.Y) + Sqr(E.Z));
     if L < 1E-9 then Continue;
     E := P3(E.X / L, E.Y / L, E.Z / L);
@@ -10126,10 +10102,10 @@ begin
       if FEnts[I].Plane = plFree then AxesFromNormal(FEnts[I].Nm, AU, AV)
       else PlaneAxes(FEnts[I].Plane, AU, AV);
       { in the arc's own plane, from its old center }
-      SU := Dot3(P3(Ts.X - FEnts[I].C.X, Ts.Y - FEnts[I].C.Y, Ts.Z - FEnts[I].C.Z), AU);
-      SV := Dot3(P3(Ts.X - FEnts[I].C.X, Ts.Y - FEnts[I].C.Y, Ts.Z - FEnts[I].C.Z), AV);
-      EU := Dot3(P3(Te.X - FEnts[I].C.X, Te.Y - FEnts[I].C.Y, Te.Z - FEnts[I].C.Z), AU);
-      EV := Dot3(P3(Te.X - FEnts[I].C.X, Te.Y - FEnts[I].C.Y, Te.Z - FEnts[I].C.Z), AV);
+      SU := Dot3(Sub3(Ts, FEnts[I].C), AU);
+      SV := Dot3(Sub3(Ts, FEnts[I].C), AV);
+      EU := Dot3(Sub3(Te, FEnts[I].C), AU);
+      EV := Dot3(Sub3(Te, FEnts[I].C), AV);
       { the circle through both ends whose center is nearest the old one:
         on the line halfway between them, square to the chord }
       MU := (SU + EU) / 2; MV := (SV + EV) / 2;
@@ -10258,8 +10234,8 @@ begin
             A := Corners[Tris[J*3]];
             B := Corners[Tris[J*3+1]];
             C := Corners[Tris[J*3+2]];
-            E1 := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
-            E2 := P3(C.X - A.X, C.Y - A.Y, C.Z - A.Z);
+            E1 := Sub3(B, A);
+            E2 := Sub3(C, A);
             Cr := Cross3(E1, E2);
             if Sqrt(Sqr(Cr.X) + Sqr(Cr.Y) + Sqr(Cr.Z)) < 1E-12 then Continue;
             { turn it so the three run anticlockwise seen from outside, the
@@ -10460,8 +10436,8 @@ begin
       A := Corners[Tris[J*3]];
       B := Corners[Tris[J*3+1]];
       C := Corners[Tris[J*3+2]];
-      E1 := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
-      E2 := P3(C.X - A.X, C.Y - A.Y, C.Z - A.Z);
+      E1 := Sub3(B, A);
+      E2 := Sub3(C, A);
       Cr := Cross3(E1, E2);
       L2 := Sqrt(Sqr(Cr.X) + Sqr(Cr.Y) + Sqr(Cr.Z));
       if L2 < 1E-12 then Continue;   { no area, nothing to print }
@@ -10473,8 +10449,8 @@ begin
         Tmp := B;
         B := C;
         C := Tmp;
-        E1 := P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
-        E2 := P3(C.X - A.X, C.Y - A.Y, C.Z - A.Z);
+        E1 := Sub3(B, A);
+        E2 := Sub3(C, A);
         Cr := Cross3(E1, E2);
         L2 := Sqrt(Sqr(Cr.X) + Sqr(Cr.Y) + Sqr(Cr.Z));
         if L2 < 1E-12 then Continue;
@@ -11752,8 +11728,8 @@ begin
             is clear }
           if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, U, DG, FEnts[I].Txt) then
           begin
-            DA := P3(FEnts[I].A.X + FEnts[I].C.X, FEnts[I].A.Y + FEnts[I].C.Y, FEnts[I].A.Z + FEnts[I].C.Z);
-            DB := P3(FEnts[I].B.X + FEnts[I].C.X, FEnts[I].B.Y + FEnts[I].C.Y, FEnts[I].B.Z + FEnts[I].C.Z);
+            DA := Add3(FEnts[I].A, FEnts[I].C);
+            DB := Add3(FEnts[I].B, FEnts[I].C);
             RunSeg(FEnts[I].A, DA, 1.0, 0.5, LabelCol, J);
             RunSeg(FEnts[I].B, DB, 1.0, 0.5, LabelCol, J);
             RunSeg(DA, DB, 1.2, 0.85, LabelCol, J);

@@ -275,7 +275,7 @@ begin
 
   if Typed then
   begin
-    D := P3(FCur.X - FP1.X, FCur.Y - FP1.Y, FCur.Z - FP1.Z);
+    D := Sub3(FCur, FP1);
     Len := Sqrt(D.X * D.X + D.Y * D.Y + D.Z * D.Z);
     if Len < 1E-9 then
     begin
@@ -701,7 +701,7 @@ var
   end;
 
 begin
-  D := P3(FCur.X - FAxisA.X, FCur.Y - FAxisA.Y, FCur.Z - FAxisA.Z);
+  D := Sub3(FCur, FAxisA);
   L := Dist(D, P3(0, 0, 0));
   if L < 1E-9 then Exit;
   D := P3(D.X / L, D.Y / L, D.Z / L);
@@ -731,7 +731,7 @@ begin
             Q.Y + FD.Doc[FFollowFace].Poly[K].Y / N,
             Q.Z + FD.Doc[FFollowFace].Poly[K].Z / N);
   { the middle of the outline, brought onto the axis }
-  Q := P3(Q.X - FAxisA.X, Q.Y - FAxisA.Y, Q.Z - FAxisA.Z);
+  Q := Sub3(Q, FAxisA);
   AP := P3(FAxisA.X + D.X * Dot3(Q, D), FAxisA.Y + D.Y * Dot3(Q, D),
            FAxisA.Z + D.Z * Dot3(Q, D));
   C.Pen.Width := 1;
@@ -3203,7 +3203,7 @@ begin
   MinU := 1E30; MaxU := -1E30; MinV := 1E30; MaxV := -1E30;
   for I := 0 to N - 1 do
   begin
-    P := P3(Poly[I].X - O.X, Poly[I].Y - O.Y, Poly[I].Z - O.Z);
+    P := Sub3(Poly[I], O);
     UV[I] := PtF(Dot3(P, AU), Dot3(P, AV));
     MinU := Min(MinU, UV[I].X); MaxU := Max(MaxU, UV[I].X);
     MinV := Min(MinV, UV[I].Y); MaxV := Max(MaxV, UV[I].Y);
@@ -3214,8 +3214,7 @@ begin
     SetLength(HUV[H], Length(FD.Doc[Face].Holes[H]));
     for I := 0 to High(HUV[H]) do
     begin
-      P := P3(FD.Doc[Face].Holes[H][I].X - O.X, FD.Doc[Face].Holes[H][I].Y - O.Y,
-              FD.Doc[Face].Holes[H][I].Z - O.Z);
+      P := Sub3(FD.Doc[Face].Holes[H][I], O);
       HUV[H][I] := PtF(Dot3(P, AU), Dot3(P, AV));
     end;
   end;
@@ -3223,7 +3222,7 @@ begin
   { the size of a screen pixel in the plane, so hatch density holds at any
     zoom }
   SA := ScreenOf(O);
-  SB := ScreenOf(P3(O.X + AU.X, O.Y + AU.Y, O.Z + AU.Z));
+  SB := ScreenOf(Add3(O, AU));
   Ppx := Sqrt(Sqr(SB.X - SA.X) + Sqr(SB.Y - SA.Y));
   if Ppx < 1E-6 then Exit;
   StepW := STEP_PX * FUIScale / Ppx;
@@ -3328,7 +3327,7 @@ begin
     C.Ellipse(Round(PA.X) - R, Round(PA.Y) - R, Round(PA.X) + R, Round(PA.Y) + R);
     Exit;
   end;
-  D := P3(E.B.X - E.A.X, E.B.Y - E.A.Y, E.B.Z - E.A.Z);
+  D := Sub3(E.B, E.A);
   L := Sqrt(Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z));
   if L < 1E-9 then Exit;
   PA := ScreenOf(P3(E.A.X - D.X / L * 5000, E.A.Y - D.Y / L * 5000,

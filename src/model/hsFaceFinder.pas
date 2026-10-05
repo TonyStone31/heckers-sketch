@@ -555,7 +555,7 @@ begin
   Result := P3(0, 0, 0);
   if N = 0 then Exit;
   for I := 0 to N - 1 do
-    Result := P3(Result.X + Loop[I].X, Result.Y + Loop[I].Y, Result.Z + Loop[I].Z);
+    Result := Add3(Result, Loop[I]);
   Result := P3(Result.X / N, Result.Y / N, Result.Z / N);
   if N < 3 then Exit;
   { the corner average is fine when it is inside, which is most of the time }

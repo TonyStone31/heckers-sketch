@@ -267,7 +267,7 @@ var
   function Off(const P: TP3): Double;
   begin
     { how far P is from the line A-B }
-    Result := Dist(P3(0, 0, 0), Cross3(P3(P.X - A.X, P.Y - A.Y, P.Z - A.Z), Dir));
+    Result := Dist(P3(0, 0, 0), Cross3(Sub3(P, A), Dir));
   end;
 
 begin
@@ -286,8 +286,8 @@ begin
       C := Zones[O].Outline[K];
       D := Zones[O].Outline[(K + 1) mod Length(Zones[O].Outline)];
       if (Off(C) > 0.05) or (Off(D) > 0.05) then Continue;
-      T0 := Dot3(P3(C.X - A.X, C.Y - A.Y, C.Z - A.Z), Dir);
-      T1 := Dot3(P3(D.X - A.X, D.Y - A.Y, D.Z - A.Z), Dir);
+      T0 := Dot3(Sub3(C, A), Dir);
+      T1 := Dot3(Sub3(D, A), Dir);
       Lo := Max(0, Min(T0, T1)); Hi := Min(L, Max(T0, T1));
       if Hi > Lo then Result := Result + (Hi - Lo);
     end;

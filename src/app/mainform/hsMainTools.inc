@@ -192,7 +192,7 @@ begin
   for K := 0 to 2 do
   begin
     AD := AxisDir(K * 2);
-    PA := ScreenOf(P3(From.X + AD.X, From.Y + AD.Y, From.Z + AD.Z));
+    PA := ScreenOf(Add3(From, AD));
     UX := PA.X - PR.X;
     UY := PA.Y - PR.Y;
     LenSq := UX * UX + UY * UY;
@@ -798,9 +798,7 @@ begin
           GUIDE_PICK_PX * FUIScale);
         if (I >= 0) and (FD.Doc[I].Kind = ekLine) and not FD.Doc[I].Dim then
         begin
-          FParDir := P3(FD.Doc[I].B.X - FD.Doc[I].A.X,
-                        FD.Doc[I].B.Y - FD.Doc[I].A.Y,
-                        FD.Doc[I].B.Z - FD.Doc[I].A.Z);
+          FParDir := Sub3(FD.Doc[I].B, FD.Doc[I].A);
           FParHas := Sqr(FParDir.X) + Sqr(FParDir.Y) + Sqr(FParDir.Z) > 1E-12;
         end;
       end
@@ -839,9 +837,7 @@ begin
           GUIDE_PICK_PX * FUIScale);
         if (I >= 0) and (FD.Doc[I].Kind = ekLine) and not FD.Doc[I].Dim then
         begin
-          FArcTanDir := P3(FD.Doc[I].B.X - FD.Doc[I].A.X,
-                           FD.Doc[I].B.Y - FD.Doc[I].A.Y,
-                           FD.Doc[I].B.Z - FD.Doc[I].A.Z);
+          FArcTanDir := Sub3(FD.Doc[I].B, FD.Doc[I].A);
           FArcTanHas := Sqr(FArcTanDir.X) + Sqr(FArcTanDir.Y) +
                         Sqr(FArcTanDir.Z) > 1E-12;
         end;
@@ -930,8 +926,7 @@ begin
             if (I >= 0) and (FD.Doc[I].Kind = ekLine) and IsProfileEdge(I) then
             begin
               DoRevolve(FD.Doc[I].A,
-                P3(FD.Doc[I].B.X - FD.Doc[I].A.X, FD.Doc[I].B.Y - FD.Doc[I].A.Y,
-                   FD.Doc[I].B.Z - FD.Doc[I].A.Z));
+                Sub3(FD.Doc[I].B, FD.Doc[I].A));
               Exit;
             end;
             if (I >= 0) and (FD.Doc[I].Kind in [ekLine, ekArc]) then
@@ -950,7 +945,7 @@ begin
             FCmdMsg := 'The second point has to be somewhere else along the axis.';
             Exit;
           end;
-          DoRevolve(FAxisA, P3(FCur.X - FAxisA.X, FCur.Y - FAxisA.Y, FCur.Z - FAxisA.Z));
+          DoRevolve(FAxisA, Sub3(FCur, FAxisA));
         end;
       end;
 
@@ -1278,7 +1273,7 @@ begin
         Ang := RotAngle;
         T := RotV(RotRefDir, FRotAxis, Ang);
         PushUndo;
-        FD.Doc.AddGuide(FP1, P3(FP1.X + T.X, FP1.Y + T.Y, FP1.Z + T.Z));
+        FD.Doc.AddGuide(FP1, Add3(FP1, T));
         RenderInk;
         RecomposeAll;
         FCmdMsg := 'Guide laid at ' + FormatAngle(RadToDeg(Ang)) + '.';
@@ -1294,7 +1289,7 @@ begin
     ptFollow:
       begin
         if FStage = 2 then
-          DoRevolve(FAxisA, P3(FCur.X - FAxisA.X, FCur.Y - FAxisA.Y, FCur.Z - FAxisA.Z));
+          DoRevolve(FAxisA, Sub3(FCur, FAxisA));
         Exit;
       end;
 
@@ -1335,7 +1330,7 @@ begin
             the edges enclose, not by a rule per case }
           { parallel and perpendicular are now measured from the piece just
             drawn (see TInferMode) }
-          FParDir := P3(T.X - FP1.X, T.Y - FP1.Y, T.Z - FP1.Z);
+          FParDir := Sub3(T, FP1);
           FParHas := Sqr(FParDir.X) + Sqr(FParDir.Y) + Sqr(FParDir.Z) > 1E-12;
           I := FaceCount;
           K := RebuildFlatFaces;

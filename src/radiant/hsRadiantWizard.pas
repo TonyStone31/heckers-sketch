@@ -1515,7 +1515,7 @@ begin
   for Z := 0 to High(FZones) do
     for I := 0 to High(FZones[Z].Outline) do
     begin
-      Mid := P3(Mid.X + FZones[Z].Outline[I].X, Mid.Y + FZones[Z].Outline[I].Y, Mid.Z + FZones[Z].Outline[I].Z);
+      Mid := Add3(Mid, FZones[Z].Outline[I]);
       Inc(N);
     end;
   if N > 0 then Mid := P3(Mid.X / N, Mid.Y / N, Mid.Z / N);
