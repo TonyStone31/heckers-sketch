@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Spin, LCLType,
-  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat, BCComboBox;
+  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat, BCComboBox, BCTrackbarUpdown;
 
 type
 
@@ -34,14 +34,14 @@ type
     cbUse: TBCComboBox;
     cbWalls: TBCComboBox;
     cbZone: TBCComboBox;
-    edAltitude: TSpinEdit;
-    edBaths: TSpinEdit;
-    edCeiling: TSpinEdit;
-    edDoors: TSpinEdit;
-    edGlycol: TSpinEdit;
-    edIndoor: TSpinEdit;
-    edOutdoor: TSpinEdit;
-    edWindows: TSpinEdit;
+    edAltitude: TBCTrackbarUpdown;
+    edBaths: TBCTrackbarUpdown;
+    edCeiling: TBCTrackbarUpdown;
+    edDoors: TBCTrackbarUpdown;
+    edGlycol: TBCTrackbarUpdown;
+    edIndoor: TBCTrackbarUpdown;
+    edOutdoor: TBCTrackbarUpdown;
+    edWindows: TBCTrackbarUpdown;
     lblAbove: TLabel;
     lblAltitude: TLabel;
     lblAltitudeFt: TLabel;
@@ -145,12 +145,7 @@ begin
   for I := 0 to ComponentCount - 1 do
   begin
     C := Components[I];
-    if C is TSpinEdit then
-    begin
-      TSpinEdit(C).Color := PixToColor(DlgTheme.Shell2);
-      TSpinEdit(C).Font.Color := PixToColor(DlgTheme.Text);
-      TSpinEdit(C).Font.Height := -13;
-    end
+    if C is TBCTrackbarUpdown then hsDialogSkin.SkinSpin(TBCTrackbarUpdown(C))
     else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
     else if C is TMemo then
     begin

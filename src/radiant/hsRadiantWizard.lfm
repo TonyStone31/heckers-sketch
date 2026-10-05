@@ -116,7 +116,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Waste on the coil'
     end
-    object edWaste: TSpinEdit
+    object edWaste: TBCTrackbarUpdown
       Left = 176
       Height = 28
       Top = 200
@@ -143,7 +143,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Most loops a manifold'
     end
-    object edMaxPorts: TSpinEdit
+    object edMaxPorts: TBCTrackbarUpdown
       Left = 176
       Height = 28
       Top = 238
@@ -162,7 +162,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Search until'
     end
-    object edGoalCover: TSpinEdit
+    object edGoalCover: TBCTrackbarUpdown
       Left = 176
       Height = 28
       Top = 276
@@ -189,7 +189,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'and the loops within'
     end
-    object edGoalEven: TSpinEdit
+    object edGoalEven: TBCTrackbarUpdown
       Left = 176
       Height = 28
       Top = 314

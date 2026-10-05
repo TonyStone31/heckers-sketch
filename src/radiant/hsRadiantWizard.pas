@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, StrUtils, Menus, Spin, BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantBusy,
-  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox;
+  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox, BCTrackbarUpdown;
 
 type
 
@@ -49,12 +49,12 @@ type
     miBringBack: TMenuItem;
     cbTube: TBCComboBox;
     edMaxLoop: TEdit;
-    edGoalCover: TSpinEdit;
-    edGoalEven: TSpinEdit;
+    edGoalCover: TBCTrackbarUpdown;
+    edGoalEven: TBCTrackbarUpdown;
     edSpacing: TEdit;
     edTag: TEdit;
-    edWaste: TSpinEdit;
-    edMaxPorts: TSpinEdit;
+    edWaste: TBCTrackbarUpdown;
+    edMaxPorts: TBCTrackbarUpdown;
     lblGoal: TLabel;
     lblGoalCover: TLabel;
     lblGoalEven: TLabel;
@@ -356,12 +356,7 @@ begin
   begin
     C := Components[I];
     if (C is TBCButton) and (C <> btnBuild) and (C <> btnCancel) then hsDialogSkin.SkinButton(TBCButton(C), bkPlain)
-    else if C is TSpinEdit then
-    begin
-      TSpinEdit(C).Color := PixToColor(DlgTheme.Shell2);
-      TSpinEdit(C).Font.Color := PixToColor(DlgTheme.Text);
-      TSpinEdit(C).Font.Height := -13;
-    end
+    else if C is TBCTrackbarUpdown then hsDialogSkin.SkinSpin(TBCTrackbarUpdown(C))
     else if C is TEdit then hsDialogSkin.SkinEdit(TEdit(C))
     else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
     else if (C is TListBox) or (C is TMemo) then
@@ -420,7 +415,7 @@ begin
       begin
         C := Components[I];
         if (C = edTag) or (C = edZoneName) or (C = cbPinManifold) then Continue;
-        if C is TSpinEdit then Ini.WriteString('radiant', C.Name, IntToStr(TSpinEdit(C).Value))
+        if C is TBCTrackbarUpdown then Ini.WriteString('radiant', C.Name, IntToStr(TBCTrackbarUpdown(C).Value))
         else if C is TEdit then Ini.WriteString('radiant', C.Name, TEdit(C).Text)
         else if C is TBCComboBox then Ini.WriteInteger('radiant', C.Name, TBCComboBox(C).ItemIndex)
         else if C is TBGRAThemeCheckBox then Ini.WriteBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);
@@ -457,8 +452,8 @@ begin
           if (C = edTag) or (C = edZoneName) or (C = cbPinManifold) then Continue;
           if not Ini.ValueExists('radiant', C.Name) then Continue;
           { a spin edit's value may have been written as text, with a decimal }
-          if C is TSpinEdit then
-            TSpinEdit(C).Value := Round(StrToFloatDef(Ini.ReadString('radiant', C.Name, ''), TSpinEdit(C).Value))
+          if C is TBCTrackbarUpdown then
+            TBCTrackbarUpdown(C).Value := Round(StrToFloatDef(Ini.ReadString('radiant', C.Name, ''), TBCTrackbarUpdown(C).Value))
           else if C is TEdit then TEdit(C).Text := Ini.ReadString('radiant', C.Name, TEdit(C).Text)
           else if C is TBCComboBox then
             TBCComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('radiant', C.Name, 0), 0, TBCComboBox(C).Items.Count - 1)

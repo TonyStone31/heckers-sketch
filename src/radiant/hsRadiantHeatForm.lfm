@@ -44,12 +44,13 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Outdoor design'
     end
-    object edOutdoor: TSpinEdit
+    object edOutdoor: TBCTrackbarUpdown
       Left = 150
       Height = 28
       Top = 100
       Width = 70
       MaxValue = 70
+      AllowNegativeValues = True
       MinValue = -60
       Increment = 1
       TabOrder = 1
@@ -72,7 +73,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Indoor'
     end
-    object edIndoor: TSpinEdit
+    object edIndoor: TBCTrackbarUpdown
       Left = 150
       Height = 28
       Top = 138
@@ -127,7 +128,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Glycol'
     end
-    object edGlycol: TSpinEdit
+    object edGlycol: TBCTrackbarUpdown
       Left = 150
       Height = 28
       Top = 214
@@ -155,7 +156,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Altitude'
     end
-    object edAltitude: TSpinEdit
+    object edAltitude: TBCTrackbarUpdown
       Left = 150
       Height = 28
       Top = 252
@@ -201,7 +202,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Bathrooms'
     end
-    object edBaths: TSpinEdit
+    object edBaths: TBCTrackbarUpdown
       Left = 150
       Height = 28
       Top = 328
@@ -452,7 +453,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Ceiling height'
     end
-    object edCeiling: TSpinEdit
+    object edCeiling: TBCTrackbarUpdown
       Left = 126
       Height = 28
       Top = 352
@@ -480,7 +481,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Windows'
     end
-    object edWindows: TSpinEdit
+    object edWindows: TBCTrackbarUpdown
       Left = 126
       Height = 28
       Top = 386
@@ -508,7 +509,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'Overhead doors'
     end
-    object edDoors: TSpinEdit
+    object edDoors: TBCTrackbarUpdown
       Left = 126
       Height = 28
       Top = 420

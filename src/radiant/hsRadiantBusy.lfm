@@ -51,7 +51,7 @@ object RadiantBusyForm: TRadiantBusyForm
     Width = 44
     Caption = 'Goals:'
   end
-  object edBusyCover: TSpinEdit
+  object edBusyCover: TBCTrackbarUpdown
     Left = 76
     Height = 28
     Top = 120
@@ -68,7 +68,7 @@ object RadiantBusyForm: TRadiantBusyForm
     Width = 150
     Caption = '% covered, loops within'
   end
-  object edBusyEven: TSpinEdit
+  object edBusyEven: TBCTrackbarUpdown
     Left = 300
     Height = 28
     Top = 120

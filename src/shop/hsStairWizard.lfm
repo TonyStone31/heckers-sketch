@@ -135,7 +135,7 @@ object StairForm: TStairForm
     AutoSize = False
     Caption = 'Risers'
   end
-  object edCount: TSpinEdit
+  object edCount: TBCTrackbarUpdown
     Left = 120
     Height = 28
     Top = 296

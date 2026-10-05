@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -100,6 +100,7 @@ procedure SkinLabel(L: TBCLabel; Dim: Boolean = False; FontH: Integer = 0;
 procedure SkinEdit(E: TEdit);
 procedure SkinCheck(C: TBGRAThemeControl);
 procedure SkinCombo(C: TBCComboBox);
+procedure SkinSpin(C: TBCTrackbarUpdown);
 procedure SkinTrack(T: TTrackBar);
 { Themes every control on a form by kind, colors only; sizes and fonts stay
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
@@ -380,6 +381,26 @@ begin
   C.Button.OnAfterRenderBCButton := @CornerFix.AfterRender;
 end;
 
+{ a number box with its up and down buttons, in the field's colors }
+procedure SkinSpin(C: TBCTrackbarUpdown);
+begin
+  C.Background.Style := bbsColor;
+  C.Background.Color := FieldColor;
+  C.ButtonBackground.Style := bbsColor;
+  C.ButtonBackground.Color := PixToColor(DlgTheme.PanelHi);
+  C.ButtonDownBackground.Style := bbsColor;
+  C.ButtonDownBackground.Color := PixToColor(DlgTheme.Accent);
+  C.Border.Style := bboSolid;
+  C.Border.Color := PixToColor(MixPix(DlgTheme.Shell1, DlgTheme.TextDim, 0.6));
+  C.Border.Width := 1;
+  C.Rounding.RoundX := 6;
+  C.Rounding.RoundY := 6;
+  C.ArrowColor := PixToColor(DlgTheme.Text);
+  C.Font.Color := PixToColor(DlgTheme.Text);
+  C.Font.Height := -13;
+  C.HasTrackBar := False;
+end;
+
 procedure SkinCheck(C: TBGRAThemeControl);
 begin
   C.Theme := BoxTheme;
@@ -428,6 +449,8 @@ begin
     end
     else if C is TBCComboBox then
       SkinCombo(TBCComboBox(C))
+    else if C is TBCTrackbarUpdown then
+      SkinSpin(TBCTrackbarUpdown(C))
     else if C is TCustomEdit then
     begin
       TWinControl(C).Color := FieldColor;

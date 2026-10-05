@@ -12,7 +12,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, ExtCtrls, Graphics, Spin,
-  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin, BCComboBox;
+  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin, BCComboBox, BCTrackbarUpdown;
 
 type
   { draws a layout the search has found into the preview: the one whose
@@ -29,8 +29,8 @@ type
     cbBusyHooks: TBGRAThemeCheckBox;
     lblBusyLess: TLabel;
     lblBusyHooks: TLabel;
-    edBusyCover: TSpinEdit;
-    edBusyEven: TSpinEdit;
+    edBusyCover: TBCTrackbarUpdown;
+    edBusyEven: TBCTrackbarUpdown;
     lblBusyCover: TLabel;
     lblBusyEven: TLabel;
     lblDetail: TLabel;
