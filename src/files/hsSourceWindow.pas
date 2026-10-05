@@ -55,7 +55,7 @@ type
     edtFind: TEdit;
     Editor: TSynEdit;
     pnlTop: TPanel;
-    Status: TStatusBar;
+    Status: TLabel;
     tmrFollow: TTimer;
     pmEditor: TPopupMenu;
     miCenter: TMenuItem;
@@ -529,10 +529,10 @@ end;
 procedure TSourceForm.TellPicked;
 begin
   if Length(FPicked) = 0 then
-    Status.SimpleText := Format('  %s  %d lines, %d things.  Click a line to pick it; ' +
+    Status.Caption := Format('  %s  %d lines, %d things.  Click a line to pick it; ' +
       'Ctrl+click a name to go to it.', [FWhat, FAll.Count, Length(FFirst)])
   else
-    Status.SimpleText := Format('  %s  %d lines, %d things.  %d picked.',
+    Status.Caption := Format('  %s  %d lines, %d things.  %d picked.',
       [FWhat, FAll.Count, Length(FFirst), Length(FPicked)]);
 end;
 
@@ -681,7 +681,7 @@ begin
   while (B <= Length(Line)) and (Line[B] <> '''') do Inc(B);
   F := FindJig(Copy(Line, A + 1, B - A - 1));
   if F = '' then
-    Status.SimpleText := '  There is no jig called "' + Copy(Line, A + 1, B - A - 1) + '" in ' + JigsDir
+    Status.Caption := '  There is no jig called "' + Copy(Line, A + 1, B - A - 1) + '" in ' + JigsDir
   else
     OpenDocument(F);
 end;
@@ -699,7 +699,7 @@ begin
     if Back then Editor.CaretXY := Point(1, Editor.Lines.Count)
     else Editor.CaretXY := Point(1, 1);
     if Editor.SearchReplace(edtFind.Text, '', Opt) = 0 then
-      Status.SimpleText := '  "' + edtFind.Text + '" is not in it.';
+      Status.Caption := '  "' + edtFind.Text + '" is not in it.';
   end;
 end;
 

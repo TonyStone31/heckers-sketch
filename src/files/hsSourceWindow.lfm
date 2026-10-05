@@ -186,12 +186,15 @@ object SourceForm: TSourceForm
       OnClick = btnRevertClick
     end
   end
-  object Status: TStatusBar
+  object Status: TLabel
     Left = 0
-    Height = 17
-    Top = 846
+    Height = 20
+    Top = 843
     Width = 1202
-    Panels = <>
+    Align = alBottom
+    AutoSize = False
+    Layout = tlCenter
+    Tag = 1
   end
   object pmEditor: TPopupMenu
     OnPopup = pmEditorPopup
