@@ -23,7 +23,7 @@ object SourceForm: TSourceForm
     ClientHeight = 38
     ClientWidth = 1202
     TabOrder = 0
-    object edtFind: TEdit
+    object edtFind: TInkEdit
       Left = 12
       Height = 29
       Top = 6

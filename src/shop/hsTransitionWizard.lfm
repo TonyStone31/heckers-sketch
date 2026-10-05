@@ -41,7 +41,7 @@ object TransitionForm: TTransitionForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object edEntryW: TEdit
+  object edEntryW: TInkEdit
     Left = 150
     Height = 28
     Top = 80
@@ -57,7 +57,7 @@ object TransitionForm: TTransitionForm
     Width = 12
     Caption = 'x'
   end
-  object edEntryH: TEdit
+  object edEntryH: TInkEdit
     Left = 244
     Height = 28
     Top = 80
@@ -85,7 +85,7 @@ object TransitionForm: TTransitionForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object edExitW: TEdit
+  object edExitW: TInkEdit
     Left = 150
     Height = 28
     Top = 116
@@ -101,7 +101,7 @@ object TransitionForm: TTransitionForm
     Width = 12
     Caption = 'x'
   end
-  object edExitH: TEdit
+  object edExitH: TInkEdit
     Left = 244
     Height = 28
     Top = 116
@@ -119,7 +119,7 @@ object TransitionForm: TTransitionForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object edLen: TEdit
+  object edLen: TInkEdit
     Left = 150
     Height = 28
     Top = 152
@@ -182,7 +182,7 @@ object TransitionForm: TTransitionForm
       OnChange = AnyChange
     end
   end
-  object edSideAmount: TEdit
+  object edSideAmount: TInkEdit
     Left = 244
     Height = 28
     Top = 258
@@ -267,7 +267,7 @@ object TransitionForm: TTransitionForm
       OnChange = AnyChange
     end
   end
-  object edHeightAmount: TEdit
+  object edHeightAmount: TInkEdit
     Left = 244
     Height = 28
     Top = 470
@@ -336,13 +336,13 @@ object TransitionForm: TTransitionForm
     OnChange = EndKindChange
     TabOrder = 12
   end
-  object edEntryEndAmt: TEdit
+  object edEntryEndAmt: TInkEdit
     Left = 358
     Height = 28
     Top = 560
     Width = 52
-    OnChange = AnyChange
     TabOrder = 13
+    OnChange = AnyChange
   end
   object lblEndUnit1: TLabel
     Left = 414
@@ -367,13 +367,13 @@ object TransitionForm: TTransitionForm
     OnChange = EndKindChange
     TabOrder = 14
   end
-  object edExitEndAmt: TEdit
+  object edExitEndAmt: TInkEdit
     Left = 358
     Height = 28
     Top = 594
     Width = 52
-    OnChange = AnyChange
     TabOrder = 15
+    OnChange = AnyChange
   end
   object lblEndUnit2: TLabel
     Left = 414
@@ -446,13 +446,13 @@ object TransitionForm: TTransitionForm
     Width = 30
     Caption = 'Tag'
   end
-  object edTag: TEdit
+  object edTag: TInkEdit
     Left = 480
     Height = 28
     Top = 488
     Width = 300
-    OnChange = AnyChange
     TabOrder = 18
+    OnChange = AnyChange
   end
   object lblTagHint: TLabel
     Tag = 1
@@ -577,15 +577,15 @@ object TransitionForm: TTransitionForm
       OnChange = AnyChange
     end
   end
-  object edAngle: TEdit
+  object edAngle: TInkEdit
     Left = 332
     Height = 28
     Top = 180
     Width = 60
-    OnChange = AnyChange
     TabOrder = 23
     Text = '30'
     Visible = False
+    OnChange = AnyChange
   end
   object lblDeg: TLabel
     Left = 396
@@ -656,15 +656,15 @@ object TransitionForm: TTransitionForm
     Caption = 'Throat radius'
     Visible = False
   end
-  object edThroat: TEdit
+  object edThroat: TInkEdit
     Left = 170
     Height = 28
     Top = 290
     Width = 80
-    OnChange = AnyChange
     TabOrder = 25
     Text = '4'
     Visible = False
+    OnChange = AnyChange
   end
   object lblThroatHint: TLabel
     Tag = 1
@@ -694,25 +694,25 @@ object TransitionForm: TTransitionForm
     Caption = 'Legs, entry / exit'
     Visible = False
   end
-  object edLeg0: TEdit
+  object edLeg0: TInkEdit
     Left = 170
     Height = 28
     Top = 366
     Width = 70
-    OnChange = AnyChange
     TabOrder = 27
     Text = '2'
     Visible = False
+    OnChange = AnyChange
   end
-  object edLeg1: TEdit
+  object edLeg1: TInkEdit
     Left = 250
     Height = 28
     Top = 366
     Width = 70
-    OnChange = AnyChange
     TabOrder = 28
     Text = '2'
     Visible = False
+    OnChange = AnyChange
   end
   object lblLegHint: TLabel
     Tag = 1
@@ -733,15 +733,15 @@ object TransitionForm: TTransitionForm
     Caption = 'Branch opening'
     Visible = False
   end
-  object edBW: TEdit
+  object edBW: TInkEdit
     Left = 170
     Height = 28
     Top = 210
     Width = 70
-    OnChange = AnyChange
     TabOrder = 29
     Text = '12'
     Visible = False
+    OnChange = AnyChange
   end
   object lblBX: TLabel
     Left = 246
@@ -751,15 +751,15 @@ object TransitionForm: TTransitionForm
     Caption = 'x'
     Visible = False
   end
-  object edBH: TEdit
+  object edBH: TInkEdit
     Left = 260
     Height = 28
     Top = 210
     Width = 70
-    OnChange = AnyChange
     TabOrder = 30
     Text = '10'
     Visible = False
+    OnChange = AnyChange
   end
   object lblBHint: TLabel
     Tag = 1
@@ -834,14 +834,14 @@ object TransitionForm: TTransitionForm
     Hint = 'blank is centered along the run'
     Visible = False
   end
-  object edBFrom: TEdit
+  object edBFrom: TInkEdit
     Left = 200
     Height = 28
     Top = 310
     Width = 80
-    OnChange = AnyChange
     TabOrder = 32
     Visible = False
+    OnChange = AnyChange
   end
   object lblBUp: TLabel
     Left = 24
@@ -851,14 +851,14 @@ object TransitionForm: TTransitionForm
     Caption = 'Up from the bottom'
     Visible = False
   end
-  object edBUp: TEdit
+  object edBUp: TInkEdit
     Left = 200
     Height = 28
     Top = 344
     Width = 80
-    OnChange = AnyChange
     TabOrder = 33
     Visible = False
+    OnChange = AnyChange
   end
   object lblBUpHint: TLabel
     Tag = 1
@@ -879,15 +879,15 @@ object TransitionForm: TTransitionForm
     Caption = 'Branch length'
     Visible = False
   end
-  object edBLen: TEdit
+  object edBLen: TInkEdit
     Left = 200
     Height = 28
     Top = 378
     Width = 80
-    OnChange = AnyChange
     TabOrder = 34
     Text = '8'
     Visible = False
+    OnChange = AnyChange
   end
   object lblBranchEnd: TLabel
     Left = 24
@@ -906,14 +906,14 @@ object TransitionForm: TTransitionForm
     OnChange = EndKindChange
     TabOrder = 35
   end
-  object edBranchEndAmt: TEdit
+  object edBranchEndAmt: TInkEdit
     Left = 358
     Height = 28
     Top = 628
     Width = 52
-    OnChange = AnyChange
     TabOrder = 36
     Visible = False
+    OnChange = AnyChange
   end
   object lblEndUnit3: TLabel
     Left = 414

@@ -48,7 +48,7 @@ object TapeWizard: TTapeWizard
     Width = 720
     OnPaint = PicPaint
   end
-  object edA: TEdit
+  object edA: TInkEdit
     Left = 32
     Height = 28
     Top = 144
@@ -64,7 +64,7 @@ object TapeWizard: TTapeWizard
     Caption = 'to the bottom'
     OnClick = EdgeClick
   end
-  object edB: TEdit
+  object edB: TInkEdit
     Left = 658
     Height = 28
     Top = 144

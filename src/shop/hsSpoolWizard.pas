@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, LCLIntf, LCLType, Types, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsPaths, hsDrawing,
-  hsPipe, hsPreview, hsDialogSkin, BCComboBox;
+  hsPipe, hsPreview, hsDialogSkin, BCComboBox, InkEdit, InkMemo;
 
 type
   TSpoolForm = class(TForm)
@@ -34,8 +34,8 @@ type
     cbSize: TBCComboBox;
     cbFinish: TBCComboBox;
     lblFinish: TLabel;
-    edLen: TEdit;
-    edTag: TEdit;
+    edLen: TInkEdit;
+    edTag: TInkEdit;
     lblEnd0: TLabel;
     lblEnd1: TLabel;
     lblHint: TLabel;
@@ -45,7 +45,7 @@ type
     lblStatus: TLabel;
     lblTag: TLabel;
     lblTitle: TLabel;
-    memTicket: TMemo;
+    memTicket: TInkMemo;
     pb3D: TPaintBox;
     pbSketch: TPaintBox;
     pcViews: TPanel;
@@ -267,9 +267,9 @@ var
 begin
   Read(S);
   Err := SpoolProblem(S);
-  if Length(S.Legs) = 0 then memTicket.Text := Err
-  else if Err = '' then memTicket.Text := SpoolTicket(S)
-  else memTicket.Text := Err + LineEnding + LineEnding + SpoolTicket(S);
+  if Length(S.Legs) = 0 then memTicket.Lines.Text := Err
+  else if Err = '' then memTicket.Lines.Text := SpoolTicket(S)
+  else memTicket.Lines.Text := Err + LineEnding + LineEnding + SpoolTicket(S);
   btnBuild.Enabled := Err = '';
   { a sketch with lengths still to come can still go to the office }
   btnEmail.Enabled := Length(S.Legs) > 0;
@@ -674,7 +674,7 @@ var
 begin
   Read(S);
   MainForm.ReportFromDialog('Fitter''s scratchpad', SpoolTicket(S) + LineEnding +
-    'problem shown: ' + memTicket.Text);
+    'problem shown: ' + memTicket.Lines.Text);
 end;
 
 function TSpoolForm.ExportFiles(out Dir: string; out Files: TStringArray): Boolean;

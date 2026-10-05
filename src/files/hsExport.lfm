@@ -200,14 +200,14 @@ object ExportDlg: TExportDlg
       TabOrder = 4
       OnChange = SizeChanged
     end
-    object edW: TEdit
+    object edW: TInkEdit
       Left = 14
       Height = 26
       Top = 148
       Width = 100
       TabOrder = 5
     end
-    object edH: TEdit
+    object edH: TInkEdit
       Left = 146
       Height = 26
       Top = 148
@@ -406,7 +406,7 @@ object ExportDlg: TExportDlg
       Caption = 'Save it as'
       FontEx.Height = -12
     end
-    object edPath: TEdit
+    object edPath: TInkEdit
       Left = 14
       Height = 28
       Top = 32

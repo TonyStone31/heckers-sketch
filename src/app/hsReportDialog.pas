@@ -14,12 +14,12 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, StdCtrls, ExtCtrls, LCLType,
-  BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin;
+  BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin, InkCodeMemo;
 
 type
   TReportDialog = class(TForm)
     lblSay: TLabel;
-    memNote: TMemo;
+    memNote: TInkCodeMemo;
     cbDrawing: TBGRAThemeCheckBox;
     lblFine: TLabel;
     imgShot: TImage;

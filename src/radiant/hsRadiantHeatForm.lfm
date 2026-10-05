@@ -534,19 +534,17 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'sq ft'
     end
-    object memResult: TMemo
+    object memResult: TInkMemo
       Font.Height = -11
       ParentFont = False
       Left = 16
       Height = 200
       Top = 460
       Width = 290
-      Font.Height = -11
       Font.Name = 'monospace'
-      ParentFont = False
-      ReadOnly = True
-      ScrollBars = ssAutoVertical
       TabOrder = 22
+      TextFormat = itfPlain
+      WordWrap = True
     end
   end
 end

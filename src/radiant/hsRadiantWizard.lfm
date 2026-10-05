@@ -66,7 +66,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Spacing, on center'
     end
-    object edSpacing: TEdit
+    object edSpacing: TInkEdit
       Left = 176
       Height = 28
       Top = 124
@@ -91,7 +91,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Longest loop'
     end
-    object edMaxLoop: TEdit
+    object edMaxLoop: TInkEdit
       Left = 176
       Height = 28
       Top = 162
@@ -306,7 +306,7 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = 'Job name'
     end
-    object edTag: TEdit
+    object edTag: TInkEdit
       Left = 100
       Height = 28
       Top = 578
@@ -468,7 +468,7 @@ object RadiantForm: TRadiantForm
           Width = 40
           Caption = 'Name'
         end
-        object edZoneName: TEdit
+        object edZoneName: TInkEdit
           Left = 56
           Height = 28
           Top = 6
@@ -567,7 +567,7 @@ object RadiantForm: TRadiantForm
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object memTicket: TMemo
+        object memTicket: TInkMemo
           Left = 8
           Height = 298
           Top = 416
@@ -576,9 +576,9 @@ object RadiantForm: TRadiantForm
           Font.Height = -11
           Font.Name = 'monospace'
           ParentFont = False
-          ReadOnly = True
-          ScrollBars = ssAutoVertical
           TabOrder = 4
+          TextFormat = itfPlain
+          WordWrap = True
         end
       end
     end

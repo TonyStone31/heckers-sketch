@@ -11,17 +11,17 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
-  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsDrawing, hsFittings, hsDialogSkin;
+  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsDrawing, hsFittings, hsDialogSkin, InkEdit;
 
 type
   TFieldElbowForm = class(TForm)
     btnCancel: TBCButton;
     btnOK: TBCButton;
-    edAngle: TEdit;
-    edFwd: TEdit;
-    edFwd2: TEdit;
-    edOver: TEdit;
-    edOver2: TEdit;
+    edAngle: TInkEdit;
+    edFwd: TInkEdit;
+    edFwd2: TInkEdit;
+    edOver: TInkEdit;
+    edOver2: TInkEdit;
     lblAngle: TLabel;
     lblDeg: TLabel;
     lblFwd: TLabel;

@@ -11,7 +11,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, LCLIntf, IniFiles, LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsPaths, hsDrawing,
-  hsFittings, hsFieldElbow, hsTapeWizard, hsDialogSkin, BCComboBox;
+  hsFittings, hsFieldElbow, hsTapeWizard, hsDialogSkin, BCComboBox, InkEdit;
 
 type
   TTransitionForm = class(TForm)
@@ -21,8 +21,8 @@ type
     cbEntryEnd: TBCComboBox;
     cbExitEnd: TBCComboBox;
     cbDims: TBGRAThemeCheckBox;
-    edEntryEndAmt: TEdit;
-    edExitEndAmt: TEdit;
+    edEntryEndAmt: TInkEdit;
+    edExitEndAmt: TInkEdit;
     lblEnds: TLabel;
     lblEntryEnd: TLabel;
     lblExitEnd: TLabel;
@@ -34,49 +34,49 @@ type
     tsIso: TPage;
     lblTag: TLabel;
     lblTagHint: TLabel;
-    edTag: TEdit;
+    edTag: TInkEdit;
     btnEmail: TBCButton;
     btnFiles: TBCButton;
     rgFitting: TPanel;
     rgAngle: TPanel;
-    edAngle: TEdit;
+    edAngle: TInkEdit;
     lblDeg: TLabel;
     rgTurn: TPanel;
     lblThroat: TLabel;
-    edThroat: TEdit;
+    edThroat: TInkEdit;
     lblThroatHint: TLabel;
     cbSquareHeel: TBGRAThemeCheckBox;
     lblLegs: TLabel;
-    edLeg0: TEdit;
-    edLeg1: TEdit;
+    edLeg0: TInkEdit;
+    edLeg1: TInkEdit;
     lblLegHint: TLabel;
     lblBranch: TLabel;
-    edBW: TEdit;
+    edBW: TInkEdit;
     lblBX: TLabel;
-    edBH: TEdit;
+    edBH: TInkEdit;
     lblBHint: TLabel;
     rgBranchOn: TPanel;
     lblBFrom: TLabel;
-    edBFrom: TEdit;
+    edBFrom: TInkEdit;
     lblBUp: TLabel;
-    edBUp: TEdit;
+    edBUp: TInkEdit;
     lblBUpHint: TLabel;
     lblBLen: TLabel;
-    edBLen: TEdit;
+    edBLen: TInkEdit;
     lblBranchEnd: TLabel;
     cbBranchEnd: TBCComboBox;
-    edBranchEndAmt: TEdit;
+    edBranchEndAmt: TInkEdit;
     lblEndUnit3: TLabel;
     btnField: TBCButton;
     lblExitHint: TLabel;
     lblBFromHint: TLabel;
-    edEntryW: TEdit;
-    edEntryH: TEdit;
-    edExitW: TEdit;
-    edExitH: TEdit;
-    edLen: TEdit;
-    edSideAmount: TEdit;
-    edHeightAmount: TEdit;
+    edEntryW: TInkEdit;
+    edEntryH: TInkEdit;
+    edExitW: TInkEdit;
+    edExitH: TInkEdit;
+    edLen: TInkEdit;
+    edSideAmount: TInkEdit;
+    edHeightAmount: TInkEdit;
     lblTitle: TLabel;
     lblUnits: TLabel;
     lblEntry: TLabel;
@@ -500,7 +500,7 @@ end;
   1 3/8"), which can be typed over. }
 procedure TTransitionForm.EndKindChange(Sender: TObject);
 var
-  Ed: TEdit;
+  Ed: TInkEdit;
   K: TDuctEnd;
 begin
   if Sender = cbEntryEnd then Ed := edEntryEndAmt
@@ -783,7 +783,7 @@ begin
       begin
         C := Components[I];
         if C = edTag then Continue;
-        if C is TEdit then Ini.WriteString('fitting', C.Name, TEdit(C).Text)
+        if C is TInkEdit then Ini.WriteString('fitting', C.Name, TInkEdit(C).Text)
         else if C is TBCComboBox then Ini.WriteInteger('fitting', C.Name, TBCComboBox(C).ItemIndex)
         else if IsRadioPanel(C) then Ini.WriteInteger('fitting', C.Name, RadioIndex(TWinControl(C)))
         else if C is TBGRAThemeCheckBox then Ini.WriteBool('fitting', C.Name, TBGRAThemeCheckBox(C).Checked);
@@ -811,7 +811,7 @@ begin
         C := Components[I];
         if C = edTag then Continue;
         if not Ini.ValueExists('fitting', C.Name) then Continue;
-        if C is TEdit then TEdit(C).Text := Ini.ReadString('fitting', C.Name, TEdit(C).Text)
+        if C is TInkEdit then TInkEdit(C).Text := Ini.ReadString('fitting', C.Name, TInkEdit(C).Text)
         else if C is TBCComboBox then
           TBCComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, TBCComboBox(C).Items.Count - 1)
         else if IsRadioPanel(C) then

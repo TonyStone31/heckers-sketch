@@ -22,7 +22,7 @@ object ReportDialog: TReportDialog
     Constraints.MinHeight = 62
     WordWrap = True
   end
-  object memNote: TMemo
+  object memNote: TInkCodeMemo
     AnchorSideTop.Control = lblSay
     AnchorSideTop.Side = asrBottom
     Left = 12
@@ -31,8 +31,9 @@ object ReportDialog: TReportDialog
     Width = 576
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 6
-    ScrollBars = ssAutoVertical
     TabOrder = 0
+    WantReturns = True
+    WantTabs = False
     WordWrap = True
   end
   object cbDrawing: TBGRAThemeCheckBox

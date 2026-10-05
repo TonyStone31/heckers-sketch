@@ -40,7 +40,7 @@ object LongTextForm: TLongTextForm
       OnClick = btnCloseClick
     end
   end
-  object memText: TMemo
+  object memText: TInkMemo
     Left = 0
     Height = 592
     Top = 0
@@ -48,9 +48,8 @@ object LongTextForm: TLongTextForm
     Align = alClient
     Font.Height = -13
     ParentFont = False
-    ReadOnly = True
-    ScrollBars = ssBoth
     TabOrder = 0
+    TextFormat = itfPlain
     WordWrap = False
   end
 end

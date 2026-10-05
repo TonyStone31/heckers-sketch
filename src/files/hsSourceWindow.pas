@@ -16,7 +16,7 @@ uses
   SynGutterLineNumber, SynEditMarkupHighAll, SynEditMarkupWordGroup, SynEditMouseCmds, LCLIntf,
   SynEditMiscProcs, LazSynEditText, SynEditFoldedView,
   BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsHeckHighlight, hsJigRun, hsHeckSample, hsHeckComplete,
-  hsHeckWriter, StrUtils, hsDialogSkin;
+  hsHeckWriter, StrUtils, hsDialogSkin, InkEdit;
 
 type
   TSourceAskState = procedure(out DocSeq, PickSeq: Int64) of object;
@@ -52,7 +52,7 @@ type
     lblApply: TLabel;
     pnlApply: TPanel;
     btnUnfold: TBCButton;
-    edtFind: TEdit;
+    edtFind: TInkEdit;
     Editor: TSynEdit;
     pnlTop: TPanel;
     Status: TLabel;
@@ -1258,7 +1258,7 @@ begin
   { The buttons and find box use the dialog theme (ThemeChrome); the labels
     beside them follow the page. }
   for I := 0 to pnlTop.ControlCount - 1 do
-    if not (pnlTop.Controls[I] is TBCButton) and not (pnlTop.Controls[I] is TEdit) then
+    if not (pnlTop.Controls[I] is TBCButton) and not (pnlTop.Controls[I] is TInkEdit) then
       pnlTop.Controls[I].Font.Color := Fore;
   Status.Color := Back;
   Status.Font.Color := Fore;

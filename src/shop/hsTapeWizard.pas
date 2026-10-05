@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Types, Forms, Controls, StdCtrls, Graphics, ExtCtrls,
-  LCLType, BCButton, hsDrawing, hsFittings, hsDialogSkin;
+  LCLType, BCButton, hsDrawing, hsFittings, hsDialogSkin, InkEdit;
 
 type
   TTapeWizard = class(TForm)
@@ -20,9 +20,9 @@ type
     btnRun: TBCButton;
     pbPic: TPaintBox;
     { the two readings and the edge each was taken to, on the picture }
-    edA: TEdit;
+    edA: TInkEdit;
     btnEdgeA: TBCButton;
-    edB: TEdit;
+    edB: TInkEdit;
     btnEdgeB: TBCButton;
     btnRef: TBCButton;
     lblResult: TLabel;

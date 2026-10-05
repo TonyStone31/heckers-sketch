@@ -11,7 +11,7 @@ unit hsPostcard;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Dialogs, LCLType, BCButton;
+  Classes, SysUtils, Forms, Controls, StdCtrls, Dialogs, LCLType, BCButton, InkMemo, InkCodeMemo;
 
 type
 
@@ -21,9 +21,9 @@ type
     lblHead: TLabel;
     lblWhy: TLabel;
     lblWhat: TLabel;
-    memText: TMemo;
+    memText: TInkMemo;
     lblNote: TLabel;
-    memNote: TMemo;
+    memNote: TInkCodeMemo;
     lblHonest: TLabel;
     lblStage: TLabel;
     btnSave: TBCButton;
@@ -189,9 +189,9 @@ procedure THelloForm.Refresh_;
 var
   Top_: Integer;
 begin
-  Top_ := memText.VertScrollBar.Position;
+  Top_ := memText.ScrollY;
   memText.Lines.Text := PostcardText(FVersion, memNote.Lines.Text);
-  memText.VertScrollBar.Position := Top_;
+  memText.ScrollTo(Top_);
 end;
 
 procedure THelloForm.Stage(const S: string);

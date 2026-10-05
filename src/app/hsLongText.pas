@@ -12,11 +12,11 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, Graphics, StdCtrls, ExtCtrls,
-  LCLType, Clipbrd, BCButton, hsDialogSkin;
+  LCLType, Clipbrd, BCButton, hsDialogSkin, InkMemo;
 
 type
   TLongTextForm = class(TForm)
-    memText: TMemo;
+    memText: TInkMemo;
     pnlBar: TPanel;
     btnCopy: TBCButton;
     btnClose: TBCButton;

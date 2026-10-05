@@ -49,14 +49,14 @@ object FieldElbowForm: TFieldElbowForm
     Width = 100
     Caption = 'Straight ahead'
   end
-  object edFwd: TEdit
+  object edFwd: TInkEdit
     Left = 130
     Height = 28
     Top = 176
     Width = 70
-    OnChange = AnyChange
     TabOrder = 0
     Text = '30'
+    OnChange = AnyChange
   end
   object lblOver: TLabel
     Left = 214
@@ -65,14 +65,14 @@ object FieldElbowForm: TFieldElbowForm
     Width = 130
     Caption = 'Across, to the turn'
   end
-  object edOver: TEdit
+  object edOver: TInkEdit
     Left = 354
     Height = 28
     Top = 176
     Width = 70
-    OnChange = AnyChange
     TabOrder = 1
     Text = '20'
+    OnChange = AnyChange
   end
   object rgHow: TPanel
     Left = 24
@@ -117,14 +117,14 @@ object FieldElbowForm: TFieldElbowForm
     Width = 160
     Caption = 'Angle off straight ahead'
   end
-  object edAngle: TEdit
+  object edAngle: TInkEdit
     Left = 200
     Height = 28
     Top = 292
     Width = 70
-    OnChange = AnyChange
     TabOrder = 3
     Text = '90'
+    OnChange = AnyChange
   end
   object lblDeg: TLabel
     Left = 276
@@ -140,14 +140,14 @@ object FieldElbowForm: TFieldElbowForm
     Width = 160
     Caption = 'Second point, ahead'
   end
-  object edFwd2: TEdit
+  object edFwd2: TInkEdit
     Left = 200
     Height = 28
     Top = 328
     Width = 70
-    OnChange = AnyChange
     TabOrder = 4
     Text = '30'
+    OnChange = AnyChange
   end
   object lblOver2: TLabel
     Left = 276
@@ -156,14 +156,14 @@ object FieldElbowForm: TFieldElbowForm
     Width = 60
     Caption = 'across'
   end
-  object edOver2: TEdit
+  object edOver2: TInkEdit
     Left = 354
     Height = 28
     Top = 328
     Width = 70
-    OnChange = AnyChange
     TabOrder = 5
     Text = '40'
+    OnChange = AnyChange
   end
   object lblResult: TLabel
     Left = 24

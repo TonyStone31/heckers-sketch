@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox, hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox, InkEdit, InkMemo, InkRichEdit, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -505,10 +505,12 @@ begin
       SkinProgress(TBGRAFlashProgressBar(C))
     else if C is TInkListBox then
       SkinList(TInkListBox(C))
-    else if C is TCustomEdit then
+    else if (C is TInkEdit) or (C is TInkMemo) or (C is TInkRichEdit) then
     begin
       TWinControl(C).Color := FieldColor;
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
+      { with no size of its own the control would use the page's larger one }
+      if TWinControl(C).Font.Height = 0 then TWinControl(C).Font.Height := -13;
     end
     else if C is TBGRAThemeControl then
       SkinCheck(TBGRAThemeControl(C))

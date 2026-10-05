@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Types, Spin, LCLType,
-  Dialogs, BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsStairs, BCComboBox, BCTrackbarUpdown;
+  Dialogs, BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsStairs, BCComboBox, BCTrackbarUpdown, InkEdit, InkMemo;
 
 type
   { on two picked lines; typed and placed afterward by a click; or at a
@@ -47,11 +47,11 @@ type
     cbRound: TBGRAThemeCheckBox;
     cbUse: TBCComboBox;
     edCount: TBCTrackbarUpdown;
-    edNosing: TEdit;
-    edRise: TEdit;
-    edRun: TEdit;
-    edThickness: TEdit;
-    edWidth: TEdit;
+    edNosing: TInkEdit;
+    edRise: TInkEdit;
+    edRun: TInkEdit;
+    edThickness: TInkEdit;
+    edWidth: TInkEdit;
     lblClosed: TLabel;
     lblCount: TLabel;
     lblFrom: TLabel;
@@ -70,7 +70,7 @@ type
     lblTitle: TLabel;
     lblUse: TLabel;
     lblWidth: TLabel;
-    memAdvice: TMemo;
+    memAdvice: TInkMemo;
     pbSide: TPaintBox;
     sdStringers: TSaveDialog;
     procedure BuildClick(Sender: TObject);

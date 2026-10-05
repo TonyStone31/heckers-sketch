@@ -46,7 +46,7 @@ object HelloForm: THelloForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object memText: TMemo
+  object memText: TInkMemo
     Left = 24
     Height = 190
     Top = 174
@@ -55,9 +55,8 @@ object HelloForm: THelloForm
     Font.Name = 'Monospace'
     Font.Pitch = fpFixed
     ParentFont = False
-    ReadOnly = True
-    ScrollBars = ssAutoBoth
     TabOrder = 0
+    TextFormat = itfPlain
     WordWrap = False
   end
   object lblNote: TLabel
@@ -70,15 +69,17 @@ object HelloForm: THelloForm
     Caption = 'What do you want to use this for?  It would shape where the work goes.  Anything at all, or nothing:'
     WordWrap = True
   end
-  object memNote: TMemo
+  object memNote: TInkCodeMemo
     Left = 24
     Height = 80
     Top = 396
     Width = 592
     Anchors = [akTop, akLeft, akRight]
-    MaxLength = 2000
-    ScrollBars = ssAutoVertical
     TabOrder = 1
+    WantReturns = True
+    WantTabs = False
+    WordWrap = True
+    MaxLength = 2000
     OnChange = memNoteChange
   end
   object lblHonest: TLabel

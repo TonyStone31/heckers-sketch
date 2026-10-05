@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Spin, LCLType,
-  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat, BCComboBox, BCTrackbarUpdown;
+  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat, BCComboBox, BCTrackbarUpdown, InkMemo;
 
 type
 
@@ -72,7 +72,7 @@ type
     lblWindows: TLabel;
     lblWindowsSq: TLabel;
     lblZoneHead: TLabel;
-    memResult: TMemo;
+    memResult: TInkMemo;
     pbPlan: TPaintBox;
     pnJob: TBCPanel;
     pnPlan: TBCPanel;

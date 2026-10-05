@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, StrUtils, Menus, Spin, BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantBusy,
-  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox, BCTrackbarUpdown, InkListBox;
+  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox, BCTrackbarUpdown, InkListBox, InkEdit, InkMemo;
 
 type
 
@@ -33,7 +33,7 @@ type
     lblFoundHead: TLabel;
     lblZoneHead: TLabel;
     lblZoneName: TLabel;
-    edZoneName: TEdit;
+    edZoneName: TInkEdit;
     cbPinManifold: TBGRAThemeCheckBox;
     lblZonesHint: TLabel;
     lbSolutions: TInkListBox;
@@ -48,11 +48,11 @@ type
     miNotZone: TMenuItem;
     miBringBack: TMenuItem;
     cbTube: TBCComboBox;
-    edMaxLoop: TEdit;
+    edMaxLoop: TInkEdit;
     edGoalCover: TBCTrackbarUpdown;
     edGoalEven: TBCTrackbarUpdown;
-    edSpacing: TEdit;
-    edTag: TEdit;
+    edSpacing: TInkEdit;
+    edTag: TInkEdit;
     edWaste: TBCTrackbarUpdown;
     edMaxPorts: TBCTrackbarUpdown;
     lblGoal: TLabel;
@@ -74,7 +74,7 @@ type
     lblWaste: TLabel;
     lblMaxPorts: TLabel;
     lblWastePct: TLabel;
-    memTicket: TMemo;
+    memTicket: TInkMemo;
     miClearAll: TMenuItem;
     miClearZone: TMenuItem;
     miRotate: TMenuItem;
@@ -377,7 +377,7 @@ begin
         C := Components[I];
         if (C = edTag) or (C = edZoneName) or (C = cbPinManifold) then Continue;
         if C is TBCTrackbarUpdown then Ini.WriteString('radiant', C.Name, IntToStr(TBCTrackbarUpdown(C).Value))
-        else if C is TEdit then Ini.WriteString('radiant', C.Name, TEdit(C).Text)
+        else if C is TInkEdit then Ini.WriteString('radiant', C.Name, TInkEdit(C).Text)
         else if C is TBCComboBox then Ini.WriteInteger('radiant', C.Name, TBCComboBox(C).ItemIndex)
         else if C is TBGRAThemeCheckBox then Ini.WriteBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);
       end;
@@ -415,7 +415,7 @@ begin
           { a spin edit's value may have been written as text, with a decimal }
           if C is TBCTrackbarUpdown then
             TBCTrackbarUpdown(C).Value := Round(StrToFloatDef(Ini.ReadString('radiant', C.Name, ''), TBCTrackbarUpdown(C).Value))
-          else if C is TEdit then TEdit(C).Text := Ini.ReadString('radiant', C.Name, TEdit(C).Text)
+          else if C is TInkEdit then TInkEdit(C).Text := Ini.ReadString('radiant', C.Name, TInkEdit(C).Text)
           else if C is TBCComboBox then
             TBCComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('radiant', C.Name, 0), 0, TBCComboBox(C).Items.Count - 1)
           else if C is TBGRAThemeCheckBox then TBGRAThemeCheckBox(C).Checked := Ini.ReadBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);

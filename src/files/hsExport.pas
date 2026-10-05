@@ -15,7 +15,7 @@ uses
   Classes, SysUtils, Math, Types, Graphics, Controls, Forms, StdCtrls,
   ExtCtrls, ComCtrls, Dialogs, LCLType,
   BCButton, BCPanel, BCLabel,
-  hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder, BCComboBox, BCFluentSlider, BGRATheme, BGRAThemeCheckBox;
+  hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder, BCComboBox, BCFluentSlider, BGRATheme, BGRAThemeCheckBox, InkEdit;
 
 type
   TExportKind = (exPng, exJpeg, exWebP, exSvg, exDxfView, exDxfModel, exStl,
@@ -76,9 +76,9 @@ type
     lblNote: TLabel;
     lblSize: TBCLabel;
     cbSize: TBCComboBox;
-    edW: TEdit;
+    edW: TInkEdit;
     lblBy: TBCLabel;
-    edH: TEdit;
+    edH: TInkEdit;
     cbPaper: TBCComboBox;
     cbOrientation: TBCComboBox;
     cbScale: TBCComboBox;
@@ -100,7 +100,7 @@ type
     { where it goes }
     pnlFoot: TBCPanel;
     lblSave: TBCLabel;
-    edPath: TEdit;
+    edPath: TInkEdit;
     lblTellBad: TLabel;
     btnSay: TBCButton;
     btnBrowse: TBCButton;
