@@ -8,14 +8,14 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, ComCtrls,
-  LCLType, BCButton, hsUpdater, hsNet, hsDialogSkin;
+  LCLType, BCButton, hsUpdater, hsNet, hsDialogSkin, BGRAFlashProgressBar;
 
 type
   TUpdateForm = class(TForm)
     btnClose: TBCButton;
     lblDetail: TLabel;
     lblStage: TLabel;
-    pbProgress: TProgressBar;
+    pbProgress: TBGRAFlashProgressBar;
     tmrStart: TTimer;
     procedure btnCloseClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -58,7 +58,7 @@ procedure TUpdateForm.SetStage(const Stage, Detail: string;
 begin
   lblStage.Caption := Stage;
   lblDetail.Caption := Detail;
-  pbProgress.Position := ProgressValue;
+  pbProgress.Value := ProgressValue;
   Application.ProcessMessages;
 end;
 
@@ -84,7 +84,7 @@ begin
     Percent := Round(BytesReceived * 100.0 / TotalBytes);
     if Percent < 0 then Percent := 0;
     if Percent > 100 then Percent := 100;
-    pbProgress.Position := Percent;
+    pbProgress.Value := Percent;
     lblDetail.Caption := ByteSize(BytesReceived) + ' of ' + ByteSize(TotalBytes) +
       '  (' + IntToStr(Percent) + '%)';
   end
@@ -105,7 +105,7 @@ begin
   FBusy := False;
   lblStage.Caption := 'Update stopped';
   lblDetail.Caption := Msg;
-  pbProgress.Position := 0;
+  pbProgress.Value := 0;
   btnClose.Visible := True;
   Application.ProcessMessages;
 end;
@@ -216,7 +216,7 @@ begin
   btnClose.Visible := False;
   lblStage.Caption := 'Preparing update';
   lblDetail.Caption := 'Getting ready to download ' + Info.Tag + '...';
-  pbProgress.Position := 0;
+  pbProgress.Value := 0;
   ShowModal;
   Result := FSucceeded;
 end;

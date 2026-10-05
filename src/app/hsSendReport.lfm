@@ -33,14 +33,13 @@ object SendForm: TSendForm
     AutoSize = False
     WordWrap = True
   end
-  object pbProgress: TProgressBar
+  object pbProgress: TBGRAFlashProgressBar
     Left = 28
     Height = 22
     Top = 104
     Width = 864
     Anchors = [akTop, akLeft, akRight]
-    Max = 100
-    TabOrder = 0
+    MaxValue = 100
   end
   object Page: TInkPage
     Left = 28

@@ -35,14 +35,13 @@ object RadiantBusyForm: TRadiantBusyForm
     AutoSize = False
     WordWrap = True
   end
-  object pbProgress: TProgressBar
+  object pbProgress: TBGRAFlashProgressBar
     Left = 24
     Height = 22
     Top = 88
     Width = 652
     Anchors = [akTop, akLeft, akRight]
-    Max = 100
-    TabOrder = 0
+    MaxValue = 100
   end
   object lblGoals: TLabel
     Left = 24
@@ -160,7 +159,8 @@ object RadiantBusyForm: TRadiantBusyForm
     WordWrap = True
     Caption = 'Found so far, best first - apart is how far the shortest loop falls short of the longest, easy how friendly it is to lay (of 100).  Click one to keep it; double-click to stop and keep it.'
   end
-  object lbFound: TListBox
+  object lbFound: TInkListBox
+    HTMLEnabled = False
     Left = 24
     Height = 178
     Top = 224

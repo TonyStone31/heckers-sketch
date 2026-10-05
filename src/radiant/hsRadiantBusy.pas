@@ -12,7 +12,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, ExtCtrls, Graphics, Spin,
-  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin, BCComboBox, BCTrackbarUpdown;
+  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, InkListBox;
 
 type
   { draws a layout the search has found into the preview: the one whose
@@ -40,8 +40,8 @@ type
     lblPreview: TLabel;
     pbPreview: TPaintBox;
     lblStage: TLabel;
-    lbFound: TListBox;
-    pbProgress: TProgressBar;
+    lbFound: TInkListBox;
+    pbProgress: TBGRAFlashProgressBar;
     tmrStart: TTimer;
     procedure btnStopClick(Sender: TObject);
     procedure btnStopAllClick(Sender: TObject);
@@ -150,7 +150,7 @@ procedure TRadiantBusyForm.Stage(const AStage, ADetail: string; Percent: Integer
 begin
   lblStage.Caption := AStage;
   lblDetail.Caption := ADetail;
-  pbProgress.Position := Percent;
+  pbProgress.Value := Percent;
   Repaint;
   Application.ProcessMessages;
 end;

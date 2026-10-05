@@ -254,13 +254,13 @@ object ExportDlg: TExportDlg
       TabOrder = 9
       OnChange = SizeChanged
     end
-    object btnTransp: TBCButton
+    object cbTransp: TBGRAThemeCheckBox
       Left = 14
       Height = 26
       Top = 212
       Width = 232
-      Caption = ''
-      OnClick = Ticked
+      Caption = 'Nothing behind it'
+      OnChange = Ticked
     end
     object lblQual: TBCLabel
       Tag = 1
@@ -271,32 +271,33 @@ object ExportDlg: TExportDlg
       Caption = 'Quality 88'
       FontEx.Height = -12
     end
-    object tbQual: TTrackBar
+    object tbQual: TBCFluentSlider
       Left = 10
       Height = 34
       Top = 232
       Width = 240
-      Max = 100
-      Min = 20
-      OnChange = SizeChanged
-      Position = 88
-      TabOrder = 10
+      MinValue = 20
+      MaxValue = 100
+      Value = 88
+      OnChangeValue = SizeChanged
     end
-    object btnLoop: TBCButton
+    object cbLoop: TBGRAThemeCheckBox
       Left = 14
       Height = 26
       Top = 208
       Width = 232
-      Caption = ''
-      OnClick = Ticked
+      Caption = 'Go round for ever'
+      Checked = True
+      OnChange = Ticked
     end
-    object btnBounce: TBCButton
+    object cbBounce: TBGRAThemeCheckBox
       Left = 14
       Height = 26
       Top = 236
       Width = 232
-      Caption = ''
-      OnClick = Ticked
+      Caption = 'Come back to the start'
+      Checked = True
+      OnChange = Ticked
     end
     object cbSecs: TBCComboBox
       Left = 14
@@ -332,21 +333,23 @@ object ExportDlg: TExportDlg
       Caption = 'Play it'
       OnClick = DoPlay
     end
-    object btnMid: TBCButton
+    object cbMid: TBGRAThemeCheckBox
       Left = 14
       Height = 26
       Top = 116
       Width = 232
-      Caption = ''
-      OnClick = Ticked
+      Caption = 'Center it on the origin'
+      Checked = True
+      OnChange = Ticked
     end
-    object btnAxes: TBCButton
+    object cbAxes: TBGRAThemeCheckBox
       Left = 14
       Height = 26
       Top = 180
       Width = 232
-      Caption = ''
-      OnClick = Ticked
+      Caption = 'Show the axes'
+      Checked = True
+      OnChange = Ticked
     end
     object lblClip: TLabel
       Tag = 1

@@ -36,13 +36,12 @@ object UpdateForm: TUpdateForm
     Caption = 'Getting ready...'
     WordWrap = True
   end
-  object pbProgress: TProgressBar
+  object pbProgress: TBGRAFlashProgressBar
     Left = 28
     Height = 22
     Top = 108
     Width = 464
-    Max = 100
-    TabOrder = 0
+    MaxValue = 100
   end
   object btnClose: TBCButton
     Tag = 1

@@ -15,7 +15,7 @@ uses
   Classes, SysUtils, Math, Types, Graphics, Controls, Forms, StdCtrls,
   ExtCtrls, ComCtrls, Dialogs, LCLType,
   BCButton, BCPanel, BCLabel,
-  hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder, BCComboBox;
+  hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder, BCComboBox, BCFluentSlider, BGRATheme, BGRAThemeCheckBox;
 
 type
   TExportKind = (exPng, exJpeg, exWebP, exSvg, exDxfView, exDxfModel, exStl,
@@ -82,19 +82,19 @@ type
     cbPaper: TBCComboBox;
     cbOrientation: TBCComboBox;
     cbScale: TBCComboBox;
-    btnTransp: TBCButton;
+    cbTransp: TBGRAThemeCheckBox;
     lblQual: TBCLabel;
-    tbQual: TTrackBar;
-    btnLoop: TBCButton;
-    btnBounce: TBCButton;
+    tbQual: TBCFluentSlider;
+    cbLoop: TBGRAThemeCheckBox;
+    cbBounce: TBGRAThemeCheckBox;
     { How long the film runs, which sets its speed. }
     cbSecs: TBCComboBox;
     btnRec: TBCButton;
     { two lines, so the note about a closing clip is never cut off }
     lblClip: TLabel;
     btnPlay: TBCButton;
-    btnMid: TBCButton;
-    btnAxes: TBCButton;
+    cbMid: TBGRAThemeCheckBox;
+    cbAxes: TBGRAThemeCheckBox;
     lblShot: TLabel;
     cbDxfWhat: TBCComboBox;
     { where it goes }
@@ -171,7 +171,6 @@ type
     { the format buttons, indexed by format for PickKind and ShowOptions }
     FKindBtn: array[TExportKind] of TBCButton;
     FHeadDrag: hsDialogSkin.TFormDrag;
-    FTranspOn, FLoopOn, FAxesOn, FMidOn, FBounceOn: Boolean;
     FCam: TCamPath;
     FPrevS: TArtSurface;
     FBusy: Boolean;
@@ -185,7 +184,6 @@ type
     procedure FilmSays(const S: string);
     procedure FilmStep(Done, Total: Integer; const What: string);
     procedure Working(On_: Boolean);
-    procedure ShowTick(B: TBCButton; On_: Boolean; const Cap: string);
     function Ext: string;
     { The full path to offer: the folder this kind went to last time, plus the
       name in the box now. }
@@ -278,16 +276,6 @@ begin
   { The film is whatever was recorded.  A move that does not end where it
     began would jump at each loop, so Bounce walks it back to the start within
     the same running time.  A move that already closes does not get the tick. }
-  FTranspOn := False;
-  FLoopOn := True;
-  FBounceOn := True;
-  FMidOn := True;
-  FAxesOn := True;
-  ShowTick(btnTransp, FTranspOn, 'Nothing behind it');
-  ShowTick(btnLoop, FLoopOn, 'Go round for ever');
-  ShowTick(btnBounce, FBounceOn, 'Come back to the start');
-  ShowTick(btnMid, FMidOn, 'Center it on the origin');
-  ShowTick(btnAxes, FAxesOn, 'Show the axes');
   FKind := exPng;
 end;
 
@@ -468,14 +456,14 @@ begin
   edW.Visible := Raster and (cbSize.ItemIndex = SIZE_MINE);
   edH.Visible := edW.Visible;
   lblBy.Visible := edW.Visible;
-  btnTransp.Visible := FKind = exPng;
+  cbTransp.Visible := FKind = exPng;
   lblQual.Visible := FKind = exJpeg;
   tbQual.Visible := FKind = exJpeg;
 
-  btnLoop.Visible := Anim;
+  cbLoop.Visible := Anim;
   cbSecs.Visible := Anim and (Length(FCam) >= 2);
   { bounce only matters for a clip that does not already close }
-  btnBounce.Visible := Anim and (Length(FCam) >= 2) and not CamPathCloses(FCam);
+  cbBounce.Visible := Anim and (Length(FCam) >= 2) and not CamPathCloses(FCam);
   btnPlay.Visible := Anim and (Length(FCam) >= 2);
   lblShot.Visible := Raster;
   if Anim then
@@ -490,13 +478,13 @@ begin
         [CamPathLength(FCam)]);
   end;
   lblClip.Visible := Anim;
-  btnAxes.Visible := Raster or (FKind = exPdf);
-  if FKind = exPdf then btnAxes.Top := 224 else btnAxes.Top := 180;
+  cbAxes.Visible := Raster or (FKind = exPdf);
+  if FKind = exPdf then cbAxes.Top := 224 else cbAxes.Top := 180;
   btnRec.Visible := Anim;
   cbDxfWhat.Visible := FKind in [exDxfView, exDxfModel];
   { The origin matters to anything importing the model (a slicer, a CAD
     program, a Revit family), so offer the tick for every whole-model format. }
-  btnMid.Visible := (FKind in [exStl, exScad]) or
+  cbMid.Visible := (FKind in [exStl, exScad]) or
                   ((FKind = exDxfModel) and (cbDxfWhat.ItemIndex = 1));
 
   if not Anim then
@@ -548,51 +536,10 @@ begin
   pbPrev.Invalidate;
 end;
 
-{ A tick drawn as a button, because a themed check box draws its caption
-  in the system text color and ignores ours. }
-procedure TExportDlg.ShowTick(B: TBCButton; On_: Boolean; const Cap: string);
-begin
-  if On_ then
-  begin
-    B.Caption := '[x]  ' + Cap;
-    hsDialogSkin.SkinButton(B, bkGo);
-  end
-  else
-  begin
-    B.Caption := '[  ]  ' + Cap;
-    hsDialogSkin.SkinButton(B, bkPlain);
-  end;
-end;
-
 { Shared by the ticks and the length combo, which only needs the options
   and the preview updated. }
 procedure TExportDlg.Ticked(Sender: TObject);
 begin
-  if Sender = btnTransp then
-  begin
-    FTranspOn := not FTranspOn;
-    ShowTick(btnTransp, FTranspOn, 'Nothing behind it');
-  end
-  else if Sender = btnLoop then
-  begin
-    FLoopOn := not FLoopOn;
-    ShowTick(btnLoop, FLoopOn, 'Go round for ever');
-  end
-  else if Sender = btnAxes then
-  begin
-    FAxesOn := not FAxesOn;
-    ShowTick(btnAxes, FAxesOn, 'Show the axes');
-  end
-  else if Sender = btnMid then
-  begin
-    FMidOn := not FMidOn;
-    ShowTick(btnMid, FMidOn, 'Center it on the origin');
-  end
-  else if Sender = btnBounce then
-  begin
-    FBounceOn := not FBounceOn;
-    ShowTick(btnBounce, FBounceOn, 'Come back to the start');
-  end;
   pbPrev.Invalidate;
   ShowOptions;
 end;
@@ -600,7 +547,7 @@ end;
 procedure TExportDlg.SizeChanged(Sender: TObject);
 begin
   if Sender = tbQual then
-    lblQual.Caption := Format('Quality %d', [tbQual.Position]);
+    lblQual.Caption := Format('Quality %d', [tbQual.Value]);
   ShowOptions;
 end;
 
@@ -710,7 +657,7 @@ begin
   { With nothing recorded the preview just holds the shot still; it never
     wanders around the model on its own. }
   if FPlaying and (Length(FCam) >= 2) then V := Tween(FPlayT) else V := FView;
-  if (FKind = exPng) and FTranspOn then Bg := Pix(255, 255, 255, 0)
+  if (FKind = exPng) and cbTransp.Checked then Bg := Pix(255, 255, 255, 0)
   else Bg := Pix(255, 255, 255);
   { Keep one surface instead of making a new one every repaint; during
     playback this runs 25 times a second. }
@@ -722,7 +669,7 @@ begin
   if FKind = exPdf then V := PdfPreviewView
   else V := Fitted(V, FSrcW, FSrcH, pbPrev.Width, pbPrev.Height);
   ShootInto(S, FDoc, V,
-    FUnits, FFont, FLabelCol, FEdgeW, Bg, FDragging or FPlaying, FAxesOn);
+    FUnits, FFont, FLabelCol, FEdgeW, Bg, FDragging or FPlaying, cbAxes.Checked);
   pbPrev.Canvas.Draw(0, 0, S.AsBitmap);
 end;
 
@@ -862,8 +809,8 @@ begin
     'what it said: %s' + LineEnding +
     'path=%s',
     [KIND_NAME[FKind], FStage, W, H, FSrcW, FSrcH, cbSize.ItemIndex,
-     FILM_FPS, BoolToStr(FLoopOn, 'yes', 'no'),
-     CamPathLength(FCam), BoolToStr(FAxesOn, 'yes', 'no'),
+     FILM_FPS, BoolToStr(cbLoop.Checked, 'yes', 'no'),
+     CamPathLength(FCam), BoolToStr(cbAxes.Checked, 'yes', 'no'),
      FMsg, ExtractFileName(edPath.Text)]);
   ModalResult := mrCancel;
   { The report needs a screenshot and this window is in front, so close it
@@ -896,7 +843,7 @@ begin
   Hide;
   try
     if RecordMove(FDoc, FView, FUnits, FFont, FLabelCol, FEdgeW,
-         FSrcW, FSrcH, FAxesOn, FPivot, Got) then
+         FSrcW, FSrcH, cbAxes.Checked, FPivot, Got) then
     begin
       FCam := Got;
       FPlayT := 0;
@@ -991,7 +938,7 @@ begin
         PdfSheetSize(cbPaper.ItemIndex, cbOrientation.ItemIndex = 1, PW, PH);
         FStage := 'writing the vector PDF';
         SaveDrawingPDF(FDoc, FView, FSrcW, FSrcH, FUnits, FEdgeW,
-          Fn, PW, PH, PdfDenominator, FAxesOn);
+          Fn, PW, PH, PdfDenominator, cbAxes.Checked);
         FMsg := Format('Wrote %s - one vector page, scale 1:%g.',
           [ExtractFileName(Fn), PdfDenominator]);
       end;
@@ -1014,7 +961,7 @@ begin
         FStage := 'writing the DXF';
         L := TStringList.Create;
         try
-          FDoc.WriteDXF(L, FView, FUnits, cbDxfWhat.ItemIndex = 1, FMidOn);
+          FDoc.WriteDXF(L, FView, FUnits, cbDxfWhat.ItemIndex = 1, cbMid.Checked);
           L.SaveToFile(Fn);
         finally
           L.Free;
@@ -1027,7 +974,7 @@ begin
         FStage := 'writing the OpenSCAD script';
         L := TStringList.Create;
         try
-          N := FDoc.WriteSCAD(L, FUnits, NTri, Shut, FMidOn);
+          N := FDoc.WriteSCAD(L, FUnits, NTri, Shut, cbMid.Checked);
           L.SaveToFile(Fn);
         finally
           L.Free;
@@ -1053,7 +1000,7 @@ begin
         FStage := 'writing the STL';
         FS := TFileStream.Create(Fn, fmCreate);
         try
-          NTri := FDoc.WriteSTL(FS, FUnits, Shut, FMidOn);
+          NTri := FDoc.WriteSTL(FS, FUnits, Shut, cbMid.Checked);
         finally
           FS.Free;
         end;
@@ -1081,8 +1028,8 @@ begin
         if not OutSize(W, H) then raise Exception.Create('that size will not do');
         FStage := Format('drawing the frames at %dx%d', [W, H]);
         N := SavePathFilm(FDoc, FCam, FSrcW, FSrcH, W, H, FUnits, FFont,
-          FLabelCol, FEdgeW, FILM_FPS, FLoopOn, FAxesOn, Fn,
-          FBounceOn, FilmSeconds);
+          FLabelCol, FEdgeW, FILM_FPS, cbLoop.Checked, cbAxes.Checked, Fn,
+          cbBounce.Checked, FilmSeconds);
         FMsg := Format('Wrote %s - %d frames, %d x %d.',
           [ExtractFileName(Fn), N, W, H]);
       end;
@@ -1093,8 +1040,8 @@ begin
       if not OutSize(W, H) then raise Exception.Create('that size will not do');
       FStage := Format('drawing the picture at %dx%d', [W, H]);
       SaveStill(FDoc, FView, FSrcW, FSrcH, W, H, FUnits, FFont, FLabelCol,
-        FEdgeW, Fn, FKind = exJpeg, tbQual.Position,
-        (FKind = exPng) and FTranspOn, FAxesOn);
+        FEdgeW, Fn, FKind = exJpeg, tbQual.Value,
+        (FKind = exPng) and cbTransp.Checked, cbAxes.Checked);
       FMsg := Format('Wrote %s - %d x %d.', [ExtractFileName(Fn), W, H]);
     end;
   end;

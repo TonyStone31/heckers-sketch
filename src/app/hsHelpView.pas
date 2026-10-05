@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, StdCtrls, ComCtrls, ExtCtrls,
-  LCLType, LCLIntf, BCPanel, BCButton, InkCSS, InkPage;
+  LCLType, LCLIntf, BCPanel, BCButton, InkCSS, InkPage, BGRAFlashProgressBar;
 
 type
   { The page theme switch, same three as the website.  Auto follows the
@@ -31,8 +31,8 @@ type
     lblNotice: TLabel;
     lblEmptyTitle: TLabel;
     lblEmptyText: TLabel;
-    pbNotice: TProgressBar;
-    pbEmpty: TProgressBar;
+    pbNotice: TBGRAFlashProgressBar;
+    pbEmpty: TBGRAFlashProgressBar;
     pnlBar: TBCPanel;
     pnlNotice: TBCPanel;
     pnlEmpty: TBCPanel;
@@ -157,6 +157,8 @@ begin
   hsDialogSkin.SkinPanel(pnlBar, False, 0);
   hsDialogSkin.SkinPanel(pnlNotice, False, 0);
   hsDialogSkin.SkinPanel(pnlEmpty, False, 0);
+  hsDialogSkin.SkinProgress(pbNotice);
+  hsDialogSkin.SkinProgress(pbEmpty);
   hsDialogSkin.SkinButton(btnBack, bkPlain);
   hsDialogSkin.SkinButton(btnForward, bkPlain);
   hsDialogSkin.SkinButton(btnContents, bkPlain);
@@ -371,8 +373,8 @@ begin
   end;
   if FFetching then Exit;
   FFetching := True;
-  pbNotice.Position := 0;
-  pbEmpty.Position := 0;
+  pbNotice.Value := 0;
+  pbEmpty.Value := 0;
   if LocalHelpIndex = '' then
     ShowEmpty('Downloading the help pages...')
   else
@@ -392,8 +394,8 @@ begin
     Pct := Round(BytesReceived * 100.0 / TotalBytes)
   else
     Pct := (BytesReceived div (256 * 1024)) mod 100;
-  pbNotice.Position := Pct;
-  pbEmpty.Position := Pct;
+  pbNotice.Value := Pct;
+  pbEmpty.Value := Pct;
 end;
 
 procedure THelpForm.FetchDone(Sender: TObject);

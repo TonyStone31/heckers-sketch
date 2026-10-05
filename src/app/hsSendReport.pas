@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, Graphics,
-  InkPage, InkMarkdown, LCLType, BCButton, hsDialogSkin;
+  InkPage, InkMarkdown, LCLType, BCButton, hsDialogSkin, BGRAFlashProgressBar;
 
 type
   { progress of one file of the report }
@@ -26,7 +26,7 @@ type
   TSendForm = class(TForm)
     lblStage: TLabel;
     lblDetail: TLabel;
-    pbProgress: TProgressBar;
+    pbProgress: TBGRAFlashProgressBar;
     Page: TInkPage;
     btnClose: TBCButton;
     procedure btnCloseClick(Sender: TObject);
@@ -281,7 +281,7 @@ procedure TSendForm.Stage(const AStage, ADetail: string; Percent: Integer;
 begin
   lblStage.Caption := AStage;
   lblDetail.Caption := ADetail;
-  pbProgress.Position := Percent;
+  pbProgress.Value := Percent;
   Application.ProcessMessages;
   PauseFor(Hold);
 end;
@@ -295,7 +295,7 @@ begin
   FBanner := Msg;
   FBannerSub := Detail;
   FClosing := ClosingHTML;
-  if OK then pbProgress.Position := 100 else pbProgress.Position := 0;
+  if OK then pbProgress.Value := 100 else pbProgress.Value := 0;
   { the banner says it now, so the page takes over the labels' and bar's
     room }
   Page.SetBounds(Page.Left, lblStage.Top, Page.Width,

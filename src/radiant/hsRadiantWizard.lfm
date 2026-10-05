@@ -537,7 +537,8 @@ object RadiantForm: TRadiantForm
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object lbSolutions: TListBox
+        object lbSolutions: TInkListBox
+          HTMLEnabled = False
           Left = 8
           Height = 150
           Top = 238

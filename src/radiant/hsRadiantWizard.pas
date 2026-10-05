@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
   ComCtrls, Dialogs, StrUtils, Menus, Spin, BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantBusy,
-  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox, BCTrackbarUpdown;
+  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin, BCComboBox, BCTrackbarUpdown, InkListBox;
 
 type
 
@@ -36,7 +36,7 @@ type
     edZoneName: TEdit;
     cbPinManifold: TBGRAThemeCheckBox;
     lblZonesHint: TLabel;
-    lbSolutions: TListBox;
+    lbSolutions: TInkListBox;
     pnZone: TPanel;
     cbLabels: TBGRAThemeCheckBox;
     cbHookPairs: TBGRAThemeCheckBox;
@@ -359,7 +359,8 @@ begin
     else if C is TBCTrackbarUpdown then hsDialogSkin.SkinSpin(TBCTrackbarUpdown(C))
     else if C is TEdit then hsDialogSkin.SkinEdit(TEdit(C))
     else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
-    else if (C is TListBox) or (C is TMemo) then
+    else if C is TInkListBox then hsDialogSkin.SkinList(TInkListBox(C))
+    else if C is TMemo then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);

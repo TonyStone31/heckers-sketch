@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -101,7 +101,9 @@ procedure SkinEdit(E: TEdit);
 procedure SkinCheck(C: TBGRAThemeControl);
 procedure SkinCombo(C: TBCComboBox);
 procedure SkinSpin(C: TBCTrackbarUpdown);
-procedure SkinTrack(T: TTrackBar);
+procedure SkinProgress(P: TBGRAFlashProgressBar);
+procedure SkinList(L: TInkListBox);
+procedure SkinSlider(T: TBCFluentSlider);
 { Themes every control on a form by kind, colors only; sizes and fonts stay
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
   panel Tag 1: dim text or raised panel.  Call from OnCreate, after UseTheme. }
@@ -401,6 +403,27 @@ begin
   C.HasTrackBar := False;
 end;
 
+{ a plain accent bar on the field color; the library's default is a
+  randomized, animated one }
+procedure SkinProgress(P: TBGRAFlashProgressBar);
+begin
+  P.BackgroundRandomize := False;
+  P.ShowBarAnimation := False;
+  P.ShowDividers := False;
+  P.Caption := '';
+  P.Color := PixToColor(DlgTheme.Shell1);
+  P.BackgroundColor := FieldColor;
+  P.BarColor := PixToColor(DlgTheme.Accent);
+end;
+
+procedure SkinList(L: TInkListBox);
+begin
+  L.Color := FieldColor;
+  L.Font.Color := PixToColor(DlgTheme.Text);
+  L.SelectionColor := PixToColor(DlgTheme.Accent);
+  L.SelectionTextColor := PixToColor(OnPix(DlgTheme.Accent));
+end;
+
 procedure SkinCheck(C: TBGRAThemeControl);
 begin
   C.Theme := BoxTheme;
@@ -408,12 +431,10 @@ begin
     from here }
   if C.Hint <> '' then C.ShowHint := True;
 end;
-procedure SkinTrack(T: TTrackBar);
+procedure SkinSlider(T: TBCFluentSlider);
 begin
-  T.Color := PixToColor(DlgTheme.Panel);
-  T.ParentColor := False;
-  T.ShowSelRange := False;
-  T.TickStyle := tsNone;
+  T.LineColor := PixToColor(DlgTheme.Accent);
+  T.LineBkgColor := PixToColor(MixPix(DlgTheme.Shell1, DlgTheme.TextDim, 0.5));
 end;
 
 procedure ThemeForm(F: TForm);
@@ -451,6 +472,10 @@ begin
       SkinCombo(TBCComboBox(C))
     else if C is TBCTrackbarUpdown then
       SkinSpin(TBCTrackbarUpdown(C))
+    else if C is TBGRAFlashProgressBar then
+      SkinProgress(TBGRAFlashProgressBar(C))
+    else if C is TInkListBox then
+      SkinList(TInkListBox(C))
     else if C is TCustomEdit then
     begin
       TWinControl(C).Color := FieldColor;
@@ -458,8 +483,8 @@ begin
     end
     else if C is TBGRAThemeControl then
       SkinCheck(TBGRAThemeControl(C))
-    else if C is TTrackBar then
-      SkinTrack(TTrackBar(C))
+    else if C is TBCFluentSlider then
+      SkinSlider(TBCFluentSlider(C))
     else if (C is TCustomPanel) or (C is TNotebook) or (C is TPage) then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell1);
