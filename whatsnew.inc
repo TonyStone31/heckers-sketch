@@ -13,7 +13,7 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
-    '## Next release' + LineEnding +
+    '## v2026.10.05.2' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +
     '' + LineEnding +
@@ -34,6 +34,7 @@ const
     '' + LineEnding +
     '- The number boxes in the radiant and stair windows had huge text.' + LineEnding +
     '- A click on a radiant layout in a list no longer opens it for editing.' + LineEnding +
+    '- The command bar''s cursor sat a space away from the last letter typed.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.05.1' + LineEnding +
     '' + LineEnding +
