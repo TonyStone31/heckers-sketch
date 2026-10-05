@@ -1022,6 +1022,8 @@ begin
   if FStage = 0 then FPlaneFromFace := False;
   if (FStage = 0) and not FPlaneHeld and (FD.View = vkOrbit) then
     FD.Plane := plXY;
+  if (FStage = 0) and (FTool in [ptLine, ptRect, ptCircle, ptArc]) then
+    FaceTheCamera;
   { an arrow-held plane keeps its direction but still passes through a
     face under the cursor that faces the same way }
   if (FStage = 0) and FPlaneHeld and (FD.Plane <> plFree) and
@@ -1177,6 +1179,33 @@ begin
   T := Min(1, R / RMax);
   { a quarter of the rate at the middle to the plain rate at the rim }
   Result := 0.25 + 0.75 * T * T;
+end;
+
+{ A plane seen nearly edge-on turns a pixel into tens or hundreds of feet, so
+  a shape is never started on one: within 5 degrees of edge-on the axis
+  plane that faces the camera takes over, held or not, through the middle
+  of the view rather than wherever the cursor last landed. }
+procedure TMainForm.FaceTheCamera;
+const
+  EDGE_ON = 0.087;   { sin 5 degrees }
+var
+  O, U, V, N, D: TP3;
+begin
+  if FD.View <> vkOrbit then Exit;
+  if FD.Plane = plFree then GetFreePlane(O, U, V, N)
+  else
+  begin
+    PlaneAxes(FD.Plane, U, V);
+    N := Norm3(Cross3(U, V));
+  end;
+  D := ViewDir(Proj);
+  if Abs(Dot3(N, D)) >= EDGE_ON then Exit;
+  if (Abs(D.Z) >= Abs(D.Y)) and (Abs(D.Z) >= Abs(D.X)) then FD.Plane := plXY
+  else if Abs(D.Y) >= Abs(D.X) then FD.Plane := plXZ
+  else FD.Plane := plYZ;
+  FPlaneHeld := False;
+  FCur := PivotAt(0, 0);
+  FCmdMsg := 'Looking along that plane - the shape goes on the one facing you.';
 end;
 
 { What the view turns about.  An empty sheet turns about the origin: the

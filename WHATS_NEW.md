@@ -10,6 +10,17 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- **A rectangle drawn after orbiting round could come out hundreds of
+  feet deep.**  With the view nearly level, the ground is seen edge-on and
+  a pixel covers a huge distance.  A shape is now never started on a plane
+  you are looking along - it goes on the one facing you, through the middle
+  of the view, and the bar says so.
+- **Orbiting is a quarter slower.**
+
 ## v2026.10.05
 
 ### New

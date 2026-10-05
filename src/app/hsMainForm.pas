@@ -1121,6 +1121,7 @@ type
     procedure PaintPopup(C: TCanvas; DX: Integer = 0; DY: Integer = 0);
     procedure PaintToolGlyph(C: TCanvas; AX, AY: Integer);
     function PivotAt(SX, SY: Integer): TP3;
+    procedure FaceTheCamera;
     function OrbitGainAt(SX, SY: Integer): Double;
     procedure AnchorOrbit(SX, SY: Integer);
     function RectTarget: TP3;
@@ -1589,10 +1590,9 @@ const
   HOLD_BREAK      = 0.70;   // and this long to break; longer feels like waiting
   SNAP_RECOIL     = 0.30;
   AXIS_PX         = 8.0;    // how near the axis through a reference counts
-  { View turn per pixel of drag, for a press halfway out from the middle.
-    OrbitGainAt scales it from half this at the middle to twice at the edge.
-    Matched to SketchUp's feel. }
-  ORBIT_RAD_PX    = 0.006;
+  { View turn per pixel of drag at the rim; OrbitGainAt makes it a quarter
+    of this at the middle. }
+  ORBIT_RAD_PX    = 0.0045;
   LOCK_PX         = 7.5;    // this close and the point is what you meant
   { once taken, a point holds until the cursor is this far off it, so a
     small twitch does not drop the snap }

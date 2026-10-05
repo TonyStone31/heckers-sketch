@@ -13,6 +13,17 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- **A rectangle drawn after orbiting round could come out hundreds of' + LineEnding +
+    '  feet deep.**  With the view nearly level, the ground is seen edge-on and' + LineEnding +
+    '  a pixel covers a huge distance.  A shape is now never started on a plane' + LineEnding +
+    '  you are looking along - it goes on the one facing you, through the middle' + LineEnding +
+    '  of the view, and the bar says so.' + LineEnding +
+    '- **Orbiting is a quarter slower.**' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.05' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +
