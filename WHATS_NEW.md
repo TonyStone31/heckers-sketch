@@ -10,6 +10,26 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **The help pages follow light and dark** the proper way: Auto matches
+  the program's theme, and the Theme switch on each page picks Light or
+  Dark.
+- **The report-sending window is tidier** - rounded "sent" and "did not
+  go" badges, a bold banner, and the machine and program facts as two
+  cards side by side.
+- **Keys in these notes show as keys**, like <kbd>G</kbd>.
+
+### Fixed
+
+- **A long command no longer stops halfway through a letter** - the
+  command bar ends it with "..." instead.
+- **Names with accents are cut cleanly** when a tab, the groups panel or
+  the info panel has to shorten them, instead of sometimes ending in a
+  broken character.
+
 ## v2026.10.03
 
 ### New

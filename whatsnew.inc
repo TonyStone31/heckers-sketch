@@ -13,6 +13,26 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **The help pages follow light and dark** the proper way: Auto matches' + LineEnding +
+    '  the program''s theme, and the Theme switch on each page picks Light or' + LineEnding +
+    '  Dark.' + LineEnding +
+    '- **The report-sending window is tidier** - rounded "sent" and "did not' + LineEnding +
+    '  go" badges, a bold banner, and the machine and program facts as two' + LineEnding +
+    '  cards side by side.' + LineEnding +
+    '- **Keys in these notes show as keys**, like <kbd>G</kbd>.' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- **A long command no longer stops halfway through a letter** - the' + LineEnding +
+    '  command bar ends it with "..." instead.' + LineEnding +
+    '- **Names with accents are cut cleanly** when a tab, the groups panel or' + LineEnding +
+    '  the info panel has to shorten them, instead of sometimes ending in a' + LineEnding +
+    '  broken character.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.03' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +
