@@ -9,7 +9,7 @@ unit hsSendReport;
 interface
 
 uses
-  Classes, SysUtils, Math, Forms, Controls, StdCtrls, ComCtrls, Graphics,
+  Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, Graphics,
   InkPage, InkMarkdown, LCLType, BCButton, hsDialogSkin;
 
 type
@@ -92,10 +92,7 @@ const
     'td.b-run { background: #1d4ed8 } ' +
     'div.title { font-size: 22px; font-weight: bold } ' +
     'div.sub { font-size: 14px; margin-top: 4px } ' +
-    'td.cap { border: 0; font-size: 12px; color: #64748b; ' +
-    '         text-transform: uppercase; font-weight: bold; ' +
-    '         padding: 18px 0 6px 0 } ' +
-    'td.gap { border: 0; padding: 0; width: 14px } ' +
+    '.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } ' +
     'span.pill { border-radius: 10px; padding: 2px 10px; font-weight: bold } ' +
     'span.wait { background: #f1f5f9; color: #64748b } ' +
     'span.busy { background: #fef3c7; color: #92400e } ' +
@@ -172,51 +169,6 @@ var
     Result := Result + '</table>';
   end;
 
-  { Two sections side by side in one five-column table: key, value, gap,
-    key, value.  LazInk does not style the text in a grid card yet, so not
-    two cards. }
-  function Pair(const A, B: string): string;
-  var
-    KA, KB_: TStringList;
-    K, N, P1: Integer;
-    L: string;
-
-    function Cells(List: TStringList; At: Integer): string;
-    var
-      Q: Integer;
-    begin
-      if At >= List.Count then
-        Exit('<td class="gap"></td><td class="gap"></td>');
-      Q := Pos(#9, List[At]);
-      Result := '<td class="key">' + Esc(Copy(List[At], 1, Q - 1)) +
-        '</td><td class="val">' + Esc(Copy(List[At], Q + 1, MaxInt)) + '</td>';
-    end;
-
-  begin
-    KA := TStringList.Create;
-    KB_ := TStringList.Create;
-    try
-      for K := 0 to FFacts.Count - 1 do
-      begin
-        L := FFacts[K];
-        P1 := Pos(#9, L);
-        if Copy(L, 1, P1 - 1) = A then KA.Add(Copy(L, P1 + 1, MaxInt))
-        else if Copy(L, 1, P1 - 1) = B then KB_.Add(Copy(L, P1 + 1, MaxInt));
-      end;
-      Result := '<table><tr><td class="cap" colspan="2">' + Esc(A) +
-        '</td><td class="gap"></td><td class="cap" colspan="2">' + Esc(B) +
-        '</td></tr>';
-      N := Max(KA.Count, KB_.Count);
-      for K := 0 to N - 1 do
-        Result := Result + '<tr>' + Cells(KA, K) + '<td class="gap"></td>' +
-          Cells(KB_, K) + '</tr>';
-      Result := Result + '</table>';
-    finally
-      KA.Free;
-      KB_.Free;
-    end;
-  end;
-
 begin
   H := TStringList.Create;
   Sections := TStringList.Create;
@@ -263,7 +215,8 @@ begin
     J := 0;
     if Sections.Count >= 2 then
     begin
-      H.Add(Pair(Sections[0], Sections[1]));
+      H.Add('<div class="cards"><div>' + Card(Sections[0]) + '</div><div>' +
+        Card(Sections[1]) + '</div></div>');
       J := 2;
     end;
     for I := J to Sections.Count - 1 do H.Add(Card(Sections[I]));

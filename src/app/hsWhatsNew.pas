@@ -66,17 +66,11 @@ implementation
 { --- reading the file -------------------------------------------------- }
 
 { The sections of WHATS_NEW.md newer than Since; the file's own title and
-  editor comment are dropped.  LazInk shows raw HTML as text, so the few
-  inline tags that might slip in are removed by name.  Do not strip every
-  <...>: the notes use "/tiles <folder>" as a placeholder. }
+  editor comment are dropped. }
 function ReleaseNotesMarkdown(const Since: string): string;
-const
-  TAGS: array[0..11] of string =
-    ('<kbd>', '</kbd>', '<code>', '</code>', '<b>', '</b>',
-     '<i>', '</i>', '<em>', '</em>', '<strong>', '</strong>');
 var
   Lines, Out_: TStringList;
-  I, K: Integer;
+  I: Integer;
   L, Title: string;
   Keep: Boolean;
 begin
@@ -108,8 +102,6 @@ begin
         Continue;
       end;
       if not Keep then Continue;
-      for K := 0 to High(TAGS) do
-        L := StringReplace(L, TAGS[K], '', [rfReplaceAll, rfIgnoreCase]);
       Out_.Add(L);
     end;
     if Out_.Count = 0 then Result := ''
@@ -207,6 +199,8 @@ end;
 procedure TWhatsNewForm.ShowNotes;
 begin
   Page.TextFormat := itfMarkdown;
+  { <kbd> and the like draw; a placeholder like "/tiles <folder>" stays text }
+  Page.MarkdownInlineHTML := True;
   Page.StyleSheet.Text := ReleaseNotesStyle(hsDialogSkin.DlgTheme);
   Page.Source := FNotes;
   Page.ScrollTo(0);

@@ -8400,60 +8400,25 @@ begin
   PaintCmdMsg(C, P);
 end;
 
-{ One line of the bar's markup, drawn run by run so it stays one line, cut
-  at MaxX.  Returns the width it took (or would take, with Measure). }
+{ One line of the bar's markup, ending in an ellipsis at MaxX when it does
+  not fit.  Returns the width it took (or would take, with Measure). }
 function TMainForm.DrawCmdRuns(C: TCanvas; X, Y, H, MaxX, Size: Integer;
   Mono: Boolean; const M: string; Measure: Boolean): Integer;
 var
-  R: TCmdRuns;
-  K, W, X0, TH: Integer;
-  S: string;
-  Col: TPix;
-
-  function PixOf(const Hex: string; const Dflt: TPix): TPix;
-  begin
-    if Length(Hex) <> 7 then Exit(Dflt);
-    Result := Pix(StrToIntDef('$' + Copy(Hex, 2, 2), 0), StrToIntDef('$' + Copy(Hex, 4, 2), 0),
-      StrToIntDef('$' + Copy(Hex, 6, 2), 0));
-  end;
-
+  Opt: THTMLOptions;
+  R: TRect;
 begin
-  X0 := X;
-  R := CmdRuns(M);
-  for K := 0 to High(R) do
-  begin
-    Col := PixOf(R[K].Color, Theme.Text);
-    UIFont(C, Size, R[K].Bold, Col, Mono);
-    S := R[K].Text;
-    W := C.TextWidth(S);
-    if R[K].Back <> '' then Inc(W, Round(4 * FUIScale));
-    if not Measure then
-    begin
-      if X >= MaxX then Break;
-      { a key cap: a small rounded plate behind the word }
-      if R[K].Back <> '' then
-      begin
-        C.Brush.Style := bsSolid;
-        C.Brush.Color := PixToColor(PixOf(R[K].Back, Theme.Panel));
-        C.Pen.Style := psClear;
-        TH := C.TextHeight('Xg');
-        C.RoundRect(X, Y + (H - TH) div 2 - 1, Min(MaxX, X + W), Y + (H + TH) div 2 + 1,
-          Round(5 * FUIScale), Round(5 * FUIScale));
-        C.Pen.Style := psSolid;
-        C.Brush.Style := bsClear;
-        C.TextOut(X + Round(2 * FUIScale), Y + (H - C.TextHeight(S)) div 2, S);
-      end
-      else
-      begin
-        { cut at the edge, not run past it }
-        while (S <> '') and (X + C.TextWidth(S) > MaxX) do
-          S := Copy(S, 1, Length(S) - 1);
-        C.TextOut(X, Y + (H - C.TextHeight('Xg')) div 2, S);
-      end;
-    end;
-    Inc(X, W);
-  end;
-  Result := X - X0;
+  UIFont(C, Size, False, Theme.Text, Mono);
+  Opt := DefaultHTMLOptions;
+  Opt.NoWrap := True;
+  Opt.Ellipsis := True;
+  Opt.VertAlign := ivaCenter;
+  if Measure then
+    Exit(HTMLTextExtentOpt(C, Rect(0, 0, 100000, H), [], M, Opt).cx);
+  if MaxX <= X then Exit(0);
+  R := Rect(X, Y, MaxX, Y + H);
+  HTMLDrawOpt(C, R, [], M, Opt);
+  Result := Min(MaxX - X, HTMLTextExtentOpt(C, R, [], M, Opt).cx);
 end;
 
 { The message rows: the message, wrapped to two lines by LazInk, then the

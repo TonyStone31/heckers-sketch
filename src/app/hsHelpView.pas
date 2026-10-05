@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, StdCtrls, ComCtrls, ExtCtrls,
-  LCLType, LCLIntf, BCPanel, BCButton, InkPage;
+  LCLType, LCLIntf, BCPanel, BCButton, InkCSS, InkPage;
 
 type
   { The page theme switch, same three as the website.  Auto follows the
@@ -55,7 +55,6 @@ type
       is hidden, so it is dressed again on each open }
     procedure Dress;
   private
-    function PageIsLight: Boolean;
     function ThemeWord: string;
     procedure LoadThemeChoice;
     procedure SaveThemeChoice;
@@ -183,19 +182,6 @@ begin
   Page.Font.Color := PixToColor(DlgTheme.Text);
 end;
 
-{ Whether to show the light palette.  Auto follows the program's theme,
-  since LazInk cannot judge the stylesheet's media query; Light and Dark are
-  the reader's override from the switch on each page. }
-function THelpForm.PageIsLight: Boolean;
-begin
-  case FThemeChoice of
-    htLight: Result := True;
-    htDark: Result := False;
-  else
-    Result := DlgTheme.Panel.R + DlgTheme.Panel.G + DlgTheme.Panel.B >= 3 * 128;
-  end;
-end;
-
 { The switch's label, in the website's words. }
 function THelpForm.ThemeWord: string;
 begin
@@ -236,33 +222,14 @@ begin
   end;
 end;
 
-{ The page with style-light.css linked in after style.css when the page
-  should be light.  LazInk only reads custom properties from :root and the
-  page's rules beat an outside stylesheet, so a later linked sheet is the
-  way that works. }
+{ The page with the theme switch's label filled in.  In a browser theme.js
+  writes the switch's state in; no script runs here, so do the same
+  substitution. }
 function THelpForm.PageWithMode(const HTML: string): string;
-var
-  Low, Prefix: string;
-  P, Q: Integer;
 begin
-  Result := HTML;
-  { In a browser theme.js writes the switch's state in; no script runs
-    here, so do the same substitution. }
-  Result := StringReplace(Result, '#theme" title="Light or dark">Theme</a>',
+  Result := StringReplace(HTML, '#theme" title="Light or dark">Theme</a>',
     '#theme" title="Light or dark">Theme: ' + ThemeWord + '</a>',
     [rfReplaceAll, rfIgnoreCase]);
-  if not PageIsLight then Exit;
-  Low := LowerCase(Result);
-  P := Pos('style.css"', Low);
-  if P <= 0 then Exit;
-  { same relative prefix as style.css; pages under tools/ use ../ }
-  Q := P;
-  while (Q > 1) and (Low[Q - 1] <> '"') do Dec(Q);
-  Prefix := Copy(Result, Q, P - Q);
-  P := Pos('>', Low, P);
-  if P <= 0 then Exit;
-  Insert(LineEnding + '<link rel="stylesheet" href="' + Prefix +
-    'style-light.css">', Result, P + 1);
 end;
 
 { Every page load goes through here so each carries the light/dark mode.
@@ -301,6 +268,13 @@ begin
     Src := L.Text;
   finally
     L.Free;
+  end;
+  { style.css has both palettes; Auto goes by the page's background, which
+    is the program's dialog color }
+  case FThemeChoice of
+    htLight: Page.ColorScheme := icsLight;
+    htDark: Page.ColorScheme := icsDark;
+  else Page.ColorScheme := icsAuto;
   end;
   Page.LoadHTML(PageWithMode(Src), FilenameToURI(ExpandFileName(Path)));
   if Anchor <> '' then Page.JumpToAnchor(Anchor);

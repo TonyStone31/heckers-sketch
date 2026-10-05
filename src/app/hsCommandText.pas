@@ -24,16 +24,6 @@ type
     Sep: string;       { the x between two sizes }
   end;
 
-  { one colored piece, for the bar's first row, which is drawn directly
-    rather than by LazInk because it must stay on one line }
-  TCmdRun = record
-    Text: string;
-    Color: string;     { #RRGGBB, or '' for the canvas's own }
-    Back: string;      { a key cap's color, or '' }
-    Bold: Boolean;
-  end;
-  TCmdRuns = array of TCmdRun;
-
 { the no-break space, as the character itself: a run that must not wrap }
 const
   NBSP = #$C2#$A0;
@@ -44,14 +34,8 @@ function CmdEsc(const S: string): string;
 function Painted(const Col, S: string; Bold: Boolean = False): string;
 { a message, with its names, lengths, commands and keys picked out }
 function MarkMessage(const S: string; const P: TCmdPalette): string;
-{ markup with every space outside a tag made a no-break space, for a line
-  that must stay one line }
-function NoBreak(const M: string): string;
 { what is being typed: a command and its words, or a length and its sum }
 function MarkTyped(const S: string; const P: TCmdPalette): string;
-{ the markup this unit writes, read back as runs: <b>, <font color bgcolor>,
-  &amp; &lt; &gt; and the no-break space - nothing else is ever in it }
-function CmdRuns(const M: string): TCmdRuns;
 
 implementation
 
@@ -244,7 +228,7 @@ begin
     begin
       Flush;
       Result := Result + '<font color="' + P.Key + '" bgcolor="' + P.KeyBack +
-        '">' + NBSP + CmdEsc(Copy(S, I, N)) + NBSP + '</font>';
+        '" pad="1 3" radius="5">' + CmdEsc(Copy(S, I, N)) + '</font>';
       Inc(I, N);
       Continue;
     end;
@@ -273,25 +257,6 @@ begin
   Flush;
 end;
 
-function NoBreak(const M: string): string;
-var
-  I: Integer;
-  InTag: Boolean;
-begin
-  Result := '';
-  InTag := False;
-  for I := 1 to Length(M) do
-  begin
-    if M[I] = '<' then InTag := True
-    else if M[I] = '>' then InTag := False;
-    if (M[I] = ' ') and not InTag then Result := Result + NBSP
-    else Result := Result + M[I];
-  end;
-end;
-
-{ Colors the typed input: figures, feet and inch marks, sum operators and
-  the x between sizes each get their own color.  The single dash of 12'-6"
-  is part of the length; only -- subtracts (see ParseLen). }
 function MarkTyped(const S: string; const P: TCmdPalette): string;
 var
   I, J: Integer;
@@ -374,90 +339,6 @@ begin
       Inc(I);
     end;
   end;
-end;
-
-function CmdRuns(const M: string): TCmdRuns;
-var
-  I, J, Bold, N: Integer;
-  Cols, Backs: array of string;
-  Tag, Txt: string;
-
-  function Attr(const T, Name: string): string;
-  var
-    K, E: Integer;
-  begin
-    Result := '';
-    K := Pos(Name + '="', T);
-    if K = 0 then Exit;
-    Inc(K, Length(Name) + 2);
-    E := K;
-    while (E <= Length(T)) and (T[E] <> '"') do Inc(E);
-    Result := Copy(T, K, E - K);
-  end;
-
-  procedure Emit(const S: string);
-  begin
-    if S = '' then Exit;
-    SetLength(Result, N + 1);
-    Result[N].Text := S;
-    if Length(Cols) > 0 then Result[N].Color := Cols[High(Cols)] else Result[N].Color := '';
-    if Length(Backs) > 0 then Result[N].Back := Backs[High(Backs)] else Result[N].Back := '';
-    Result[N].Bold := Bold > 0;
-    Inc(N);
-  end;
-
-begin
-  Result := nil;
-  N := 0;
-  Bold := 0;
-  Cols := nil;
-  Backs := nil;
-  Txt := '';
-  I := 1;
-  while I <= Length(M) do
-  begin
-    if M[I] = '<' then
-    begin
-      Emit(Txt);
-      Txt := '';
-      J := I;
-      while (J <= Length(M)) and (M[J] <> '>') do Inc(J);
-      Tag := Copy(M, I + 1, J - I - 1);
-      if Tag = 'b' then Inc(Bold)
-      else if Tag = '/b' then Dec(Bold)
-      else if Copy(Tag, 1, 5) = 'font ' then
-      begin
-        SetLength(Cols, Length(Cols) + 1);
-        Cols[High(Cols)] := Attr(Tag, 'color');
-        SetLength(Backs, Length(Backs) + 1);
-        Backs[High(Backs)] := Attr(Tag, 'bgcolor');
-      end
-      else if Tag = '/font' then
-      begin
-        if Length(Cols) > 0 then SetLength(Cols, Length(Cols) - 1);
-        if Length(Backs) > 0 then SetLength(Backs, Length(Backs) - 1);
-      end;
-      I := J + 1;
-    end
-    else if M[I] = '&' then
-    begin
-      if Copy(M, I, 5) = '&amp;' then begin Txt := Txt + '&'; Inc(I, 5); end
-      else if Copy(M, I, 4) = '&lt;' then begin Txt := Txt + '<'; Inc(I, 4); end
-      else if Copy(M, I, 4) = '&gt;' then begin Txt := Txt + '>'; Inc(I, 4); end
-      else begin Txt := Txt + '&'; Inc(I); end;
-    end
-    else if Copy(M, I, 2) = NBSP then
-    begin
-      Txt := Txt + ' ';
-      Inc(I, 2);
-    end
-    else
-    begin
-      Txt := Txt + M[I];
-      Inc(I);
-    end;
-  end;
-  Emit(Txt);
 end;
 
 end.
