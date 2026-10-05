@@ -9,7 +9,7 @@ unit hsSendReport;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, Graphics,
+  Classes, SysUtils, Math, Forms, Controls, StdCtrls, ComCtrls, Graphics,
   InkPage, InkMarkdown, LCLType, BCButton, hsDialogSkin;
 
 type
@@ -79,24 +79,29 @@ const
     'th { text-align: left; background: #f1f5f9; color: #475569; ' +
     '     font-size: 12px; padding: 7px 10px; border: 1px solid #e2e8f0 } ' +
     'td { padding: 7px 10px; border: 1px solid #e2e8f0 } ' +
-    'td.file { font-size: 12px; color: #1e293b } ' +
-    'td.num { text-align: right; color: #334155 } ' +
-    'td.key { background: #f8fafc; color: #475569; font-size: 13px } ' +
+    'td.part { font-weight: bold; white-space: nowrap } ' +
+    'td.file { font-size: 12px; font-family: monospace; color: #1e293b } ' +
+    'td.num { text-align: right; color: #334155; white-space: nowrap } ' +
+    'td.key { background: #f8fafc; color: #475569; font-size: 13px; ' +
+    '         white-space: nowrap } ' +
     'td.val { font-size: 13px } ' +
-    'td.wait { background: #f1f5f9; color: #64748b; font-weight: bold } ' +
-    'td.busy { background: #fef3c7; color: #92400e; font-weight: bold } ' +
-    'td.send { background: #dbeafe; color: #1d4ed8; font-weight: bold } ' +
-    'td.ok   { background: #dcfce7; color: #15803d; font-weight: bold } ' +
-    'td.bad  { background: #fee2e2; color: #b91c1c; font-weight: bold } ' +
-    'td.big { border: 0; font-size: 21px; padding: 14px 18px 2px 18px } ' +
-    'td.sub { border: 0; font-size: 14px; padding: 0 18px 14px 18px } ' +
-    'td.b-ok  { background: #15803d; color: #ffffff } ' +
-    'td.b-bad { background: #b91c1c; color: #ffffff } ' +
-    'td.b-run { background: #1d4ed8; color: #ffffff } ' +
+    'td.banner { border: 0; border-radius: 8px; padding: 14px 18px; ' +
+    '            color: #ffffff } ' +
+    'td.b-ok  { background: #15803d } ' +
+    'td.b-bad { background: #b91c1c } ' +
+    'td.b-run { background: #1d4ed8 } ' +
+    'div.title { font-size: 22px; font-weight: bold } ' +
+    'div.sub { font-size: 14px; margin-top: 4px } ' +
     'td.cap { border: 0; font-size: 12px; color: #64748b; ' +
     '         text-transform: uppercase; font-weight: bold; ' +
     '         padding: 18px 0 6px 0 } ' +
     'td.gap { border: 0; padding: 0; width: 14px } ' +
+    'span.pill { border-radius: 10px; padding: 2px 10px; font-weight: bold } ' +
+    'span.wait { background: #f1f5f9; color: #64748b } ' +
+    'span.busy { background: #fef3c7; color: #92400e } ' +
+    'span.send { background: #dbeafe; color: #1d4ed8 } ' +
+    'span.ok   { background: #dcfce7; color: #15803d } ' +
+    'span.bad  { background: #fee2e2; color: #b91c1c } ' +
     'li { margin-bottom: 4px; font-size: 13px } ' +
     'code { font-size: 12px } ' +
     'small { color: #64748b }';
@@ -106,13 +111,6 @@ begin
   Result := StringReplace(S, '&', '&amp;', [rfReplaceAll]);
   Result := StringReplace(Result, '<', '&lt;', [rfReplaceAll]);
   Result := StringReplace(Result, '>', '&gt;', [rfReplaceAll]);
-end;
-
-{ keeps a short cell on one line so the table does not fold "85 KB" to make
-  room for a long file name }
-function Whole(const S: string): string;
-begin
-  Result := StringReplace(Esc(S), ' ', #$C2#$A0, [rfReplaceAll]);
 end;
 
 constructor TSendForm.CreateSending(AOwner: TComponent; const Title: string);
@@ -145,21 +143,22 @@ end;
 
 function TSendForm.PageHTML: string;
 const
-  CELL: array[TSendState] of string = ('wait', 'busy', 'send', 'ok', 'bad', 'wait');
+  PILL: array[TSendState] of string = ('wait', 'busy', 'send', 'ok', 'bad', 'wait');
   WORD_: array[TSendState] of string = ('waiting', 'encrypting', 'sending',
     'sent', 'did not go', 'not included');
 var
   H: TStringList;
   Sections: TStringList;
-  I, J, P1, P2: Integer;
+  I, J: Integer;
   Sec, Line, Verdict: string;
 
-  procedure Card(const Name_: string);
+  { one section's facts: its heading and a key/value table }
+  function Card(const Name_: string): string;
   var
-    K: Integer;
+    K, P1, P2: Integer;
     L: string;
   begin
-    H.Add('<h3>' + Esc(Name_) + '</h3><table>');
+    Result := '<h3>' + Esc(Name_) + '</h3><table>';
     for K := 0 to FFacts.Count - 1 do
     begin
       L := FFacts[K];
@@ -167,19 +166,19 @@ var
       if Copy(L, 1, P1 - 1) <> Name_ then Continue;
       Delete(L, 1, P1);
       P2 := Pos(#9, L);
-      H.Add('<tr><td class="key">' + Whole(Copy(L, 1, P2 - 1)) +
-        '</td><td class="val">' + Esc(Copy(L, P2 + 1, MaxInt)) + '</td></tr>');
+      Result := Result + '<tr><td class="key">' + Esc(Copy(L, 1, P2 - 1)) +
+        '</td><td class="val">' + Esc(Copy(L, P2 + 1, MaxInt)) + '</td></tr>';
     end;
-    H.Add('</table>');
+    Result := Result + '</table>';
   end;
 
   { Two sections side by side in one five-column table: key, value, gap,
-    key, value.  LazInk draws nested tables without cell styling, so no
-    nesting. }
-  procedure Pair(const A, B: string);
+    key, value.  LazInk does not style the text in a grid card yet, so not
+    two cards. }
+  function Pair(const A, B: string): string;
   var
     KA, KB_: TStringList;
-    K, N: Integer;
+    K, N, P1: Integer;
     L: string;
 
     function Cells(List: TStringList; At: Integer): string;
@@ -189,7 +188,7 @@ var
       if At >= List.Count then
         Exit('<td class="gap"></td><td class="gap"></td>');
       Q := Pos(#9, List[At]);
-      Result := '<td class="key">' + Whole(Copy(List[At], 1, Q - 1)) +
+      Result := '<td class="key">' + Esc(Copy(List[At], 1, Q - 1)) +
         '</td><td class="val">' + Esc(Copy(List[At], Q + 1, MaxInt)) + '</td>';
     end;
 
@@ -204,16 +203,14 @@ var
         if Copy(L, 1, P1 - 1) = A then KA.Add(Copy(L, P1 + 1, MaxInt))
         else if Copy(L, 1, P1 - 1) = B then KB_.Add(Copy(L, P1 + 1, MaxInt));
       end;
-      H.Add('<table><tr><td class="cap" colspan="2">' +
-        '<b style="font-size: 12px">' + Esc(A) + '</b>' +
-        '</td><td class="gap"></td><td class="cap" colspan="2">' +
-        '<b style="font-size: 12px">' + Esc(B) + '</b></td></tr>');
-      N := KA.Count;
-      if KB_.Count > N then N := KB_.Count;
+      Result := '<table><tr><td class="cap" colspan="2">' + Esc(A) +
+        '</td><td class="gap"></td><td class="cap" colspan="2">' + Esc(B) +
+        '</td></tr>';
+      N := Max(KA.Count, KB_.Count);
       for K := 0 to N - 1 do
-        H.Add('<tr>' + Cells(KA, K) + '<td class="gap"></td>' +
-          Cells(KB_, K) + '</tr>');
-      H.Add('</table>');
+        Result := Result + '<tr>' + Cells(KA, K) + '<td class="gap"></td>' +
+          Cells(KB_, K) + '</tr>';
+      Result := Result + '</table>';
     finally
       KA.Free;
       KB_.Free;
@@ -231,9 +228,9 @@ begin
     begin
       if not FDone then Sec := 'b-run'
       else if FFailed then Sec := 'b-bad' else Sec := 'b-ok';
-      H.Add('<table class="banner"><tr><td class="' + Sec + ' big">' +
-        '<b style="font-size: 22px">' + Esc(FBanner) + '</b></td></tr><tr><td class="' + Sec + ' sub">' +
-        Esc(FBannerSub) + '</td></tr></table>');
+      H.Add('<table><tr><td class="banner ' + Sec + '">' +
+        '<div class="title">' + Esc(FBanner) + '</div>' +
+        '<div class="sub">' + Esc(FBannerSub) + '</div></td></tr></table>');
     end;
 
     H.Add('<h3>Files</h3><table>');
@@ -243,34 +240,33 @@ begin
       H.Add('<tr><td colspan="5"><small>getting ready</small></td></tr>');
     for I := 0 to High(FFiles) do
     begin
-      Verdict := '<b>' + Whole(WORD_[FFiles[I].State]) + '</b>';
+      Verdict := '<span class="pill ' + PILL[FFiles[I].State] + '">' +
+        WORD_[FFiles[I].State] + '</span>';
       if FFiles[I].Why <> '' then
         Verdict := Verdict + '<br><small>' + Esc(FFiles[I].Why) + '</small>';
       Line := FFiles[I].Encrypted;
       if Line = '' then Line := '-';
-      H.Add('<tr><td><b>' + Whole(FFiles[I].What) + '</b></td>' +
-        '<td class="file"><code>' + Esc(FFiles[I].Name_) + '</code></td>' +
-        '<td class="num">' + Whole(FFiles[I].Size) + '</td>' +
-        '<td class="num">' + Whole(Line) + '</td>' +
-        '<td class="' + CELL[FFiles[I].State] + '">' + Verdict +
-        '</td></tr>');
+      H.Add('<tr><td class="part">' + Esc(FFiles[I].What) + '</td>' +
+        '<td class="file">' + Esc(FFiles[I].Name_) + '</td>' +
+        '<td class="num">' + Esc(FFiles[I].Size) + '</td>' +
+        '<td class="num">' + Esc(Line) + '</td>' +
+        '<td>' + Verdict + '</td></tr>');
     end;
     H.Add('</table>');
 
-    { sections in the order first named }
+    { sections in the order first named; the first two side by side }
     for I := 0 to FFacts.Count - 1 do
     begin
       Sec := Copy(FFacts[I], 1, Pos(#9, FFacts[I]) - 1);
       if Sections.IndexOf(Sec) < 0 then Sections.Add(Sec);
     end;
+    J := 0;
     if Sections.Count >= 2 then
     begin
-      Pair(Sections[0], Sections[1]);
+      H.Add(Pair(Sections[0], Sections[1]));
       J := 2;
-    end
-    else
-      J := 0;
-    for I := J to Sections.Count - 1 do Card(Sections[I]);
+    end;
+    for I := J to Sections.Count - 1 do H.Add(Card(Sections[I]));
 
     H.Add(FClosing);
     H.Add('</body></html>');

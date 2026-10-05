@@ -8126,9 +8126,9 @@ end;
 
 { The command bar: three rows.  Row one is the tool and the moment:
   what the cursor holds (in its mark's color), the prompt, and the typing in
-  its own box.  Rows two and three are the message, in LazInk's memo so it
-  wraps, is colored and can be copied; the keys that apply now follow it and
-  drop out of sight when the message needs both lines. }
+  its own box.  Rows two and three are the message, drawn by LazInk so it
+  wraps and is colored (right-click copies it); the keys that apply now
+  follow it and drop out of sight when the message needs both lines. }
 procedure TMainForm.CmdRows(out Pad, Row1, Row: Integer);
 begin
   Pad := Round(5 * FUIScale);
