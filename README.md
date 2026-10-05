@@ -186,7 +186,7 @@ each part of the program, and every unit starts `hs`.
 
 | Folder | What is in it |
 | --- | --- |
-| `src/app/` | the window and its plumbing: `hsMainForm` (the window and the tools), `hsCommandText` (the command bar's colors), `hsPaths`, the splash, updates (`hsUpdater`), bug reports (`hsBugReport`, `hsSendReport`), the manual's viewer (`hsHelpView`) |
+| `src/app/` | the window and its plumbing: `hsMainForm` (the window and the tools, its code split into include files in `src/app/mainform/`), `hsCommandText` (the command bar's colors), `hsPaths`, the splash, updates (`hsUpdater`), bug reports (`hsBugReport`, `hsSendReport`), the manual's viewer (`hsHelpView`) |
 | `src/model/` | the geometry: `hsDrawing` (the 3D document - geometry, snapping, hit testing, rendering), `hsFaceFinder` (edges into faces and holes), `hsImpliedFaces`, `hsTriangulate`, `hsTunnels` (the drill), `hsUnfold` (flat patterns), `hsGroupData` |
 | `src/draw/` | pixels: `hsSurface` (the software rasterizer everything is drawn with), `hsSkin`, `hsViewCube`, `hsFilm` and `hsRecorder` (pictures and WebP films) |
 | `src/files/` | Heck and the other formats: `hsHeckReader`, `hsHeckWriter`, `hsHeckFile`, the source window (`hsSourceWindow`), jigs (`hsJigRun`), `hsExport`, `hsDxf`, `hsPdf`, `hsSvg` |
