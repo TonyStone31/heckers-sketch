@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
-  ComCtrls, Dialogs, LCLIntf, IniFiles, LCLType, BCButton, hsPaths, hsDrawing,
+  ComCtrls, Dialogs, LCLIntf, IniFiles, LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsPaths, hsDrawing,
   hsFittings, hsFieldElbow, hsTapeWizard, hsDialogSkin;
 
 type
@@ -20,7 +20,7 @@ type
     btnReport: TBCButton;
     cbEntryEnd: TComboBox;
     cbExitEnd: TComboBox;
-    cbDims: TCheckBox;
+    cbDims: TBGRAThemeCheckBox;
     edEntryEndAmt: TEdit;
     edExitEndAmt: TEdit;
     lblEnds: TLabel;
@@ -29,23 +29,23 @@ type
     lblEndUnit1: TLabel;
     lblEndUnit2: TLabel;
     pbIso: TPaintBox;
-    pcViews: TPageControl;
-    tsPlan: TTabSheet;
-    tsIso: TTabSheet;
+    pcViews: TPanel;
+    tsPlan: TPage;
+    tsIso: TPage;
     lblTag: TLabel;
     lblTagHint: TLabel;
     edTag: TEdit;
     btnEmail: TBCButton;
     btnFiles: TBCButton;
-    rgFitting: TRadioGroup;
-    rgAngle: TRadioGroup;
+    rgFitting: TPanel;
+    rgAngle: TPanel;
     edAngle: TEdit;
     lblDeg: TLabel;
-    rgTurn: TRadioGroup;
+    rgTurn: TPanel;
     lblThroat: TLabel;
     edThroat: TEdit;
     lblThroatHint: TLabel;
-    cbSquareHeel: TCheckBox;
+    cbSquareHeel: TBGRAThemeCheckBox;
     lblLegs: TLabel;
     edLeg0: TEdit;
     edLeg1: TEdit;
@@ -55,7 +55,7 @@ type
     lblBX: TLabel;
     edBH: TEdit;
     lblBHint: TLabel;
-    rgBranchOn: TRadioGroup;
+    rgBranchOn: TPanel;
     lblBFrom: TLabel;
     edBFrom: TEdit;
     lblBUp: TLabel;
@@ -88,8 +88,8 @@ type
     lblLenHint: TLabel;
     lblProblem: TLabel;
     pbSketch: TPaintBox;
-    rgSide: TRadioGroup;
-    rgHeight: TRadioGroup;
+    rgSide: TPanel;
+    rgHeight: TPanel;
     btnTape: TBCButton;
     lblFlex: TLabel;
     lblMetal: TLabel;
@@ -98,6 +98,39 @@ type
     lblMetalHint: TLabel;
     cbEntryFlex: TComboBox;
     cbExitFlex: TComboBox;
+    rgSideCaption: TLabel;
+    rgSide1: TBGRAThemeRadioButton;
+    rgSide2: TBGRAThemeRadioButton;
+    rgSide3: TBGRAThemeRadioButton;
+    rgHeightCaption: TLabel;
+    rgHeight1: TBGRAThemeRadioButton;
+    rgHeight2: TBGRAThemeRadioButton;
+    rgHeight3: TBGRAThemeRadioButton;
+    rgHeight4: TBGRAThemeRadioButton;
+    rgHeight5: TBGRAThemeRadioButton;
+    rgHeight6: TBGRAThemeRadioButton;
+    rgHeight7: TBGRAThemeRadioButton;
+    pbViewTabs: TPaintBox;
+    nbViews: TNotebook;
+    rgFittingCaption: TLabel;
+    rgFitting1: TBGRAThemeRadioButton;
+    rgFitting2: TBGRAThemeRadioButton;
+    rgFitting3: TBGRAThemeRadioButton;
+    rgAngleCaption: TLabel;
+    rgAngle1: TBGRAThemeRadioButton;
+    rgAngle2: TBGRAThemeRadioButton;
+    rgAngle3: TBGRAThemeRadioButton;
+    rgAngle4: TBGRAThemeRadioButton;
+    rgTurnCaption: TLabel;
+    rgTurn1: TBGRAThemeRadioButton;
+    rgTurn2: TBGRAThemeRadioButton;
+    rgTurn3: TBGRAThemeRadioButton;
+    rgTurn4: TBGRAThemeRadioButton;
+    rgBranchOnCaption: TLabel;
+    rgBranchOn1: TBGRAThemeRadioButton;
+    rgBranchOn2: TBGRAThemeRadioButton;
+    rgBranchOn3: TBGRAThemeRadioButton;
+    rgBranchOn4: TBGRAThemeRadioButton;
     procedure AnyChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pbSketchPaint(Sender: TObject);
@@ -152,20 +185,20 @@ uses
 procedure TTransitionForm.btnReportClick(Sender: TObject);
 begin
   MainForm.ReportFromDialog('Build a fitting',
-    'fitting: ' + rgFitting.Items[Max(0, rgFitting.ItemIndex)] + LineEnding +
+    'fitting: ' + RadioText(rgFitting, Max(0, RadioIndex(rgFitting))) + LineEnding +
     'entry ' + edEntryW.Text + ' x ' + edEntryH.Text +
     ', exit ' + edExitW.Text + ' x ' + edExitH.Text +
     ', length ' + edLen.Text + LineEnding +
-    'width: ' + rgSide.Items[Max(0, rgSide.ItemIndex)] + ' ' + edSideAmount.Text + LineEnding +
-    'height: ' + rgHeight.Items[Max(0, rgHeight.ItemIndex)] + ' ' + edHeightAmount.Text + LineEnding +
+    'width: ' + RadioText(rgSide, Max(0, RadioIndex(rgSide))) + ' ' + edSideAmount.Text + LineEnding +
+    'height: ' + RadioText(rgHeight, Max(0, RadioIndex(rgHeight))) + ' ' + edHeightAmount.Text + LineEnding +
     'entry end: ' + cbEntryEnd.Text + ' ' + edEntryEndAmt.Text + LineEnding +
     'exit end: ' + cbExitEnd.Text + ' ' + edExitEndAmt.Text + LineEnding +
     'branch end: ' + cbBranchEnd.Text + ' ' + edBranchEndAmt.Text + LineEnding +
-    'angle ' + rgAngle.Items[Max(0, rgAngle.ItemIndex)] + ' ' + edAngle.Text +
-    ', turn ' + rgTurn.Items[Max(0, rgTurn.ItemIndex)] +
+    'angle ' + RadioText(rgAngle, Max(0, RadioIndex(rgAngle))) + ' ' + edAngle.Text +
+    ', turn ' + RadioText(rgTurn, Max(0, RadioIndex(rgTurn))) +
     ', throat ' + edThroat.Text + ', square heel ' + BoolToStr(cbSquareHeel.Checked, True) +
     ', legs ' + edLeg0.Text + ' / ' + edLeg1.Text + LineEnding +
-    'branch ' + edBW.Text + ' x ' + edBH.Text + ' on ' + rgBranchOn.Items[Max(0, rgBranchOn.ItemIndex)] +
+    'branch ' + edBW.Text + ' x ' + edBH.Text + ' on ' + RadioText(rgBranchOn, Max(0, RadioIndex(rgBranchOn))) +
     ', from ' + edBFrom.Text + ', up ' + edBUp.Text + ', long ' + edBLen.Text + LineEnding +
     'dimensions: ' + BoolToStr(cbDims.Checked, True) + LineEnding +
     'tag: ' + edTag.Text + LineEnding +
@@ -196,12 +229,12 @@ var
   Deg: Double;
 begin
   T := Default(TTransitionSpec);
-  T.Kind := TFittingKind(Max(0, rgFitting.ItemIndex));
+  T.Kind := TFittingKind(Max(0, RadioIndex(rgFitting)));
   Result := InchesOf(edEntryW.Text, T.W0) and InchesOf(edEntryH.Text, T.H0);
   case T.Kind of
     fkElbow:
       begin
-        case rgAngle.ItemIndex of
+        case RadioIndex(rgAngle) of
           0: T.Angle := DegToRad(22.5);
           1: T.Angle := DegToRad(45);
           2: T.Angle := DegToRad(90);
@@ -211,7 +244,7 @@ begin
             T.Angle := DegToRad(Deg);
           end;
         end;
-        T.Turn := TTurn(Max(0, rgTurn.ItemIndex));
+        T.Turn := TTurn(Max(0, RadioIndex(rgTurn)));
         Result := Result and InchesOf(edThroat.Text, T.Throat) and
           InchesOf(edLeg0.Text, T.Leg0) and InchesOf(edLeg1.Text, T.Leg1);
         T.SquareHeel := cbSquareHeel.Checked;
@@ -226,7 +259,7 @@ begin
         Result := Result and InchesOf(edLen.Text, T.Len) and
           InchesOf(edBW.Text, T.BW) and InchesOf(edBH.Text, T.BH) and
           InchesOf(edBLen.Text, T.BranchLen);
-        T.BranchOn := TBranchSide(Max(0, rgBranchOn.ItemIndex));
+        T.BranchOn := TBranchSide(Max(0, RadioIndex(rgBranchOn)));
         { blank is centered along the run }
         if Trim(edBFrom.Text) = '' then T.BranchFrom := (T.Len - T.BW) / 2
         else Result := Result and InchesOf(edBFrom.Text, T.BranchFrom);
@@ -247,8 +280,8 @@ begin
     begin
       Result := Result and InchesOf(edExitW.Text, T.W1) and InchesOf(edExitH.Text, T.H1) and
                 InchesOf(edLen.Text, T.Len);
-      T.Side := TSideRule(Max(0, rgSide.ItemIndex));
-      T.Height := THeightRule(Max(0, rgHeight.ItemIndex));
+      T.Side := TSideRule(Max(0, RadioIndex(rgSide)));
+      T.Height := THeightRule(Max(0, RadioIndex(rgHeight)));
       if T.Side <> srCenterd then
         Result := Result and InchesOf(edSideAmount.Text, T.SideAmount);
       if T.Height in [hrTopUp, hrTopDown, hrBottomUp, hrBottomDown] then
@@ -318,6 +351,7 @@ begin
   cbStiffen.ItemIndex := Ord(stAuto);
   { theme the form, keeping the problem line red }
   hsDialogSkin.ThemeForm(Self);
+  THsTabStrip.Create(pbViewTabs, nbViews, ['Plan', '3D']);
   lblProblem.Font.Color := clRed;
   ShowKind;
 end;
@@ -378,9 +412,9 @@ begin
     T.Vertical := FTape.Vertical;
   end;
   if not TTapeWizard.Ask(FUnits, T) then Exit;
-  rgSide.ItemIndex := Ord(T.Side);
+  SetRadioIndex(rgSide, Ord(T.Side));
   edSideAmount.Text := FormatFloat('0.###', T.SideAmount / T.Inch);
-  rgHeight.ItemIndex := Ord(T.Height);
+  SetRadioIndex(rgHeight, Ord(T.Height));
   if T.Height in [hrTopUp, hrTopDown, hrBottomUp, hrBottomDown] then
     edHeightAmount.Text := FormatFloat('0.###', T.HeightAmount / T.Inch);
   FTape := T;
@@ -400,7 +434,7 @@ begin
     Exit;
   end;
   if not TFieldElbowForm.Ask(FUnits, T) then Exit;
-  rgAngle.ItemIndex := 3;
+  SetRadioIndex(rgAngle, 3);
   edAngle.Text := FormatFloat('0.##', RadToDeg(T.Angle));
   edLeg0.Text := FormatFloat('0.###', T.Leg0 / T.Inch);
   edLeg1.Text := FormatFloat('0.###', T.Leg1 / T.Inch);
@@ -412,7 +446,7 @@ var
   K: TFittingKind;
   Tr, El, Te: Boolean;
 begin
-  K := TFittingKind(Max(0, rgFitting.ItemIndex));
+  K := TFittingKind(Max(0, RadioIndex(rgFitting)));
   Tr := K = fkTransition; El := K = fkElbow; Te := K = fkTee;
   { the exit size is the transition's, and the elbow's for a reducing elbow }
   lblExit.Visible := not Te; edExitW.Visible := not Te; lblExitX.Visible := not Te; edExitH.Visible := not Te;
@@ -713,12 +747,12 @@ procedure TTransitionForm.AnyChange(Sender: TObject);
 var
   T: TTransitionSpec;
 begin
-  edSideAmount.Enabled := rgSide.ItemIndex > 0;
-  edHeightAmount.Enabled := rgHeight.ItemIndex >= 3;
+  edSideAmount.Enabled := RadioIndex(rgSide) > 0;
+  edHeightAmount.Enabled := RadioIndex(rgHeight) >= 3;
   edEntryEndAmt.Enabled := cbEntryEnd.ItemIndex > 0;
   edExitEndAmt.Enabled := cbExitEnd.ItemIndex > 0;
   edBranchEndAmt.Enabled := cbBranchEnd.ItemIndex > 0;
-  edAngle.Enabled := rgAngle.ItemIndex = 3;
+  edAngle.Enabled := RadioIndex(rgAngle) = 3;
   if not Read(T) then
   begin
     lblProblem.Caption := 'A size did not read - 20, 20.5, 8 3/4, or 2'' with a mark.';
@@ -751,8 +785,8 @@ begin
         if C = edTag then Continue;
         if C is TEdit then Ini.WriteString('fitting', C.Name, TEdit(C).Text)
         else if C is TComboBox then Ini.WriteInteger('fitting', C.Name, TComboBox(C).ItemIndex)
-        else if C is TRadioGroup then Ini.WriteInteger('fitting', C.Name, TRadioGroup(C).ItemIndex)
-        else if C is TCheckBox then Ini.WriteBool('fitting', C.Name, TCheckBox(C).Checked);
+        else if IsRadioPanel(C) then Ini.WriteInteger('fitting', C.Name, RadioIndex(TWinControl(C)))
+        else if C is TBGRAThemeCheckBox then Ini.WriteBool('fitting', C.Name, TBGRAThemeCheckBox(C).Checked);
       end;
     finally
       Ini.Free;
@@ -780,9 +814,9 @@ begin
         if C is TEdit then TEdit(C).Text := Ini.ReadString('fitting', C.Name, TEdit(C).Text)
         else if C is TComboBox then
           TComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, TComboBox(C).Items.Count - 1)
-        else if C is TRadioGroup then
-          TRadioGroup(C).ItemIndex := EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, TRadioGroup(C).Items.Count - 1)
-        else if C is TCheckBox then TCheckBox(C).Checked := Ini.ReadBool('fitting', C.Name, TCheckBox(C).Checked);
+        else if IsRadioPanel(C) then
+          SetRadioIndex(TWinControl(C), EnsureRange(Ini.ReadInteger('fitting', C.Name, 0), 0, RadioCount(TWinControl(C)) - 1))
+        else if C is TBGRAThemeCheckBox then TBGRAThemeCheckBox(C).Checked := Ini.ReadBool('fitting', C.Name, TBGRAThemeCheckBox(C).Checked);
       end;
     finally
       Ini.Free;

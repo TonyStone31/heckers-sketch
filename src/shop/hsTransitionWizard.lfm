@@ -138,23 +138,49 @@ object TransitionForm: TTransitionForm
     Font.Color = clGrayText
     ParentFont = False
   end
-  object rgSide: TRadioGroup
+  object rgSide: TPanel
     Left = 24
     Height = 100
     Top = 200
     Width = 210
-    AutoFill = True
-    Caption = 'Width - which side comes in'
-    ClientHeight = 80
-    ClientWidth = 206
-    ItemIndex = 0
-    Items.Strings = (
-      'Centered'
-      'Left side in by'
-      'Right side in by'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 100
+    ClientWidth = 210
     TabOrder = 5
+    object rgSideCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 210
+      AutoSize = False
+      Caption = 'Width - which side comes in'
+    end
+    object rgSide1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 210
+      Caption = 'Centered'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgSide2: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 44
+      Width = 210
+      Caption = 'Left side in by'
+      OnChange = AnyChange
+    end
+    object rgSide3: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 68
+      Width = 210
+      Caption = 'Right side in by'
+      OnChange = AnyChange
+    end
   end
   object edSideAmount: TEdit
     Left = 244
@@ -165,27 +191,81 @@ object TransitionForm: TTransitionForm
     Text = '4'
     OnChange = AnyChange
   end
-  object rgHeight: TRadioGroup
+  object rgHeight: TPanel
     Left = 24
     Height = 210
     Top = 312
     Width = 210
-    AutoFill = True
-    Caption = 'Height - what stays put'
-    ClientHeight = 130
-    ClientWidth = 206
-    ItemIndex = 0
-    Items.Strings = (
-      'Flat bottom  (FB)'
-      'Flat top  (FT)'
-      'Centered'
-      'Top up by'
-      'Top down by'
-      'Bottom up by'
-      'Bottom down by'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 210
+    ClientWidth = 210
     TabOrder = 7
+    object rgHeightCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 210
+      AutoSize = False
+      Caption = 'Height - what stays put'
+    end
+    object rgHeight1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 210
+      Caption = 'Flat bottom  (FB)'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgHeight2: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 44
+      Width = 210
+      Caption = 'Flat top  (FT)'
+      OnChange = AnyChange
+    end
+    object rgHeight3: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 68
+      Width = 210
+      Caption = 'Centered'
+      OnChange = AnyChange
+    end
+    object rgHeight4: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 92
+      Width = 210
+      Caption = 'Top up by'
+      OnChange = AnyChange
+    end
+    object rgHeight5: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 116
+      Width = 210
+      Caption = 'Top down by'
+      OnChange = AnyChange
+    end
+    object rgHeight6: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 140
+      Width = 210
+      Caption = 'Bottom up by'
+      OnChange = AnyChange
+    end
+    object rgHeight7: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 164
+      Width = 210
+      Caption = 'Bottom down by'
+      OnChange = AnyChange
+    end
   end
   object edHeightAmount: TEdit
     Left = 244
@@ -304,49 +384,60 @@ object TransitionForm: TTransitionForm
     Width = 16
     Caption = 'in'
   end
-  object cbDims: TCheckBox
+  object cbDims: TBGRAThemeCheckBox
     Left = 24
     Height = 22
     Top = 660
     Width = 300
     Caption = 'Put the sizes on it as dimensions'
     Checked = True
-    State = cbChecked
     OnChange = AnyChange
     TabOrder = 16
   end
-  object pcViews: TPageControl
+  object pcViews: TPanel
     Left = 440
     Height = 352
     Top = 128
     Width = 340
-    ActivePage = tsPlan
-    TabIndex = 0
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 352
+    ClientWidth = 340
     TabOrder = 17
-    object tsPlan: TTabSheet
-      Caption = 'Plan'
-      ClientHeight = 366
-      ClientWidth = 332
-      object pbSketch: TPaintBox
-        Left = 0
-        Height = 366
-        Top = 0
-        Width = 332
-        Align = alClient
-        OnPaint = pbSketchPaint
-      end
+    object pbViewTabs: TPaintBox
+      Left = 0
+      Height = 30
+      Top = 0
+      Width = 340
+      Align = alTop
     end
-    object tsIso: TTabSheet
-      Caption = '3D'
-      ClientHeight = 366
-      ClientWidth = 332
-      object pbIso: TPaintBox
-        Left = 0
-        Height = 366
-        Top = 0
-        Width = 332
-        Align = alClient
-        OnPaint = pbIsoPaint
+    object nbViews: TNotebook
+      Left = 0
+      Height = 322
+      Top = 30
+      Width = 340
+      PageIndex = 0
+      Align = alClient
+      TabOrder = 0
+      object tsPlan: TPage
+        object pbSketch: TPaintBox
+          Left = 0
+          Height = 366
+          Top = 0
+          Width = 332
+          Align = alClient
+          OnPaint = pbSketchPaint
+        end
+      end
+      object tsIso: TPage
+        object pbIso: TPaintBox
+          Left = 0
+          Height = 366
+          Top = 0
+          Width = 332
+          Align = alClient
+          OnPaint = pbIsoPaint
+        end
       end
     end
   end
@@ -391,53 +482,102 @@ object TransitionForm: TTransitionForm
     Caption = 'Show the files'
     OnClick = btnFilesClick
   end
-  object rgFitting: TRadioGroup
+  object rgFitting: TPanel
     Left = 440
     Height = 44
     Top = 74
     Width = 340
-    AutoFill = True
-    Caption = 'Fitting'
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 3
-    Columns = 3
-    ItemIndex = 0
-    Items.Strings = (
-      'Transition'
-      'Elbow'
-      'Tee'
-    )
-    OnClick = FittingChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 44
+    ClientWidth = 340
     TabOrder = 21
+    object rgFittingCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 340
+      AutoSize = False
+      Caption = 'Fitting'
+    end
+    object rgFitting1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 113
+      Caption = 'Transition'
+      Checked = True
+      OnChange = FittingChange
+    end
+    object rgFitting2: TBGRAThemeRadioButton
+      Left = 113
+      Height = 24
+      Top = 20
+      Width = 113
+      Caption = 'Elbow'
+      OnChange = FittingChange
+    end
+    object rgFitting3: TBGRAThemeRadioButton
+      Left = 226
+      Height = 24
+      Top = 20
+      Width = 113
+      Caption = 'Tee'
+      OnChange = FittingChange
+    end
   end
-  object rgAngle: TRadioGroup
+  object rgAngle: TPanel
     Left = 24
     Height = 52
     Top = 164
     Width = 300
-    AutoFill = True
-    Caption = 'Angle'
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 4
-    Columns = 4
-    ItemIndex = 2
-    Items.Strings = (
-      '22.5'
-      '45'
-      '90'
-      'Other'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 52
+    ClientWidth = 300
     TabOrder = 22
     Visible = False
+    object rgAngleCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 300
+      AutoSize = False
+      Caption = 'Angle'
+    end
+    object rgAngle1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = '22.5'
+      OnChange = AnyChange
+    end
+    object rgAngle2: TBGRAThemeRadioButton
+      Left = 75
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = '45'
+      OnChange = AnyChange
+    end
+    object rgAngle3: TBGRAThemeRadioButton
+      Left = 150
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = '90'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgAngle4: TBGRAThemeRadioButton
+      Left = 225
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = 'Other'
+      OnChange = AnyChange
+    end
   end
   object edAngle: TEdit
     Left = 332
@@ -457,30 +597,58 @@ object TransitionForm: TTransitionForm
     Caption = 'deg'
     Visible = False
   end
-  object rgTurn: TRadioGroup
+  object rgTurn: TPanel
     Left = 24
     Height = 52
     Top = 224
     Width = 300
-    AutoFill = True
-    Caption = 'Turns, seen from the entry'
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 4
-    Columns = 4
-    ItemIndex = 0
-    Items.Strings = (
-      'Right'
-      'Left'
-      'Up'
-      'Down'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 52
+    ClientWidth = 300
     TabOrder = 24
     Visible = False
+    object rgTurnCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 300
+      AutoSize = False
+      Caption = 'Turns, seen from the entry'
+    end
+    object rgTurn1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = 'Right'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgTurn2: TBGRAThemeRadioButton
+      Left = 75
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = 'Left'
+      OnChange = AnyChange
+    end
+    object rgTurn3: TBGRAThemeRadioButton
+      Left = 150
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = 'Up'
+      OnChange = AnyChange
+    end
+    object rgTurn4: TBGRAThemeRadioButton
+      Left = 225
+      Height = 24
+      Top = 20
+      Width = 75
+      Caption = 'Down'
+      OnChange = AnyChange
+    end
   end
   object lblThroat: TLabel
     Left = 24
@@ -511,7 +679,7 @@ object TransitionForm: TTransitionForm
     ParentFont = False
     Visible = False
   end
-  object cbSquareHeel: TCheckBox
+  object cbSquareHeel: TBGRAThemeCheckBox
     Left = 24
     Height = 22
     Top = 330
@@ -519,7 +687,6 @@ object TransitionForm: TTransitionForm
     Caption = 'Square heel - mitred, not rolled'
     OnChange = AnyChange
     TabOrder = 26
-    Visible = False
   end
   object lblLegs: TLabel
     Left = 24
@@ -607,30 +774,58 @@ object TransitionForm: TTransitionForm
     ParentFont = False
     Visible = False
   end
-  object rgBranchOn: TRadioGroup
+  object rgBranchOn: TPanel
     Left = 24
     Height = 52
     Top = 248
     Width = 400
-    AutoFill = True
-    Caption = 'Branch comes off the'
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 4
-    Columns = 4
-    ItemIndex = 1
-    Items.Strings = (
-      'Left side'
-      'Right side'
-      'Top'
-      'Bottom'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 52
+    ClientWidth = 400
     TabOrder = 31
     Visible = False
+    object rgBranchOnCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 400
+      AutoSize = False
+      Caption = 'Branch comes off the'
+    end
+    object rgBranchOn1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 100
+      Caption = 'Left side'
+      OnChange = AnyChange
+    end
+    object rgBranchOn2: TBGRAThemeRadioButton
+      Left = 100
+      Height = 24
+      Top = 20
+      Width = 100
+      Caption = 'Right side'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgBranchOn3: TBGRAThemeRadioButton
+      Left = 200
+      Height = 24
+      Top = 20
+      Width = 100
+      Caption = 'Top'
+      OnChange = AnyChange
+    end
+    object rgBranchOn4: TBGRAThemeRadioButton
+      Left = 300
+      Height = 24
+      Top = 20
+      Width = 100
+      Caption = 'Bottom'
+      OnChange = AnyChange
+    end
   end
   object lblBFrom: TLabel
     Left = 24

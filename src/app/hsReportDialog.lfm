@@ -35,7 +35,7 @@ object ReportDialog: TReportDialog
     TabOrder = 0
     WordWrap = True
   end
-  object cbDrawing: TCheckBox
+  object cbDrawing: TBGRAThemeCheckBox
     AnchorSideTop.Control = memNote
     AnchorSideTop.Side = asrBottom
     Left = 12
@@ -43,11 +43,9 @@ object ReportDialog: TReportDialog
     Top = 268
     Width = 576
     Anchors = [akTop, akLeft, akRight]
-    AutoSize = False
     BorderSpacing.Top = 10
     Caption = 'Send the drawing too'
     Checked = True
-    State = cbChecked
     TabOrder = 1
   end
   object lblFine: TLabel

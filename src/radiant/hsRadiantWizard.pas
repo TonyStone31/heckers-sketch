@@ -12,8 +12,8 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
-  ComCtrls, Dialogs, StrUtils, Menus, Spin, BCButton, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantBusy,
-  hsRadiantSubmittal, hsRadiantHeat;
+  ComCtrls, Dialogs, StrUtils, Menus, Spin, BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantBusy,
+  hsRadiantSubmittal, hsRadiantHeat, hsDialogSkin;
 
 type
 
@@ -34,13 +34,12 @@ type
     lblZoneHead: TLabel;
     lblZoneName: TLabel;
     edZoneName: TEdit;
-    cbPinManifold: TCheckBox;
+    cbPinManifold: TBGRAThemeCheckBox;
     lblZonesHint: TLabel;
     lbSolutions: TListBox;
     pnZone: TPanel;
-    tcZones: TTabControl;
-    cbLabels: TCheckBox;
-    cbHookPairs: TCheckBox;
+    cbLabels: TBGRAThemeCheckBox;
+    cbHookPairs: TBGRAThemeCheckBox;
     lblPinManifold: TLabel;
     lblHookPairs: TLabel;
     lblLabels: TLabel;
@@ -63,7 +62,6 @@ type
     lblMaxLoop: TLabel;
     lblMaxLoopHint: TLabel;
     lblNeed: TLabel;
-    lblObsHead: TLabel;
     lblProblem: TLabel;
     lblSpacing: TLabel;
     lblSpacingIn: TLabel;
@@ -96,6 +94,8 @@ type
     pnPlanArea: TBCPanel;
     pnZoneArea: TBCPanel;
     lblGoalEvenHead: TLabel;
+    pnZones: TPanel;
+    pbZoneTabs: TPaintBox;
     procedure AnyChange(Sender: TObject);
     procedure btnNotZoneClick(Sender: TObject);
     procedure btnBringBackClick(Sender: TObject);
@@ -132,6 +132,7 @@ type
     procedure pmZonePopup(Sender: TObject);
     procedure RoutingChange(Sender: TObject);
   private
+    FZoneTabs: THsTabStrip;
     FUnits: TUnitSystem;
     FZones: TRadiantZones;           { every face selected, with its holes }
     { closed shapes that are not floor to heat (a chase, a column against
@@ -286,7 +287,7 @@ implementation
 {$R *.lfm}
 
 uses
-  IniFiles, LCLIntf, LCLType, hsPaths, hsMainForm, hsUpdater, hsDialogSkin, hsSurface, hsRadiantHeatForm;
+  IniFiles, LCLIntf, LCLType, hsPaths, hsMainForm, hsUpdater, hsSurface, hsRadiantHeatForm;
 
 { a bare number is inches - the trade says 9, not 9" - and a mark switches
   to the drawing's own notation, as the fitting wizard does }
@@ -346,12 +347,8 @@ begin
   pnZone.ParentColor := False;
   hsDialogSkin.SkinButton(btnBuild, bkGo);
   hsDialogSkin.SkinButton(btnCancel, bkQuiet);
-  { the tabs are the desktop's own widget and keep its colors for their
-    words, or it is light on light; the panel under them gets the theme's,
-    set after }
-  tcZones.ParentFont := False;
-  tcZones.Font.Color := clDefault;
-  tcZones.Font.Height := -13;
+  FZoneTabs := THsTabStrip.Create(pbZoneTabs, nil, []);
+  FZoneTabs.OnChange := @tcZonesChange;
   pnZone.ParentFont := False;
   pnZone.Font.Color := PixToColor(DlgTheme.Text);
   pnZone.Font.Height := -13;
@@ -371,7 +368,7 @@ begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
     end
-    else if C is TCheckBox then hsDialogSkin.SkinCheck(TCheckBox(C))
+    else if C is TBGRAThemeCheckBox then hsDialogSkin.SkinCheck(TBGRAThemeCheckBox(C))
     else if C is TLabel then
     begin
       TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
@@ -425,7 +422,7 @@ begin
         if C is TSpinEdit then Ini.WriteString('radiant', C.Name, IntToStr(TSpinEdit(C).Value))
         else if C is TEdit then Ini.WriteString('radiant', C.Name, TEdit(C).Text)
         else if C is TComboBox then Ini.WriteInteger('radiant', C.Name, TComboBox(C).ItemIndex)
-        else if C is TCheckBox then Ini.WriteBool('radiant', C.Name, TCheckBox(C).Checked);
+        else if C is TBGRAThemeCheckBox then Ini.WriteBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);
       end;
       Ini.WriteInteger('radiant', 'GiveUp', FGiveUpIdx);
       Ini.WriteBool('radiant', 'LessFriendly', FLessFriendly);
@@ -464,7 +461,7 @@ begin
           else if C is TEdit then TEdit(C).Text := Ini.ReadString('radiant', C.Name, TEdit(C).Text)
           else if C is TComboBox then
             TComboBox(C).ItemIndex := EnsureRange(Ini.ReadInteger('radiant', C.Name, 0), 0, TComboBox(C).Items.Count - 1)
-          else if C is TCheckBox then TCheckBox(C).Checked := Ini.ReadBool('radiant', C.Name, TCheckBox(C).Checked);
+          else if C is TBGRAThemeCheckBox then TBGRAThemeCheckBox(C).Checked := Ini.ReadBool('radiant', C.Name, TBGRAThemeCheckBox(C).Checked);
         end;
       finally
         Ini.Free;
@@ -851,14 +848,14 @@ end;
 { the zone whose tab is up; -1 on the All zones tab }
 function TRadiantForm.SelectedZone: Integer;
 begin
-  Result := tcZones.TabIndex;
+  Result := FZoneTabs.TabIndex;
   if (Result < 0) or (Result > High(FZones)) then Result := -1;
 end;
 
 procedure TRadiantForm.SelectZone(Z: Integer);
 begin
-  if (Z < 0) or (Z > High(FZones)) or (Z >= tcZones.Tabs.Count) then Exit;
-  if tcZones.TabIndex <> Z then tcZones.TabIndex := Z;
+  if (Z < 0) or (Z > High(FZones)) or (Z >= FZoneTabs.Tabs.Count) then Exit;
+  if FZoneTabs.TabIndex <> Z then FZoneTabs.TabIndex := Z;
   ShowZonePanel;
   pbPlan.Invalidate;
 end;
@@ -975,7 +972,7 @@ begin
   Z := SelectedZone;
   if (Z < 0) or (Z > High(FZoneNames)) then Exit;
   FZoneNames[Z] := Trim(edZoneName.Text);
-  if Z < tcZones.Tabs.Count then tcZones.Tabs[Z] := ZoneTitle(Z);
+  if Z < FZoneTabs.Tabs.Count then FZoneTabs.Tabs[Z] := ZoneTitle(Z);
   SaveNames;
   Summarize;
 end;
@@ -998,8 +995,8 @@ end;
   the box. }
 procedure TRadiantForm.CheckLabelClick(Sender: TObject);
 begin
-  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TCheckBox) and TLabel(Sender).FocusControl.Enabled then
-    with TCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
+  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TBGRAThemeCheckBox) and TLabel(Sender).FocusControl.Enabled then
+    with TBGRAThemeCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
 end;
 
 { the heat load: its own dialog; once used it goes in the submittal }
@@ -1034,23 +1031,23 @@ procedure TRadiantForm.ListZones;
 var
   Z, Was, N: Integer;
 begin
-  Was := tcZones.TabIndex;
+  Was := FZoneTabs.TabIndex;
   if Length(FZoneNames) <> Length(FZones) then LoadNames;
   N := Length(FZones);
   if N > 1 then Inc(N);
-  if tcZones.Tabs.Count <> N then
+  if FZoneTabs.Tabs.Count <> N then
   begin
-    tcZones.Tabs.BeginUpdate;
+    FZoneTabs.Tabs.BeginUpdate;
     try
-      tcZones.Tabs.Clear;
-      for Z := 0 to High(FZones) do tcZones.Tabs.Add(ZoneTitle(Z));
-      if Length(FZones) > 1 then tcZones.Tabs.Add('All zones');
+      FZoneTabs.Tabs.Clear;
+      for Z := 0 to High(FZones) do FZoneTabs.Tabs.Add(ZoneTitle(Z));
+      if Length(FZones) > 1 then FZoneTabs.Tabs.Add('All zones');
     finally
-      tcZones.Tabs.EndUpdate;
+      FZoneTabs.Tabs.EndUpdate;
     end;
   end;
-  if (Was >= 0) and (Was < tcZones.Tabs.Count) then tcZones.TabIndex := Was
-  else if tcZones.Tabs.Count > 0 then tcZones.TabIndex := 0;
+  if (Was >= 0) and (Was < FZoneTabs.Tabs.Count) then FZoneTabs.TabIndex := Was
+  else if FZoneTabs.Tabs.Count > 0 then FZoneTabs.TabIndex := 0;
   ShowZonePanel;
 end;
 
@@ -1728,7 +1725,7 @@ begin
     Exit;
   end;
   DropZone(Z, True);
-  tcZones.Tabs.Clear;
+  FZoneTabs.Tabs.Clear;
   ListZones;
   ShowLeftOut;
   SaveNames;
@@ -1775,7 +1772,7 @@ begin
   { names, pins and heat load read again for the zones as they are now }
   FZoneNames := nil;
   LoadNames;
-  tcZones.Tabs.Clear;
+  FZoneTabs.Tabs.Clear;
   ListZones;
   ShowLeftOut;
   Summarize;

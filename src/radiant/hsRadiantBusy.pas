@@ -12,7 +12,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, ExtCtrls, Graphics, Spin,
-  LCLType, BCButton, hsDialogSkin;
+  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, hsDialogSkin;
 
 type
   { draws a layout the search has found into the preview: the one whose
@@ -25,8 +25,8 @@ type
     btnStop: TBCButton;
     btnStopAll: TBCButton;
     cbGiveUp: TComboBox;
-    cbBusyLess: TCheckBox;
-    cbBusyHooks: TCheckBox;
+    cbBusyLess: TBGRAThemeCheckBox;
+    cbBusyHooks: TBGRAThemeCheckBox;
     lblBusyLess: TLabel;
     lblBusyHooks: TLabel;
     edBusyCover: TSpinEdit;
@@ -233,8 +233,8 @@ end;
   ticks the box. }
 procedure TRadiantBusyForm.CheckLabelClick(Sender: TObject);
 begin
-  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TCheckBox) and TLabel(Sender).FocusControl.Enabled then
-    with TCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
+  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TBGRAThemeCheckBox) and TLabel(Sender).FocusControl.Enabled then
+    with TBGRAThemeCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
 end;
 
 function TRadiantBusyForm.GiveUpSecs: Integer;

@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
-  ComCtrls, Dialogs, LCLIntf, LCLType, Types, BCButton, hsPaths, hsDrawing,
+  ComCtrls, Dialogs, LCLIntf, LCLType, Types, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsPaths, hsDrawing,
   hsPipe, hsPreview, hsDialogSkin;
 
 type
@@ -23,8 +23,8 @@ type
     btnLeg: TBCButton;
     btnReport: TBCButton;
     btnUndo: TBCButton;
-    cbDims: TCheckBox;
-    cbLines: TCheckBox;
+    cbDims: TBGRAThemeCheckBox;
+    cbLines: TBGRAThemeCheckBox;
     cbMeasure: TComboBox;
     lblMeasureHint: TLabel;
     cbAfter: TComboBox;
@@ -48,10 +48,15 @@ type
     memTicket: TMemo;
     pb3D: TPaintBox;
     pbSketch: TPaintBox;
-    pcViews: TPageControl;
-    rgRadius: TRadioGroup;
-    tsIso: TTabSheet;
-    ts3D: TTabSheet;
+    pcViews: TPanel;
+    rgRadius: TPanel;
+    tsIso: TPage;
+    ts3D: TPage;
+    rgRadiusCaption: TLabel;
+    rgRadius1: TBGRAThemeRadioButton;
+    rgRadius2: TBGRAThemeRadioButton;
+    pbViewTabs: TPaintBox;
+    nbViews: TNotebook;
     procedure AnyChange(Sender: TObject);
     procedure MeasureChange(Sender: TObject);
     procedure AfterChange(Sender: TObject);
@@ -163,6 +168,7 @@ begin
   FSel := -1;
   lblStatus.Caption := 'Click where the first leg ends.';
   hsDialogSkin.ThemeForm(Self);
+  THsTabStrip.Create(pbViewTabs, nbViews, ['Iso sketch', '3D']);
 end;
 
 { Drawn buttons cannot be Cancel, so Escape is handled here.  Enter is left
@@ -215,7 +221,7 @@ begin
   S := Default(TSpoolSpec);
   S.Size := Max(0, cbSize.ItemIndex);
   S.Finish := TPipeFinish(Max(0, cbFinish.ItemIndex));
-  S.LongRadius := rgRadius.ItemIndex <> 1;
+  S.LongRadius := RadioIndex(rgRadius) <> 1;
   S.Ends[0] := TPipeEnd(Max(0, cbEnd0.ItemIndex));
   S.Ends[1] := TPipeEnd(Max(0, cbEnd1.ItemIndex));
   S.Legs := Copy(FLegs);

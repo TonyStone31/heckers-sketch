@@ -72,7 +72,7 @@ object SourceForm: TSourceForm
       Caption = 'Pick'
       OnClick = btnPickClick
     end
-    object chkOnTop: TCheckBox
+    object chkOnTop: TBGRAThemeCheckBox
       Left = 1108
       Height = 22
       Top = 7
@@ -82,7 +82,7 @@ object SourceForm: TSourceForm
       TabOrder = 7
       OnChange = chkOnTopChange
     end
-    object chkOnlyPicked: TCheckBox
+    object chkOnlyPicked: TBGRAThemeCheckBox
       Left = 979
       Height = 22
       Top = 7

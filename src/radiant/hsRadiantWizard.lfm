@@ -209,13 +209,12 @@ object RadiantForm: TRadiantForm
       AutoSize = False
       Caption = '% of each other'
     end
-    object cbHookPairs: TCheckBox
+    object cbHookPairs: TBGRAThemeCheckBox
       Left = 16
       Height = 22
       Top = 350
       Width = 22
       Hint = 'two neighboring loops share their rows, split by one hook at the far wall - one mark a loop; the search tries it alongside plain layouts'
-      ShowHint = True
       TabOrder = 20
     end
     object lblHookPairs: TLabel
@@ -267,13 +266,12 @@ object RadiantForm: TRadiantForm
       Font.Color = clGrayText
       ParentFont = False
     end
-    object cbLabels: TCheckBox
+    object cbLabels: TBGRAThemeCheckBox
       Left = 16
       Height = 22
       Top = 546
       Width = 22
       Hint = 'on the drawing - /hide labels and /show labels later'
-      ShowHint = True
       TabOrder = 10
     end
     object lblLabels: TLabel
@@ -430,13 +428,23 @@ object RadiantForm: TRadiantForm
     Width = 356
     BevelOuter = bvNone
     TabOrder = 2
-    object tcZones: TTabControl
+    object pnZones: TPanel
       Left = 8
       Height = 714
       Top = 8
       Width = 340
-      OnChange = tcZonesChange
+      BevelOuter = bvNone
+      Caption = ''
+      ClientHeight = 714
+      ClientWidth = 340
       TabOrder = 21
+      object pbZoneTabs: TPaintBox
+        Left = 0
+        Height = 30
+        Top = 0
+        Width = 340
+        Align = alTop
+      end
       object pnZone: TPanel
         Left = 0
         Height = 624
@@ -464,14 +472,12 @@ object RadiantForm: TRadiantForm
           TextHint = 'Kitchen, barn east bay...'
           OnChange = edZoneNameChange
         end
-        object cbPinManifold: TCheckBox
+        object cbPinManifold: TBGRAThemeCheckBox
           Left = 8
           Height = 22
           Top = 40
           Width = 22
           Hint = 'The search never slides this zone''s manifold along its wall'
-          ParentShowHint = False
-          ShowHint = True
           TabOrder = 1
           OnChange = cbPinManifoldChange
         end

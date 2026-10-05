@@ -13,6 +13,17 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- **Check boxes, choices and tabs are readable on Windows.**  In the dark' + LineEnding +
+    '  theme their words came out dark on dark, and the tabs were always' + LineEnding +
+    '  light; they are now drawn in the dialog''s own colors, light or dark.' + LineEnding +
+    '- **The pipe scratchpad''s lined paper shows** - pale blue, like an iso' + LineEnding +
+    '  pad.  The gray lines were too faint to see on some screens.' + LineEnding +
+    '- **The scratchpad''s Material box says "Carbon steel"**, which fits.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.04' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

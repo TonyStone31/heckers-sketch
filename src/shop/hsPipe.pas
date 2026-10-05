@@ -70,7 +70,7 @@ const
   { bend step, 7.5 degrees: a ninety comes out in twelve steps }
   BEND_STEP = Pi / 24;
   PIPE_FINISH_NAMES: array[TPipeFinish] of string =
-    ('Black - carbon steel', 'Stainless');
+    ('Carbon steel', 'Stainless');
 
 { the bend radius of the elbows, in drawing units }
 function ElbowRadius(const S: TSpoolSpec): Double;

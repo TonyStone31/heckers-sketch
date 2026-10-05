@@ -15,7 +15,7 @@ uses
   SynEdit, SynEditTypes, SynGutterBase, SynGutter, SynGutterCodeFolding,
   SynGutterLineNumber, SynEditMarkupHighAll, SynEditMarkupWordGroup, SynEditMouseCmds, LCLIntf,
   SynEditMiscProcs, LazSynEditText, SynEditFoldedView,
-  BCButton, hsDrawing, hsHeckHighlight, hsJigRun, hsHeckSample, hsHeckComplete,
+  BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsHeckHighlight, hsJigRun, hsHeckSample, hsHeckComplete,
   hsHeckWriter, StrUtils, hsDialogSkin;
 
 type
@@ -41,8 +41,8 @@ type
   TJigGutter = class;
 
   TSourceForm = class(TForm)
-    chkOnlyPicked: TCheckBox;
-    chkOnTop: TCheckBox;
+    chkOnlyPicked: TBGRAThemeCheckBox;
+    chkOnTop: TBGRAThemeCheckBox;
     btnFold: TBCButton;
     btnApply: TBCButton;
     btnRevert: TBCButton;

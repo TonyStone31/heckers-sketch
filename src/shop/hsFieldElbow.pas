@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics,
-  LCLType, BCButton, hsDrawing, hsFittings, hsDialogSkin;
+  LCLType, BCButton, BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsDrawing, hsFittings, hsDialogSkin;
 
 type
   TFieldElbowForm = class(TForm)
@@ -33,7 +33,10 @@ type
     lblResult: TLabel;
     lblTitle: TLabel;
     pbSketch: TPaintBox;
-    rgHow: TRadioGroup;
+    rgHow: TPanel;
+    rgHowCaption: TLabel;
+    rgHow1: TBGRAThemeRadioButton;
+    rgHow2: TBGRAThemeRadioButton;
     procedure AnyChange(Sender: TObject);
     procedure pbSketchPaint(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -113,7 +116,7 @@ var
 begin
   if not (InchesOf(edFwd.Text, Fwd) and InchesOf(edOver.Text, Over)) then
     Exit('The near corner needs both numbers.');
-  if rgHow.ItemIndex = 0 then
+  if RadioIndex(rgHow) = 0 then
   begin
     if not TryStrToFloat(Trim(edAngle.Text), Deg) then Exit('The angle did not read.');
     Theta := DegToRad(Deg);
@@ -137,9 +140,9 @@ procedure TFieldElbowForm.AnyChange(Sender: TObject);
 var
   Err: string;
 begin
-  edAngle.Enabled := rgHow.ItemIndex = 0;
-  edFwd2.Enabled := rgHow.ItemIndex = 1;
-  edOver2.Enabled := rgHow.ItemIndex = 1;
+  edAngle.Enabled := RadioIndex(rgHow) = 0;
+  edFwd2.Enabled := RadioIndex(rgHow) = 1;
+  edOver2.Enabled := RadioIndex(rgHow) = 1;
   Err := Solve;
   if Err = '' then
   begin

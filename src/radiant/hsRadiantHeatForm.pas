@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Spin, LCLType,
-  BCButton, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat;
+  BCButton, BGRATheme, BGRAThemeCheckBox, BCPanel, hsDrawing, hsRadiantData, hsRadiant, hsRadiantHeat;
 
 type
 
@@ -25,7 +25,7 @@ type
     cbAbove: TComboBox;
     cbClimate: TComboBox;
     cbCover: TComboBox;
-    cbDhw: TCheckBox;
+    cbDhw: TBGRAThemeCheckBox;
     lblDhw: TLabel;
     cbRun: TComboBox;
     cbSlab: TComboBox;
@@ -157,7 +157,7 @@ begin
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
       if C is TComboBox then TComboBox(C).Font.Height := -13;
     end
-    else if C is TCheckBox then hsDialogSkin.SkinCheck(TCheckBox(C))
+    else if C is TBGRAThemeCheckBox then hsDialogSkin.SkinCheck(TBGRAThemeCheckBox(C))
     else if C is TLabel then
     begin
       TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
@@ -483,8 +483,8 @@ end;
   ticks the box. }
 procedure TRadiantHeatForm.CheckLabelClick(Sender: TObject);
 begin
-  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TCheckBox) and TLabel(Sender).FocusControl.Enabled then
-    with TCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
+  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TBGRAThemeCheckBox) and TLabel(Sender).FocusControl.Enabled then
+    with TBGRAThemeCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
 end;
 
 procedure TRadiantHeatForm.btnClimateHelpClick(Sender: TObject);

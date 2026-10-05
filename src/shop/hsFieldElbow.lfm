@@ -74,27 +74,41 @@ object FieldElbowForm: TFieldElbowForm
     TabOrder = 1
     Text = '20'
   end
-  object rgHow: TRadioGroup
+  object rgHow: TPanel
     Left = 24
     Height = 60
     Top = 220
     Width = 460
-    AutoFill = True
-    Caption = 'Which way it runs'
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 2
-    Columns = 2
-    ItemIndex = 0
-    Items.Strings = (
-      'I know the angle'
-      'A second point along its inside edge'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 60
+    ClientWidth = 460
     TabOrder = 2
+    object rgHowCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 460
+      AutoSize = False
+      Caption = 'Which way it runs'
+    end
+    object rgHow1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 20
+      Top = 20
+      Width = 460
+      Caption = 'I know the angle'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgHow2: TBGRAThemeRadioButton
+      Left = 0
+      Height = 20
+      Top = 40
+      Width = 460
+      Caption = 'A second point along its inside edge'
+      OnChange = AnyChange
+    end
   end
   object lblAngle: TLabel
     Left = 24

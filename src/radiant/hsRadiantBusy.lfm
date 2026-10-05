@@ -111,13 +111,12 @@ object RadiantBusyForm: TRadiantBusyForm
     TabOrder = 6
     Text = 'never'
   end
-  object cbBusyLess: TCheckBox
+  object cbBusyLess: TBGRAThemeCheckBox
     Left = 24
     Height = 22
     Top = 156
     Width = 22
     Hint = 'off, the search keeps to layouts an installer lays easily (85 of 100 or better) - change it while it searches'
-    ShowHint = True
     TabOrder = 7
   end
   object lblBusyLess: TLabel
@@ -132,15 +131,13 @@ object RadiantBusyForm: TRadiantBusyForm
     ShowHint = True
     OnClick = CheckLabelClick
   end
-  object cbBusyHooks: TCheckBox
+  object cbBusyHooks: TBGRAThemeCheckBox
     Left = 370
     Height = 22
     Top = 156
     Width = 22
     Checked = True
     Hint = 'a loop run on over its neighbor''s first two rows to even the loops - four bends; off, never tried'
-    ShowHint = True
-    State = cbChecked
     TabOrder = 8
   end
   object lblBusyHooks: TLabel

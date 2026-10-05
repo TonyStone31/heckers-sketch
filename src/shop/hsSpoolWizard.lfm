@@ -67,27 +67,41 @@ object SpoolForm: TSpoolForm
     Style = csDropDownList
     TabOrder = 20
   end
-  object rgRadius: TRadioGroup
+  object rgRadius: TPanel
     Left = 16
     Height = 52
     Top = 140
     Width = 250
-    AutoFill = True
-    Caption = 'Elbows'
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 2
-    Columns = 2
-    ItemIndex = 0
-    Items.Strings = (
-      'Long radius'
-      'Short radius'
-    )
-    OnClick = AnyChange
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 52
+    ClientWidth = 250
     TabOrder = 1
+    object rgRadiusCaption: TLabel
+      Left = 0
+      Height = 18
+      Top = 0
+      Width = 250
+      AutoSize = False
+      Caption = 'Elbows'
+    end
+    object rgRadius1: TBGRAThemeRadioButton
+      Left = 0
+      Height = 24
+      Top = 20
+      Width = 125
+      Caption = 'Long radius'
+      Checked = True
+      OnChange = AnyChange
+    end
+    object rgRadius2: TBGRAThemeRadioButton
+      Left = 125
+      Height = 24
+      Top = 20
+      Width = 125
+      Caption = 'Short radius'
+      OnChange = AnyChange
+    end
   end
   object lblEnd0: TLabel
     Left = 16
@@ -218,14 +232,13 @@ object SpoolForm: TSpoolForm
     OnChange = AnyChange
     TabOrder = 7
   end
-  object cbDims: TCheckBox
+  object cbDims: TBGRAThemeCheckBox
     Left = 16
     Height = 22
     Top = 544
     Width = 120
     Caption = 'Lengths on'
     Checked = True
-    State = cbChecked
     OnChange = AnyChange
     TabOrder = 8
   end
@@ -241,40 +254,52 @@ object SpoolForm: TSpoolForm
     ScrollBars = ssAutoVertical
     TabOrder = 9
   end
-  object pcViews: TPageControl
+  object pcViews: TPanel
     Left = 280
     Height = 596
     Top = 78
     Width = 704
-    ActivePage = tsIso
-    TabIndex = 0
+    BevelOuter = bvNone
+    Caption = ''
+    ClientHeight = 596
+    ClientWidth = 704
     TabOrder = 10
-    object tsIso: TTabSheet
-      Caption = 'Iso sketch'
-      ClientHeight = 562
-      ClientWidth = 696
-      object pbSketch: TPaintBox
-        Left = 0
-        Height = 562
-        Top = 0
-        Width = 696
-        Align = alClient
-        OnMouseDown = pbSketchMouseDown
-        OnMouseMove = pbSketchMouseMove
-        OnPaint = pbSketchPaint
-      end
+    object pbViewTabs: TPaintBox
+      Left = 0
+      Height = 30
+      Top = 0
+      Width = 704
+      Align = alTop
     end
-    object ts3D: TTabSheet
-      Caption = '3D'
-      ClientHeight = 562
-      ClientWidth = 696
-      object pb3D: TPaintBox
-        Left = 0
-        Height = 562
-        Top = 0
-        Width = 696
-        Align = alClient
-        OnPaint = pb3DPaint
+    object nbViews: TNotebook
+      Left = 0
+      Height = 566
+      Top = 30
+      Width = 704
+      PageIndex = 0
+      Align = alClient
+      TabOrder = 0
+      object tsIso: TPage
+        object pbSketch: TPaintBox
+          Left = 0
+          Height = 562
+          Top = 0
+          Width = 696
+          Align = alClient
+          OnMouseDown = pbSketchMouseDown
+          OnMouseMove = pbSketchMouseMove
+          OnPaint = pbSketchPaint
+        end
+      end
+      object ts3D: TPage
+        object pb3D: TPaintBox
+          Left = 0
+          Height = 562
+          Top = 0
+          Width = 696
+          Align = alClient
+          OnPaint = pb3DPaint
+        end
       end
     end
   end
@@ -327,7 +352,7 @@ object SpoolForm: TSpoolForm
     Caption = 'Build it'
     OnClick = btnBuildClick
   end
-  object cbLines: TCheckBox
+  object cbLines: TBGRAThemeCheckBox
     Left = 140
     Height = 22
     Top = 544

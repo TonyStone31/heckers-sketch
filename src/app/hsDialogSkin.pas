@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -37,9 +37,53 @@ procedure DragBegin(out D: TFormDrag; F: TForm);
 procedure DragTo(const D: TFormDrag; F: TForm);
 procedure DragEnd(var D: TFormDrag);
 
+type
+  { Check boxes and radio buttons drawn in the dialog colors.  Windows draws
+    its own in its own colors whatever the font says, which on a dark dialog
+    left their words dark on dark.  ThemeForm gives every BGRA theme control
+    this theme. }
+  THsBoxTheme = class(TBGRATheme)
+  private
+    procedure DrawBox(const Caption: string; State: TBGRAThemeButtonState;
+      Focused, Checked, Round: Boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+  public
+    procedure DrawCheckBox(Caption: string; State: TBGRAThemeButtonState;
+      Focused: boolean; Checked: boolean; ARect: TRect;
+      ASurface: TBGRAThemeSurface); override;
+    procedure DrawRadioButton(Caption: string; State: TBGRAThemeButtonState;
+      Focused: boolean; Checked: boolean; ARect: TRect;
+      ASurface: TBGRAThemeSurface); override;
+  end;
+
+  { Tabs drawn on a paint box in the dialog colors, for the same reason: a
+    page control's tabs are the desktop's light ones whatever the dialog.
+    Turns Pages, when given.  OnChange fires on a click only. }
+  THsTabStrip = class(TComponent)
+  private
+    FBox: TPaintBox;
+    FPages: TNotebook;
+    FTabs: TStringList;
+    FIndex: Integer;
+    FOnChange: TNotifyEvent;
+    procedure Paint(Sender: TObject);
+    procedure MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure TabsChanged(Sender: TObject);
+    procedure SetIndex(V: Integer);
+    function TabRight(I: Integer): Integer;
+  public
+    constructor Create(ABox: TPaintBox; APages: TNotebook;
+      const Names: array of string); reintroduce;
+    destructor Destroy; override;
+    property Tabs: TStringList read FTabs;
+    property TabIndex: Integer read FIndex write SetIndex;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+  end;
+
 var
   { the dialogs' current theme, set by UseTheme }
   DlgTheme: TTheme;
+  BoxTheme: THsBoxTheme;
 
 { Call before building a dialog. }
 procedure UseTheme(const T: TTheme);
@@ -54,7 +98,7 @@ procedure SkinButton(B: TBCButton; Kind: TBtnKind; FontH: Integer = 0);
 procedure SkinLabel(L: TBCLabel; Dim: Boolean = False; FontH: Integer = 0;
   Bold: Boolean = False);
 procedure SkinEdit(E: TEdit);
-procedure SkinCheck(C: TCheckBox);
+procedure SkinCheck(C: TBGRAThemeControl);
 procedure SkinTrack(T: TTrackBar);
 { Themes every control on a form by kind, colors only; sizes and fonts stay
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
@@ -63,6 +107,14 @@ procedure ThemeForm(F: TForm);
 { fill for a text field: darker than the panel on a dark theme, near white
   on a light one }
 function FieldColor: TColor;
+
+{ A radio group is a panel of BGRA radio buttons; they count in the order
+  they were laid out.  RadioIndex is -1 when none is checked. }
+function RadioIndex(P: TWinControl): Integer;
+procedure SetRadioIndex(P: TWinControl; I: Integer);
+function RadioText(P: TWinControl; I: Integer): string;
+function RadioCount(P: TWinControl): Integer;
+function IsRadioPanel(C: TComponent): Boolean;
 
 implementation
 
@@ -100,6 +152,7 @@ end;
 procedure UseTheme(const T: TTheme);
 begin
   DlgTheme := T;
+  if BoxTheme <> nil then BoxTheme.InvalidateThemedControls;
 end;
 
 function Shade(C: TColor; Amount: Double): TColor;
@@ -291,14 +344,13 @@ begin
   E.BorderStyle := bsSingle;
 end;
 
-procedure SkinCheck(C: TCheckBox);
+procedure SkinCheck(C: TBGRAThemeControl);
 begin
-  C.Color := PixToColor(DlgTheme.Panel);
-  C.Font.Color := PixToColor(DlgTheme.Text);
-  C.Font.Height := -13;
-  C.ParentColor := False;
+  C.Theme := BoxTheme;
+  { the class does not publish ShowHint, so a hint from the form is shown
+    from here }
+  if C.Hint <> '' then C.ShowHint := True;
 end;
-
 procedure SkinTrack(T: TTrackBar);
 begin
   T.Color := PixToColor(DlgTheme.Panel);
@@ -352,23 +404,317 @@ begin
       TWinControl(C).Color := FieldColor;
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
     end
-    else if (C is TCustomCheckBox) or (C is TRadioButton) then
-    begin
-      TWinControl(C).Color := PixToColor(DlgTheme.Shell1);
-      TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
-    end
+    else if C is TBGRAThemeControl then
+      SkinCheck(TBGRAThemeControl(C))
     else if C is TTrackBar then
       SkinTrack(TTrackBar(C))
-    { page control tabs are always drawn in the desktop's light colors, so
-      their text keeps the desktop's color too }
-    else if C is TCustomTabControl then
-      TCustomTabControl(C).Font.Color := clDefault
-    else if (C is TCustomGroupBox) or (C is TCustomPanel) or (C is TTabSheet) then
+    else if (C is TCustomPanel) or (C is TNotebook) or (C is TPage) then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell1);
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
     end;
   end;
 end;
+
+type
+  { for ParentColor, which is protected; reached through a Pointer since
+    the checked build refuses the class cast }
+  TWinControlAccess = class(TWinControl);
+
+{ the color behind a control: the nearest parent that has one of its own }
+function BackOf(C: TControl): TColor;
+begin
+  Result := PixToColor(DlgTheme.Shell1);
+  if C = nil then Exit;
+  C := C.Parent;
+  while C <> nil do
+  begin
+    if C is TBCPanel then Exit(TBCPanel(C).Background.Color);
+    if (C.Color <> clDefault) and not ((C is TWinControl) and TWinControlAccess(Pointer(C)).ParentColor) then
+      Exit(C.Color);
+    C := C.Parent;
+  end;
+end;
+
+function PixOfColor(C: TColor): TBGRAPixel;
+begin
+  Result := ColorToBGRA(ColorToRGB(C));
+end;
+
+procedure THsBoxTheme.DrawBox(const Caption: string; State: TBGRAThemeButtonState;
+  Focused, Checked, Round: Boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+var
+  Ctl: TCustomControl;
+  C: TCanvas;
+  Bmp: TBGRABitmap;
+  S, Y, I, Gap: Integer;
+  W, Lw: Single;
+  Edge, Fill, Mark: TBGRAPixel;
+  Txt: TColor;
+  St: TTextStyle;
+  A: TPix;
+begin
+  Ctl := nil;
+  for I := 0 to ThemedControlCount - 1 do
+    if ThemedControl[I].Canvas = ASurface.DestCanvas then Ctl := ThemedControl[I];
+  C := ASurface.DestCanvas;
+  C.Brush.Style := bsSolid;
+  C.Brush.Color := BackOf(Ctl);
+  C.FillRect(ARect);
+
+  A := DlgTheme.Accent;
+  Fill := PixOfColor(FieldColor);
+  Txt := PixToColor(DlgTheme.Text);
+  if State = btbsDisabled then
+  begin
+    Edge := PixOfColor(PixToColor(DlgTheme.TextDim));
+    Txt := PixToColor(DlgTheme.TextDim);
+  end
+  else if Focused or (State in [btbsHover, btbsActive]) then
+    Edge := BGRA(A.R, A.G, A.B)
+  else
+    Edge := PixOfColor(PixToColor(DlgTheme.TextDim));
+  { a dark mark on a pale accent, a white one on a deep accent }
+  if A.R * 3 + A.G * 6 + A.B >= 1400 then Mark := PixOfColor(PixToColor(DlgTheme.Shell1))
+  else Mark := BGRAWhite;
+
+  S := ASurface.ScaleForCanvas(16);
+  Y := ARect.Top + (ARect.Height - S) div 2;
+  ASurface.BitmapRect := Rect(ARect.Left + 1, Y, ARect.Left + 1 + S, Y + S);
+  Bmp := ASurface.Bitmap;
+  W := Bmp.Width;
+  Lw := W / 14;
+  if Lw < 1 then Lw := 1;
+  if Round then
+  begin
+    Bmp.EllipseAntialias((W - 1) / 2, (W - 1) / 2, W / 2 - Lw, W / 2 - Lw, Edge, Lw, Fill);
+    if Checked then
+      Bmp.FillEllipseAntialias((W - 1) / 2, (W - 1) / 2, W / 4.2, W / 4.2,
+        BGRA(A.R, A.G, A.B));
+  end
+  else if Checked and (State <> btbsDisabled) then
+  begin
+    Bmp.FillRoundRectAntialias(0.5, 0.5, W - 1.5, W - 1.5, W * 0.22, W * 0.22,
+      BGRA(A.R, A.G, A.B));
+    Bmp.DrawPolyLineAntialias([PointF(W * 0.24, W * 0.52), PointF(W * 0.42, W * 0.70),
+      PointF(W * 0.76, W * 0.32)], Mark, W / 8);
+  end
+  else
+  begin
+    Bmp.RoundRectAntialias(Lw / 2, Lw / 2, W - 1 - Lw / 2, W - 1 - Lw / 2,
+      W * 0.22, W * 0.22, Edge, Lw, Fill);
+    if Checked then
+      Bmp.DrawPolyLineAntialias([PointF(W * 0.24, W * 0.52), PointF(W * 0.42, W * 0.70),
+        PointF(W * 0.76, W * 0.32)], Edge, W / 8);
+  end;
+  ASurface.DrawBitmap;
+
+  if Caption = '' then Exit;
+  if Ctl <> nil then C.Font.Assign(Ctl.Font);
+  C.Font.Color := Txt;
+  C.Brush.Style := bsClear;
+  FillChar(St, SizeOf(St), 0);
+  St.Layout := tlCenter;
+  St.SingleLine := True;
+  St.EndEllipsis := True;
+  St.Clipping := True;
+  Gap := ASurface.ScaleForCanvas(7);
+  C.TextRect(Rect(ARect.Left + S + Gap, ARect.Top, ARect.Right, ARect.Bottom),
+    ARect.Left + S + Gap, ARect.Top, Caption, St);
+end;
+
+procedure THsBoxTheme.DrawCheckBox(Caption: string; State: TBGRAThemeButtonState;
+  Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+begin
+  DrawBox(Caption, State, Focused, Checked, False, ARect, ASurface);
+end;
+
+procedure THsBoxTheme.DrawRadioButton(Caption: string; State: TBGRAThemeButtonState;
+  Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+begin
+  DrawBox(Caption, State, Focused, Checked, True, ARect, ASurface);
+end;
+
+constructor THsTabStrip.Create(ABox: TPaintBox; APages: TNotebook;
+  const Names: array of string);
+var
+  I: Integer;
+begin
+  inherited Create(ABox);
+  FBox := ABox;
+  FPages := APages;
+  FTabs := TStringList.Create;
+  for I := 0 to High(Names) do FTabs.Add(Names[I]);
+  FTabs.OnChange := @TabsChanged;
+  FIndex := 0;
+  if FPages <> nil then FPages.PageIndex := 0;
+  FBox.OnPaint := @Paint;
+  FBox.OnMouseDown := @MouseDown;
+end;
+
+destructor THsTabStrip.Destroy;
+begin
+  FTabs.Free;
+  inherited Destroy;
+end;
+
+procedure THsTabStrip.TabsChanged(Sender: TObject);
+begin
+  if FIndex >= FTabs.Count then FIndex := FTabs.Count - 1;
+  FBox.Invalidate;
+end;
+
+procedure THsTabStrip.SetIndex(V: Integer);
+begin
+  if (V < 0) or (V >= FTabs.Count) or (V = FIndex) then Exit;
+  FIndex := V;
+  if (FPages <> nil) and (V < FPages.PageCount) then FPages.PageIndex := V;
+  FBox.Invalidate;
+end;
+
+{ where tab I ends: tabs take their words' width, and share the strip
+  evenly when that does not fit }
+function THsTabStrip.TabRight(I: Integer): Integer;
+var
+  K, Pad, Total: Integer;
+  Wid: array of Integer;
+begin
+  FBox.Canvas.Font.Height := FBox.Scale96ToForm(-13);
+  Pad := FBox.Scale96ToForm(14);
+  SetLength(Wid, FTabs.Count);
+  Total := 0;
+  for K := 0 to FTabs.Count - 1 do
+  begin
+    Wid[K] := FBox.Canvas.TextWidth(FTabs[K]) + 2 * Pad;
+    Inc(Total, Wid[K]);
+  end;
+  if Total > FBox.Width then
+    for K := 0 to FTabs.Count - 1 do Wid[K] := FBox.Width div FTabs.Count;
+  Result := 0;
+  for K := 0 to I do Inc(Result, Wid[K]);
+end;
+
+procedure THsTabStrip.Paint(Sender: TObject);
+var
+  C: TCanvas;
+  I, X0, X1, H, Bar, R: Integer;
+  St: TTextStyle;
+begin
+  C := FBox.Canvas;
+  H := FBox.Height;
+  Bar := FBox.Scale96ToForm(3);
+  R := FBox.Scale96ToForm(8);
+  C.Brush.Style := bsSolid;
+  C.Brush.Color := BackOf(FBox);
+  C.FillRect(0, 0, FBox.Width, H);
+  { a hairline under the strip, so it reads as the top of the pages }
+  C.Pen.Color := PixToColor(MixPix(DlgTheme.Shell1, DlgTheme.TextDim, 0.35));
+  C.Line(0, H - 1, FBox.Width, H - 1);
+  FillChar(St, SizeOf(St), 0);
+  St.Alignment := taCenter;
+  St.Layout := tlCenter;
+  St.SingleLine := True;
+  St.EndEllipsis := True;
+  St.Clipping := True;
+  X0 := 0;
+  for I := 0 to FTabs.Count - 1 do
+  begin
+    X1 := TabRight(I);
+    if I = FIndex then
+    begin
+      C.Brush.Color := PixToColor(DlgTheme.Panel);
+      C.Pen.Color := C.Brush.Color;
+      C.RoundRect(X0, 0, X1, H + R, R, R);
+      C.Brush.Color := PixToColor(DlgTheme.Accent);
+      C.FillRect(X0 + R div 2, H - Bar, X1 - R div 2, H);
+      C.Font.Color := PixToColor(DlgTheme.Text);
+      C.Font.Style := [fsBold];
+    end
+    else
+    begin
+      C.Font.Color := PixToColor(DlgTheme.TextDim);
+      C.Font.Style := [];
+    end;
+    C.Brush.Style := bsClear;
+    C.TextRect(Rect(X0, 0, X1, H - Bar), X0, 0, FTabs[I], St);
+    C.Brush.Style := bsSolid;
+    X0 := X1;
+  end;
+end;
+
+procedure THsTabStrip.MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  I, Was: Integer;
+begin
+  if Button <> mbLeft then Exit;
+  for I := 0 to FTabs.Count - 1 do
+    if X < TabRight(I) then
+    begin
+      Was := FIndex;
+      SetIndex(I);
+      if (FIndex <> Was) and Assigned(FOnChange) then FOnChange(Self);
+      Exit;
+    end;
+end;
+
+function RadioCount(P: TWinControl): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 0 to P.ControlCount - 1 do
+    if P.Controls[I] is TBGRAThemeRadioButton then Inc(Result);
+end;
+
+function RadioAt(P: TWinControl; Idx: Integer): TBGRAThemeRadioButton;
+var
+  I, N: Integer;
+begin
+  N := 0;
+  for I := 0 to P.ControlCount - 1 do
+    if P.Controls[I] is TBGRAThemeRadioButton then
+    begin
+      if N = Idx then Exit(TBGRAThemeRadioButton(P.Controls[I]));
+      Inc(N);
+    end;
+  Result := nil;
+end;
+
+function RadioIndex(P: TWinControl): Integer;
+var
+  I: Integer;
+begin
+  for I := 0 to RadioCount(P) - 1 do
+    if RadioAt(P, I).Checked then Exit(I);
+  Result := -1;
+end;
+
+procedure SetRadioIndex(P: TWinControl; I: Integer);
+var
+  B: TBGRAThemeRadioButton;
+begin
+  B := RadioAt(P, I);
+  if B <> nil then B.Checked := True;
+end;
+
+function RadioText(P: TWinControl; I: Integer): string;
+var
+  B: TBGRAThemeRadioButton;
+begin
+  B := RadioAt(P, I);
+  if B <> nil then Result := B.Caption else Result := '';
+end;
+
+function IsRadioPanel(C: TComponent): Boolean;
+begin
+  Result := (C is TWinControl) and (RadioCount(TWinControl(C)) > 0);
+end;
+
+initialization
+  BoxTheme := THsBoxTheme.Create(nil);
+
+finalization
+  FreeAndNil(BoxTheme);
 
 end.

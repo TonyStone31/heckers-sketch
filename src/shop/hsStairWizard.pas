@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Math, Forms, Controls, StdCtrls, ExtCtrls, Graphics, Types, Spin, LCLType,
-  Dialogs, BCButton, hsDrawing, hsStairs;
+  Dialogs, BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsStairs;
 
 type
   { on two picked lines; typed and placed afterward by a click; or at a
@@ -42,9 +42,9 @@ type
     btnSource: TBCButton;
     btnStringers: TBCButton;
     btnSuggest: TBCButton;
-    cbClosed: TCheckBox;
+    cbClosed: TBGRAThemeCheckBox;
     cbFrom: TComboBox;
-    cbRound: TCheckBox;
+    cbRound: TBGRAThemeCheckBox;
     cbUse: TComboBox;
     edCount: TSpinEdit;
     edNosing: TEdit;
@@ -120,7 +120,7 @@ begin
   begin
     C := Components[I];
     if C is TEdit then SkinEdit(TEdit(C))
-    else if C is TCheckBox then SkinCheck(TCheckBox(C))
+    else if C is TBGRAThemeCheckBox then SkinCheck(TBGRAThemeCheckBox(C))
     else if (C is TSpinEdit) or (C is TComboBox) or (C is TMemo) then
     begin
       TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
@@ -382,8 +382,8 @@ end;
   caption dark on this dark panel.  A click on the label ticks the box. }
 procedure TStairForm.CheckLabelClick(Sender: TObject);
 begin
-  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TCheckBox) and TLabel(Sender).FocusControl.Enabled then
-    with TCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
+  if (Sender is TLabel) and (TLabel(Sender).FocusControl is TBGRAThemeCheckBox) and TLabel(Sender).FocusControl.Enabled then
+    with TBGRAThemeCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
 end;
 
 procedure TStairForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

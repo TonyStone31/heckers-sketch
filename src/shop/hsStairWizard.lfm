@@ -210,7 +210,7 @@ object StairForm: TStairForm
     AutoSize = False
     Caption = 'past the riser'
   end
-  object cbClosed: TCheckBox
+  object cbClosed: TBGRAThemeCheckBox
     Left = 20
     Height = 22
     Top = 414
@@ -228,7 +228,7 @@ object StairForm: TStairForm
     FocusControl = cbClosed
     OnClick = CheckLabelClick
   end
-  object cbRound: TCheckBox
+  object cbRound: TBGRAThemeCheckBox
     Left = 20
     Height = 22
     Top = 442

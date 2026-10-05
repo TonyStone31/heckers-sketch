@@ -176,7 +176,7 @@ object RadiantHeatForm: TRadiantHeatForm
       AutoSize = False
       Caption = 'ft'
     end
-    object cbDhw: TCheckBox
+    object cbDhw: TBGRAThemeCheckBox
       Left = 16
       Height = 22
       Top = 296

@@ -10,6 +10,17 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- **Check boxes, choices and tabs are readable on Windows.**  In the dark
+  theme their words came out dark on dark, and the tabs were always
+  light; they are now drawn in the dialog's own colors, light or dark.
+- **The pipe scratchpad's lined paper shows** - pale blue, like an iso
+  pad.  The gray lines were too faint to see on some screens.
+- **The scratchpad's Material box says "Carbon steel"**, which fits.
+
 ## v2026.10.04
 
 ### New
