@@ -12,6 +12,17 @@
 
 ## Next release
 
+### New
+
+- **Every dialog draws its own controls** - drop-down lists, number boxes,
+  text boxes, check boxes, choices, tabs, progress bars - in the dark or
+  light theme you picked, the same on Windows and Linux.  Drop-down lists
+  open inside the dialog in its colors.
+- **Text boxes undo** with Ctrl+Z (Ctrl+Y or Ctrl+Shift+Z to redo), and a
+  right-click gives Cut, Copy, Paste and Select All.
+- **The export dialog's options are real check boxes** - Show the axes,
+  Nothing behind it, Go round for ever and the rest.
+
 ### Fixed
 
 - **Check boxes, choices and tabs are readable on Windows.**  In the dark

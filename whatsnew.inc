@@ -15,6 +15,17 @@ const
     '' + LineEnding +
     '## Next release' + LineEnding +
     '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Every dialog draws its own controls** - drop-down lists, number boxes,' + LineEnding +
+    '  text boxes, check boxes, choices, tabs, progress bars - in the dark or' + LineEnding +
+    '  light theme you picked, the same on Windows and Linux.  Drop-down lists' + LineEnding +
+    '  open inside the dialog in its colors.' + LineEnding +
+    '- **Text boxes undo** with Ctrl+Z (Ctrl+Y or Ctrl+Shift+Z to redo), and a' + LineEnding +
+    '  right-click gives Cut, Copy, Paste and Select All.' + LineEnding +
+    '- **The export dialog''s options are real check boxes** - Show the axes,' + LineEnding +
+    '  Nothing behind it, Go round for ever and the rest.' + LineEnding +
+    '' + LineEnding +
     '### Fixed' + LineEnding +
     '' + LineEnding +
     '- **Check boxes, choices and tabs are readable on Windows.**  In the dark' + LineEnding +
