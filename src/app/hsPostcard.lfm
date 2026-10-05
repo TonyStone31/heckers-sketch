@@ -8,7 +8,9 @@ object HelloForm: THelloForm
   Caption = 'A postcard to the authors'
   ClientHeight = 670
   ClientWidth = 640
+  KeyPreview = True
   OnClose = FormClose
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   Position = poMainFormCenter
   object lblHead: TLabel
@@ -98,35 +100,32 @@ object HelloForm: THelloForm
     AutoSize = False
     Caption = ''
   end
-  object btnSave: TButton
+  object btnSave: TBCButton
+    Tag = 2
     Left = 24
     Height = 32
     Top = 622
     Width = 120
     Anchors = [akLeft, akBottom]
     Caption = 'Save a copy...'
-    TabOrder = 2
     OnClick = btnSaveClick
   end
-  object btnNo: TButton
+  object btnNo: TBCButton
     Left = 376
     Height = 32
     Top = 622
     Width = 120
     Anchors = [akRight, akBottom]
-    Cancel = True
     Caption = 'No thanks'
-    TabOrder = 3
     OnClick = btnNoClick
   end
-  object btnSend: TButton
+  object btnSend: TBCButton
     Left = 504
     Height = 32
     Top = 622
     Width = 112
     Anchors = [akRight, akBottom]
     Caption = 'Send it'
-    TabOrder = 4
     OnClick = btnSendClick
   end
 end

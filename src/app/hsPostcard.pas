@@ -11,7 +11,7 @@ unit hsPostcard;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Dialogs;
+  Classes, SysUtils, Forms, Controls, StdCtrls, Dialogs, LCLType, BCButton;
 
 type
 
@@ -26,13 +26,14 @@ type
     memNote: TMemo;
     lblHonest: TLabel;
     lblStage: TLabel;
-    btnSave: TButton;
-    btnNo: TButton;
-    btnSend: TButton;
+    btnSave: TBCButton;
+    btnNo: TBCButton;
+    btnSend: TBCButton;
     procedure btnNoClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure memNoteChange(Sender: TObject);
   private
@@ -162,13 +163,13 @@ procedure THelloForm.FormShow(Sender: TObject);
 begin
   FVersion := Version;
   hsDialogSkin.SkinForm(Self);
-  { bold labels have their own font, so set their color; stock buttons keep
-    the toolkit's text color }
+  { bold labels have their own font, so set their color }
   lblHead.Font.Color := PixToColor(DlgTheme.Text);
   lblWhat.Font.Color := PixToColor(DlgTheme.Text);
-  btnSave.Font.Color := clBtnText;
-  btnNo.Font.Color := clBtnText;
-  btnSend.Font.Color := clBtnText;
+  { No and Send look the same on purpose: neither is the one to press }
+  hsDialogSkin.SkinButton(btnSave, bkQuiet);
+  hsDialogSkin.SkinButton(btnNo, bkPlain);
+  hsDialogSkin.SkinButton(btnSend, bkPlain);
   memText.Color := PixToColor(DlgTheme.Shell2);
   memText.Font.Color := PixToColor(DlgTheme.Text);
   memNote.Color := PixToColor(DlgTheme.Shell2);
@@ -213,6 +214,17 @@ end;
 procedure THelloForm.memNoteChange(Sender: TObject);
 begin
   Refresh_;
+end;
+
+{ Esc is No, as the stock Cancel button made it }
+procedure THelloForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_ESCAPE) and btnNo.Enabled then
+  begin
+    btnNoClick(btnNo);
+    Key := 0;
+  end;
 end;
 
 procedure THelloForm.btnNoClick(Sender: TObject);
