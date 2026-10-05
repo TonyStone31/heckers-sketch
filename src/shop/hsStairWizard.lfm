@@ -138,8 +138,8 @@ object StairForm: TStairForm
   end
   object edCount: TBCTrackbarUpdown
     Left = 120
-    Height = 28
-    Top = 296
+    Height = 22
+    Top = 299
     Width = 80
     MaxValue = 200
     MinValue = 2
@@ -326,6 +326,8 @@ object StairForm: TStairForm
     WordWrap = True
   end
   object memAdvice: TInkMemo
+    Borders.Left = 4
+    Borders.Right = 16
     Font.Height = -12
     ParentFont = False
     Left = 360
@@ -333,7 +335,6 @@ object StairForm: TStairForm
     Top = 498
     Width = 620
     TabOrder = 10
-    TextFormat = itfPlain
     WordWrap = True
   end
   object btnCancel: TBCButton

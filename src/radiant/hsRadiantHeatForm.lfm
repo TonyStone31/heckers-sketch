@@ -47,8 +47,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edOutdoor: TBCTrackbarUpdown
       Left = 150
-      Height = 28
-      Top = 100
+      Height = 22
+      Top = 103
       Width = 70
       MaxValue = 70
       AllowNegativeValues = True
@@ -76,8 +76,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edIndoor: TBCTrackbarUpdown
       Left = 150
-      Height = 28
-      Top = 138
+      Height = 22
+      Top = 141
       Width = 70
       MaxValue = 85
       MinValue = 40
@@ -131,8 +131,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edGlycol: TBCTrackbarUpdown
       Left = 150
-      Height = 28
-      Top = 214
+      Height = 22
+      Top = 217
       Width = 70
       MaxValue = 60
       MinValue = 0
@@ -159,8 +159,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edAltitude: TBCTrackbarUpdown
       Left = 150
-      Height = 28
-      Top = 252
+      Height = 22
+      Top = 255
       Width = 90
       MaxValue = 14000
       MinValue = 0
@@ -205,8 +205,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edBaths: TBCTrackbarUpdown
       Left = 150
-      Height = 28
-      Top = 328
+      Height = 22
+      Top = 331
       Width = 70
       MaxValue = 8
       MinValue = 1
@@ -460,8 +460,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edCeiling: TBCTrackbarUpdown
       Left = 126
-      Height = 28
-      Top = 352
+      Height = 22
+      Top = 355
       Width = 70
       MaxValue = 60
       MinValue = 1
@@ -488,8 +488,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edWindows: TBCTrackbarUpdown
       Left = 126
-      Height = 28
-      Top = 386
+      Height = 22
+      Top = 389
       Width = 80
       MaxValue = 50000
       MinValue = 0
@@ -516,8 +516,8 @@ object RadiantHeatForm: TRadiantHeatForm
     end
     object edDoors: TBCTrackbarUpdown
       Left = 126
-      Height = 28
-      Top = 420
+      Height = 22
+      Top = 423
       Width = 80
       MaxValue = 50000
       MinValue = 0
@@ -535,6 +535,8 @@ object RadiantHeatForm: TRadiantHeatForm
       Caption = 'sq ft'
     end
     object memResult: TInkMemo
+      Borders.Left = 4
+      Borders.Right = 16
       Font.Height = -11
       ParentFont = False
       Left = 16
@@ -543,7 +545,6 @@ object RadiantHeatForm: TRadiantHeatForm
       Width = 290
       Font.Name = 'monospace'
       TabOrder = 22
-      TextFormat = itfPlain
       WordWrap = True
     end
   end

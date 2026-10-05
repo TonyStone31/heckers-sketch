@@ -246,7 +246,7 @@ begin
       HeatZoneLines(FJob, FSel, R[FSel], FUnits, L);
     L.Add('');
     HeatBoilerLines(FJob, B, L);
-    memResult.Lines.Assign(L);
+    memResult.Lines.Text := InkReport(L.Text);
   finally
     L.Free;
   end;

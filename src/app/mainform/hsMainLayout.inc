@@ -190,7 +190,7 @@ end;
   rules.  With S given, draw into that surface (its corner at OX, OY on
   screen) instead: that is how the wash gets into the cursor square. }
 procedure TMainForm.PaintFaceHint(C: TCanvas; Face: Integer; const Col: TPix;
-  S: TArtSurface; OX, OY: Integer);
+  S: TArtSurface; OX, OY: Integer; Edge: Boolean; Every: Integer);
 var
   Pts: TPointFArray;
   HPts: array of TPointFArray;
@@ -287,7 +287,7 @@ begin
     in pairs.  A per-dot inside test was millions of divides per mouse move on
     a big face.  Hole edges go into the same crossing list, so even-odd
     leaves them empty for free. }
-  Step := 2;
+  Step := Max(1, Every);
   Y := Y0 - (Y0 mod Step);
   while Y <= Y1 do
   begin
@@ -337,6 +337,7 @@ begin
     Inc(Y, Step);
   end;
 
+  if not Edge then Exit;
   if S <> nil then
   begin
     { the bold edge, into the square too }

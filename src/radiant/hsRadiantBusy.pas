@@ -27,8 +27,11 @@ type
     cbGiveUp: TBCComboBox;
     cbBusyLess: TBGRAThemeCheckBox;
     cbBusyHooks: TBGRAThemeCheckBox;
+    cbBusyPairs: TBGRAThemeCheckBox;
     lblBusyLess: TLabel;
     lblBusyHooks: TLabel;
+    lblBusyPairs: TLabel;
+    lblCheck: TLabel;
     edBusyCover: TBCTrackbarUpdown;
     edBusyEven: TBCTrackbarUpdown;
     lblBusyCover: TLabel;
@@ -57,12 +60,18 @@ type
     { the picked line, by its text - the list is rebuilt and reordered every
       time the search finds another, and the pick follows it }
     FPicked: string;
+    { the search has returned; the window waits for Search again or Close }
+    FFinished: Boolean;
     procedure CaptionPreview;
+    procedure ShowCheck(Met: Boolean);
   public
     { Stop: the current zone keeps its best and the next zone starts. The
       search reads it between tries; the caller clears it for the next zone.
       Stop all: that, and no more zones. }
     Stopping, StoppingAll: Boolean;
+    { set by the search as it ends: every zone met the goals, so the check
+      stays up }
+    AllMet: Boolean;
     { the search, run once the window is up; the window closes when it returns }
     OnWork: TNotifyEvent;
     { draws the picked layout (or the best so far) live beside the list }
@@ -70,6 +79,9 @@ type
     constructor CreateBusy(AOwner: TCustomForm);
     { ready for the next zone: Stop can be pressed again }
     procedure NextZone;
+    { a zone that met the goals: the big green check, a moment to see it, and
+      on to the next }
+    procedure ZoneMet(const What: string);
     procedure Stage(const AStage, ADetail: string; Percent: Integer);
     { the solutions found so far, best first, one line each; the picked line
       stays picked while the list changes under it }
@@ -110,7 +122,8 @@ procedure TRadiantBusyForm.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_ESCAPE then
   begin
-    if btnStop.Enabled then btnStopClick(btnStop);
+    if FFinished then ModalResult := mrOK
+    else if btnStop.Enabled then btnStopClick(btnStop);
     Key := 0;
   end;
 end;
@@ -120,17 +133,44 @@ begin
   tmrStart.Enabled := True;
 end;
 
+{ The search runs from here once the window is up.  When it returns the
+  window stays: the options can be changed and Search again run, or Close. }
 procedure TRadiantBusyForm.tmrStartTimer(Sender: TObject);
 begin
   tmrStart.Enabled := False;
   { a new window is mapped and painted over several turns of the message
     loop; pumped only once, the search started over an empty frame }
   PauseFor(100);
+  FFinished := False;
+  AllMet := False;
+  ShowCheck(False);
   try
     if Assigned(OnWork) then OnWork(Self);
   finally
-    ModalResult := mrOK;
+    FFinished := True;
+    lblStage.Caption := 'Done';
+    pbProgress.Value := pbProgress.MaxValue;
+    btnStop.Caption := 'Search again';
+    btnStop.Enabled := True;
+    btnStopAll.Caption := 'Close';
+    btnStopAll.Enabled := True;
+    ShowCheck(AllMet);
   end;
+end;
+
+procedure TRadiantBusyForm.ShowCheck(Met: Boolean);
+begin
+  lblCheck.Caption := #$E2#$9C#$93;
+  lblCheck.Font.Color := $0050C020;
+  lblCheck.Visible := Met;
+end;
+
+procedure TRadiantBusyForm.ZoneMet(const What: string);
+begin
+  ShowCheck(True);
+  lblDetail.Caption := What + ' meets the goals.';
+  PauseFor(900);
+  ShowCheck(False);
 end;
 
 procedure TRadiantBusyForm.Stage(const AStage, ADetail: string; Percent: Integer);
@@ -244,11 +284,16 @@ end;
 procedure TRadiantBusyForm.lbFoundDblClick(Sender: TObject);
 begin
   lbFoundClick(Sender);
-  if FPicked <> '' then btnStopClick(Sender);
+  if (FPicked <> '') and not FFinished then btnStopClick(Sender);
 end;
 
 procedure TRadiantBusyForm.btnStopAllClick(Sender: TObject);
 begin
+  if FFinished then
+  begin
+    ModalResult := mrOK;
+    Exit;
+  end;
   StoppingAll := True;
   btnStopAll.Enabled := False;
   btnStopClick(Sender);
@@ -256,6 +301,17 @@ end;
 
 procedure TRadiantBusyForm.btnStopClick(Sender: TObject);
 begin
+  if FFinished then
+  begin
+    { Search again, with the options as they are now }
+    Stopping := False;
+    StoppingAll := False;
+    btnStop.Caption := 'Stop - keep the best';
+    btnStopAll.Caption := 'Stop all';
+    NextZone;
+    tmrStart.Enabled := True;
+    Exit;
+  end;
   Stopping := True;
   btnStop.Enabled := False;
   lblDetail.Caption := 'Stopping after the layout it is on - the best so far is kept...';

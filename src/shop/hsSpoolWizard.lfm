@@ -236,6 +236,8 @@ object SpoolForm: TSpoolForm
     TabOrder = 8
   end
   object memTicket: TInkMemo
+    Borders.Left = 4
+    Borders.Right = 16
     Left = 16
     Height = 102
     Top = 572
@@ -244,7 +246,6 @@ object SpoolForm: TSpoolForm
     Font.Name = 'Monospace'
     ParentFont = False
     TabOrder = 9
-    TextFormat = itfPlain
     WordWrap = True
   end
   object pcViews: TPanel

@@ -13,6 +13,23 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **A picked face is dotted, a picked edge is blue**, so you can see which' + LineEnding +
+    '  of the two you are holding.' + LineEnding +
+    '- **Ctrl, Shift and Ctrl+Shift work everywhere in picking.**  A box with' + LineEnding +
+    '  Shift toggles what it covers and with Ctrl+Shift takes it away; two or' + LineEnding +
+    '  three clicks with Ctrl add to what is already picked.' + LineEnding +
+    '- **The radiant search window stays open** when it finds a layout, puts a' + LineEnding +
+    '  big green check on each zone that meets the goals, and has the goals and' + LineEnding +
+    '  hooked pairs on it.  Search again from there, or pick a different layout.' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- The number boxes in the radiant and stair windows had huge text.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.05.1' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +

@@ -58,6 +58,8 @@ type
   { none; one finger down, not yet a tap or a drag; one finger as the mouse;
     two fingers panning and pinching; gesture over, remaining finger ignored }
   TTouchMode = (tmNone, tmPending, tmMouse, tmGesture, tmSpent);
+  { what a click or box does to what is already selected }
+  TSelMode = (smOnly, smAdd, smToggle, smRemove);
 
   { One line of the entity panel, with its steppers when the value can be
     changed.  The painter reads this and the mouse hit test uses the same rects. }
@@ -933,7 +935,8 @@ type
     procedure PaintAxes;
     procedure PaintPushPreview(C: TCanvas);
     procedure PaintFaceHint(C: TCanvas; Face: Integer; const Col: TPix;
-      S: TArtSurface = nil; OX: Integer = 0; OY: Integer = 0);
+      S: TArtSurface = nil; OX: Integer = 0; OY: Integer = 0; Edge: Boolean = True;
+      Every: Integer = 2);
     function HintFaceNow: Integer;
     { the face a press is on (see the body) }
     function FaceAtPress: Integer;
@@ -1091,7 +1094,8 @@ type
       Dashed: Boolean; const Shift: TP3);
     function PromptForTool: string;
     procedure SelectConnected(I: Integer);
-    procedure SelectInBox(X0, Y0, X1, Y1: Integer; Crossing, Add: Boolean);
+    procedure SelectInBox(X0, Y0, X1, Y1: Integer; Crossing: Boolean; Mode: TSelMode);
+    procedure MergeSel(const Before: array of Integer; Mode: TSelMode);
     procedure DeleteSelection;
     function MoveDelta: TP3;
     function RunReading(const A, B: TP3): string;

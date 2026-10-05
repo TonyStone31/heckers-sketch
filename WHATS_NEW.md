@@ -10,6 +10,28 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **A picked face is dotted, a picked edge is blue**, so you can see which
+  of the two you are holding.
+- **Ctrl, Shift and Ctrl+Shift work everywhere in picking.**  A box with
+  Shift toggles what it covers and with Ctrl+Shift takes it away; two or
+  three clicks with Ctrl add to what is already picked.
+- **The radiant search window stays open** when it finds a layout, puts a
+  big green check on each zone that meets the goals, and has the goals and
+  hooked pairs on it.  Search again from there, or pick a different layout.
+- **Results in color.**  The radiant layouts show their coverage, spacing
+  and ease of laying green when they meet your goals and red when they
+  miss.  The material list, heat load, stair advice and spool ticket put
+  headings, figures and warnings in their own colors.
+
+### Fixed
+
+- The number boxes in the radiant and stair windows had huge text.
+- A click on a radiant layout in a list no longer opens it for editing.
+
 ## v2026.10.05.1
 
 ### Fixed

@@ -267,9 +267,8 @@ var
 begin
   Read(S);
   Err := SpoolProblem(S);
-  if Length(S.Legs) = 0 then memTicket.Lines.Text := Err
-  else if Err = '' then memTicket.Lines.Text := SpoolTicket(S)
-  else memTicket.Lines.Text := Err + LineEnding + LineEnding + SpoolTicket(S);
+  if Length(S.Legs) = 0 then memTicket.Lines.Text := InkReport('', Err)
+  else memTicket.Lines.Text := InkReport(SpoolTicket(S), Err);
   btnBuild.Enabled := Err = '';
   { a sketch with lengths still to come can still go to the office }
   btnEmail.Enabled := Length(S.Legs) > 0;
@@ -674,7 +673,7 @@ var
 begin
   Read(S);
   MainForm.ReportFromDialog('Fitter''s scratchpad', SpoolTicket(S) + LineEnding +
-    'problem shown: ' + memTicket.Lines.Text);
+    'problem shown: ' + SpoolProblem(S));
 end;
 
 function TSpoolForm.ExportFiles(out Dir: string; out Files: TStringArray): Boolean;

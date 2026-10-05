@@ -1732,6 +1732,9 @@ begin
             Pix(70, 130, 240), 1.0);
       end;
     end
+    { a picked face is dotted and keeps its own edges, so a picked line shows }
+    else if FD.Doc[FSel[AY]].Kind = ekFace then
+      PaintFaceHint(nil, FSel[AY], Pix(70, 130, 240), FSelLayer, 0, 0, False, 3)
     else
       TraceOutlineInto(FSelLayer, FSel[AY], Pix(70, 130, 240), W);
   end;
@@ -2493,42 +2496,46 @@ end;
 procedure TMainForm.FinishSelect(X, Y: Integer; Shift: TShiftState);
 var
   I: Integer;
-  Add, Sub, Tog: Boolean;
+  Mode: TSelMode;
+  Before: array of Integer;
 begin
-  Add := ssCtrl in Shift;
-  Tog := ssShift in Shift;
-  Sub := Add and Tog;
+  if [ssCtrl, ssShift] <= Shift then Mode := smRemove
+  else if ssShift in Shift then Mode := smToggle
+  else if ssCtrl in Shift then Mode := smAdd
+  else Mode := smOnly;
 
   if (Abs(X - FBoxX) > 3) or (Abs(Y - FBoxY) > 3) then
-  begin
-    SelectInBox(FBoxX, FBoxY, X, Y, X < FBoxX, Add or Tog);
-  end
+    SelectInBox(FBoxX, FBoxY, X, Y, X < FBoxX, Mode)
   else
   begin
     I := PickAt(X, Y);
     if I < 0 then
     begin
       { SketchUp: a click on nothing while a group is open closes it }
-      if not (Add or Tog) then
+      if Mode = smOnly then
         if FD.Doc.Context <> 0 then CloseGroup else SelectNone;
     end
-    else if FD.Doc.TopPartIn(I) > 0 then
+    else if (FD.Doc.TopPartIn(I) > 0) and (FClickN >= 2) then
+      { GTK delivers a double-click's second press twice, so the count reads
+        one higher; hence >= 2 for double and >= 3 for triple throughout }
+      OpenGroup(FD.Doc.TopPartIn(I))
+    else if (FD.Doc.TopPartIn(I) = 0) and (FClickN >= 2) then
     begin
-      { a group: double-click opens it, otherwise the whole group is taken.
-        GTK delivers a double-click's second press twice, so the count reads
-        one higher; hence >= 2 for double and >= 3 for triple throughout. }
-      if FClickN >= 2 then OpenGroup(FD.Doc.TopPartIn(I))
-      else if Sub then SelectRemove(I)
-      else if Tog then SelectToggle(I)
-      else if Add then SelectAdd(I)
-      else SelectOnly(I);
+      { the first click already did its part; with a key held the rest is
+        added, or taken away with both }
+      Before := Copy(FSel);
+      if FClickN >= 3 then SelectConnected(I) else SelectAttached(I);
+      if Mode = smRemove then MergeSel(Before, smRemove)
+      else if Mode <> smOnly then MergeSel(Before, smAdd);
     end
-    else if FClickN >= 3 then SelectConnected(I)
-    else if FClickN = 2 then SelectAttached(I)
-    else if Sub then SelectRemove(I)
-    else if Tog then SelectToggle(I)
-    else if Add then SelectAdd(I)
-    else SelectOnly(I);
+    else
+      case Mode of
+        smRemove: SelectRemove(I);
+        smToggle: SelectToggle(I);
+        smAdd: SelectAdd(I);
+      else
+        SelectOnly(I);
+      end;
   end;
 
   if Length(FSel) = 0 then
@@ -2550,23 +2557,59 @@ end;
 
 { crossing takes anything the box touches, otherwise only what is wholly
   inside }
-procedure TMainForm.SelectInBox(X0, Y0, X1, Y1: Integer; Crossing, Add: Boolean);
+procedure TMainForm.SelectInBox(X0, Y0, X1, Y1: Integer; Crossing: Boolean; Mode: TSelMode);
 var
   I, T: Integer;
   Picked: TIntArrayW;
+  Before: array of Integer;
   Tk: QWord;
-  BX0, BY0, BX1, BY1: Double;
 begin
   if X1 < X0 then begin T := X0; X0 := X1; X1 := T; end;
   if Y1 < Y0 then begin T := Y0; Y0 := Y1; Y1 := T; end;
-  if not Add then SetLength(FSel, 0);
+  Before := Copy(FSel);
+  SetLength(FSel, 0);
   Tk := GetTickCount64;
   BeginBulkSelect;
   { what the box takes is BoxPick's question (see it and BoxTakes) }
   Picked := FD.Doc.BoxPick(Proj, X0, Y0, X1, Y1, Crossing);
   for I := 0 to High(Picked) do SelectAdd(Picked[I]);
   EndBulkSelect;
+  MergeSel(Before, Mode);
   Took('box select', Tk);
+  FScreenDirty := True;
+end;
+
+{ FSel holds what was just picked; put it together with what was selected
+  before }
+procedure TMainForm.MergeSel(const Before: array of Integer; Mode: TSelMode);
+var
+  InBefore, InGot: array of Boolean;
+  Got: array of Integer;
+  K, N: Integer;
+
+  procedure Keep(E: Integer);
+  begin
+    FSel[N] := E;
+    Inc(N);
+  end;
+
+begin
+  if Mode = smOnly then Exit;
+  Got := Copy(FSel);
+  SetLength(InBefore, FD.Doc.Live);
+  SetLength(InGot, FD.Doc.Live);
+  for K := 0 to High(Before) do
+    if (Before[K] >= 0) and (Before[K] < FD.Doc.Live) then InBefore[Before[K]] := True;
+  for K := 0 to High(Got) do InGot[Got[K]] := True;
+  SetLength(FSel, Length(Before) + Length(Got));
+  N := 0;
+  for K := 0 to High(Before) do
+    if (Before[K] >= 0) and (Before[K] < FD.Doc.Live) and
+       ((Mode = smAdd) or not InGot[Before[K]]) then Keep(Before[K]);
+  if Mode <> smRemove then
+    for K := 0 to High(Got) do
+      if not InBefore[Got[K]] then Keep(Got[K]);
+  SetLength(FSel, N);
   FScreenDirty := True;
 end;
 

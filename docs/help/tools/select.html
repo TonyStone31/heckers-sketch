@@ -21,9 +21,11 @@ anything in the drawing but the guides, which belong to
 it, or an edge and the faces it holds up.</li>
 <li><b>Click three times</b> to take the whole of whatever it is part of -
 every edge and face joined to it, however far that reaches.</li>
-<li>Drag a box to pick several.  Everything the box touches comes with it.</li>
+<li>Drag a box to pick several.  Dragged right to left it takes everything
+it touches; left to right, only what is wholly inside.</li>
 <li><kbd>Ctrl</kbd> adds to what is picked, <kbd>Shift</kbd> toggles each
-thing, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> takes away.</li>
+thing, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> takes away - for a click, two or
+three clicks, and a box alike.</li>
 <li>Click empty paper, or press <kbd>Esc</kbd>, to let go of the lot.</li>
 </ol>
 <figure>
@@ -59,8 +61,9 @@ that changes shape can put <b>Erase</b> under a hand that was aiming at
 something harmless.</p>
 
 <h2 id="what-a-picked-thing-looks-like">What a picked thing looks like</h2>
-<p>Blue, and along its whole length.  The count is in the bar along the
-bottom.</p>
+<p>A picked edge turns blue along its whole length.  A picked face is
+dotted blue and keeps its own edges, so a face on its own and a face with
+its edges look different.  The count is in the bar along the bottom.</p>
 
 <h2 id="what-it-will-not-pick">What it will not pick</h2>
 <p>A guide, ever - not by a click, a box or <code>/all</code>.  Guides are

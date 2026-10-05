@@ -39,9 +39,7 @@ type
     lbSolutions: TInkListBox;
     pnZone: TPanel;
     cbLabels: TBGRAThemeCheckBox;
-    cbHookPairs: TBGRAThemeCheckBox;
     lblPinManifold: TLabel;
-    lblHookPairs: TLabel;
     lblLabels: TLabel;
     btnHeat: TBCButton;
     btnNotZone: TBCButton;
@@ -49,15 +47,10 @@ type
     miBringBack: TMenuItem;
     cbTube: TBCComboBox;
     edMaxLoop: TInkEdit;
-    edGoalCover: TBCTrackbarUpdown;
-    edGoalEven: TBCTrackbarUpdown;
     edSpacing: TInkEdit;
     edTag: TInkEdit;
     edWaste: TBCTrackbarUpdown;
     edMaxPorts: TBCTrackbarUpdown;
-    lblGoal: TLabel;
-    lblGoalCover: TLabel;
-    lblGoalEven: TLabel;
     lblManifoldHead: TLabel;
     lblMaxLoop: TLabel;
     lblMaxLoopHint: TLabel;
@@ -93,7 +86,6 @@ type
     pnSettings: TBCPanel;
     pnPlanArea: TBCPanel;
     pnZoneArea: TBCPanel;
-    lblGoalEvenHead: TLabel;
     pnZones: TPanel;
     pbZoneTabs: TPaintBox;
     procedure AnyChange(Sender: TObject);
@@ -169,6 +161,12 @@ type
     { the search window's less friendly and hooks choices (see the spec);
       remembered }
     FLessFriendly, FNoHooks: Boolean;
+    { the search's goals and whether it tries hooked pairs; set in the search
+      window, kept here between searches and saved }
+    FGoalCover, FGoalEven: Double;
+    FHookPairs: Boolean;
+    { the zone the search window's list is about, once the search is done }
+    FLastSearched: Integer;
     { the evenness gauge's worst zone: longest loop less shortest, feet }
     FEvenFt: Double;
     { what SearchWork searches, set by Search before the busy window runs it }
@@ -242,11 +240,13 @@ type
     function ManifoldAt(X, Y: Integer): Integer;
     procedure Search(const Which: array of Integer);
     procedure SearchWork(Sender: TObject);
+    procedure PickFromBusy;
     procedure SearchProgress(Done, Total: Integer; const Best: TRadiantResult; var Stop: Boolean);
     { a kept solution as a line in the busy window's list, and a shorter
       one for the zone tab }
     function FoundLine(const R: TRadiantResult): string;
     function ShortLine(const R: TRadiantResult): string;
+    function ResultLine(const R: TRadiantResult; Short: Boolean): string;
     procedure SearchPreview(C: TCanvas; W, H: Integer; const Picked: string);
     procedure PaintCompass(C: TCanvas; CX, CY: Integer);
     function Read(out Spec: TRadiantSpec): Boolean;
@@ -287,7 +287,7 @@ implementation
 {$R *.lfm}
 
 uses
-  IniFiles, LCLIntf, LCLType, hsPaths, hsMainForm, hsUpdater, hsSurface, hsRadiantHeatForm;
+  IniFiles, LCLIntf, LCLType, hsPaths, hsMainForm, hsUpdater, hsSurface, hsRadiantHeatForm, hsText;
 
 { a bare number is inches - the trade says 9, not 9" - and a mark switches
   to the drawing's own notation, as the fitting wizard does }
@@ -327,6 +327,8 @@ begin
   FDragManifold := -1;
   FCoverage := -1; FEvenness := -1;
   Dress;
+  FGoalCover := 97;
+  FGoalEven := 10;
   LoadLast;
 end;
 
@@ -384,6 +386,9 @@ begin
       Ini.WriteInteger('radiant', 'GiveUp', FGiveUpIdx);
       Ini.WriteBool('radiant', 'LessFriendly', FLessFriendly);
       Ini.WriteBool('radiant', 'NoHooks', FNoHooks);
+      Ini.WriteString('radiant', 'edGoalCover', FloatToStr(FGoalCover, DotFS));
+      Ini.WriteString('radiant', 'edGoalEven', FloatToStr(FGoalEven, DotFS));
+      Ini.WriteBool('radiant', 'cbHookPairs', FHookPairs);
     finally
       Ini.Free;
     end;
@@ -407,6 +412,9 @@ begin
         FGiveUpIdx := Ini.ReadInteger('radiant', 'GiveUp', 0);
         FLessFriendly := Ini.ReadBool('radiant', 'LessFriendly', False);
         FNoHooks := Ini.ReadBool('radiant', 'NoHooks', False);
+        FGoalCover := StrToFloatDef(Ini.ReadString('radiant', 'edGoalCover', ''), FGoalCover, DotFS);
+        FGoalEven := StrToFloatDef(Ini.ReadString('radiant', 'edGoalEven', ''), FGoalEven, DotFS);
+        FHookPairs := Ini.ReadBool('radiant', 'cbHookPairs', FHookPairs);
         for I := 0 to ComponentCount - 1 do
         begin
           C := Components[I];
@@ -476,7 +484,7 @@ var
 begin
   Spec := DefaultRadiantSpec;
   Spec.LessFriendly := FLessFriendly; Spec.NoHooks := FNoHooks;
-  Spec.HookPairs := cbHookPairs.Checked;
+  Spec.HookPairs := FHookPairs;
   Spec.Tube := TTubeSize(Max(0, cbTube.ItemIndex));
   Result := InchesOf(edSpacing.Text, FUnits, Spec.Spacing);
   if Trim(edMaxLoop.Text) = '' then Spec.MaxLoopFt := 0
@@ -492,11 +500,9 @@ begin
   Spec.Extra := nil;
   Spec.Tag := Trim(edTag.Text);
   Spec.Labels := cbLabels.Checked;
-  { the goals the search keeps going for; blank is no goal }
-  if Trim(edGoalCover.Text) = '' then Spec.GoalCoverPct := 0
-  else Result := Result and TryStrToFloat(Trim(edGoalCover.Text), Spec.GoalCoverPct);
-  if Trim(edGoalEven.Text) = '' then Spec.GoalEvenPct := 0
-  else Result := Result and TryStrToFloat(Trim(edGoalEven.Text), Spec.GoalEvenPct);
+  { the goals the search keeps going for; nought is no goal }
+  Spec.GoalCoverPct := FGoalCover;
+  Spec.GoalEvenPct := FGoalEven;
 end;
 
 { What is known so far without searching: the ticket for each zone
@@ -1054,7 +1060,7 @@ begin
   begin
     lblZoneHead.Caption := Format('Every zone: %d of them.  Pick a zone''s tab, or click it on the plan, to work on it.',
       [Length(FZones)]);
-    memTicket.Lines.Text := FAllTicket;
+    memTicket.Lines.Text := InkReport(FAllTicket);
     Exit;
   end;
   if Length(FOutline) >= 3 then FFrame := RadiantPlanFrame(FOutline);
@@ -1089,7 +1095,7 @@ begin
   end
   else S := S + ' - no layout.';
   lblZoneHead.Caption := S;
-  if Z <= High(FZoneTicket) then memTicket.Lines.Text := FZoneTicket[Z] else memTicket.Lines.Text := '';
+  if Z <= High(FZoneTicket) then memTicket.Lines.Text := InkReport(FZoneTicket[Z]) else memTicket.Lines.Text := '';
 end;
 
 procedure TRadiantForm.lbSolutionsClick(Sender: TObject);
@@ -1130,15 +1136,20 @@ begin
     FBusy.cbGiveUp.ItemIndex := EnsureRange(FGiveUpIdx, 0, FBusy.cbGiveUp.Items.Count - 1);
     FBusy.cbBusyLess.Checked := FLessFriendly;
     FBusy.cbBusyHooks.Checked := not FNoHooks;
+    FBusy.cbBusyPairs.Checked := FHookPairs;
+    FLastSearched := -1;
     FBusy.ShowModal;
+    { a layout picked from the list after the search finished is the one kept }
+    PickFromBusy;
     { goals changed while it searched are the goals now }
     FGiveUpIdx := FBusy.cbGiveUp.ItemIndex;
     FLessFriendly := FBusy.cbBusyLess.Checked;
     FNoHooks := not FBusy.cbBusyHooks.Checked;
     FListing := True;
     try
-      edGoalCover.Value := Round(FLiveGoals.CoverPct);
-      edGoalEven.Value := Round(FLiveGoals.EvenPct);
+      FGoalCover := FLiveGoals.CoverPct;
+      FGoalEven := FLiveGoals.EvenPct;
+      FHookPairs := FBusy.cbBusyPairs.Checked;
     finally
       FListing := False;
     end;
@@ -1149,21 +1160,39 @@ begin
   Summarize;
 end;
 
+procedure TRadiantForm.PickFromBusy;
+var
+  I, Z: Integer;
+begin
+  Z := FLastSearched;
+  if (FBusy = nil) or (FBusy.Picked = '') or (Z < 0) or (Z > High(FSolutions)) then Exit;
+  for I := 0 to High(FSolutions[Z]) do
+    if FoundLine(FSolutions[Z][I]) = FBusy.Picked then
+    begin
+      if I <> FSolIdx[Z] then ShowSolution(Z, I);
+      Exit;
+    end;
+end;
+
 { search the zones asked for, one after another, under the busy window }
 procedure TRadiantForm.SearchWork(Sender: TObject);
 var
-  K, Z, I: Integer;
+  K, Z, I, Met, Searched: Integer;
+  Lines: array of string;
   R: TRadiantResult;
   Picked: string;
   Began: TDateTime;
   Extra: TStringArray;
 begin
   FBusyCount := Length(FWorkZones);
+  Met := 0;
+  Searched := 0;
   for K := 0 to High(FWorkZones) do
   begin
     Z := FWorkZones[K];
     if (Z < 0) or (Z > High(FZones)) then Continue;
     FBusyIndex := K;
+    FWorkSpec.HookPairs := FBusy.cbBusyPairs.Checked;
     ClearZone(Z);
     FBusy.Stage(ZoneTitle(Z) + IfThen(FBusyCount > 1, Format(' (%d of %d)', [K + 1, FBusyCount]), ''),
       'Starting the search...',
@@ -1205,6 +1234,11 @@ begin
         end;
     for I := 0 to High(FSolutions[Z]) do
       FSolutions[Z][I].SearchLog := Concat(Extra, FSolutions[Z][I].SearchLog);
+    { the window's list becomes what was kept, so a pick made after the
+      search is one that can still be had }
+    SetLength(Lines, Length(FSolutions[Z]));
+    for I := 0 to High(FSolutions[Z]) do Lines[I] := FoundLine(FSolutions[Z][I]);
+    FBusy.ShowFound(Lines);
     R := FSolutions[Z][FSolIdx[Z]];
     { a stopped search hands back the best it had; the ticket says if it
       fell short of the goals }
@@ -1217,13 +1251,31 @@ begin
         where the layout was laid from }
       FManifolds[Z] := R.Manifolds[0].At;
     end;
-    { each zone shows as it finishes, its tab up }
+    { each zone shows as it finishes, its tab up; one that met the goals gets
+      its check before the next starts }
     Summarize;
     SelectZone(Z);
-    { Stop kept this zone's best; Stop all, and there is no next zone }
-    if FBusy.StoppingAll then Break;
+    Inc(Searched);
+    FLastSearched := Z;
+    if (FStopWhy = '') and RadiantMeetsGoals(R, FWorkSpec) then
+    begin
+      Inc(Met);
+      FBusy.ZoneMet(ZoneTitle(Z));
+    end;
+    { Stop kept this zone's best; Stop all, and there is no next zone.  The
+      last zone's list stays up to look at. }
+    if FBusy.StoppingAll or (K = High(FWorkZones)) then Break;
     FBusy.NextZone;
   end;
+  FBusy.AllMet := (Searched > 0) and (Met = Searched);
+  if Searched = 1 then
+    FBusy.lblDetail.Caption := IfThen(Met = 1, 'It meets the goals.',
+      'It falls short of the goals - the best it found is kept.')
+  else if Met = Searched then
+    FBusy.lblDetail.Caption := Format('All %d zones meet the goals.', [Searched])
+  else
+    FBusy.lblDetail.Caption := Format('%d of %d zones meet the goals; the others keep the best they found.',
+      [Met, Searched]);
 end;
 
 { The fixed restarts first, as a fraction; then, with the goals not met,
@@ -1353,6 +1405,16 @@ begin
         Break;
       end;
   if not Got and (Length(FLiveFound) > 0) then begin R := FLiveFound[0]; Got := True; end;
+  { the search done, the zone's kept layouts are where the list came from }
+  if not Got and (Z <= High(FSolutions)) then
+  begin
+    for I := 0 to High(FSolutions[Z]) do
+      if (Picked = '') or (FoundLine(FSolutions[Z][I]) = Picked) then
+      begin
+        R := FSolutions[Z][I]; Got := True;
+        Break;
+      end;
+  end;
   { the drawing's own plan, the zone fitted to the box }
   F := RadiantPlanFrame(FOutline);
   MinX := 1E300; MinY := 1E300; MaxX := -1E300; MaxY := -1E300;
@@ -1411,24 +1473,55 @@ begin
   else Result := FormatFloat('0', R.Friendly);
 end;
 
-function TRadiantForm.FoundLine(const R: TRadiantResult): string;
+{ a list row in color: a figure green when it meets its goal, red when it
+  misses, the words between dim }
+function TRadiantForm.ResultLine(const R: TRadiantResult; Short: Boolean): string;
 var
   Cover, Spread: Double;
+  Goals, Met: Boolean;
+  Easy: string;
+
+  { colored against its goal only when there are goals to meet }
+  function Fig(const Txt: string; Good: Boolean): string;
+  begin
+    if Goals then Result := InkSpan(Txt, ToneColor(Good), True) else Result := TextSpan(Txt);
+  end;
+
 begin
   RadiantMeasure(R, Cover, Spread);
-  Result := Format('%5s%% covered  %4s%% apart (%3s ft)  %2d loops  %4d bends  %5s ft  easy %3s%s',
-    [FormatFloat('0.0', Cover * 100), FormatFloat('0.0', Spread * 100), FormatFloat('0', RadiantSpreadFt(R)),
-     Length(R.Loops), R.Bends, FormatFloat('0', R.TotalFt), EasyWord(R), IfThen(RadiantMeetsGoals(R, FWorkSpec), '  ok', '')]);
+  Goals := (FWorkSpec.GoalCoverPct > 0) or (FWorkSpec.GoalEvenPct > 0);
+  Met := RadiantMeetsGoals(R, FWorkSpec);
+  Easy := EasyWord(R);
+  Result :=
+    Fig(Format('%5s%%', [FormatFloat('0.0', Cover * 100)]),
+      (FWorkSpec.GoalCoverPct <= 0) or (Cover * 100 >= FWorkSpec.GoalCoverPct - 1E-9)) +
+    DimSpan(IfThen(Short, ' ', ' covered  ')) +
+    Fig(Format('%4s%%', [FormatFloat(IfThen(Short, '0', '0.0'), Spread * 100)]),
+      (FWorkSpec.GoalEvenPct <= 0) or (Spread * 100 <= FWorkSpec.GoalEvenPct + 1E-9)) +
+    DimSpan(Format(IfThen(Short, ' (%3s ft) ', ' apart (%3s ft)  '), [FormatFloat('0', RadiantSpreadFt(R))])) +
+    IfThen(RadiantOverPorts(R, FWorkSpec) > 0, InkSpan(Format('%2d', [Length(R.Loops)]), ToneColor(False), True),
+      TextSpan(Format('%2d', [Length(R.Loops)]))) +
+    DimSpan(IfThen(Short, ' lp ', ' loops  ')) +
+    TextSpan(Format(IfThen(Short, '%3d', '%4d'), [R.Bends])) +
+    DimSpan(IfThen(Short, ' bd  ', ' bends  '));
+  if not Short then
+    Result := Result + TextSpan(Format('%5s', [FormatFloat('0', R.TotalFt)])) + DimSpan(' ft  easy ');
+  if Easy = '-' then Result := Result + DimSpan(Format('%3s', [Easy]))
+  else Result := Result + Fig(Format('%3s', [Easy]), not RadiantUnfriendly(R, FWorkSpec));
+  if not R.Ok or (R.Crossings > 0) then
+    Result := Result + InkSpan(IfThen(R.Crossings > 0, '  crosses', '  unfinished'), ToneColor(False), True)
+  else if Met then
+    Result := Result + InkSpan(IfThen(Short, ' ', '  ') + #$E2#$9C#$93, ToneColor(True), True);
+end;
+
+function TRadiantForm.FoundLine(const R: TRadiantResult): string;
+begin
+  Result := ResultLine(R, False);
 end;
 
 function TRadiantForm.ShortLine(const R: TRadiantResult): string;
-var
-  Cover, Spread: Double;
 begin
-  RadiantMeasure(R, Cover, Spread);
-  Result := Format('%5s%% %3s%% (%3s ft) %2d lp %3d bd  %3s%s',
-    [FormatFloat('0.0', Cover * 100), FormatFloat('0', Spread * 100), FormatFloat('0', RadiantSpreadFt(R)),
-     Length(R.Loops), R.Bends, EasyWord(R), IfThen(RadiantMeetsGoals(R, FWorkSpec), ' ok', '')]);
+  Result := ResultLine(R, True);
 end;
 
 procedure TRadiantForm.btnSearchZoneClick(Sender: TObject);
@@ -2090,8 +2183,6 @@ begin
   Job := Default(TRadiantJob);
   Result := False;
   if not Read(Job.Spec) or (Length(FZones) = 0) then Exit;
-  Job.Spec.GoalCoverPct := StrToFloatDef(Trim(edGoalCover.Text), 0);
-  Job.Spec.GoalEvenPct := StrToFloatDef(Trim(edGoalEven.Text), 0);
   Job.Title := Trim(edTag.Text);
   Job.ZoneNames := Copy(FZoneNames);
   Job.Heat := FHeat;
@@ -2188,9 +2279,9 @@ begin
     edWaste.Text := FormatFloat('0.##', Spec.WastePct);
     if Spec.MaxPorts > 0 then edMaxPorts.Text := IntToStr(Spec.MaxPorts) else edMaxPorts.Text := '';
     cbLabels.Checked := Spec.Labels;
-    cbHookPairs.Checked := Spec.HookPairs;
-    if Spec.GoalCoverPct > 0 then edGoalCover.Text := FormatFloat('0.##', Spec.GoalCoverPct) else edGoalCover.Text := '';
-    if Spec.GoalEvenPct > 0 then edGoalEven.Text := FormatFloat('0.##', Spec.GoalEvenPct) else edGoalEven.Text := '';
+    FHookPairs := Spec.HookPairs;
+    FGoalCover := Spec.GoalCoverPct;
+    FGoalEven := Spec.GoalEvenPct;
     FLessFriendly := Spec.LessFriendly;
     FNoHooks := Spec.NoHooks;
   finally

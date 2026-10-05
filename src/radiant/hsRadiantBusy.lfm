@@ -1,11 +1,11 @@
 object RadiantBusyForm: TRadiantBusyForm
   Left = 520
-  Height = 464
+  Height = 492
   Top = 240
   Width = 1100
   BorderIcons = []
   Caption = 'Searching for a layout'
-  ClientHeight = 464
+  ClientHeight = 492
   ClientWidth = 1100
   Constraints.MinHeight = 300
   Constraints.MinWidth = 480
@@ -18,13 +18,27 @@ object RadiantBusyForm: TRadiantBusyForm
     Left = 24
     Height = 26
     Top = 18
-    Width = 652
+    Width = 560
     Anchors = [akTop, akLeft, akRight]
     AutoSize = False
     Caption = 'Searching'
     Font.Height = -17
     Font.Style = [fsBold]
     ParentFont = False
+  end
+  object lblCheck: TLabel
+    Left = 590
+    Height = 44
+    Top = 6
+    Width = 86
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight]
+    AutoSize = False
+    Caption = ''
+    Font.Height = -40
+    Font.Style = [fsBold]
+    ParentFont = False
+    Visible = False
   end
   object lblDetail: TLabel
     Left = 24
@@ -52,8 +66,8 @@ object RadiantBusyForm: TRadiantBusyForm
   end
   object edBusyCover: TBCTrackbarUpdown
     Left = 76
-    Height = 28
-    Top = 120
+    Height = 22
+    Top = 123
     Width = 64
     MaxValue = 100
     Hint = 'change it while it searches - it works to the new goal from the next layout'
@@ -69,8 +83,8 @@ object RadiantBusyForm: TRadiantBusyForm
   end
   object edBusyEven: TBCTrackbarUpdown
     Left = 300
-    Height = 28
-    Top = 120
+    Height = 22
+    Top = 123
     Width = 64
     MaxValue = 100
     Hint = 'change it while it searches - it works to the new goal from the next layout'
@@ -149,10 +163,30 @@ object RadiantBusyForm: TRadiantBusyForm
     ShowHint = True
     OnClick = CheckLabelClick
   end
+  object cbBusyPairs: TBGRAThemeCheckBox
+    Left = 24
+    Height = 22
+    Top = 184
+    Width = 22
+    Hint = 'two neighboring loops share their rows, split by one hook at the far wall - one mark a loop; the search tries it alongside plain layouts'
+    TabOrder = 9
+  end
+  object lblBusyPairs: TLabel
+    Left = 52
+    Height = 18
+    Top = 186
+    Width = 400
+    AutoSize = False
+    Caption = 'Loops in hooked pairs, to even them'
+    FocusControl = cbBusyPairs
+    Hint = 'two neighboring loops share their rows, split by one hook at the far wall - one mark a loop; the search tries it alongside plain layouts'
+    ShowHint = True
+    OnClick = CheckLabelClick
+  end
   object lblFound: TLabel
     Left = 24
     Height = 36
-    Top = 184
+    Top = 212
     Width = 652
     Anchors = [akTop, akLeft, akRight]
     AutoSize = False
@@ -160,10 +194,12 @@ object RadiantBusyForm: TRadiantBusyForm
     Caption = 'Found so far, best first - apart is how far the shortest loop falls short of the longest, easy how friendly it is to lay (of 100).  Click one to keep it; double-click to stop and keep it.'
   end
   object lbFound: TInkListBox
-    HTMLEnabled = False
+    Borders.Left = 4
+    LineSpacing = 3
+    EditMode = emNone
     Left = 24
     Height = 178
-    Top = 224
+    Top = 252
     Width = 652
     Anchors = [akTop, akLeft, akRight, akBottom]
     Font.Name = 'Monospace'
@@ -176,7 +212,7 @@ object RadiantBusyForm: TRadiantBusyForm
   object btnStopAll: TBCButton
     Left = 766
     Height = 32
-    Top = 418
+    Top = 446
     Width = 100
     Anchors = [akRight, akBottom]
     Caption = 'Stop all'
@@ -187,7 +223,7 @@ object RadiantBusyForm: TRadiantBusyForm
   object btnStop: TBCButton
     Left = 876
     Height = 32
-    Top = 418
+    Top = 446
     Width = 200
     Anchors = [akRight, akBottom]
     Caption = 'Stop - keep the best'
@@ -197,7 +233,7 @@ object RadiantBusyForm: TRadiantBusyForm
   end
   object pbPreview: TPaintBox
     Left = 690
-    Height = 364
+    Height = 392
     Top = 18
     Width = 386
     Anchors = [akTop, akRight, akBottom]
@@ -207,7 +243,7 @@ object RadiantBusyForm: TRadiantBusyForm
     Tag = 1
     Left = 690
     Height = 18
-    Top = 388
+    Top = 416
     Width = 386
     Anchors = [akRight, akBottom]
     AutoSize = False

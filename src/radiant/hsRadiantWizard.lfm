@@ -120,8 +120,8 @@ object RadiantForm: TRadiantForm
     end
     object edWaste: TBCTrackbarUpdown
       Left = 176
-      Height = 28
-      Top = 200
+      Height = 22
+      Top = 203
       Width = 70
       MaxValue = 50
       MinValue = 0
@@ -147,8 +147,8 @@ object RadiantForm: TRadiantForm
     end
     object edMaxPorts: TBCTrackbarUpdown
       Left = 176
-      Height = 28
-      Top = 238
+      Height = 22
+      Top = 241
       Width = 70
       MaxValue = 64
       MinValue = 2
@@ -156,84 +156,10 @@ object RadiantForm: TRadiantForm
       Value = 12
       OnChange = RoutingChange
     end
-    object lblGoal: TLabel
-      Left = 16
-      Height = 18
-      Top = 282
-      Width = 150
-      AutoSize = False
-      Caption = 'Search until'
-    end
-    object edGoalCover: TBCTrackbarUpdown
-      Left = 176
-      Height = 28
-      Top = 276
-      Width = 70
-      MaxValue = 100
-      MinValue = 0
-      TabOrder = 5
-      Value = 97
-      OnChange = AnyChange
-    end
-    object lblGoalCover: TLabel
-      Left = 252
-      Height = 18
-      Top = 282
-      Width = 184
-      AutoSize = False
-      Caption = '% of the floor covered'
-    end
-    object lblGoalEvenHead: TLabel
-      Left = 16
-      Height = 18
-      Top = 320
-      Width = 150
-      AutoSize = False
-      Caption = 'and the loops within'
-    end
-    object edGoalEven: TBCTrackbarUpdown
-      Left = 176
-      Height = 28
-      Top = 314
-      Width = 70
-      MaxValue = 100
-      MinValue = 0
-      TabOrder = 6
-      Value = 10
-      OnChange = AnyChange
-    end
-    object lblGoalEven: TLabel
-      Left = 252
-      Height = 18
-      Top = 320
-      Width = 184
-      AutoSize = False
-      Caption = '% of each other'
-    end
-    object cbHookPairs: TBGRAThemeCheckBox
-      Left = 16
-      Height = 22
-      Top = 350
-      Width = 22
-      Hint = 'two neighboring loops share their rows, split by one hook at the far wall - one mark a loop; the search tries it alongside plain layouts'
-      TabOrder = 20
-    end
-    object lblHookPairs: TLabel
-      Left = 44
-      Height = 18
-      Top = 352
-      Width = 396
-      AutoSize = False
-      Caption = 'Loops in hooked pairs, to even them'
-      FocusControl = cbHookPairs
-      Hint = 'two neighboring loops share their rows, split by one hook at the far wall - one mark a loop; the search tries it alongside plain layouts'
-      ShowHint = True
-      OnClick = CheckLabelClick
-    end
     object lblManifoldHead: TLabel
       Left = 16
       Height = 18
-      Top = 390
+      Top = 279
       Width = 420
       AutoSize = False
       Caption = 'Manifolds'
@@ -243,7 +169,7 @@ object RadiantForm: TRadiantForm
     object btnSuggest: TBCButton
       Left = 16
       Height = 32
-      Top = 414
+      Top = 303
       Width = 200
       Caption = 'Suggest manifolds'
       OnClick = btnSuggestClick
@@ -251,7 +177,7 @@ object RadiantForm: TRadiantForm
     object btnSearchAll: TBCButton
       Left = 224
       Height = 32
-      Top = 414
+      Top = 303
       Width = 212
       Caption = 'Search all zones'
       OnClick = btnSearchAllClick
@@ -260,7 +186,7 @@ object RadiantForm: TRadiantForm
       Tag = 1
       Left = 16
       Height = 54
-      Top = 454
+      Top = 343
       Width = 420
       AutoSize = False
       Caption = 'Click a zone on the plan to open its tab; drag a manifold to move it.  Right-click for more: search, square or turn it, or Not a zone - a shape left bare, brought back the same way.'
@@ -271,7 +197,7 @@ object RadiantForm: TRadiantForm
     object cbLabels: TBGRAThemeCheckBox
       Left = 16
       Height = 22
-      Top = 546
+      Top = 435
       Width = 22
       Hint = 'on the drawing - /hide labels and /show labels later'
       TabOrder = 10
@@ -279,7 +205,7 @@ object RadiantForm: TRadiantForm
     object lblLabels: TLabel
       Left = 44
       Height = 18
-      Top = 548
+      Top = 437
       Width = 226
       AutoSize = False
       Caption = 'Show the labels'
@@ -291,7 +217,7 @@ object RadiantForm: TRadiantForm
     object btnHeat: TBCButton
       Left = 276
       Height = 30
-      Top = 542
+      Top = 431
       Width = 160
       Caption = 'Heat load...'
       Hint = 'the heat each zone needs, its water, pump and pipe, and the boiler - for the submittal'
@@ -301,7 +227,7 @@ object RadiantForm: TRadiantForm
     object lblTag: TLabel
       Left = 16
       Height = 18
-      Top = 584
+      Top = 473
       Width = 80
       AutoSize = False
       Caption = 'Job name'
@@ -309,7 +235,7 @@ object RadiantForm: TRadiantForm
     object edTag: TInkEdit
       Left = 100
       Height = 28
-      Top = 578
+      Top = 467
       Width = 336
       TabOrder = 11
       OnChange = AnyChange
@@ -318,7 +244,7 @@ object RadiantForm: TRadiantForm
       Tag = 1
       Left = 100
       Height = 18
-      Top = 610
+      Top = 499
       Width = 336
       AutoSize = False
       Caption = 'the job, on the submittal - Smith residence'
@@ -328,7 +254,7 @@ object RadiantForm: TRadiantForm
     object lblProblem: TLabel
       Left = 16
       Height = 20
-      Top = 630
+      Top = 519
       Width = 420
       AutoSize = False
       Caption = ''
@@ -340,7 +266,7 @@ object RadiantForm: TRadiantForm
       Tag = 1
       Left = 16
       Height = 34
-      Top = 654
+      Top = 543
       Width = 128
       Caption = 'Build it'
       OnClick = btnBuildClick
@@ -349,7 +275,7 @@ object RadiantForm: TRadiantForm
       Tag = 2
       Left = 152
       Height = 34
-      Top = 654
+      Top = 543
       Width = 100
       Caption = 'Cancel'
       OnClick = btnCancelClick
@@ -357,7 +283,7 @@ object RadiantForm: TRadiantForm
     object btnReport: TBCButton
       Left = 260
       Height = 34
-      Top = 654
+      Top = 543
       Width = 176
       Caption = 'Report a problem...'
       OnClick = btnReportClick
@@ -365,7 +291,7 @@ object RadiantForm: TRadiantForm
     object btnExport: TBCButton
       Left = 16
       Height = 34
-      Top = 692
+      Top = 581
       Width = 200
       Caption = 'Export the submittal...'
       Hint = 'the system, the zone and loop schedules, every zone''s material list and notes, every loop set out from the walls, and the design record'
@@ -375,7 +301,7 @@ object RadiantForm: TRadiantForm
     object btnPreview: TBCButton
       Left = 224
       Height = 34
-      Top = 692
+      Top = 581
       Width = 212
       Caption = 'Preview the PDF'
       Hint = 'the submittal as it would export, opened in the PDF reader - nothing saved'
@@ -545,7 +471,9 @@ object RadiantForm: TRadiantForm
           ParentFont = False
         end
         object lbSolutions: TInkListBox
-          HTMLEnabled = False
+          Borders.Left = 4
+          LineSpacing = 3
+          EditMode = emNone
           Left = 8
           Height = 150
           Top = 238
@@ -568,6 +496,8 @@ object RadiantForm: TRadiantForm
           ParentFont = False
         end
         object memTicket: TInkMemo
+          Borders.Left = 4
+          Borders.Right = 16
           Left = 8
           Height = 298
           Top = 416
@@ -577,7 +507,6 @@ object RadiantForm: TRadiantForm
           Font.Name = 'monospace'
           ParentFont = False
           TabOrder = 4
-          TextFormat = itfPlain
           WordWrap = True
         end
       end

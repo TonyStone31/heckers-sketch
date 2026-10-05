@@ -178,7 +178,7 @@ begin
       [FSpec.Risers, StairMeasure(R, FUnits), FSpec.Risers - 1, StairMeasure(G, FUnits),
        StairLen(G + FSpec.Nosing, FUnits), RadToDeg(ArcTan2(R, G))]);
     A := RecommendStairs(FFrame, FUnits, TStairUse(Max(0, cbUse.ItemIndex)), FSpec);
-    memAdvice.Lines.Text := A.Summary;
+    memAdvice.Lines.Text := InkReport(A.Summary);
     { whether it meets the chosen use, with each miss in red }
     if A.CurrentFits then
     begin

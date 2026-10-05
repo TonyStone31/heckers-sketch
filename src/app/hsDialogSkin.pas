@@ -114,6 +114,20 @@ procedure PauseFor(Milliseconds: QWord);
   on a light one }
 function FieldColor: TColor;
 
+{ Markup for LazInk lists and memos, in the current theme.  ToneColor is
+  green for good and red for bad, readable on a light or a dark field. }
+function ToneColor(Good: Boolean): TColor;
+{ Hard keeps every space, for a row that never wraps; otherwise a line can
+  still break between words }
+function InkSpan(const Txt: string; C: TColor; Bold: Boolean = False; Hard: Boolean = True): string;
+function DimSpan(const Txt: string; Hard: Boolean = True): string;
+function TextSpan(const Txt: string; Bold: Boolean = False; Hard: Boolean = True): string;
+{ a plain report dressed up, columns kept: a line over indented ones is a
+  heading, figures stand out from the words, a line in capitals is a title
+  and one led by WARNING, SHORT and the like is a warning, and Warn goes
+  first in red }
+function InkReport(const Plain: string; const Warn: string = ''): string;
+
 { A radio group is a panel of BGRA radio buttons; they count in the order
   they were laid out.  RadioIndex is -1 when none is checked. }
 function RadioIndex(P: TWinControl): Integer;
@@ -123,6 +137,9 @@ function RadioCount(P: TWinControl): Integer;
 function IsRadioPanel(C: TComponent): Boolean;
 
 implementation
+
+uses
+  StrUtils;
 
 procedure DragBegin(out D: TFormDrag; F: TForm);
 var
@@ -340,6 +357,161 @@ begin
     Result := PixToColor(MixPix(DlgTheme.Panel, Pix(255, 255, 255), 0.75))
   else
     Result := PixToColor(MixPix(DlgTheme.Panel, Pix(0, 0, 0), 0.30));
+end;
+
+function ToneColor(Good: Boolean): TColor;
+begin
+  if LightTheme then
+  begin
+    if Good then Result := $00308A1B else Result := $002828C6;
+  end
+  else if Good then Result := $007AD35C
+  else Result := $006B6BFF;
+end;
+
+{ HTML text with its spacing kept: a run of spaces collapses, so all but
+  the last of one become &nbsp; - all of them when Hard }
+function KeepSpaces(const Txt: string; Hard: Boolean): string;
+var
+  I, J: Integer;
+begin
+  Result := '';
+  I := 1;
+  while I <= Length(Txt) do
+    if Txt[I] = ' ' then
+    begin
+      J := I;
+      while (J <= Length(Txt)) and (Txt[J] = ' ') do Inc(J);
+      if Hard then Result := Result + DupeString('&nbsp;', J - I)
+      else Result := Result + DupeString('&nbsp;', J - I - 1) + ' ';
+      I := J;
+    end
+    else
+    begin
+      case Txt[I] of
+        '&': Result := Result + '&amp;';
+        '<': Result := Result + '&lt;';
+        '>': Result := Result + '&gt;';
+      else
+        Result := Result + Txt[I];
+      end;
+      Inc(I);
+    end;
+end;
+
+function InkSpan(const Txt: string; C: TColor; Bold, Hard: Boolean): string;
+begin
+  if Txt = '' then Exit('');
+  C := ColorToRGB(C);
+  Result := KeepSpaces(Txt, Hard);
+  if Bold then Result := '<b>' + Result + '</b>';
+  Result := Format('<font color="#%.2X%.2X%.2X">%s</font>', [Red(C), Green(C), Blue(C), Result]);
+end;
+
+function DimSpan(const Txt: string; Hard: Boolean): string;
+begin
+  Result := InkSpan(Txt, PixToColor(DlgTheme.TextDim), False, Hard);
+end;
+
+function TextSpan(const Txt: string; Bold, Hard: Boolean): string;
+begin
+  Result := InkSpan(Txt, PixToColor(DlgTheme.Text), Bold, Hard);
+end;
+
+function InkReport(const Plain: string; const Warn: string): string;
+var
+  Lines, Out: TStringList;
+  I, K, Indent, Start: Integer;
+  L, Body, Lead: string;
+  Head, Indented: Boolean;
+
+  function NextIndented(From: Integer): Boolean;
+  var
+    J: Integer;
+  begin
+    for J := From to Lines.Count - 1 do
+      if Trim(Lines[J]) <> '' then Exit((Lines[J] <> '') and (Lines[J][1] = ' '));
+    Result := False;
+  end;
+
+  function Digit(J: Integer): Boolean;
+  begin
+    Result := (J >= 1) and (J <= Length(Body)) and (Body[J] in ['0'..'9']);
+  end;
+
+  { the line's own words, its figures picked out }
+  function Figures: string;
+  var
+    J, From: Integer;
+  begin
+    Result := '';
+    J := 1;
+    From := 1;
+    while J <= Length(Body) do
+      if (Digit(J) or ((Body[J] = '-') and Digit(J + 1))) and
+         ((J = 1) or not (Body[J - 1] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.'])) then
+      begin
+        if Indented then Result := Result + DimSpan(Copy(Body, From, J - From), False)
+        else Result := Result + TextSpan(Copy(Body, From, J - From), False, False);
+        From := J;
+        Inc(J);
+        while (J <= Length(Body)) and (Digit(J) or (Body[J] in ['''', '"', '%']) or
+          ((Body[J] in ['.', ',', '/', '-']) and Digit(J + 1))) do Inc(J);
+        Result := Result + TextSpan(Copy(Body, From, J - From), True, False);
+        From := J;
+      end
+      else Inc(J);
+    if Indented then Result := Result + DimSpan(Copy(Body, From, MaxInt), False)
+    else Result := Result + TextSpan(Copy(Body, From, MaxInt), False, False);
+  end;
+
+begin
+  Lines := TStringList.Create;
+  Out := TStringList.Create;
+  try
+    if Warn <> '' then
+    begin
+      Lines.Text := Warn;
+      for I := 0 to Lines.Count - 1 do Out.Add(InkSpan(Lines[I], ToneColor(False), True, False));
+      Out.Add('&nbsp;');
+    end;
+    Lines.Text := Plain;
+    for I := 0 to Lines.Count - 1 do
+    begin
+      L := TrimRight(Lines[I]);
+      if L = '' then begin Out.Add('&nbsp;'); Continue; end;
+      Indent := 0;
+      while (Indent < Length(L)) and (L[Indent + 1] = ' ') do Inc(Indent);
+      Body := Copy(L, Indent + 1, MaxInt);
+      Indented := Indent > 0;
+      Start := 1;
+      while (Start <= Length(Body)) and (Body[Start] in ['A'..'Z']) do Inc(Start);
+      Lead := Copy(Body, 1, Start - 1);
+      Head := not Indented and NextIndented(I + 1);
+      L := DupeString('&nbsp;', Indent);
+      { a line all in capitals is a title }
+      if (Length(Lead) >= 3) and (Body = UpperCase(Body)) then
+        L := L + InkSpan(Body, PixToColor(DlgTheme.Accent), True, False)
+      else if AnsiMatchStr(Lead, ['WARNING', 'SHORT', 'NOT', 'OUT', 'LESS', 'OVER', 'TOO', 'NO', 'ERROR']) then
+        L := L + InkSpan(Body, ToneColor(False), True, False)
+      else if Body.Trim([' ', '-', '=']) = '' then
+        L := L + DimSpan(Body, False)
+      else if Head then
+        L := L + InkSpan(Body, PixToColor(DlgTheme.Accent), True, False)
+      else
+        L := L + Figures;
+      Out.Add(L);
+    end;
+    Result := '';
+    for K := 0 to Out.Count - 1 do
+    begin
+      if K > 0 then Result := Result + LineEnding;
+      Result := Result + Out[K];
+    end;
+  finally
+    Lines.Free;
+    Out.Free;
+  end;
 end;
 
 { A combo box is a drawn button and a list that drops down inside the
