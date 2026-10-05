@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ComCtrls, Graphics,
-  InkPage, InkMarkdown, LCLType, BCButton, hsDialogSkin, BGRAFlashProgressBar;
+  InkPage, InkMarkdown, LCLType, BCButton, hsDialogSkin, BGRAFlashProgressBar, hsText;
 
 type
   { progress of one file of the report }
@@ -60,8 +60,6 @@ type
     procedure Finish(const Msg, Detail, ClosingHTML: string; OK: Boolean);
   end;
 
-{ text made safe to put inside the page }
-function Esc(const S: string): string;
 
 implementation
 
@@ -102,13 +100,6 @@ const
     'li { margin-bottom: 4px; font-size: 13px } ' +
     'code { font-size: 12px } ' +
     'small { color: #64748b }';
-
-function Esc(const S: string): string;
-begin
-  Result := StringReplace(S, '&', '&amp;', [rfReplaceAll]);
-  Result := StringReplace(Result, '<', '&lt;', [rfReplaceAll]);
-  Result := StringReplace(Result, '>', '&gt;', [rfReplaceAll]);
-end;
 
 constructor TSendForm.CreateSending(AOwner: TComponent; const Title: string);
 begin
@@ -155,7 +146,7 @@ var
     K, P1, P2: Integer;
     L: string;
   begin
-    Result := '<h3>' + Esc(Name_) + '</h3><table>';
+    Result := '<h3>' + HtmlEsc(Name_) + '</h3><table>';
     for K := 0 to FFacts.Count - 1 do
     begin
       L := FFacts[K];
@@ -163,8 +154,8 @@ var
       if Copy(L, 1, P1 - 1) <> Name_ then Continue;
       Delete(L, 1, P1);
       P2 := Pos(#9, L);
-      Result := Result + '<tr><td class="key">' + Esc(Copy(L, 1, P2 - 1)) +
-        '</td><td class="val">' + Esc(Copy(L, P2 + 1, MaxInt)) + '</td></tr>';
+      Result := Result + '<tr><td class="key">' + HtmlEsc(Copy(L, 1, P2 - 1)) +
+        '</td><td class="val">' + HtmlEsc(Copy(L, P2 + 1, MaxInt)) + '</td></tr>';
     end;
     Result := Result + '</table>';
   end;
@@ -181,8 +172,8 @@ begin
       if not FDone then Sec := 'b-run'
       else if FFailed then Sec := 'b-bad' else Sec := 'b-ok';
       H.Add('<table><tr><td class="banner ' + Sec + '">' +
-        '<div class="title">' + Esc(FBanner) + '</div>' +
-        '<div class="sub">' + Esc(FBannerSub) + '</div></td></tr></table>');
+        '<div class="title">' + HtmlEsc(FBanner) + '</div>' +
+        '<div class="sub">' + HtmlEsc(FBannerSub) + '</div></td></tr></table>');
     end;
 
     H.Add('<h3>Files</h3><table>');
@@ -195,13 +186,13 @@ begin
       Verdict := '<span class="pill ' + PILL[FFiles[I].State] + '">' +
         WORD_[FFiles[I].State] + '</span>';
       if FFiles[I].Why <> '' then
-        Verdict := Verdict + '<br><small>' + Esc(FFiles[I].Why) + '</small>';
+        Verdict := Verdict + '<br><small>' + HtmlEsc(FFiles[I].Why) + '</small>';
       Line := FFiles[I].Encrypted;
       if Line = '' then Line := '-';
-      H.Add('<tr><td class="part">' + Esc(FFiles[I].What) + '</td>' +
-        '<td class="file">' + Esc(FFiles[I].Name_) + '</td>' +
-        '<td class="num">' + Esc(FFiles[I].Size) + '</td>' +
-        '<td class="num">' + Esc(Line) + '</td>' +
+      H.Add('<tr><td class="part">' + HtmlEsc(FFiles[I].What) + '</td>' +
+        '<td class="file">' + HtmlEsc(FFiles[I].Name_) + '</td>' +
+        '<td class="num">' + HtmlEsc(FFiles[I].Size) + '</td>' +
+        '<td class="num">' + HtmlEsc(Line) + '</td>' +
         '<td>' + Verdict + '</td></tr>');
     end;
     H.Add('</table>');

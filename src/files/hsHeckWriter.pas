@@ -11,7 +11,7 @@ unit hsHeckWriter;
 interface
 
 uses
-  Classes, SysUtils, Math, Graphics, hsDrawing, hsFaceFinder, hsImpliedFaces, hsGroupData;
+  Classes, SysUtils, Math, Graphics, hsDrawing, hsFaceFinder, hsImpliedFaces, hsGroupData, hsText;
 
 const
   { the first line of every Heck file }
@@ -108,10 +108,7 @@ var
   Inches, R, Frac: Double;
   Feet, Whole, Num, Den: Integer;
   S: string;
-  FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   V := Abs(V);
   if V < FRIENDLY_TOL then Exit('0');
   if U = usMetric then
@@ -120,9 +117,9 @@ begin
       when exact, in full otherwise. }
     R := V * 304.8;
     if Abs(Round(R * 1000) / 1000 / 304.8 - V) <= FRIENDLY_TOL then
-      S := FloatToStrF(Round(R * 1000) / 1000, ffGeneral, 12, 0, FS)
+      S := FloatToStrF(Round(R * 1000) / 1000, ffGeneral, 12, 0, DotFS)
     else
-      S := FloatToStrF(R, ffGeneral, 15, 0, FS);
+      S := FloatToStrF(R, ffGeneral, 15, 0, DotFS);
     Exit(S);
   end;
   Inches := V * 12;
@@ -133,8 +130,8 @@ begin
       rounding noise), otherwise in full. }
     R := Round(Inches * 1000) / 1000;
     if Abs(R / 12 - V) <= ROUNDING_NOISE then
-      Exit(FloatToStrF(R, ffGeneral, 12, 0, FS) + '"');
-    Exit(FloatToStrF(Inches, ffGeneral, 12, 0, FS) + '"');
+      Exit(FloatToStrF(R, ffGeneral, 12, 0, DotFS) + '"');
+    Exit(FloatToStrF(Inches, ffGeneral, 12, 0, DotFS) + '"');
   end;
   Feet := Trunc(R / 12 + 1E-9);
   R := R - Feet * 12;
@@ -169,10 +166,7 @@ end;
 function AsRead(V: Double; U: TUnitSystem): Double;
 var
   A, Inches, R: Double;
-  FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   A := Abs(V);
   Result := 0;
   if A < FRIENDLY_TOL then Exit;
@@ -182,7 +176,7 @@ begin
     if Abs(Round(R * 1000) / 1000 / 304.8 - A) <= FRIENDLY_TOL then
       Result := Round(R * 1000) / 1000 / 304.8
     else
-      Result := StrToFloat(FloatToStrF(R, ffGeneral, 15, 0, FS), FS) / 304.8;
+      Result := StrToFloat(FloatToStrF(R, ffGeneral, 15, 0, DotFS), DotFS) / 304.8;
   end
   else
   begin
@@ -192,7 +186,7 @@ begin
     begin
       R := Round(Inches * 1000) / 1000;
       if Abs(R / 12 - A) <= ROUNDING_NOISE then Result := R / 12
-      else Result := StrToFloat(FloatToStrF(Inches, ffGeneral, 12, 0, FS), FS) / 12;
+      else Result := StrToFloat(FloatToStrF(Inches, ffGeneral, 12, 0, DotFS), DotFS) / 12;
     end
     else
       Result := R / 12;
@@ -275,15 +269,11 @@ begin
 end;
 
 function Deg2(A: Double): string;
-var
-  FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   A := RadToDeg(A);
   if Abs(A - Round(A * 1000) / 1000) < 1E-7 then A := Round(A * 1000) / 1000;
   if Abs(A) < 1E-9 then A := 0;
-  Result := FloatToStrF(A, ffGeneral, 10, 0, FS) + '°';
+  Result := FloatToStrF(A, ffGeneral, 10, 0, DotFS) + '°';
 end;
 
 { "up", "east"... or for a tilted thing, how far it leans from up and which
@@ -293,13 +283,10 @@ function Facing2(const N: TP3): string;
 var
   Tilt, Head, T2, H2: Double;
   W: string;
-  FS: TFormatSettings;
   Back: TP3;
 begin
   Result := FacingWord(N);
   if Result <> '' then Exit;
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   Tilt := ArcCos(EnsureRange(N.Z, -1, 1));
   Head := ArcTan2(N.Y, N.X);
   T2 := DegToRad(Round(RadToDeg(Tilt) * 1000) / 1000);
@@ -314,7 +301,7 @@ begin
     else W := Deg2(H2) + ' round from east';
     Exit('up, leaning ' + Deg2(T2) + ' toward ' + W);
   end;
-  Result := Format('%.9g east, %.9g north, %.9g up', [N.X, N.Y, N.Z], FS);
+  Result := Format('%.9g east, %.9g north, %.9g up', [N.X, N.Y, N.Z], DotFS);
 end;
 
 function Color2(C: TColor): string;
@@ -332,11 +319,6 @@ begin
   Result := Format('#%.2x%.2x%.2x', [C and $FF, (C shr 8) and $FF, (C shr 16) and $FF]);
 end;
 
-function Quoted(const S: string): string;
-begin
-  Result := '''' + StringReplace(S, '''', '''''', [rfReplaceAll]) + '''';
-end;
-
 procedure WriteFormat2(D: TWorkDoc; const SheetName: string; U: TUnitSystem;
   L: TStrings; out First, Last, LineThing: TIntArrayW; Hints: TStrings = nil;
   Names: TStrings = nil; SheetLines: TStrings = nil; Quick: Boolean = False);
@@ -345,7 +327,6 @@ var
   DefInk: TColor;
   DefWidth: Single;
   NLine: Integer;
-  FS: TFormatSettings;
   Circles: TIntArrayW;        { the whole circles on the sheet: c1, c2... }
   { from pass one: the faces the reader restores by itself, and the loops it
     closes that are not faces of the drawing }
@@ -974,7 +955,7 @@ var
   begin
     if D[I].Ink <> DefInk then Put(Depth, 'ink = ' + Color2(D[I].Ink), I);
     if (D[I].Kind in [ekLine, ekArc]) and (Abs(D[I].Weight - DefWidth) > 1E-3) then
-      Put(Depth, 'width = ' + FloatToStrF(D[I].Weight, ffGeneral, 4, 0, FS), I);
+      Put(Depth, 'width = ' + FloatToStrF(D[I].Weight, ffGeneral, 4, 0, DotFS), I);
   end;
 
   { HasMat/Mat: what the solid says its faces are made of, so a face only
@@ -1080,7 +1061,7 @@ var
           Put(Depth + 1, 'from = ' + Place2(D[I].A, U, False), I);
           Put(Depth + 1, 'to = ' + Place2(D[I].B, U, False), I);
           Put(Depth + 1, 'off = ' + Place2(D[I].C, U, True), I);
-          if D[I].Txt <> '' then Put(Depth + 1, 'label = ' + Quoted(D[I].Txt), I);
+          if D[I].Txt <> '' then Put(Depth + 1, 'label = ' + QuotedStr(D[I].Txt), I);
           PutInk(Depth + 1, I);
           Put(Depth, 'end', I);
         end;
@@ -1100,12 +1081,12 @@ var
           try
             Parts.Text := D[I].Txt;
             for K := 0 to Parts.Count - 1 do
-              Put(Depth + 1, 'text = ' + Quoted(Parts[K]), I);
+              Put(Depth + 1, 'text = ' + QuotedStr(Parts[K]), I);
           finally
             Parts.Free;
           end;
           if (D[I].Size > 0) and (Abs(D[I].Size - 1) > 1E-6) then
-            Put(Depth + 1, 'size = ' + FloatToStrF(D[I].Size, ffGeneral, 4, 0, FS), I);
+            Put(Depth + 1, 'size = ' + FloatToStrF(D[I].Size, ffGeneral, 4, 0, DotFS), I);
           PutInk(Depth + 1, I);
           Put(Depth, 'end', I);
         end;
@@ -1357,7 +1338,7 @@ var
   procedure PutPen(Depth: Integer; Ink: TColor; Wd: Single);
   begin
     if Ink <> DefInk then Put(Depth, 'ink = ' + Color2(Ink), -1);
-    if Abs(Wd - DefWidth) > 1E-3 then Put(Depth, 'width = ' + FloatToStrF(Wd, ffGeneral, 4, 0, FS), -1);
+    if Abs(Wd - DefWidth) > 1E-3 then Put(Depth, 'width = ' + FloatToStrF(Wd, ffGeneral, 4, 0, DotFS), -1);
   end;
 
   function PlainPen(Ink: TColor; Wd: Single): Boolean;
@@ -1874,7 +1855,7 @@ var
     for I := 0 to D.Live - 1 do
       if (D[I].Kind = ekPart) and (D[I].Part = Part_) then
       begin
-        Put(Depth, 'group ' + Quoted(D[I].Txt), I);
+        Put(Depth, 'group ' + QuotedStr(D[I].Txt), I);
         if D[I].Solid then Put(Depth + 1, 'locked = true', I);
         if D[I].Hidden then Put(Depth + 1, 'hidden = true', I);
         if D[I].Jig <> '' then Put(Depth + 1, 'jig = ' + D[I].Jig, I);
@@ -2143,8 +2124,6 @@ begin
       InPass1 := False;
     end;
   end;
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   NLine := 0;
   NextHint := '';
   SetLength(LineThing, 256);
@@ -2164,9 +2143,9 @@ begin
   if U = usMetric then Put(0, 'units = mm', -1)
   else Put(0, 'units = ft in', -1);
   Put(0, '', -1);
-  Put(0, 'sheet ' + Quoted(SheetName), -1);
+  Put(0, 'sheet ' + QuotedStr(SheetName), -1);
   Put(1, 'ink = ' + Color2(DefInk), -1);
-  Put(1, 'width = ' + FloatToStrF(DefWidth, ffGeneral, 4, 0, FS), -1);
+  Put(1, 'width = ' + FloatToStrF(DefWidth, ffGeneral, 4, 0, DotFS), -1);
   { the sheet's own settings, as the file keeps them; see hsHeckFile }
   if SheetLines <> nil then
     for I := 0 to SheetLines.Count - 1 do Put(1, SheetLines[I], -1);

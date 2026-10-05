@@ -14,7 +14,7 @@ interface
 
 uses
   Contnrs,
-  Classes, SysUtils, Types, Math, StrUtils, Graphics, hsSurface, hsTriangulate, hsDxf, hsSvg;
+  Classes, SysUtils, Types, Math, StrUtils, Graphics, hsSurface, hsTriangulate, hsDxf, hsSvg, hsText;
 
 type
   TUnitSystem = (usImperial, usMetric);
@@ -1065,14 +1065,11 @@ var
   P, Q: Integer;
   Whole, Num, Den: Double;
   FracPart: string;
-  FS: TFormatSettings;
 begin
   Result := False;
   V := 0;
   S := Trim(S);
   if S = '' then Exit;
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
 
   { split off a trailing fraction }
   FracPart := '';
@@ -1089,13 +1086,13 @@ begin
 
   Whole := 0;
   if S <> '' then
-    if not TryStrToFloat(S, Whole, FS) then Exit;
+    if not TryStrToFloat(S, Whole, DotFS) then Exit;
 
   if FracPart <> '' then
   begin
     P := Pos('/', FracPart);
-    if not TryStrToFloat(Copy(FracPart, 1, P - 1), Num, FS) then Exit;
-    if not TryStrToFloat(Copy(FracPart, P + 1, MaxInt), Den, FS) then Exit;
+    if not TryStrToFloat(Copy(FracPart, 1, P - 1), Num, DotFS) then Exit;
+    if not TryStrToFloat(Copy(FracPart, P + 1, MaxInt), Den, DotFS) then Exit;
     if Den = 0 then Exit;
     Whole := Whole + Num / Den;
   end;
@@ -2400,12 +2397,9 @@ var
   T: string;
   P: Integer;
   Rise, Run: Double;
-  FS: TFormatSettings;
 begin
   Result := False;
   Deg := 0;
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   T := Trim(S);
   if T = '' then Exit;
   { 8:12 - a slope, rise over run, which is how a roof pitch or a duct
@@ -2413,8 +2407,8 @@ begin
   P := Pos(':', T);
   if P > 0 then
   begin
-    if not TryStrToFloat(Trim(Copy(T, 1, P - 1)), Rise, FS) then Exit;
-    if not TryStrToFloat(Trim(Copy(T, P + 1, MaxInt)), Run, FS) then Exit;
+    if not TryStrToFloat(Trim(Copy(T, 1, P - 1)), Rise, DotFS) then Exit;
+    if not TryStrToFloat(Trim(Copy(T, P + 1, MaxInt)), Run, DotFS) then Exit;
     if Abs(Run) < 1E-12 then Exit;
     Deg := RadToDeg(ArcTan2(Rise, Abs(Run)));
     if Run < 0 then Deg := -Deg;
@@ -2425,19 +2419,15 @@ begin
     T := Trim(Copy(T, 1, Length(T) - 2))
   else if (T <> '') and (T[Length(T)] in ['d', 'D']) then
     T := Trim(Copy(T, 1, Length(T) - 1));
-  Result := TryStrToFloat(T, Deg, FS);
+  Result := TryStrToFloat(T, Deg, DotFS);
 end;
 
 function FormatAngle(Deg: Double): string;
-var
-  FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   if Abs(Deg - Round(Deg)) < 0.005 then
     Result := IntToStr(Round(Deg)) + #$C2#$B0
   else
-    Result := FormatFloat('0.0', Deg, FS) + #$C2#$B0;
+    Result := FormatFloat('0.0', Deg, DotFS) + #$C2#$B0;
 end;
 
 function RotV(const V, Axis: TP3; Ang: Double): TP3;
@@ -10011,16 +10001,6 @@ end;
 { persistence                                                              }
 { ---------------------------------------------------------------------- }
 
-{ Numbers written for another program to read - the SVG - with a point
-  for the decimal whatever the machine's own settings say.  The drawing
-  itself is saved as Heck: hsHeckWriter and hsHeckFile. }
-
-function FS: TFormatSettings;
-begin
-  Result := DefaultFormatSettings;
-  Result.DecimalSeparator := '.';
-end;
-
 procedure TWorkDoc.HealArcEnds;
 const
   { a hundredth of an inch or so, in feet: far more than any rounding,
@@ -10163,7 +10143,6 @@ end;
 function TWorkDoc.WriteSCAD(L: TStrings; U: TUnitSystem;
   out Solids: Integer; out Closed: Boolean; AtOrigin: Boolean): Integer;
 var
-  FS: TFormatSettings;
   Scale: Double;
   Mid, BLo, BHi: TP3;
   Grp, Top, I, J, K, NPt, NTri, Slot: Integer;
@@ -10211,8 +10190,6 @@ begin
        not GroupClosed(FEnts[I].Grp) then Closed := False;
     if not FEnts[I].Solid then Closed := False;
   end;
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   if U = usMetric then Scale := 1000 else Scale := 304.8;
   { Centered across the bed and standing on it, as in WriteSTL. }
   Mid := P3(0, 0, 0);
@@ -10308,7 +10285,7 @@ begin
             if Row <> '' then Row := Row + ', ';
             Row := Row + Format('[%.4f,%.4f,%.4f]',
               [(Pts[K].X - Mid.X) * Scale, (Pts[K].Y - Mid.Y) * Scale,
-               (Pts[K].Z - Mid.Z) * Scale], FS);
+               (Pts[K].Z - Mid.Z) * Scale], DotFS);
             if Length(Row) > 1200 then
             begin
               L.Add('      ' + Row + ',');
@@ -10743,7 +10720,7 @@ begin
   L.Add('<?xml version="1.0" encoding="UTF-8"?>');
   L.Add(Format('<svg xmlns="http://www.w3.org/2000/svg" ' +
     'width="%.3f%s" height="%.3f%s" viewBox="%.2f %.2f %.2f %.2f">',
-    [PW, Un, PH, Un, MinX, MinY, MaxX - MinX, MaxY - MinY], FS));
+    [PW, Un, PH, Un, MinX, MinY, MaxX - MinX, MaxY - MinY], DotFS));
 
   Writer := TSVGWriter.Create(L);
   try

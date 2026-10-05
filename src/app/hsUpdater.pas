@@ -50,7 +50,6 @@ function ExpectedSum(const SumsURL, AName: string): string;
 function WhyNotUpdate: string;
 function SwapInAndRestart(const NewFile: string; out Err: string): Boolean;
 procedure ForgetPreviousBuild;
-procedure OpenInBrowser(const URL: string);
 
 implementation
 
@@ -436,32 +435,5 @@ begin
   if FileExists(Old) then DeleteFile(Old);
 end;
 
-
-procedure OpenInBrowser(const URL: string);
-var
-  P: TProcess;
-begin
-  P := TProcess.Create(nil);
-  try
-    {$IFDEF WINDOWS}
-    P.Executable := 'cmd';
-    P.Parameters.Add('/c');
-    P.Parameters.Add('start');
-    P.Parameters.Add('');
-    P.Parameters.Add(URL);
-    {$ELSE}
-    P.Executable := 'xdg-open';
-    P.Parameters.Add(URL);
-    {$ENDIF}
-    P.InheritHandles := False;
-    try
-      P.Execute;
-    except
-      { no browser is not worth an error box }
-    end;
-  finally
-    P.Free;
-  end;
-end;
 
 end.

@@ -11,7 +11,7 @@ unit hsGroupData;
 interface
 
 uses
-  Classes, SysUtils, Math, hsDrawing;
+  Classes, SysUtils, Math, hsDrawing, hsText;
 
 type
   TDataNums = array of Double;
@@ -74,20 +74,17 @@ function DataUnquote(const V: string): string;
 
 implementation
 
-var
-  FS: TFormatSettings;
-
 function DataNum(V: Double): string;
 begin
   if IsNan(V) or IsInfinite(V) then Exit('0');
-  Result := FloatToStrF(V, ffGeneral, 15, 0, FS);
+  Result := FloatToStrF(V, ffGeneral, 15, 0, DotFS);
 end;
 
 { a coordinate to 0.00001 ft (about a thousandth of an inch) }
 function PtNum(V: Double): string;
 begin
   if IsNan(V) or IsInfinite(V) then Exit('0');
-  Result := FormatFloat('0.#####', V, FS);
+  Result := FormatFloat('0.#####', V, DotFS);
   if Result = '-0' then Result := '0';
 end;
 
@@ -195,7 +192,7 @@ var
 begin
   N := Find(K);
   if (N = nil) or N.Block then Exit(Def);
-  Result := StrToFloatDef(Trim(N.Value), Def, FS);
+  Result := StrToFloatDef(Trim(N.Value), Def, DotFS);
 end;
 
 function TDataNode.Int(const K: string; Def: Integer): Integer;
@@ -239,7 +236,7 @@ begin
   if (N = nil) or N.Block or (Trim(N.Value) = '') then Exit;
   Parts := N.Value.Split([',']);
   SetLength(Result, Length(Parts));
-  for I := 0 to High(Parts) do Result[I] := StrToFloatDef(Trim(Parts[I]), 0, FS);
+  for I := 0 to High(Parts) do Result[I] := StrToFloatDef(Trim(Parts[I]), 0, DotFS);
 end;
 
 function TDataNode.Pts(const K: string): TP3Array;
@@ -258,9 +255,9 @@ begin
   begin
     W := Trim(Parts[I]).Split([' '], TStringSplitOptions.ExcludeEmpty);
     if Length(W) < 2 then Continue;
-    Result[C].X := StrToFloatDef(W[0], 0, FS);
-    Result[C].Y := StrToFloatDef(W[1], 0, FS);
-    if Length(W) >= 3 then Result[C].Z := StrToFloatDef(W[2], 0, FS) else Result[C].Z := 0;
+    Result[C].X := StrToFloatDef(W[0], 0, DotFS);
+    Result[C].Y := StrToFloatDef(W[1], 0, DotFS);
+    if Length(W) >= 3 then Result[C].Z := StrToFloatDef(W[2], 0, DotFS) else Result[C].Z := 0;
     Inc(C);
   end;
   SetLength(Result, C);
@@ -450,8 +447,4 @@ begin
   end;
 end;
 
-initialization
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
-  FS.ThousandSeparator := #0;
 end.

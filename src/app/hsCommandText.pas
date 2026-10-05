@@ -28,8 +28,6 @@ type
 const
   NBSP = #$C2#$A0;
 
-{ & < > made safe for markup }
-function CmdEsc(const S: string): string;
 { S in a color, bold if asked }
 function Painted(const Col, S: string; Bold: Boolean = False): string;
 { a message, with its names, lengths, commands and keys picked out }
@@ -40,32 +38,17 @@ function MarkTyped(const S: string; const P: TCmdPalette): string;
 implementation
 
 uses
-  SysUtils;
+  SysUtils, hsText;
 
 const
   KEY_WORDS: array[0..14] of string = ('Ctrl', 'Shift', 'Alt', 'Esc',
     'Escape', 'Enter', 'Return', 'Tab', 'Delete', 'Backspace', 'Space',
     'Home', 'End', 'PgUp', 'PgDn');
 
-function CmdEsc(const S: string): string;
-var
-  I: Integer;
-begin
-  Result := '';
-  for I := 1 to Length(S) do
-    case S[I] of
-      '&': Result := Result + '&amp;';
-      '<': Result := Result + '&lt;';
-      '>': Result := Result + '&gt;';
-    else
-      Result := Result + S[I];
-    end;
-end;
-
 function Painted(const Col, S: string; Bold: Boolean): string;
 begin
   if S = '' then Exit('');
-  Result := '<font color="' + Col + '">' + CmdEsc(S) + '</font>';
+  Result := '<font color="' + Col + '">' + HtmlEsc(S) + '</font>';
   if Bold then Result := '<b>' + Result + '</b>';
 end;
 
@@ -228,7 +211,7 @@ begin
     begin
       Flush;
       Result := Result + '<font color="' + P.Key + '" bgcolor="' + P.KeyBack +
-        '" pad="1 3" radius="5">' + CmdEsc(Copy(S, I, N)) + '</font>';
+        '" pad="1 3" radius="5">' + HtmlEsc(Copy(S, I, N)) + '</font>';
       Inc(I, N);
       Continue;
     end;

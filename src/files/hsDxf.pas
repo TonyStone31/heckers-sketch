@@ -10,7 +10,7 @@ unit hsDxf;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, hsText;
 
 type
   TDxfWriter = class
@@ -36,9 +36,6 @@ type
   end;
 
 implementation
-
-var
-  FS: TFormatSettings;
 
 constructor TDxfWriter.Create;
 begin
@@ -76,7 +73,7 @@ end;
 
 procedure TDxfWriter.PutF(Code: Integer; V: Double);
 begin
-  Put(Code, FormatFloat('0.######', V, FS));
+  Put(Code, FormatFloat('0.######', V, DotFS));
 end;
 
 procedure TDxfWriter.Layer(const Name: string; Color: Integer; Dashed: Boolean);
@@ -164,13 +161,13 @@ begin
   if FAny then
   begin
     L.Add('  9'); L.Add('$EXTMIN');
-    L.Add(' 10'); L.Add(FormatFloat('0.######', FMinX, FS));
-    L.Add(' 20'); L.Add(FormatFloat('0.######', FMinY, FS));
-    L.Add(' 30'); L.Add(FormatFloat('0.######', FMinZ, FS));
+    L.Add(' 10'); L.Add(FormatFloat('0.######', FMinX, DotFS));
+    L.Add(' 20'); L.Add(FormatFloat('0.######', FMinY, DotFS));
+    L.Add(' 30'); L.Add(FormatFloat('0.######', FMinZ, DotFS));
     L.Add('  9'); L.Add('$EXTMAX');
-    L.Add(' 10'); L.Add(FormatFloat('0.######', FMaxX, FS));
-    L.Add(' 20'); L.Add(FormatFloat('0.######', FMaxY, FS));
-    L.Add(' 30'); L.Add(FormatFloat('0.######', FMaxZ, FS));
+    L.Add(' 10'); L.Add(FormatFloat('0.######', FMaxX, DotFS));
+    L.Add(' 20'); L.Add(FormatFloat('0.######', FMaxY, DotFS));
+    L.Add(' 30'); L.Add(FormatFloat('0.######', FMaxZ, DotFS));
   end;
   L.Add('  0'); L.Add('ENDSEC');
 
@@ -223,8 +220,5 @@ begin
   L.Add('  0'); L.Add('EOF');
 end;
 
-initialization
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
 
 end.

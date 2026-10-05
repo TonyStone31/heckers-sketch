@@ -11,7 +11,7 @@ unit hsHeckReader;
 interface
 
 uses
-  Classes, SysUtils, Math, Graphics, hsDrawing, hsFaceFinder, hsImpliedFaces, hsHeckWriter;
+  Classes, SysUtils, Math, Graphics, hsDrawing, hsFaceFinder, hsImpliedFaces, hsHeckWriter, hsText;
 
 type
   EHeck = class(Exception);
@@ -118,7 +118,6 @@ type
     function ReadList(const S: string): TLoop;
     function ReadFacing(const S: string): TP3;
     function ReadColor(const S: string): TColor;
-    function ReadText(const S: string): string;
     function ReadBool(const S: string): Boolean;
     { the grammar }
     function Opens(const Line: string): Boolean;
@@ -372,9 +371,6 @@ end;
 
 { 5' 10 5/8"   4'   18"   3/4"   5ft 10 5/8in   1200mm   90°   2.5 }
 function THeckReader.Number(const S: string; var P: Integer): TVal;
-var
-  FS: TFormatSettings;
-
   function ReadNum(var Q: Integer; out V: Double): Boolean;
   var
     B: Integer;
@@ -387,7 +383,7 @@ var
       while (Q <= Length(S)) and (S[Q] in DIGITS) do Inc(Q);
     end;
     Result := Q > B;
-    if Result then V := StrToFloat(Copy(S, B, Q - B), FS) else V := 0;
+    if Result then V := StrToFloat(Copy(S, B, Q - B), DotFS) else V := 0;
   end;
 
   { a mark at Q, after any spaces: which, and where it ends }
@@ -418,8 +414,6 @@ var
   N1, N2, Den, Inches: Double;
   M: string;
 begin
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   Result.K := vPlain;
   Q := P;
   if not ReadNum(Q, N1) then Fail('a number was expected');
@@ -872,17 +866,6 @@ begin
     Exit(TColor(((N and $FF) shl 16) or (N and $FF00) or ((N shr 16) and $FF)));
   Fail('"' + Trim(S) + '" is not a color: a name like orange, or #RRGGBB');
   Result := 0;
-end;
-
-function THeckReader.ReadText(const S: string): string;
-var
-  V: string;
-begin
-  V := Trim(S);
-  if (Length(V) >= 2) and (V[1] = '''') and (V[Length(V)] = '''') then
-    Result := StringReplace(Copy(V, 2, Length(V) - 2), '''''', '''', [rfReplaceAll])
-  else
-    Result := V;
 end;
 
 function THeckReader.ReadBool(const S: string): Boolean;
@@ -1465,7 +1448,7 @@ var
   Id, WasStamp, Save: Integer;
   Key, V: string;
 begin
-  Id := D.NewPart(ReadText(Header), D.Stamp);
+  Id := D.NewPart(Unquote(Header), D.Stamp);
   WasStamp := D.Stamp;
   Inc(Cur);
   PushScope;
@@ -1518,7 +1501,7 @@ begin
       if Key = 'from' then A := ReadPlace(V, P, False, A)
       else if Key = 'to' then B := ReadPlace(V, P, False, A)
       else if Key = 'off' then Off := ReadStep(V, P)
-      else if Key = 'label' then Lbl := ReadText(V)
+      else if Key = 'label' then Lbl := Unquote(V)
       else if Key = 'ink' then Ink := ReadColor(V);
     end;
     Inc(Cur);
@@ -1553,7 +1536,7 @@ begin
       else if Key = 'text' then
       begin
         if Txt <> '' then Txt := Txt + LineEnding;
-        Txt := Txt + ReadText(V);
+        Txt := Txt + Unquote(V);
       end
       else if Key = 'size' then Size := Expr(V, P).V
       else if Key = 'ink' then Ink := ReadColor(V);
@@ -2218,7 +2201,7 @@ begin
             Cur := High(Result);
             Result[Cur].Head := R.At[I];
             Result[Cur].Tail := -1;
-            Result[Cur].Name := R.ReadText(Trim(Copy(Line, P, MaxInt)));
+            Result[Cur].Name := Unquote(Trim(Copy(Line, P, MaxInt)));
             Result[Cur].Props := TStringList.Create;
           end;
         end;

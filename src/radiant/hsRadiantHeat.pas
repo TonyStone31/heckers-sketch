@@ -11,7 +11,7 @@ unit hsRadiantHeat;
 interface
 
 uses
-  Classes, SysUtils, Math, StrUtils, hsDrawing, hsRadiantData, hsRadiant;
+  Classes, SysUtils, Math, StrUtils, hsDrawing, hsRadiantData, hsRadiant, hsText;
 
 type
   { what the zone's tube is in }
@@ -551,14 +551,12 @@ function KeyNum(const S, Key: string; Def: Double): Double;
 var
   Parts: TStringArray;
   I: Integer;
-  FS: TFormatSettings;
 begin
   Result := Def;
-  FS := DefaultFormatSettings; FS.DecimalSeparator := '.';
   Parts := S.Split([';']);
   for I := 0 to High(Parts) do
     if AnsiStartsStr(Key + '=', Parts[I]) then
-      Exit(StrToFloatDef(Copy(Parts[I], Length(Key) + 2, MaxInt), Def, FS));
+      Exit(StrToFloatDef(Copy(Parts[I], Length(Key) + 2, MaxInt), Def, DotFS));
 end;
 
 function Str_(const S, Key: string): string;
@@ -573,11 +571,8 @@ begin
 end;
 
 function Num(V: Double): string;
-var
-  FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings; FS.DecimalSeparator := '.';
-  Result := FloatToStr(V, FS);
+  Result := FloatToStr(V, DotFS);
 end;
 
 function HeatJobToText(const J: THeatJob): string;

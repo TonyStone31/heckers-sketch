@@ -1329,7 +1329,7 @@ implementation
 
 uses
   FileUtil, Clipbrd, LazUTF8, hsHelpDocs, hsHelpView, hsReportDialog, hsLongText, hsAbout,
-  hsFacts;
+  hsFacts, hsText;
 
 {$R *.lfm}
 
@@ -1704,13 +1704,6 @@ const
 { ======================================================================== }
 { small helpers                                                             }
 { ======================================================================== }
-
-{ A dot for the decimal point whatever the locale, so the log parses back. }
-function ActFS: TFormatSettings;
-begin
-  Result := DefaultFormatSettings;
-  Result.DecimalSeparator := '.';
-end;
 
 function TMainForm.Theme: TTheme;
 begin
@@ -8358,7 +8351,7 @@ begin
   else SnapCol := SnapMarkPix;
   if (SnapSays <> '') then
     M := M + '<b><font color="' + Format('#%.2x%.2x%.2x', [SnapCol.R, SnapCol.G, SnapCol.B]) +
-      '">' + CmdEsc(SnapSays) + '</font></b>' + Painted(P.Dim, '  ' + #$E2#$80#$BA + '  ');
+      '">' + HtmlEsc(SnapSays) + '</font></b>' + Painted(P.Dim, '  ' + #$E2#$80#$BA + '  ');
   M := M + MarkMessage(PromptForTool, P);
   DrawCmdRuns(C, X, Y1, Row1, IL, 11, False, M);
   PaintCmdMsg(C, P);
@@ -10944,7 +10937,7 @@ begin
         'nothing that can be read.</li>' +
         '<li><b>A copy of what you sent</b> is kept on this computer, not ' +
         'encrypted, so you can see exactly what went:<br><code>' +
-        Esc(AppDataDir + 'reports-sent') + '</code></li></ul>', True);
+        HtmlEsc(AppDataDir + 'reports-sent') + '</code></li></ul>', True);
     end
     else
     begin
@@ -10953,11 +10946,11 @@ begin
       if WantShot then Sending.FileState(FilePic, ssFailed, '', 'not tried');
       Sending.Finish('The report did not go', Err,
         '<h3>What happened</h3><ul>' +
-        '<li>' + Esc(Err) + '</li>' +
+        '<li>' + HtmlEsc(Err) + '</li>' +
         '<li><b>Nothing is lost and nothing is broken</b> - it just did not ' +
         'send.</li>' +
         '<li>A copy of the report is kept on this computer:<br><code>' +
-        Esc(AppDataDir + 'reports-sent') + '</code></li>' +
+        HtmlEsc(AppDataDir + 'reports-sent') + '</code></li>' +
         '<li>The help button has the project page if you would rather say ' +
         'it there.</li></ul>', False);
     end;
@@ -15475,7 +15468,7 @@ begin
     [TOOL_NAMES[FTool], FStage, X, Y,
      FormatLen(FCur.X, FD.Units), FormatLen(FCur.Y, FD.Units),
      FormatLen(FCur.Z, FD.Units), Ord(FSnapKind)]));
-  Act(Format('press %.6f %.6f %.6f', [FCur.X, FCur.Y, FCur.Z], ActFS));
+  Act(Format('press %.6f %.6f %.6f', [FCur.X, FCur.Y, FCur.Z], DotFS));
   { For a line run, and for push/pull, drill and offset, the press does
     not decide: it may be a click, or a hold that strains and cancels.
     Known when the button comes up or the hold breaks. }
@@ -15601,7 +15594,7 @@ var
 
   function Num(K: Integer): Double;
   begin
-    if not TryStrToFloat(P[K], Result, ActFS) then Result := 0;
+    if not TryStrToFloat(P[K], Result, DotFS) then Result := 0;
   end;
 
 begin
@@ -16683,11 +16676,11 @@ begin
         0: ShowAbout;
         1: begin CheckForUpdate(True); DoUpdate; end;
         2: ShowWhatsNew;
-        3: OpenInBrowser('https://github.com/' + UPDATE_REPO + '/releases/latest');
+        3: OpenURL('https://github.com/' + UPDATE_REPO + '/releases/latest');
         4: OpenManual;
         5: ReportBug;
       else
-        OpenInBrowser('https://github.com/' + UPDATE_REPO);
+        OpenURL('https://github.com/' + UPDATE_REPO);
       end;
   end;
   RebuildDeck;

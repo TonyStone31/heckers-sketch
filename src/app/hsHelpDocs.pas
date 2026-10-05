@@ -79,7 +79,7 @@ function StartHelpFetch(const Tag: string; AOnProgress: THelpProgress;
 implementation
 
 uses
-  zipper, hsPaths, hsUpdater, hsNet;
+  zipper, hsPaths, hsUpdater, hsNet, FileUtil;
 
 const
   { the manual is a few megabytes; anything near these is wrong }
@@ -159,30 +159,6 @@ begin
   end;
 end;
 
-function RemoveTree(const Dir: string): Boolean;
-var
-  SR: TSearchRec;
-  D: string;
-begin
-  D := IncludeTrailingPathDelimiter(Dir);
-  if FindFirst(D + '*', faAnyFile or faSymLink, SR) = 0 then
-  try
-    repeat
-      if (SR.Name = '.') or (SR.Name = '..') then Continue;
-      { delete a link itself; never follow it into what it points at }
-      if (SR.Attr and faSymLink) <> 0 then
-        DeleteFile(D + SR.Name)
-      else if (SR.Attr and faDirectory) <> 0 then
-        RemoveTree(D + SR.Name)
-      else
-        DeleteFile(D + SR.Name);
-    until FindNext(SR) <> 0;
-  finally
-    FindClose(SR);
-  end;
-  Result := RemoveDir(Dir);
-end;
-
 function InstallHelpZip(const ZipPath, Dest: string; out Err: string): Boolean;
 var
   Z: TUnZipper;
@@ -196,8 +172,8 @@ begin
   Target := ExcludeTrailingPathDelimiter(Dest);
   Fresh := Target + '.new';
   Old := Target + '.old';
-  if DirectoryExists(Fresh) then RemoveTree(Fresh);
-  if DirectoryExists(Old) then RemoveTree(Old);
+  if DirectoryExists(Fresh) then DeleteDirectory(Fresh, False);
+  if DirectoryExists(Old) then DeleteDirectory(Old, False);
 
   Z := TUnZipper.Create;
   try
@@ -242,7 +218,7 @@ begin
       on E: Exception do
       begin
         Err := 'the help archive could not be unpacked: ' + E.Message;
-        if DirectoryExists(Fresh) then RemoveTree(Fresh);
+        if DirectoryExists(Fresh) then DeleteDirectory(Fresh, False);
         Exit;
       end;
     end;
@@ -253,7 +229,7 @@ begin
   if not FileExists(Fresh + PathDelim + 'index.html') then
   begin
     Err := 'the help archive has no index.html in it';
-    RemoveTree(Fresh);
+    DeleteDirectory(Fresh, False);
     Exit;
   end;
 
@@ -262,17 +238,17 @@ begin
   if DirectoryExists(Target) and not RenameFile(Target, Old) then
   begin
     Err := 'the old help folder could not be moved aside';
-    RemoveTree(Fresh);
+    DeleteDirectory(Fresh, False);
     Exit;
   end;
   if not RenameFile(Fresh, Target) then
   begin
     Err := 'the new help folder could not be put in place';
     if DirectoryExists(Old) then RenameFile(Old, Target);
-    RemoveTree(Fresh);
+    DeleteDirectory(Fresh, False);
     Exit;
   end;
-  if DirectoryExists(Old) then RemoveTree(Old);
+  if DirectoryExists(Old) then DeleteDirectory(Old, False);
   Result := True;
 end;
 

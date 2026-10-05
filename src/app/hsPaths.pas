@@ -38,29 +38,11 @@ function WorkDir(const Name: string): string;
 implementation
 
 uses
-  SysUtils, Classes;
+  SysUtils, Classes, LazFileUtils;
 
 var
   Cached: string = '';
   CachedPortable: Boolean = False;
-
-function CanWriteIn(const Dir: string): Boolean;
-var
-  F: TFileStream;
-  Probe: string;
-begin
-  Result := False;
-  if Dir = '' then Exit;
-  Probe := IncludeTrailingPathDelimiter(Dir) + '.hsk-write-probe';
-  try
-    F := TFileStream.Create(Probe, fmCreate);
-    F.Free;
-    DeleteFile(Probe);
-    Result := True;
-  except
-    Result := False;
-  end;
-end;
 
 function AppDataDir: string;
 var
@@ -68,7 +50,7 @@ var
 begin
   if Cached <> '' then Exit(Cached);
   Own := ExtractFilePath(ExpandFileName(ParamStr(0)));
-  if CanWriteIn(Own) then
+  if (Own <> '') and DirectoryIsWritable(Own) then
   begin
     Cached := Own;
     CachedPortable := True;

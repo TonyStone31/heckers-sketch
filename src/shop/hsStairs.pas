@@ -4,7 +4,7 @@ unit hsStairs;
   Copyright (c) 2026 Tony Stone - MIT, see LICENSE. }
 {$mode objfpc}{$H+}
 interface
-uses SysUtils, Math, Types, Graphics, hsDrawing;
+uses SysUtils, Math, Types, Graphics, hsDrawing, hsText;
 type
   TStairFrame = record
     Bottom, Across, Forward: TP3;
@@ -351,11 +351,8 @@ const
   USE_WORDS: array[TStairUse] of string = ('house', 'public', 'gentler', 'carrying', 'ada', 'exit', 'service');
 
 function Num(V: Double): string;
-var
-  FS: TFormatSettings;
 begin
-  FS := DefaultFormatSettings; FS.DecimalSeparator := '.';
-  Result := FloatToStrF(V, ffGeneral, 15, 0, FS);
+  Result := FloatToStrF(V, ffGeneral, 15, 0, DotFS);
 end;
 
 function StairJig(const F: TStairFrame; const S: TStairSpec; Use: TStairUse): string;
@@ -384,19 +381,17 @@ var
   P: Integer;
   V, Heading, Side: Double;
   Got: Integer;
-  FS: TFormatSettings;
   K: TStairUse;
 
   function Number(const T: string; out X: Double): Boolean;
   begin
-    Result := TryStrToFloat(T, X, FS) or ParseLen(T, U, X);
+    Result := TryStrToFloat(T, X, DotFS) or ParseLen(T, U, X);
   end;
 
 begin
   Result := False;
   F := Default(TStairFrame); S := Default(TStairSpec); Use := suResidential;
   if not IsStairJig(Spec) then Exit;
-  FS := DefaultFormatSettings; FS.DecimalSeparator := '.';
   Rest := Trim(Copy(Trim(Spec), Length(STAIR_JIG) + 3, MaxInt));
   if LowerCase(Copy(Rest, 1, 5)) <> 'with ' then Exit;
   Rest := Copy(Rest, 6, MaxInt) + ',';

@@ -31,7 +31,7 @@ function RunJig(const Spec: string; U: TUnitSystem; Output: TStrings;
 implementation
 
 uses
-  Process, hsPaths, hsHeckReader;
+  Process, hsPaths, hsHeckReader, hsText;
 
 const
   JIG_SECONDS = 30;
@@ -62,13 +62,10 @@ var
   P, Q: Integer;
   V: Double;
   IsLen: Boolean;
-  FS: TFormatSettings;
 begin
   Result := False;
   Err := '';
   Name := '';
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
   S := Trim(Spec);
   if (S = '') or (S[1] <> '''') then
   begin
@@ -117,7 +114,7 @@ begin
     begin
       if IsLen then
         if U = usMetric then V := V * 304.8 else V := V * 12;
-      Val := FloatToStrF(V, ffGeneral, 12, 0, FS);
+      Val := FloatToStrF(V, ffGeneral, 12, 0, DotFS);
     end
     else if (Length(Val) >= 2) and (Val[1] = '''') and (Val[Length(Val)] = '''') then
       Val := Copy(Val, 2, Length(Val) - 2);

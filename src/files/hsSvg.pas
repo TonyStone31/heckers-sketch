@@ -30,26 +30,16 @@ type
 
 implementation
 
-uses SysUtils;
+uses SysUtils, hsText;
 
 function Num(V: Double): string;
-var F: TFormatSettings;
 begin
-  F := DefaultFormatSettings;
-  F.DecimalSeparator := '.';
-  Result := FormatFloat('0.00', V, F);
+  Result := FormatFloat('0.00', V, DotFS);
 end;
 
 function Col(C: TColor): string;
 begin
   Result := Format('#%.2x%.2x%.2x', [Byte(C), Byte(C shr 8), Byte(C shr 16)]);
-end;
-
-function Escape(const S: string): string;
-begin
-  Result := StringReplace(S, '&', '&amp;', [rfReplaceAll]);
-  Result := StringReplace(Result, '<', '&lt;', [rfReplaceAll]);
-  Result := StringReplace(Result, '>', '&gt;', [rfReplaceAll]);
 end;
 
 constructor TSVGWriter.Create(Lines: TStrings);
@@ -89,7 +79,7 @@ begin
   if Centered then Anchor := 'middle' else Anchor := 'start';
   FLines.Add('<text x="' + Num(P.X) + '" y="' + Num(P.Y) +
     '" font-family="sans-serif" font-size="' + Num(Size) +
-    '" text-anchor="' + Anchor + '" fill="' + Col(Ink) + '">' + Escape(S) + '</text>');
+    '" text-anchor="' + Anchor + '" fill="' + Col(Ink) + '">' + HtmlEsc(S) + '</text>');
 end;
 
 end.

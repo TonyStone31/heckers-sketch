@@ -11,7 +11,7 @@ unit hsHeckFile;
 interface
 
 uses
-  Classes, SysUtils, Math, StrUtils, hsDrawing, hsHeckWriter, hsHeckReader;
+  Classes, SysUtils, Math, StrUtils, hsDrawing, hsHeckWriter, hsHeckReader, hsText;
 
 type
   THeckSheet = record
@@ -51,33 +51,14 @@ implementation
 const
   VIEW_WORDS: array[TViewKind] of string = ('plan', 'iso', '3d');
 
-var
-  FS: TFormatSettings;
-
 function Num(V: Double): string;
 begin
-  Result := FloatToStrF(V, ffGeneral, 12, 0, FS);
+  Result := FloatToStrF(V, ffGeneral, 12, 0, DotFS);
 end;
 
 function NumOf(const S: string; Def: Double): Double;
 begin
-  Result := StrToFloatDef(Trim(S), Def, FS);
-end;
-
-function Unquote(const V: string): string;
-var
-  T: string;
-begin
-  T := Trim(V);
-  if (Length(T) >= 2) and (T[1] = '''') and (T[Length(T)] = '''') then
-    Result := StringReplace(Copy(T, 2, Length(T) - 2), '''''', '''', [rfReplaceAll])
-  else
-    Result := T;
-end;
-
-function Quote(const S: string): string;
-begin
-  Result := '''' + StringReplace(S, '''', '''''', [rfReplaceAll]) + '''';
+  Result := StrToFloatDef(Trim(S), Def, DotFS);
 end;
 
 function NewHeckSheet(const Name: string): THeckSheet;
@@ -130,8 +111,8 @@ begin
       Extra.Clear;
       if Sheets[I].Units = usMetric then Extra.Add('units = mm') else Extra.Add('units = ft in');
       Scale := ScaleTable(Sheets[I].Units, Sheets[I].ScaleIdx);
-      Extra.Add('scale = ' + Quote(Scale.Name));
-      Extra.Add('snap = ' + Quote(SnapName(Sheets[I].Units, Sheets[I].SnapIdx)));
+      Extra.Add('scale = ' + QuotedStr(Scale.Name));
+      Extra.Add('snap = ' + QuotedStr(SnapName(Sheets[I].Units, Sheets[I].SnapIdx)));
       Extra.Add('view = ' + VIEW_WORDS[Sheets[I].View]);
       Extra.Add('camera = ' + Num(Sheets[I].Az) + ', ' + Num(Sheets[I].El) + ', ' + Num(Sheets[I].Zoom) +
         ', ' + Num(Sheets[I].ViewX) + ', ' + Num(Sheets[I].ViewY));
@@ -140,8 +121,8 @@ begin
       if Session then
       begin
         Extra.Add('document = ' + IntToStr(Sheets[I].DocKey));
-        Extra.Add('file = ' + Quote(Sheets[I].FilePath));
-        Extra.Add('tab = ' + Quote(Sheets[I].DocName));
+        Extra.Add('file = ' + QuotedStr(Sheets[I].FilePath));
+        Extra.Add('tab = ' + QuotedStr(Sheets[I].DocName));
         Extra.Add('saved = ' + IfThen(Sheets[I].Dirty, 'false', 'true'));
       end;
       One.Clear;
@@ -293,8 +274,4 @@ begin
   Result := False;
 end;
 
-initialization
-  FS := DefaultFormatSettings;
-  FS.DecimalSeparator := '.';
-  FS.ThousandSeparator := #0;
 end.
