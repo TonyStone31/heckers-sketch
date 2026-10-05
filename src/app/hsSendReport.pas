@@ -37,7 +37,6 @@ type
     FFiles: array of TSendFile;
     FFacts: TStringList;      { section TAB key TAB value, in the order given }
     FBanner, FBannerSub, FClosing: string;
-    procedure PauseFor(Milliseconds: QWord);
     procedure Repaint_;
     function PageHTML: string;
   public
@@ -254,17 +253,6 @@ procedure TSendForm.Fact(const Section, Key, Value: string);
 begin
   if Trim(Value) = '' then Exit;
   FFacts.Add(Section + #9 + Key + #9 + Value);
-end;
-
-procedure TSendForm.PauseFor(Milliseconds: QWord);
-var
-  UntilTick: QWord;
-begin
-  UntilTick := GetTickCount64 + Milliseconds;
-  repeat
-    Application.ProcessMessages;
-    Sleep(10);
-  until GetTickCount64 >= UntilTick;
 end;
 
 procedure TSendForm.Stage(const AStage, ADetail: string; Percent: Integer;

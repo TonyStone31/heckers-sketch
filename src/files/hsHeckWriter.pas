@@ -17,6 +17,12 @@ const
   { the first line of every Heck file }
   HECK_MAGIC = 'HeckersSketch 2';
 
+  { the colors Heck has names for, as TColor; any other is written #RRGGBB }
+  HECK_COLOR_NAMES: array[0..9] of string = ('black', 'white', 'gray', 'red',
+    'orange', 'yellow', 'green', 'blue', 'purple', 'brown');
+  HECK_COLOR_VALUES: array[0..9] of Integer = ($000000, $FFFFFF, $808080,
+    $0000FF, $3CB0FF, $00FFFF, $008000, $FF0000, $800080, $2A2AA5);
+
   { Sides of a circle when none are given: what the circle tool draws and
     what a one-line circle reads back with. }
   HECK_SIDES = 24;
@@ -224,11 +230,6 @@ begin
   if Result = '' then Result := '0 east';
 end;
 
-function Sub3(const A, B: TP3): TP3;
-begin
-  Result := P3(A.X - B.X, A.Y - B.Y, A.Z - B.Z);
-end;
-
 function SameP(const A, B: TP3): Boolean;
 begin
   Result := (Abs(A.X - B.X) < 1E-9) and (Abs(A.Y - B.Y) < 1E-9) and
@@ -305,17 +306,12 @@ begin
 end;
 
 function Color2(C: TColor): string;
-const
-  NAMES: array[0..9] of string = ('black', 'white', 'gray', 'red', 'orange',
-    'yellow', 'green', 'blue', 'purple', 'brown');
-  VALUES: array[0..9] of Integer = ($000000, $FFFFFF, $808080, $0000FF, $3CB0FF,
-    $00FFFF, $008000, $FF0000, $800080, $2A2AA5);
 var
   I: Integer;
 begin
   C := C and $FFFFFF;
-  for I := 0 to High(NAMES) do
-    if C = VALUES[I] then Exit(NAMES[I]);
+  for I := 0 to High(HECK_COLOR_NAMES) do
+    if C = HECK_COLOR_VALUES[I] then Exit(HECK_COLOR_NAMES[I]);
   Result := Format('#%.2x%.2x%.2x', [C and $FF, (C shr 8) and $FF, (C shr 16) and $FF]);
 end;
 

@@ -33,7 +33,6 @@ type
     FTmp: string;
     procedure DownloadProgress(BytesReceived, TotalBytes: Int64);
     procedure Fail(const Msg: string);
-    procedure PauseFor(Milliseconds: QWord);
     procedure SetStage(const Stage, Detail: string; ProgressValue: Integer);
   public
     function Run(const Info: TUpdateInfo; const TempFile: string): Boolean;
@@ -60,17 +59,6 @@ begin
   lblDetail.Caption := Detail;
   pbProgress.Value := ProgressValue;
   Application.ProcessMessages;
-end;
-
-procedure TUpdateForm.PauseFor(Milliseconds: QWord);
-var
-  UntilTick: QWord;
-begin
-  UntilTick := GetTickCount64 + Milliseconds;
-  repeat
-    Application.ProcessMessages;
-    Sleep(10);
-  until GetTickCount64 >= UntilTick;
 end;
 
 procedure TUpdateForm.DownloadProgress(BytesReceived, TotalBytes: Int64);

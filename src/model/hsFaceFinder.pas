@@ -102,32 +102,6 @@ type
 
 { ---------------------------------------------------------------- helpers - }
 
-function Len3(const A: TP3): Double; inline;
-begin
-  Result := Sqrt(A.X * A.X + A.Y * A.Y + A.Z * A.Z);
-end;
-
-function Sub3(const A, B: TP3): TP3; inline;
-begin
-  Result := P3(A.X - B.X, A.Y - B.Y, A.Z - B.Z);
-end;
-
-function Add3(const A, B: TP3): TP3; inline;
-begin
-  Result := P3(A.X + B.X, A.Y + B.Y, A.Z + B.Z);
-end;
-
-function Mul3(const A: TP3; S: Double): TP3; inline;
-begin
-  Result := P3(A.X * S, A.Y * S, A.Z * S);
-end;
-
-function Lerp(const A, B: TP3; T: Double): TP3; inline;
-begin
-  Result := P3(A.X + (B.X - A.X) * T, A.Y + (B.Y - A.Y) * T,
-               A.Z + (B.Z - A.Z) * T);
-end;
-
 { Where P falls along AB, and how far off it is.  T is clamped so Off is the
   distance to the segment, not its infinite line. }
 procedure ClosestOnSeg(const P, A, B: TP3; out T, Off: Double);
@@ -494,7 +468,7 @@ begin
     for J := 0 to Length(Cuts[I]) do
     begin
       if J = Length(Cuts[I]) then Q := Segs[I].B
-      else Q := Lerp(Segs[I].A, Segs[I].B, Cuts[I][J]);
+      else Q := Lerp3(Segs[I].A, Segs[I].B, Cuts[I][J]);
       if Dist(P, Q) > Tol then
       begin
         if Count >= Length(Result) then SetLength(Result, Count * 2 + 8);

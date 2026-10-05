@@ -186,12 +186,6 @@ begin
   Result.CurrentFits:=Length(Result.Problems)=0;
 end;
 
-function Plus(const A, B: TP3): TP3;
-begin Result := P3(A.X+B.X,A.Y+B.Y,A.Z+B.Z); end;
-function Minus(const A, B: TP3): TP3;
-begin Result := P3(A.X-B.X,A.Y-B.Y,A.Z-B.Z); end;
-function Times(const A: TP3; K: Double): TP3;
-begin Result := P3(A.X*K,A.Y*K,A.Z*K); end;
 { The flight between two level, parallel lines: the lower at the floor, the
   upper at the landing.  The height between them is the rise, the plan
   distance the run.  The lines need not match or line up: FromUpper picks
@@ -209,25 +203,25 @@ begin
   if (LenL<=Tol) or (LenH<=Tol) then begin Why:='Both lines must have length.'; Exit; end;
   if (Abs(L0.Z-L1.Z)>Tol) or (Abs(H0.Z-H1.Z)>Tol) then
     begin Why:='Each line must be level - drawn flat, at one height.'; Exit; end;
-  AB:=Minus(L1,L0); CD:=Minus(H1,H0);
-  if Dot3(AB,CD)<0 then begin T:=H0; H0:=H1; H1:=T; CD:=Minus(H1,H0); end;
+  AB:=Sub3(L1,L0); CD:=Sub3(H1,H0);
+  if Dot3(AB,CD)<0 then begin T:=H0; H0:=H1; H1:=T; CD:=Sub3(H1,H0); end;
   { parallel, to a hair in a thousand }
-  if Dist(Times(AB,1/LenL),Times(CD,1/LenH))>1E-3 then
+  if Dist(Mul3(AB,1/LenL),Mul3(CD,1/LenH))>1E-3 then
     begin Why:='The two lines must be parallel - the stairs run square to them.'; Exit; end;
   F.Rise:=((H0.Z+H1.Z)-(L0.Z+L1.Z))/2;
   if F.Rise<=Tol then begin Why:='One line must be above the other: the lower at the floor, the upper at the landing.'; Exit; end;
   { the width line and the square run from it, in plan }
-  if FromUpper then begin F.Width:=LenH; F.Across:=Times(CD,1/LenH); end
-  else begin F.Width:=LenL; F.Across:=Times(AB,1/LenL); end;
-  Delta:=Minus(H0,L0); Delta.Z:=0;
+  if FromUpper then begin F.Width:=LenH; F.Across:=Mul3(CD,1/LenH); end
+  else begin F.Width:=LenL; F.Across:=Mul3(AB,1/LenL); end;
+  Delta:=Sub3(H0,L0); Delta.Z:=0;
   Off:=Dot3(Delta,F.Across);
-  Side:=Minus(Delta,Times(F.Across,Off));
+  Side:=Sub3(Delta,Mul3(F.Across,Off));
   F.Run:=Dist(Side,P3(0,0,0));
   if F.Run<=Tol then begin Why:='The lines are one above the other - move the lower line out from the landing to give the stairs a run.'; Exit; end;
-  F.Forward:=Times(Side,1/F.Run);
+  F.Forward:=Mul3(Side,1/F.Run);
   { the corner the flight is built from, at floor level: the lower line's
     start, or the upper line's brought down and back by the run }
-  if FromUpper then begin F.Bottom:=Minus(H0,Times(F.Forward,F.Run)); F.Bottom.Z:=L0.Z; end
+  if FromUpper then begin F.Bottom:=Sub3(H0,Mul3(F.Forward,F.Run)); F.Bottom.Z:=L0.Z; end
   else F.Bottom:=L0;
   Result:=True;
 end;
@@ -274,7 +268,7 @@ var
   Profile:array of TPointF;
   LeftSide,RightSide,Cap:TP3Array;
   function World(X,Y,Z:Double):TP3;
-  begin Result:=Plus(F.Bottom,Plus(Times(F.Forward,X),Times(F.Across,Y))); Result.Z:=Result.Z+Z; end;
+  begin Result:=Add3(F.Bottom,Add3(Mul3(F.Forward,X),Mul3(F.Across,Y))); Result.Z:=Result.Z+Z; end;
   procedure Prism;
   var K,N:Integer;
   begin

@@ -847,18 +847,13 @@ begin
 end;
 
 function THeckReader.ReadColor(const S: string): TColor;
-const
-  NAMES: array[0..9] of string = ('black', 'white', 'gray', 'red', 'orange',
-    'yellow', 'green', 'blue', 'purple', 'brown');
-  VALUES: array[0..9] of Integer = ($000000, $FFFFFF, $808080, $0000FF, $3CB0FF,
-    $00FFFF, $008000, $FF0000, $800080, $2A2AA5);
 var
   V: string;
   I, N: Integer;
 begin
   V := LowerCase(Trim(S));
-  for I := 0 to High(NAMES) do
-    if V = NAMES[I] then Exit(TColor(VALUES[I]));
+  for I := 0 to High(HECK_COLOR_NAMES) do
+    if V = HECK_COLOR_NAMES[I] then Exit(TColor(HECK_COLOR_VALUES[I]));
   { Read the other spelling of gray too.  It is split here so the repo's
     spelling check does not flag it. }
   if V = 'gr' + 'ey' then Exit(TColor($808080));

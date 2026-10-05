@@ -107,6 +107,9 @@ procedure SkinSlider(T: TBCFluentSlider);
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
   panel Tag 1: dim text or raised panel.  Call from OnCreate, after UseTheme. }
 procedure ThemeForm(F: TForm);
+{ Keep the message loop turning this long, so what was just put up paints
+  and the window stays responsive. }
+procedure PauseFor(Milliseconds: QWord);
 { fill for a text field: darker than the panel on a dark theme, near white
   on a light one }
 function FieldColor: TColor;
@@ -446,6 +449,17 @@ begin
       Exit(C.Color);
     C := C.Parent;
   end;
+end;
+
+procedure PauseFor(Milliseconds: QWord);
+var
+  UntilTick: QWord;
+begin
+  UntilTick := GetTickCount64 + Milliseconds;
+  repeat
+    Application.ProcessMessages;
+    Sleep(10);
+  until GetTickCount64 >= UntilTick;
 end;
 
 procedure ThemeForm(F: TForm);

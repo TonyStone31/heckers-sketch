@@ -54,6 +54,9 @@ type
 
 implementation
 
+uses
+  hsHeckWriter;
+
 const
   { What each block may contain, as "prop|hint". }
   THINGS = 'face line box rect pull solid group points circle arc ring const dim note guide bore noface';
@@ -79,8 +82,7 @@ const
     'to|= a  (what it points at)', 'size|= 1', 'ink|= black');
   BORE_PROPS: array[0..1] of string = ('points|= a b c d', 'goes|= 6" down');
   DIRS: array[0..5] of string = ('east', 'west', 'north', 'south', 'up', 'down');
-  VALUES: array[0..12] of string = ('true', 'false', 'none', 'black', 'white', 'gray',
-    'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown');
+  VALUES: array[0..2] of string = ('true', 'false', 'none');
   THING_HINTS: array[0..16] of string = (
     'a flat area: face = a b c d',
     'two points: line = a to b',
@@ -499,6 +501,7 @@ begin
       for I := 0 to Rings.Count - 1 do Word_(Rings[I] + '1', 'first corner of ring ' + Rings[I]);
       if T[Length(T)] = '=' then
         for I := 0 to High(VALUES) do Word_(VALUES[I], '');
+        for I := 0 to High(HECK_COLOR_NAMES) do Word_(HECK_COLOR_NAMES[I], '');
     end
     else
     begin

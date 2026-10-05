@@ -66,6 +66,9 @@ const
 
 implementation
 
+uses
+  StrUtils, hsHeckWriter;
+
 const
   KEYWORDS = ' heckerssketch sheet group solid points ring const face noface hole line arc circle ' +
     'box rect pull bore dim note guide jig begin end to true false none ';
@@ -342,9 +345,7 @@ begin
       begin
         if Pos(' ' + W + ' ', KEYWORDS) > 0 then FTok := htKey
         else if not FSeenEquals then FTok := htProp
-        else if (W = 'black') or (W = 'white') or (W = 'gray') or (W = 'red') or
-                (W = 'orange') or (W = 'yellow') or (W = 'green') or (W = 'blue') or
-                (W = 'purple') or (W = 'brown') then FTok := htColor
+        else if AnsiIndexStr(W, HECK_COLOR_NAMES) >= 0 then FTok := htColor
         else FTok := htName;
       end;
       { the block opens at its first word, and "end" closes at "end" }

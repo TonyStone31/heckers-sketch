@@ -32,34 +32,9 @@ type
     S0, S1: TP3;           { where they do }
   end;
 
-function Sub(const A, B: TP3): TP3; inline;
-begin
-  Result := P3(A.X - B.X, A.Y - B.Y, A.Z - B.Z);
-end;
-
-function Len(const A: TP3): Double; inline;
-begin
-  Result := Sqrt(A.X * A.X + A.Y * A.Y + A.Z * A.Z);
-end;
-
-function Scaled(const A: TP3; S: Double): TP3; inline;
-begin
-  Result := P3(A.X * S, A.Y * S, A.Z * S);
-end;
-
-function Add(const A, B: TP3): TP3; inline;
-begin
-  Result := P3(A.X + B.X, A.Y + B.Y, A.Z + B.Z);
-end;
-
-function Dist3(const A, B: TP3): Double; inline;
-begin
-  Result := Len(Sub(A, B));
-end;
-
 function BoreAxis(D: TWorkDoc; Bore: Integer): TP3;
 begin
-  Result := Norm3(Sub(D[Bore].B, D[Bore].Poly[0]));
+  Result := Norm3(Sub3(D[Bore].B, D[Bore].Poly[0]));
 end;
 
 function BoreLen(D: TWorkDoc; Bore: Integer): Double;
@@ -80,12 +55,12 @@ begin
   begin
     A := Loop[I];
     B := Loop[(I + 1) mod N];
-    E := Sub(B, A);
-    L := Len(E);
+    E := Sub3(B, A);
+    L := Len3(E);
     if L < 1E-12 then Continue;
-    T := Dot3(Sub(P, A), E) / (L * L);
+    T := Dot3(Sub3(P, A), E) / (L * L);
     if T < 0 then T := 0 else if T > 1 then T := 1;
-    Result := Min(Result, Dist(P, Add(A, Scaled(E, T))));
+    Result := Min(Result, Dist(P, Add3(A, Mul3(E, T))));
   end;
 end;
 
@@ -96,9 +71,9 @@ var
 begin
   Result := False;
   Ax := BoreAxis(D, Bore);
-  T := Dot3(Sub(P, D[Bore].Poly[0]), Ax);
+  T := Dot3(Sub3(P, D[Bore].Poly[0]), Ax);
   if (T <= Tol) or (T >= BoreLen(D, Bore) - Tol) then Exit;
-  Q := Sub(P, Scaled(Ax, T));
+  Q := Sub3(P, Mul3(Ax, T));
   if not PointInLoop(Q, D[Bore].Poly, Ax) then Exit;
   Result := DistToLoop(Q, D[Bore].Poly) > Tol;
 end;
@@ -111,9 +86,9 @@ var
 begin
   Result := False;
   Ax := BoreAxis(D, Bore);
-  T := Dot3(Sub(P, D[Bore].Poly[0]), Ax);
+  T := Dot3(Sub3(P, D[Bore].Poly[0]), Ax);
   if (T < -Tol) or (T > BoreLen(D, Bore) + Tol) then Exit;
-  Q := Sub(P, Scaled(Ax, T));
+  Q := Sub3(P, Mul3(Ax, T));
   Result := DistToLoop(Q, D[Bore].Poly) <= Tol;
 end;
 
@@ -211,7 +186,7 @@ begin
   dA := Dot3(NA, PA[0]);
   dB := Dot3(NB, PB[0]);
   { a point on both planes }
-  L0 := Scaled(Add(Scaled(Cross3(NB, Dir), dA), Scaled(Cross3(Dir, NA), dB)), 1 / D2);
+  L0 := Mul3(Add3(Mul3(Cross3(NB, Dir), dA), Mul3(Cross3(Dir, NA), dB)), 1 / D2);
   Dir := Norm3(Dir);
   LineThroughPoly(L0, Dir, PA, NA, TA, CA, Tol);
   LineThroughPoly(L0, Dir, PB, NB, TB, CB, Tol);
@@ -229,8 +204,8 @@ begin
       begin
         Segs[NSegs].FA := -1;
         Segs[NSegs].FB := -1;
-        Segs[NSegs].S0 := Add(L0, Scaled(Dir, T0));
-        Segs[NSegs].S1 := Add(L0, Scaled(Dir, T1));
+        Segs[NSegs].S0 := Add3(L0, Mul3(Dir, T0));
+        Segs[NSegs].S1 := Add3(L0, Mul3(Dir, T1));
         Inc(NSegs);
         Result := True;
       end;
@@ -264,7 +239,7 @@ var
 
   function Along(const P: TP3): Double;
   begin
-    Result := Dot3(Sub(P, D[Face].Poly[0]), Ax);
+    Result := Dot3(Sub3(P, D[Face].Poly[0]), Ax);
   end;
 
 begin
@@ -278,7 +253,7 @@ begin
     for F := 0 to D.Live - 1 do
       if (D[F].Kind = ekFace) and D[F].Solid and (D[F].Grp <> 0) and
          (Abs(Abs(Dot3(Norm3(D.FaceNormal(F)), Norm3(D.FaceNormal(Face)))) - 1) < 1E-6) and
-         (Abs(Dot3(Norm3(D.FaceNormal(F)), Sub(D[Face].Poly[0], D[F].Poly[0]))) < 1E-6) and
+         (Abs(Dot3(Norm3(D.FaceNormal(F)), Sub3(D[Face].Poly[0], D[F].Poly[0]))) < 1E-6) and
          PointInLoop(InnerPoint(D[Face].Poly, D.FaceNormal(Face)), D[F].Poly, D.FaceNormal(F)) then
       begin
         G := D[F].Grp;
@@ -286,9 +261,9 @@ begin
       end;
   if G = 0 then Exit;
   Nm := Norm3(D.FaceNormal(Face));
-  Ax := Scaled(Nm, Sign(Dist));          { the way the push goes }
+  Ax := Mul3(Nm, Sign(Dist));          { the way the push goes }
   Size := Abs(Dist);
-  for I := 0 to N - 1 do Size := Max(Size, Dist3(D[Face].Poly[I], D[Face].Poly[0]));
+  for I := 0 to N - 1 do Size := Max(Size, hsDrawing.Dist(D[Face].Poly[I], D[Face].Poly[0]));
   Tol := 1E-6 * (1 + Size);
   Best := Abs(Dist);
   SetLength(Side, 4);
@@ -304,9 +279,9 @@ begin
         J := (I + 1) mod N;
         Side[0] := D[Face].Poly[I];
         Side[1] := D[Face].Poly[J];
-        Side[2] := Add(D[Face].Poly[J], Scaled(Ax, Abs(Dist)));
-        Side[3] := Add(D[Face].Poly[I], Scaled(Ax, Abs(Dist)));
-        if PolyCross(Side, Cross3(Sub(Side[1], Side[0]), Sub(Side[3], Side[0])),
+        Side[2] := Add3(D[Face].Poly[J], Mul3(Ax, Abs(Dist)));
+        Side[3] := Add3(D[Face].Poly[I], Mul3(Ax, Abs(Dist)));
+        if PolyCross(Side, Cross3(Sub3(Side[1], Side[0]), Sub3(Side[3], Side[0])),
                      D[F].Poly, D.FaceNormal(F), Tol, Segs, NSeg) then
           for K := 0 to NSeg - 1 do
           begin
@@ -320,7 +295,7 @@ begin
       begin
         T := Along(D[F].Poly[I]);
         if (T > Tol) and (T < Best) and
-           PointInLoop(Sub(D[F].Poly[I], Scaled(Ax, T)), D[Face].Poly, Nm) then
+           PointInLoop(Sub3(D[F].Poly[I], Mul3(Ax, T)), D[Face].Poly, Nm) then
           Best := T;
       end;
     end;
@@ -343,8 +318,8 @@ var
   var
     DA, DB: Double;
   begin
-    DA := Dot3(Sub(A, P0), N);
-    DB := Dot3(Sub(B, P0), N);
+    DA := Dot3(Sub3(A, P0), N);
+    DB := Dot3(Sub3(B, P0), N);
     if (DA > 0) and (DB > 0) then begin TA := 1; TB := 0; Exit; end;   { all outside }
     if (DA <= 0) and (DB <= 0) then Exit;                              { all inside }
     if DA > 0 then TA := Max(TA, DA / (DA - DB))                      { A outside, enters }
@@ -353,22 +328,22 @@ var
 
 begin
   TA := 0; TB := 1;
-  Ax := Norm3(Sub(FarOfFirst, Loop[0]));
+  Ax := Norm3(Sub3(FarOfFirst, Loop[0]));
   L := Dist(FarOfFirst, Loop[0]);
   M := Length(Loop);
   { the mouths }
-  Clip(Loop[0], Scaled(Ax, -1));
-  Clip(Add(Loop[0], Scaled(Ax, L)), Ax);
+  Clip(Loop[0], Mul3(Ax, -1));
+  Clip(Add3(Loop[0], Mul3(Ax, L)), Ax);
   { the sides: outward is away from the opening's middle }
   Side := P3(0, 0, 0);
-  for I := 0 to M - 1 do Side := Add(Side, Loop[I]);
-  Side := Scaled(Side, 1 / M);
+  for I := 0 to M - 1 do Side := Add3(Side, Loop[I]);
+  Side := Mul3(Side, 1 / M);
   for I := 0 to M - 1 do
   begin
     P0 := Loop[I];
-    E := Sub(Loop[(I + 1) mod M], P0);
+    E := Sub3(Loop[(I + 1) mod M], P0);
     N := Norm3(Cross3(E, Ax));
-    if Dot3(N, Sub(Side, P0)) > 0 then N := Scaled(N, -1);
+    if Dot3(N, Sub3(Side, P0)) > 0 then N := Mul3(N, -1);
     Clip(P0, N);
     if TA >= TB then Exit(False);
   end;
@@ -399,8 +374,8 @@ begin
     { only a real stretch, not a touch at a wall }
     if (TB - TA) * Dist(A, B) < Tol * 10 then Continue;
     Ink := D[I].Ink; Wt := D[I].Weight; Soft := D[I].Soft;
-    PA := Add(A, Scaled(Sub(B, A), TA));
-    PB := Add(A, Scaled(Sub(B, A), TB));
+    PA := Add3(A, Mul3(Sub3(B, A), TA));
+    PB := Add3(A, Mul3(Sub3(B, A), TB));
     D.Delete(I);
     if Dist(A, PA) > Tol * 10 then
     begin

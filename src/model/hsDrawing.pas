@@ -868,6 +868,11 @@ function ViewRight(const V: TProjector): TP3;
 function ViewUp(const V: TProjector): TP3;
 function ViewDir(const V: TProjector): TP3;
 
+{ point and vector arithmetic }
+function Add3(const A, B: TP3): TP3; inline;
+function Sub3(const A, B: TP3): TP3; inline;
+function Mul3(const A: TP3; K: Double): TP3; inline;
+function Len3(const A: TP3): Double; inline;
 function Cross3(const A, B: TP3): TP3;
 function Dot3(const A, B: TP3): Double; inline;
 function Norm3(const A: TP3): TP3;
@@ -1515,6 +1520,26 @@ end;
 function SamePt(const A, B: TP3; Tol: Double): Boolean;
 begin
   Result := Dist(A, B) <= Tol;
+end;
+
+function Add3(const A, B: TP3): TP3;
+begin
+  Result := P3(A.X + B.X, A.Y + B.Y, A.Z + B.Z);
+end;
+
+function Sub3(const A, B: TP3): TP3;
+begin
+  Result := P3(A.X - B.X, A.Y - B.Y, A.Z - B.Z);
+end;
+
+function Mul3(const A: TP3; K: Double): TP3;
+begin
+  Result := P3(A.X * K, A.Y * K, A.Z * K);
+end;
+
+function Len3(const A: TP3): Double;
+begin
+  Result := Sqrt(A.X * A.X + A.Y * A.Y + A.Z * A.Z);
 end;
 
 function Cross3(const A, B: TP3): TP3;
@@ -4399,10 +4424,6 @@ var
     Result := Dist(A, C) < 1E-9;
   end;
 
-  function Sub(const A, C: TP3): TP3;
-  begin
-    Result := P3(A.X - C.X, A.Y - C.Y, A.Z - C.Z);
-  end;
 
   procedure FaceOut(const P: array of TP3; const Want: TP3);
   begin
@@ -4438,7 +4459,7 @@ var
   begin
     Den := Dot3(D, Nm);
     if Abs(Den) < 1E-12 then Exit(P);
-    T := Dot3(Sub(O, P), Nm) / Den;
+    T := Dot3(Sub3(O, P), Nm) / Den;
     Result := P3(P.X + D.X * T, P.Y + D.Y * T, P.Z + D.Z * T);
   end;
 
@@ -4476,10 +4497,10 @@ begin
   for S := 1 to High(Rings) do
   begin
     SetLength(Rings[S], N);
-    DirIn := Norm3(Sub(Pts[S mod M], Pts[(S - 1) mod M]));
+    DirIn := Norm3(Sub3(Pts[S mod M], Pts[(S - 1) mod M]));
     if Closed or (S < M - 1) then
     begin
-      DirOut := Norm3(Sub(Pts[(S + 1) mod M], Pts[S mod M]));
+      DirOut := Norm3(Sub3(Pts[(S + 1) mod M], Pts[S mod M]));
       B := P3(DirIn.X + DirOut.X, DirIn.Y + DirOut.Y, DirIn.Z + DirOut.Z);
       if Dist(B, P3(0, 0, 0)) < 1E-9 then B := DirIn else B := Norm3(B);
       Turn := ArcCos(EnsureRange(Dot3(DirIn, DirOut), -1.0, 1.0));
@@ -4515,7 +4536,7 @@ begin
       Q := P3((Rings[S][K].X + Rings[S][K2].X + Rings[S + 1][K2].X + Rings[S + 1][K].X) / 4,
               (Rings[S][K].Y + Rings[S][K2].Y + Rings[S + 1][K2].Y + Rings[S + 1][K].Y) / 4,
               (Rings[S][K].Z + Rings[S][K2].Z + Rings[S + 1][K2].Z + Rings[S + 1][K].Z) / 4);
-      Out := Sub(Q, RingCen);
+      Out := Sub3(Q, RingCen);
       FaceOut([Rings[S][K], Rings[S][K2], Rings[S + 1][K2], Rings[S + 1][K]], Out);
     end;
     { the seam at the far ring: hard at a corner, soft along a curve }
@@ -4528,8 +4549,8 @@ begin
   for K := 0 to N - 1 do
   begin
     K2 := (K + 1) mod N;
-    PrevE := Norm3(Sub(Poly[K], Poly[(K + N - 1) mod N]));
-    E := Norm3(Sub(Poly[K2], Poly[K]));
+    PrevE := Norm3(Sub3(Poly[K], Poly[(K + N - 1) mod N]));
+    E := Norm3(Sub3(Poly[K2], Poly[K]));
     Turn := ArcCos(EnsureRange(Dot3(PrevE, E), -1.0, 1.0));
     for S := 0 to High(Rings) - 1 do
       Edge(Rings[S][K], Rings[S + 1][K], Turn < SOFT_TURN);
@@ -4561,9 +4582,9 @@ begin
     { the profile is the near cap; the far cap is the last ring }
     FEnts[Face].Solid := True;
     SetFaceGroup(Face, G);
-    DirIn := Norm3(Sub(Pts[1], Pts[0]));
+    DirIn := Norm3(Sub3(Pts[1], Pts[0]));
     if Dot3(FaceNormal(Face), DirIn) > 0 then FlipFace(Face);
-    FaceOut(Rings[High(Rings)], Norm3(Sub(Pts[M - 1], Pts[M - 2])));
+    FaceOut(Rings[High(Rings)], Norm3(Sub3(Pts[M - 1], Pts[M - 2])));
     for K := 0 to N - 1 do
       Edge(Rings[High(Rings)][K], Rings[High(Rings)][(K + 1) mod N], False);
     for K := 0 to N - 1 do

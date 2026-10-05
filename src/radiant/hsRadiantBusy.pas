@@ -82,8 +82,6 @@ type
     procedure ReadGoals(var CoverPct, EvenPct: Double);
     { seconds a zone is searched before giving up with its best, 0 for never }
     function GiveUpSecs: Integer;
-    { pump messages this long, so what was just put up is painted }
-    procedure Settle(Milliseconds: QWord);
   end;
 
 implementation
@@ -127,23 +125,12 @@ begin
   tmrStart.Enabled := False;
   { a new window is mapped and painted over several turns of the message
     loop; pumped only once, the search started over an empty frame }
-  Settle(100);
+  PauseFor(100);
   try
     if Assigned(OnWork) then OnWork(Self);
   finally
     ModalResult := mrOK;
   end;
-end;
-
-procedure TRadiantBusyForm.Settle(Milliseconds: QWord);
-var
-  UntilTick: QWord;
-begin
-  UntilTick := GetTickCount64 + Milliseconds;
-  repeat
-    Application.ProcessMessages;
-    Sleep(5);
-  until GetTickCount64 >= UntilTick;
 end;
 
 procedure TRadiantBusyForm.Stage(const AStage, ADetail: string; Percent: Integer);
