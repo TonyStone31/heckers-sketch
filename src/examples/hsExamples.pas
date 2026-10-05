@@ -18,8 +18,6 @@ uses
 { How many there are, and what each is called on disk. }
 function ExampleCount: Integer;
 function ExampleFile(I: Integer): string;
-{ A short line about it, for anything that lists them. }
-function ExampleAbout(I: Integer): string;
 { The drawing itself, as the lines of a .hsk file. }
 procedure ExampleLines(I: Integer; L: TStrings);
 
@@ -47,22 +45,6 @@ uses
 const
   FILES: array[0..6] of string = ('etch-a-sketch.hsk', 'wine-glass.hsk',
     'broom.hsk', 'robot.hsk', 'ball.hsk', 'jigs.hsk', 'mannequin.hsk');
-  ABOUT: array[0..6] of string = (
-    'A toy etch-a-sketch, to scale, with a robot on the screen.  Every ' +
-    'face of it is something to push.',
-    'A wine glass, off the lathe: an outline spun about the blue axis.  ' +
-    'Hollow bowl, solid stem, and closed enough to print.',
-    'A kitchen broom, banded the way a shop one is: a hundred and seventy ' +
-    'bristles, every face painted, and not a pen color anywhere.',
-    'A robot six foot two, with the etch-a-sketch set in his chest at the ' +
-    'height your hands are - and the toy is the toy, not a copy of it.',
-    'A soccer ball: twelve pentagons and twenty hexagons, cut off the corners ' +
-    'of an icosahedron the way the real one is.',
-    'Four groups, each made by a jig - a little program of your own, in any ' +
-    'language, that prints the drawing''s text.  Right-click one and run it again.',
-    'A mannequin, six foot and a hundred and fifty pounds, made by the body ' +
-    'jig from those two numbers - to be dressed.  Right-click her, change the ' +
-    'numbers, run the jig again: another body.');
 
 function ExampleCount: Integer;
 begin
@@ -72,11 +54,6 @@ end;
 function ExampleFile(I: Integer): string;
 begin
   if (I < 0) or (I > High(FILES)) then Result := '' else Result := FILES[I];
-end;
-
-function ExampleAbout(I: Integer): string;
-begin
-  if (I < 0) or (I > High(ABOUT)) then Result := '' else Result := ABOUT[I];
 end;
 
 procedure ExampleLines(I: Integer; L: TStrings);

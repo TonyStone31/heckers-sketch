@@ -13,9 +13,6 @@ interface
 uses
   Classes, SysUtils, Math, StrUtils, hsDrawing, hsHeckWriter, hsHeckReader;
 
-const
-  HECK_MAGIC = 'HeckersSketch 2';
-
 type
   THeckSheet = record
     Name: string;

@@ -14,6 +14,9 @@ uses
   Classes, SysUtils, Math, Graphics, hsDrawing, hsFaceFinder, hsImpliedFaces, hsGroupData;
 
 const
+  { the first line of every Heck file }
+  HECK_MAGIC = 'HeckersSketch 2';
+
   { Sides of a circle when none are given: what the circle tool draws and
     what a one-line circle reads back with. }
   HECK_SIDES = 24;
@@ -2157,7 +2160,7 @@ begin
       Circles[High(Circles)] := I;
     end;
 
-  Put(0, 'HeckersSketch 2', -1);
+  Put(0, HECK_MAGIC, -1);
   if U = usMetric then Put(0, 'units = mm', -1)
   else Put(0, 'units = ft in', -1);
   Put(0, '', -1);

@@ -26,7 +26,6 @@ type
     UploadBase: string;   { https://filebin.net/<bin> }
     Bin: string;
     Updated: string;
-    FromCache: Boolean;
   end;
 
 { Asks GitHub where reports go.  False, with a reason, on failure. }
@@ -71,7 +70,6 @@ begin
   E.UploadBase := '';
   E.Bin := '';
   E.Updated := '';
-  E.FromCache := False;
   if not HttpGet(ENDPOINT_URL, Body, Err) then Exit;
   J := nil;
   try
@@ -114,7 +112,6 @@ begin
   E.UploadBase := '';
   E.Bin := '';
   E.Updated := '';
-  E.FromCache := True;
   Result := False;
   try
     Ini := TIniFile.Create(ConfigFile);

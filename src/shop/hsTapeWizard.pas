@@ -47,7 +47,6 @@ type
       in hall coordinates (x from the left wall, y above the floor) }
     FHallW, FHallH, FVPx, FVPy, FFar: Double;
     FML, FMT, FMB: Integer;
-    FSceneW, FSceneH: Integer;
     FL0, FB0, FL1, FB1: Double;
     FT0, FT1: Double;
     FDimA0, FDimA1, FDimB0, FDimB1: TPoint;   { the two tape lines, ends }
@@ -323,8 +322,6 @@ var
   E, X: array[0..3] of TP3;
   Lo, Hi: Double;
 begin
-  FSceneW := W;
-  FSceneH := H;
   FML := 16; FMT := 12; FMB := 16;
   FFar := 0.36;
   { The entry hangs a foot below the ceiling, mid hall; the exit is offset by

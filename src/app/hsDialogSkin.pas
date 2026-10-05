@@ -97,7 +97,6 @@ procedure SkinPanel(P: TBCPanel; Raised: Boolean = False; Rounding: Integer = 10
 procedure SkinButton(B: TBCButton; Kind: TBtnKind; FontH: Integer = 0);
 procedure SkinLabel(L: TBCLabel; Dim: Boolean = False; FontH: Integer = 0;
   Bold: Boolean = False);
-procedure SkinEdit(E: TEdit);
 procedure SkinCheck(C: TBGRAThemeControl);
 procedure SkinCombo(C: TBCComboBox);
 procedure SkinSpin(C: TBCTrackbarUpdown);
@@ -338,14 +337,6 @@ begin
     Result := PixToColor(MixPix(DlgTheme.Panel, Pix(255, 255, 255), 0.75))
   else
     Result := PixToColor(MixPix(DlgTheme.Panel, Pix(0, 0, 0), 0.30));
-end;
-
-procedure SkinEdit(E: TEdit);
-begin
-  E.Color := FieldColor;
-  E.Font.Color := PixToColor(DlgTheme.Text);
-  E.Font.Height := -13;
-  E.BorderStyle := bsSingle;
 end;
 
 { A combo box is a drawn button and a list that drops down inside the

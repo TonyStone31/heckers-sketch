@@ -81,7 +81,6 @@ type
     { exact depth triangles from DepthMesh, used by the next FillLoops only }
     FZTris: TDepthTris;
     FZTriY0, FZTriY1: array of Integer;
-    FDirty: TRect;
     procedure Allocate(AWidth, AHeight: Integer);
     procedure Verify;
     procedure Invalidate; inline;
@@ -93,9 +92,6 @@ type
     function ScanLine(Y: Integer): PPix; inline;
 
     { --- damage tracking, so compositing only touches what changed ------- }
-    procedure ResetDirty;
-    procedure MarkAllDirty;
-    function TakeDirty: TRect;
 
     { --- primitives ------------------------------------------------------ }
     procedure BlendPixel(X, Y: Integer; const C: TPix; Cover: Single); inline;
@@ -105,7 +101,6 @@ type
     procedure RoundRectV(const R: TRect; Radius: Single; const C1, C2: TPix; Alpha: Single = 1.0);
     procedure RoundFrame(const R: TRect; Radius, LineW: Single; const C: TPix; Alpha: Single = 1.0);
     procedure Disc(CX, CY, Radius: Single; const C: TPix; Alpha: Single = 1.0);
-    procedure DiscV(CX, CY, Radius: Single; const C1, C2: TPix; Alpha: Single = 1.0);
     procedure Ring(CX, CY, Radius, LineW: Single; const C: TPix; Alpha: Single = 1.0);
     { A cheap one pixel antialiased line for faint things drawn in bulk, like
       the ground grid.  Clipped to the surface first.  No depth test. }
@@ -173,7 +168,6 @@ type
     { An ink layer keeps its own alpha so it can be composited over any
       background; a background surface stays fully opaque. }
     property PreserveAlpha: Boolean read FKeepAlpha write FKeepAlpha;
-    property DirtyRect: TRect read FDirty;
   end;
 
 { --- color helpers ----------------------------------------------------- }
@@ -184,7 +178,6 @@ function MixPix(const A, B: TPix; T: Single): TPix;
 { Near-black or near-white, whichever reads on this color. }
 function OnPix(const C: TPix): TPix;
 function ShadePix(const C: TPix; F: Single): TPix;
-function HSVPix(H, S, V: Single): TPix;
 function PtF(X, Y: Single): TPointF; inline;
 
 { Called when a surface finds its buffer details changed under it, so the
@@ -278,39 +271,6 @@ begin
   Result.G := EnsureRange(Round(C.G * F), 0, 255);
   Result.B := EnsureRange(Round(C.B * F), 0, 255);
   Result.A := C.A;
-end;
-
-function HSVPix(H, S, V: Single): TPix;
-var
-  I: Integer;
-  F, P, Q, T, R, G, B: Single;
-begin
-  H := H - Floor(H / 360) * 360;
-  S := EnsureRange(S, 0, 1);
-  V := EnsureRange(V, 0, 1);
-  if S <= 0 then
-  begin
-    R := V; G := V; B := V;
-  end
-  else
-  begin
-    H := H / 60;
-    I := Trunc(H);
-    F := H - I;
-    P := V * (1 - S);
-    Q := V * (1 - S * F);
-    T := V * (1 - S * (1 - F));
-    case I of
-      0: begin R := V; G := T; B := P; end;
-      1: begin R := Q; G := V; B := P; end;
-      2: begin R := P; G := V; B := T; end;
-      3: begin R := P; G := Q; B := V; end;
-      4: begin R := T; G := P; B := V; end;
-    else
-      begin R := V; G := P; B := Q; end;
-    end;
-  end;
-  Result := Pix(Round(R * 255), Round(G * 255), Round(B * 255));
 end;
 
 function PtF(X, Y: Single): TPointF;
@@ -471,7 +431,6 @@ begin
     FHeight := 0;
     FStride := 0;
     FBitmapValid := False;
-    ResetDirty;
     Exit;
   end;
   { The row stride, measured since a backing store may pad rows.  The
@@ -503,7 +462,6 @@ begin
     FHeight := 0;
     FStride := 0;
     FBitmapValid := False;
-    ResetDirty;
     Exit;
   end;
 
@@ -513,7 +471,6 @@ begin
     surface afterwards would otherwise show whatever was in that memory }
   FillChar(FBits^, PtrUInt(FStride) * PtrUInt(AHeight), 0);
   FBitmapValid := False;
-  ResetDirty;
 end;
 
 procedure TArtSurface.Invalidate;
@@ -648,30 +605,7 @@ begin
     end;
   end;
 
-  if X < FDirty.Left then FDirty.Left := X;
-  if Y < FDirty.Top then FDirty.Top := Y;
-  if X >= FDirty.Right then FDirty.Right := X + 1;
-  if Y >= FDirty.Bottom then FDirty.Bottom := Y + 1;
   FBitmapValid := False;
-end;
-
-procedure TArtSurface.ResetDirty;
-begin
-  FDirty := Rect(FWidth, FHeight, 0, 0);
-end;
-
-procedure TArtSurface.MarkAllDirty;
-begin
-  FDirty := Rect(0, 0, FWidth, FHeight);
-end;
-
-{ Returns the damaged area and clears it.  An empty rect means nothing moved. }
-function TArtSurface.TakeDirty: TRect;
-begin
-  Result := FDirty;
-  if (Result.Right <= Result.Left) or (Result.Bottom <= Result.Top) then
-    Result := Rect(0, 0, 0, 0);
-  ResetDirty;
 end;
 
 procedure TArtSurface.ClearTransparent;
@@ -680,7 +614,6 @@ var
 begin
   for Y := 0 to FHeight - 1 do
     FillChar(ScanLine(Y)^, FWidth * SizeOf(TPix), 0);
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -701,7 +634,6 @@ begin
       Inc(P);
     end;
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -765,7 +697,6 @@ begin
       Inc(P);
     end;
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -896,26 +827,6 @@ begin
     for X := X0 to X1 do
       BlendPixel(X, Y, C,
         Coverage(Sqrt(Sqr(X + 0.5 - CX) + Sqr(Y + 0.5 - CY)) - Radius) * Alpha);
-  Invalidate;
-end;
-
-procedure TArtSurface.DiscV(CX, CY, Radius: Single; const C1, C2: TPix; Alpha: Single);
-var
-  X, Y, X0, Y0, X1, Y1: Integer;
-  C: TPix;
-begin
-  if Radius <= 0 then Exit;
-  X0 := LoBound(CX - Radius - 1, FWidth);
-  Y0 := LoBound(CY - Radius - 1, FHeight);
-  X1 := HiBound(CX + Radius + 1, FWidth);
-  Y1 := HiBound(CY + Radius + 1, FHeight);
-  for Y := Y0 to Y1 do
-  begin
-    C := MixPix(C1, C2, EnsureRange((Y - (CY - Radius)) / (2 * Radius), 0, 1));
-    for X := X0 to X1 do
-      BlendPixel(X, Y, C,
-        Coverage(Sqrt(Sqr(X + 0.5 - CX) + Sqr(Y + 0.5 - CY)) - Radius) * Alpha);
-  end;
   Invalidate;
 end;
 
@@ -1567,7 +1478,6 @@ begin
     P^.G := EnsureRange(P^.G + D, 0, 255);
     P^.B := EnsureRange(P^.B + D, 0, 255);
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -1594,7 +1504,6 @@ begin
       Inc(Dst);
     end;
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -1618,7 +1527,6 @@ begin
       Inc(D);
     end;
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -1667,7 +1575,6 @@ begin
     FZBehind := False;
     FZa := 0; FZb := 0; FZc := -1E30;
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -1701,7 +1608,6 @@ begin
     { a row at a time - this copies a whole window of paper every frame }
     Move(S^, D^, (X1 - X0) * SizeOf(TPix));
   end;
-  MarkAllDirty;
   Invalidate;
 end;
 
@@ -1721,7 +1627,6 @@ begin
   if Length(Buf) <> FWidth * FHeight * 4 then Exit;
   for Y := 0 to FHeight - 1 do
     Move(Buf[Y * FWidth * 4], ScanLine(Y)^, FWidth * 4);
-  MarkAllDirty;
   Invalidate;
 end;
 

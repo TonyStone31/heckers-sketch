@@ -350,7 +350,6 @@ type
     FCmdSkin: TArtSurface;
     { the message rows' last content, so they are set only on change, and
       row one's layout kept between caret blinks }
-    FCmdRowCache: THTMLLayoutCache;
     FCmdMsgR: TRect;           { where the message rows are, in the bar }
     FCmdPillW: Integer;        { the tool pill's column, left of them }
     FOverlay: TArtSurface;
@@ -574,7 +573,6 @@ type
       since the last change. }
     FEditSeq, FDraftSeq: Int64;
     { the edit the named file was last written at; anything later is unsaved }
-    FSavedSeq: Int64;
     { unique per run, so two copies cannot write the same temp file }
     FRunTag: string;
     FDraftAge: Integer;
@@ -845,7 +843,6 @@ type
     { rest the cursor on a point and it is kept as a reference }
     FLockOn: Boolean;
     FLockPt: TP3;
-    FLockKind: TSnapKind;
     FDwellSX, FDwellSY: Integer;
     FDwellSince: QWord;
 
@@ -1015,7 +1012,6 @@ type
     { the drawing as it stood, saved beside the report }
     procedure SaveCrashDoc(const ReportPath: string);
     procedure ShakeWatch(X, Y: Integer);
-    procedure PaintStrain(C: TCanvas; const A, B: TPointF; T: Single);
     function StrainOutline(out Pts: TPointFArray): Boolean;
     procedure PaintStrainPath(C: TCanvas; const Pts: TPointFArray; T: Single);
     procedure PaintStrainSeg(C: TCanvas; const A, B: TPointF; T: Single;
@@ -1028,7 +1024,6 @@ type
     procedure PaintDimEnds(C: TCanvas; const A, B: TP3);
     procedure PaintDimTag(C: TCanvas; X, Y: Double; const S: string);
     function PushDistance: Double;
-    procedure Recompose;
     procedure RecomposeAll;
     procedure FreshScreen;
     procedure RenderInk;
@@ -1147,7 +1142,6 @@ type
 
     { tools and the command bar }
     function ToolName(T: TTool): string;
-    function Prompt: string;
     function SnapSays: string;
     function SnapMarkPix: TPix;
     function CmdPalette: TCmdPalette;
@@ -1373,7 +1367,6 @@ const
   GRP_SNAP  = 6;
   GRP_TOOL  = 7;
   GRP_POPUP = 8;   { a button that opens a list rather than setting a value }
-  GRP_TOGGLE = 9;  { a button that is simply on or off, and says which }
 
   { the lists those buttons open }
   POP_NONE  = -1;
@@ -1610,12 +1603,6 @@ const
   HINT_BLUE: TPix = (B: $F2; G: $B4; R: $76; A: 255);
   AXIS_MIN_PX     = 14.0;   // nearer than this an axis lock says nothing
   DWELL_MS        = 450;    // rest on a point this long to keep it
-  { SketchUp's default: round enough to read as a circle, few enough that a
-    push does not bury the drawing in walls (each segment becomes one). }
-  CIRCLE_SEGS     = 24;
-  { enough points for an arc in a face outline to read as a curve; each one
-    becomes a wall if the face is pulled }
-  ARC_SEGS        = 16;
 
 type
   TViewPreset = record
@@ -1674,13 +1661,6 @@ const
   { the less common tools, behind MORE }
   MORE_TOOLS: array[0..2] of TTool =
     (ptRotate, ptOffset, ptDrill);
-
-  GRP_COLS: array[0..2] of Integer = (3, 3, 3);
-  GRP_N:    array[0..2] of Integer = (6, 5, 6);
-  TOOL_GROUPS: array[0..2, 0..5] of TTool =
-    ((ptSelect, ptMove, ptRotate, ptErase, ptPush, ptDrill),
-     (ptLine, ptRect, ptCircle, ptArc, ptFollow, ptSelect),
-     (ptMeasure, ptProtractor, ptDim, ptText, ptOffset, ptOrbit));
 
   TOOL_HINTS: array[TTool] of string = (
     'Select - click to pick, drag a box for several.  Ctrl adds, Shift ' +
@@ -2512,7 +2492,6 @@ begin
   FShell := TArtSurface.Create(16, 16);
   FDeckSkin := TArtSurface.Create(16, 16);
   FCmdSkin := TArtSurface.Create(16, 16);
-  FCmdRowCache := THTMLLayoutCache.Create(8);
   FViewSkin := TArtSurface.Create(16, 16);
   FSliceSkin := TArtSurface.Create(16, 16);
   FToolSkin := TArtSurface.Create(16, 16);
@@ -4703,18 +4682,6 @@ begin
   end;
 end;
 
-procedure TMainForm.Recompose;
-var
-  R: TRect;
-begin
-  R := FInk.TakeDirty;
-  if (R.Right <= R.Left) or (R.Bottom <= R.Top) then Exit;
-  InflateRect(R, 1, 1);
-  FArt.CompositeOver(FPaper, FInk, R);
-  FShotOK := False;
-  FScreenDirty := True;
-end;
-
 procedure TMainForm.RecomposeAll;
 var
   T0: QWord;
@@ -4722,7 +4689,6 @@ begin
   FShotOK := False;
   T0 := GetTickCount64;
   FArt.CompositeOver(FPaper, FInk, Rect(0, 0, FArt.Width, FArt.Height));
-  FInk.ResetDirty;
   FScreenDirty := True;
   FMsComp := FMsComp + (GetTickCount64 - T0);
 end;
@@ -4770,7 +4736,6 @@ begin
         ').  Ctrl+Z, or save it and send it in - nothing is lost.';
     end;
   end;
-  FInk.MarkAllDirty;
   finally
     FMsRender := FMsRender + (GetTickCount64 - T0);
   end;
@@ -11338,19 +11303,6 @@ begin
   PaintStrainMark(C, CX, CY, T);
 end;
 
-{ The rubber band leaned on until it breaks: hold the button still and it
-  stiffens, bows, thins and cracks, then the run is released.  T runs 0 to 1
-  from when the press stops looking like a click to the break. }
-procedure TMainForm.PaintStrain(C: TCanvas; const A, B: TPointF; T: Single);
-var
-  P: TPointFArray;
-begin
-  SetLength(P, 2);
-  P[0] := A;
-  P[1] := B;
-  PaintStrainPath(C, P, T);
-end;
-
 { One side of it: bows away from CX,CY when the shape has a middle, to one
   side when it is a single strand. }
 procedure TMainForm.PaintStrainSeg(C: TCanvas; const A, B: TPointF; T: Single;
@@ -13295,14 +13247,6 @@ begin
       if FRotFree then Result := 'free of the face   Alt: follow faces'
       else Result := 'arrows: the plane   Alt: free of the face';
   end;
-end;
-
-{ the tool's prompt, with where you are in front of it when a group is open }
-function TMainForm.Prompt: string;
-begin
-  Result := PromptForTool;
-  if (FD <> nil) and (FD.Doc.Context <> 0) then
-    Result := 'in "' + FD.Doc.PartName(FD.Doc.Context) + '" (Esc leaves)   ' + Result;
 end;
 
 function TMainForm.PromptForTool: string;
@@ -20250,7 +20194,6 @@ begin
   if FLockOn and (Dist(FLockPt, FCur) < 1E-9) then Exit;   // already this one
   FLockOn := True;
   FLockPt := FCur;
-  FLockKind := FSnapKind;
   FScreenDirty := True;
   InvalidateStatus;
 end;
@@ -22600,7 +22543,6 @@ begin
     FDrawings[S[I]].DocName := ChangeFileExt(ExtractFileName(Path), '');
     FDrawings[S[I]].Dirty := False;
   end;
-  FSavedSeq := FEditSeq;
   { the draft only holds what is unsaved: rewritten, or dropped if nothing is
     left unsaved, on the next tick }
   FDraftSeq := -1;
@@ -23803,10 +23745,7 @@ begin
   FD.SnapIdx := 1;
   { a drawing of its own, not a file: Save asks where it goes }
   FD.DocName := FD.Name;
-  { Not the user's work until they change it, so it is not unsaved.  Only
-    this sheet: setting the window-wide FSavedSeq marked every sheet saved
-    (see TDrawing.Dirty). }
-  FSavedSeq := FEditSeq;
+  { not the user's work until they change it, so not unsaved }
   FD.Dirty := False;
   { as when opening a file: its faces say which areas are filled, so seed
     them as seen or the first rebuild works over faces that were right }

@@ -912,7 +912,6 @@ const
 implementation
 
 const
-  MM_PER_INCH = 25.4;
   { SketchUp's default front material, near enough. }
   FACE_MATERIAL: TPix = (B: $F6; G: $FA; R: $FA; A: 255);
   { The back of a face, in SketchUp's pale blue, so a solid built inside out
@@ -9039,15 +9038,6 @@ begin
   Result := ArcNearestAt(PC, E, SX, SY, Ignored, TolPx);
 end;
 
-function ArcScreenDist(const V: TProjector; const E: TWorkEnt;
-  SX, SY: Double): Double;
-var
-  PC: TProjCache;
-begin
-  BeginProject(V, PC);
-  Result := ArcScreenDistAt(PC, E, SX, SY);
-end;
-
 function AxisSnap(const V: TProjector; SX, SY, TolPx: Double;
   out P: TP3; out Axis: Integer): Boolean;
 var
@@ -10029,16 +10019,6 @@ function FS: TFormatSettings;
 begin
   Result := DefaultFormatSettings;
   Result.DecimalSeparator := '.';
-end;
-
-{ Text safe to drop into SVG markup.  The label is typed by hand, and a
-  stray & or < would make the file unopenable. }
-function XmlText(const S: string): string;
-begin
-  Result := StringReplace(S, '&', '&amp;', [rfReplaceAll]);
-  Result := StringReplace(Result, '<', '&lt;', [rfReplaceAll]);
-  Result := StringReplace(Result, '>', '&gt;', [rfReplaceAll]);
-  Result := StringReplace(Result, '"', '&quot;', [rfReplaceAll]);
 end;
 
 procedure TWorkDoc.HealArcEnds;

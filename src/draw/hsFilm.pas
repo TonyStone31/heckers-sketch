@@ -73,7 +73,6 @@ function ShootFrame(Doc: TWorkDoc; const V: TProjector; W, H: Integer;
   Field := Field + (Y - Ref) * K into a store near address zero. }
 procedure OrbitBy(var V: TProjector; DX, DY: Double);
 procedure PanBy(var V: TProjector; DX, DY: Double);
-procedure ZoomBy(var V: TProjector; Factor: Double);
 
 { Zoom keeping the point under AX, AY fixed.  A screen position is
   O + Ppu * f(point), so scaling Ppu by k gives O' = A - k * (A - O). }
@@ -314,17 +313,6 @@ begin
   Y := V.OY + DY;
   V.OX := X;
   V.OY := Y;
-end;
-
-procedure ZoomBy(var V: TProjector; Factor: Double);
-var
-  P: Double;
-begin
-  if Factor <= 0 then Exit;
-  P := V.Ppu * Factor;
-  if P < 1E-4 then P := 1E-4;
-  if P > 1E6 then P := 1E6;
-  V.Ppu := P;
 end;
 
 procedure HoldAt(var V: TProjector; const P: TP3; SX, SY: Double);

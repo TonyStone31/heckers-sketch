@@ -72,8 +72,6 @@ procedure PaintScreenPaper(S: TArtSurface; const T: TTheme);
 procedure PaintScreenWell(S: TArtSurface; const R: TRect; Radius: Single);
 procedure PaintMeasuredGrid(S: TArtSurface; const T: TTheme;
   Ppu, OX, OY: Double; MajorEvery: Integer);
-procedure PaintIsoGrid(S: TArtSurface; const T: TTheme;
-  Ppu, OX, OY: Double; MajorEvery: Integer);
 
 { The model axes, in SketchUp's colors: X red, Y green, Z blue.  Index is
   0 X, 1 Y, 2 Z; anything else comes back gray. }
@@ -671,47 +669,6 @@ begin
   { the origin itself gets an axis cross }
   S.Line(OX, 0, OX, S.Height, 1.4, T.Accent, 0.35);
   S.Line(0, OY, S.Width, OY, 1.4, T.Accent, 0.35);
-  S.Touch;
-end;
-
-{ The 30 degree lattice an isometric is drawn on, plus the three axes rising
-  from the origin. }
-procedure PaintIsoGrid(S: TArtSurface; const T: TTheme;
-  Ppu, OX, OY: Double; MajorEvery: Integer);
-const
-  C30 = 0.86602540378443865;
-  S30 = 0.5;
-var
-  I, Span: Integer;
-  DX, DY, L, A: Double;
-  Major: Boolean;
-begin
-  if Ppu < 4 then Exit;
-  S.BlendMode := bmNormal;
-  L := (S.Width + S.Height) * 1.2;
-  Span := Ceil(L / (Ppu * C30)) + 2;
-
-  for I := -Span to Span do
-  begin
-    Major := (MajorEvery > 0) and (I mod MajorEvery = 0);
-    if not Major and (Ppu < 9) then Continue;
-    { white paper needs a strong lattice, or it disappears }
-    if Major then A := 0.95 else A := 0.5;
-
-    { Lines running along +X (down-right), stepped along +Y, which projects
-      to (-C30, +S30).  Stepping by (-C30, -S30) is the -X direction and
-      would draw every line on top of the last. }
-    DX := OX - I * C30 * Ppu;
-    DY := OY + I * S30 * Ppu;
-    S.Line(DX - L * C30, DY - L * S30, DX + L * C30, DY + L * S30, 1.0, T.Grid, A);
-    { lines running along +Y (down-left), stepped along +X }
-    DX := OX + I * C30 * Ppu;
-    DY := OY + I * S30 * Ppu;
-    S.Line(DX + L * C30, DY - L * S30, DX - L * C30, DY + L * S30, 1.0, T.Grid, A);
-  end;
-
-  { No colored axes here; isometric gets plain iso paper the way plan gets a
-    measured grid.  The axes belong to the orbit view. }
   S.Touch;
 end;
 

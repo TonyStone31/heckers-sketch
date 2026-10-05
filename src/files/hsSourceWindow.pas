@@ -171,7 +171,6 @@ type
     procedure ApplyNow;
     { Completion opens by itself, or only on Ctrl+Space. }
     procedure SetAutoComplete(On: Boolean);
-    function AutoComplete: Boolean;
   private
     procedure PartToFill(const L: string; out A, B: Integer);
   end;
@@ -354,11 +353,6 @@ end;
 procedure TSourceForm.SetAutoComplete(On: Boolean);
 begin
   FComplete.Auto := On;
-end;
-
-function TSourceForm.AutoComplete: Boolean;
-begin
-  Result := FComplete.Auto;
 end;
 
 procedure TSourceForm.Refresh_;
