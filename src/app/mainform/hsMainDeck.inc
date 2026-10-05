@@ -2826,7 +2826,7 @@ end;
 procedure TMainForm.pbCmdPaint(Sender: TObject);
 var
   W, H, X, TW, I, Pad, Row1, Row, Y1, IL, IW: Integer;
-  S, M, Caret: string;
+  S, M, Before, CaretCol: string;
   SumV, SumW: Double;
   P: TCmdPalette;
   Opt: THTMLOptions;
@@ -2938,11 +2938,13 @@ begin
   { Like SketchUp's measurements box: while dragging it shows the size being
     pulled, and once you type your figure takes its place.  The number goes
     where the typing goes, because they are the same number. }
-  if (GetTickCount64 div 500) mod 2 = 0 then Caret := '|' else Caret := NBSP;
+  { the caret is a line drawn where the text before it ends: a '|' in the
+    fixed face sits in the middle of a whole letter's width }
+  CaretCol := P.Command;
   if FInput <> '' then
   begin
-    M := MarkTyped(FInput, P) + Painted(P.Command, '', False) +
-      '<font color="' + P.Command + '">' + Caret + '</font>';
+    M := MarkTyped(FInput, P) + Painted(P.Command, '', False);
+    Before := M;
     { a typed sum (8' + 8") shows its total as you type (see ParseLen) }
     if ParseLen(FInput, FD.Units, SumV) and
        (not ParseLenPlain(FInput, FD.Units, SumW) or (Abs(SumV - SumW) > 1E-9)) then
@@ -2952,9 +2954,17 @@ begin
   begin
     S := LiveMeasure;
     { dimmer than typed text: a reading, not a decision }
-    if S <> '' then M := Painted(P.Dim, S) + '<font color="' + P.Dim + '">' + Caret + '</font>'
-    else M := '<font color="' + P.Command + '">' + Caret + '</font>' +
-      Painted(P.Dim, ' type a size, or / for a command');
+    if S <> '' then
+    begin
+      M := Painted(P.Dim, S);
+      Before := M;
+      CaretCol := P.Dim;
+    end
+    else
+    begin
+      M := Painted(P.Dim, NBSP + 'type a size, or / for a command');
+      Before := '';
+    end;
   end;
   { the typing box next to the slash, as wide as its content, the prompt
     after it }
@@ -2969,6 +2979,19 @@ begin
     Round(8 * FUIScale), Round(8 * FUIScale));
   C.Brush.Style := bsClear;
   DrawCmdRuns(C, IL + Round(12 * FUIScale), Y1, Row1, IL + IW - Round(8 * FUIScale), 12, True, M);
+  if (GetTickCount64 div 500) mod 2 = 0 then
+  begin
+    I := IL + Round(12 * FUIScale);
+    if Before <> '' then I := Min(I + DrawCmdRuns(C, 0, 0, Row1, MaxInt, 12, True, Before, True),
+      IL + IW - Round(8 * FUIScale));
+    UIFont(C, 12, False, Theme.Text, True);
+    TW := C.TextHeight('Ag');
+    C.Brush.Style := bsSolid;
+    C.Brush.Color := RGBToColor(StrToInt('$' + Copy(CaretCol, 2, 2)), StrToInt('$' + Copy(CaretCol, 4, 2)),
+      StrToInt('$' + Copy(CaretCol, 6, 2)));
+    C.FillRect(I, Y1 + (Row1 - TW) div 2, I + Max(1, Round(FUIScale)), Y1 + (Row1 + TW) div 2);
+    C.Brush.Style := bsClear;
+  end;
   X := IL + IW + Round(14 * FUIScale);
   IL := W - Round(18 * FUIScale);
 

@@ -31,6 +31,7 @@
 
 - The number boxes in the radiant and stair windows had huge text.
 - A click on a radiant layout in a list no longer opens it for editing.
+- The command bar's cursor sat a space away from the last letter typed.
 
 ## v2026.10.05.1
 

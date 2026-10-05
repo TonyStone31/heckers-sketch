@@ -25,10 +25,15 @@ const
     '- **The radiant search window stays open** when it finds a layout, puts a' + LineEnding +
     '  big green check on each zone that meets the goals, and has the goals and' + LineEnding +
     '  hooked pairs on it.  Search again from there, or pick a different layout.' + LineEnding +
+    '- **Results in color.**  The radiant layouts show their coverage, spacing' + LineEnding +
+    '  and ease of laying green when they meet your goals and red when they' + LineEnding +
+    '  miss.  The material list, heat load, stair advice and spool ticket put' + LineEnding +
+    '  headings, figures and warnings in their own colors.' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +
     '' + LineEnding +
     '- The number boxes in the radiant and stair windows had huge text.' + LineEnding +
+    '- A click on a radiant layout in a list no longer opens it for editing.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.05.1' + LineEnding +
     '' + LineEnding +
