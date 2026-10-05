@@ -1334,11 +1334,26 @@ var
 implementation
 
 uses
-  FileUtil, Clipbrd, hsHelpDocs, hsHelpView, hsReportDialog, hsLongText, hsAbout,
+  FileUtil, Clipbrd, LazUTF8, hsHelpDocs, hsHelpView, hsReportDialog, hsLongText, hsAbout,
   hsFacts;
 
 {$R *.lfm}
 
+{ S cut to fit Room pixels and ended with '...'.  Cuts whole characters,
+  never a byte of one, so a name with accents does not end in a broken
+  letter. }
+function CutToFit(C: TCanvas; const S: string; Room: Integer): string;
+var
+  N: Integer;
+begin
+  Result := S;
+  if C.TextWidth(Result) <= Room then Exit;
+  N := UTF8Length(S);
+  repeat
+    Dec(N);
+    Result := UTF8Copy(S, 1, N) + '...';
+  until (N <= 0) or (C.TextWidth(Result) <= Room);
+end;
 
 function SketchAppName: string;
 begin
@@ -5259,7 +5274,7 @@ var
   R: TRect;
   IsCur, Hot: Boolean;
   C1, C2, Edge: TPix;
-  S, T: string;
+  S: string;
 begin
   PlaceTabs;
 
@@ -5337,14 +5352,7 @@ begin
       UIFont(pbTabs.Canvas, 10, False, Theme.TextDim);
     S := TabCaption(I);
     { shortened to fit, leaving room for the close cross }
-    if pbTabs.Canvas.TextWidth(S) > R.Right - R.Left - Round(36 * FUIScale) then
-    begin
-      T := S;
-      repeat
-        SetLength(T, Length(T) - 1);
-        S := T + '...';
-      until (Length(T) <= 3) or (pbTabs.Canvas.TextWidth(S) <= R.Right - R.Left - Round(36 * FUIScale));
-    end;
+    S := CutToFit(pbTabs.Canvas, S, R.Right - R.Left - Round(36 * FUIScale));
     TW := pbTabs.Canvas.TextWidth(S);
     pbTabs.Canvas.TextOut(R.Left + Round(12 * FUIScale),
       (R.Top + R.Bottom - pbTabs.Canvas.TextHeight(S)) div 2, S);
@@ -5592,9 +5600,7 @@ begin
   P := Pos('  ', Result);
   if P > 0 then Result := Trim(Copy(Result, P + 2, MaxInt));
   if C.TextWidth(Result) <= Room then Exit;
-  while (Length(Result) > 1) and (C.TextWidth(Result + '...') > Room) do
-    Delete(Result, Length(Result), 1);
-  Result := Result + '...';
+  Result := CutToFit(C, Result, Room);
 end;
 
 procedure TMainForm.pbDeckPaint(Sender: TObject);
@@ -6652,12 +6658,7 @@ begin
       else if Away then UIFont(C, 9, False, Theme.TextDim)
       else UIFont(C, 9, False, Theme.Text);
     end;
-    if C.TextWidth(S) > W - Pad - TW - X then
-    begin
-      while (S <> '') and (C.TextWidth(S + '...') > W - Pad - TW - X) do
-        S := Copy(S, 1, Length(S) - 1);
-      S := S + '...';
-    end;
+    S := CutToFit(C, S, W - Pad - TW - X);
     C.TextOut(X, Y + (RowH - C.TextHeight('X')) div 2, S);
     Inc(Y, RowH);
   end;
@@ -7343,9 +7344,7 @@ begin
       UIFont(C, 9, False, Theme.Text);
       S := FInfoRows[I].Value;
       { a long value is cut rather than run off the panel }
-      while (S <> '') and (VX + C.TextWidth(S) > W - Pad) do
-        S := Copy(S, 1, Length(S) - 1);
-      if S <> FInfoRows[I].Value then S := Copy(S, 1, Max(0, Length(S) - 1)) + '...';
+      S := CutToFit(C, S, W - Pad - VX);
       C.TextOut(VX, Y + (RowH - C.TextHeight('X')) div 2, S);
     end;
     Inc(Y, RowH);
