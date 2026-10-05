@@ -130,40 +130,8 @@ const
   CLIMATE_GUIDE_URL = 'https://www.osti.gov/biblio/1893981';
 
 procedure TRadiantHeatForm.Dress;
-var
-  I: Integer;
-  C: TComponent;
 begin
-  hsDialogSkin.SkinForm(Self);
-  hsDialogSkin.SkinPanel(pnJob, False, 12);
-  hsDialogSkin.SkinPanel(pnPlan, False, 12);
-  hsDialogSkin.SkinPanel(pnZone, False, 12);
-  hsDialogSkin.SkinButton(btnOk, bkGo);
-  hsDialogSkin.SkinButton(btnCancel, bkQuiet);
-  hsDialogSkin.SkinButton(btnOff, bkPlain);
-  hsDialogSkin.SkinButton(btnClimateHelp, bkPlain);
-  for I := 0 to ComponentCount - 1 do
-  begin
-    C := Components[I];
-    if C is TBCTrackbarUpdown then hsDialogSkin.SkinSpin(TBCTrackbarUpdown(C))
-    else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
-    else if C is TMemo then
-    begin
-      TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
-      TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
-    end
-    else if C is TBGRAThemeCheckBox then hsDialogSkin.SkinCheck(TBGRAThemeCheckBox(C))
-    else if C is TLabel then
-    begin
-      TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
-      TLabel(C).Font.Height := -13;
-      TLabel(C).Transparent := True;
-    end;
-  end;
-  lblJobHint.Font.Color := PixToColor(DlgTheme.TextDim);
-  lblMethod.Font.Color := PixToColor(DlgTheme.TextDim);
-  lblPlanHint.Font.Color := PixToColor(DlgTheme.TextDim);
-  memResult.Font.Height := -11;
+  hsDialogSkin.ThemeForm(Self);
 end;
 
 { the lists, from the unit's own names - one place says what each is }

@@ -437,6 +437,26 @@ begin
   T.LineBkgColor := PixToColor(MixPix(DlgTheme.Shell1, DlgTheme.TextDim, 0.5));
 end;
 
+type
+  { for ParentColor, which is protected; reached through a Pointer since
+    the checked build refuses the class cast }
+  TWinControlAccess = class(TWinControl);
+
+{ the color behind a control: the nearest parent that has one of its own }
+function BackOf(C: TControl): TColor;
+begin
+  Result := PixToColor(DlgTheme.Shell1);
+  if C = nil then Exit;
+  C := C.Parent;
+  while C <> nil do
+  begin
+    if C is TBCPanel then Exit(TBCPanel(C).Background.Color);
+    if (C.Color <> clDefault) and not ((C is TWinControl) and TWinControlAccess(Pointer(C)).ParentColor) then
+      Exit(C.Color);
+    C := C.Parent;
+  end;
+end;
+
 procedure ThemeForm(F: TForm);
 var
   I: Integer;
@@ -456,6 +476,8 @@ begin
         Kind := bkPlain;
       end;
       SkinButton(TBCButton(C), Kind, TBCButton(C).StateNormal.FontEx.Height);
+      { the rounded corners show the button's own color }
+      TBCButton(C).Color := BackOf(TControl(C));
     end
     else if C is TBCPanel then
       SkinPanel(TBCPanel(C), C.Tag = 1)
@@ -466,6 +488,8 @@ begin
     begin
       if C.Tag = 1 then TLabel(C).Font.Color := PixToColor(DlgTheme.TextDim)
       else TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
+      { a label with a font of its own but no size would take the desktop's }
+      if TLabel(C).Font.Height = 0 then TLabel(C).Font.Height := -13;
       TLabel(C).Transparent := True;
     end
     else if C is TBCComboBox then
@@ -487,31 +511,13 @@ begin
       SkinSlider(TBCFluentSlider(C))
     else if (C is TCustomPanel) or (C is TNotebook) or (C is TPage) then
     begin
-      TWinControl(C).Color := PixToColor(DlgTheme.Shell1);
+      { the color of whatever it sits on, a drawn panel's included }
+      TWinControl(C).Color := BackOf(TControl(C));
       TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
     end;
   end;
 end;
 
-type
-  { for ParentColor, which is protected; reached through a Pointer since
-    the checked build refuses the class cast }
-  TWinControlAccess = class(TWinControl);
-
-{ the color behind a control: the nearest parent that has one of its own }
-function BackOf(C: TControl): TColor;
-begin
-  Result := PixToColor(DlgTheme.Shell1);
-  if C = nil then Exit;
-  C := C.Parent;
-  while C <> nil do
-  begin
-    if C is TBCPanel then Exit(TBCPanel(C).Background.Color);
-    if (C.Color <> clDefault) and not ((C is TWinControl) and TWinControlAccess(Pointer(C)).ParentColor) then
-      Exit(C.Color);
-    C := C.Parent;
-  end;
-end;
 
 function PixOfColor(C: TColor): TBGRAPixel;
 begin

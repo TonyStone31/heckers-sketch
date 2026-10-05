@@ -106,43 +106,9 @@ uses
   StrUtils, hsDialogSkin, hsSurface, LCLIntf, hsStringerSheet;
 
 procedure TStairForm.Dress;
-var
-  I: Integer;
-  C: TComponent;
 begin
-  SkinForm(Self);
-  SkinButton(btnBuild, bkGo);
-  SkinButton(btnCancel, bkQuiet);
-  SkinButton(btnSuggest, bkPlain);
-  SkinButton(btnSource, bkPlain);
-  SkinButton(btnStringers, bkPlain);
-  for I := 0 to ComponentCount - 1 do
-  begin
-    C := Components[I];
-    if C is TEdit then SkinEdit(TEdit(C))
-    else if C is TBGRAThemeCheckBox then SkinCheck(TBGRAThemeCheckBox(C))
-    else if C is TBCComboBox then SkinCombo(TBCComboBox(C))
-    else if C is TBCTrackbarUpdown then SkinSpin(TBCTrackbarUpdown(C))
-    else if C is TMemo then
-    begin
-      TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
-      TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
-      TWinControl(C).Font.Height := -13;
-    end
-    else if C is TLabel then
-    begin
-      TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
-      if C <> lblTitle then TLabel(C).Font.Height := -13;
-      TLabel(C).Transparent := True;
-    end;
-  end;
-  lblHint.Font.Color := PixToColor(DlgTheme.TextDim);
-  lblLimit.Font.Color := PixToColor(DlgTheme.TextDim);
-  lblThickHint.Font.Color := PixToColor(DlgTheme.TextDim);
-  lblNosingHint.Font.Color := PixToColor(DlgTheme.TextDim);
-  lblStatus.Font.Height := -18;
+  ThemeForm(Self);
   lblProblems.Font.Color := $004040E8;
-  memAdvice.Font.Height := -12;
 end;
 
 { the frame from the lines (the chosen one sets the width) or the typed sizes }

@@ -28,6 +28,7 @@ object RadiantHeatForm: TRadiantHeatForm
       ParentFont = False
     end
     object lblJobHint: TLabel
+      Tag = 1
       Left = 16
       Height = 54
       Top = 38
@@ -215,6 +216,7 @@ object RadiantHeatForm: TRadiantHeatForm
       OnChange = FieldChange
     end
     object lblMethod: TLabel
+      Tag = 1
       Left = 16
       Height = 110
       Top = 372
@@ -224,6 +226,7 @@ object RadiantHeatForm: TRadiantHeatForm
       WordWrap = True
     end
     object btnOk: TBCButton
+      Tag = 1
       Left = 16
       Height = 34
       Top = 590
@@ -232,6 +235,7 @@ object RadiantHeatForm: TRadiantHeatForm
       OnClick = btnOkClick
     end
     object btnCancel: TBCButton
+      Tag = 2
       Left = 164
       Height = 34
       Top = 590
@@ -274,6 +278,7 @@ object RadiantHeatForm: TRadiantHeatForm
       OnPaint = pbPlanPaint
     end
     object lblPlanHint: TLabel
+      Tag = 1
       Left = 16
       Height = 80
       Top = 588
@@ -530,6 +535,8 @@ object RadiantHeatForm: TRadiantHeatForm
       Caption = 'sq ft'
     end
     object memResult: TMemo
+      Font.Height = -11
+      ParentFont = False
       Left = 16
       Height = 200
       Top = 460

@@ -152,34 +152,11 @@ end;
 { Themes the window chrome; the page itself uses the manual's stylesheet. }
 procedure THelpForm.Dress;
 begin
-  hsDialogSkin.SkinForm(Self);
-  { panel color, so the lighter buttons stand out from the bar }
+  hsDialogSkin.ThemeForm(Self);
+  { the bar and the notices run edge to edge, so square }
   hsDialogSkin.SkinPanel(pnlBar, False, 0);
   hsDialogSkin.SkinPanel(pnlNotice, False, 0);
   hsDialogSkin.SkinPanel(pnlEmpty, False, 0);
-  hsDialogSkin.SkinProgress(pbNotice);
-  hsDialogSkin.SkinProgress(pbEmpty);
-  hsDialogSkin.SkinButton(btnBack, bkPlain);
-  hsDialogSkin.SkinButton(btnForward, bkPlain);
-  hsDialogSkin.SkinButton(btnContents, bkPlain);
-  hsDialogSkin.SkinButton(btnFind, bkPlain);
-  hsDialogSkin.SkinButton(btnRefresh, bkQuiet);
-  hsDialogSkin.SkinButton(btnWeb, bkQuiet);
-  hsDialogSkin.SkinButton(btnEmptyGet, bkGo);
-  hsDialogSkin.SkinButton(btnEmptyWeb, bkPlain);
-  { rounded corners show the button's Color; match the bar, not the form }
-  btnBack.Color := pnlBar.Color;
-  btnForward.Color := pnlBar.Color;
-  btnContents.Color := pnlBar.Color;
-  btnFind.Color := pnlBar.Color;
-  btnRefresh.Color := pnlBar.Color;
-  btnWeb.Color := pnlBar.Color;
-  btnEmptyGet.Color := pnlEmpty.Color;
-  btnEmptyWeb.Color := pnlEmpty.Color;
-  lblTitle.Font.Color := PixToColor(DlgTheme.Text);
-  lblNotice.Font.Color := PixToColor(DlgTheme.Text);
-  lblEmptyTitle.Font.Color := PixToColor(DlgTheme.Text);
-  lblEmptyText.Font.Color := PixToColor(DlgTheme.TextDim);
   Page.Color := PixToColor(DlgTheme.Panel);
   Page.Font.Color := PixToColor(DlgTheme.Text);
 end;

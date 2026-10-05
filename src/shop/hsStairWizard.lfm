@@ -23,6 +23,7 @@ object StairForm: TStairForm
     ParentFont = False
   end
   object lblHint: TLabel
+    Tag = 1
     Left = 20
     Height = 54
     Top = 48
@@ -175,6 +176,7 @@ object StairForm: TStairForm
     ShowHint = True
   end
   object lblThickHint: TLabel
+    Tag = 1
     Left = 236
     Height = 18
     Top = 342
@@ -201,6 +203,7 @@ object StairForm: TStairForm
     ShowHint = True
   end
   object lblNosingHint: TLabel
+    Tag = 1
     Left = 236
     Height = 18
     Top = 376
@@ -273,6 +276,7 @@ object StairForm: TStairForm
     OnClick = StringersClick
   end
   object lblLimit: TLabel
+    Tag = 1
     Left = 20
     Height = 60
     Top = 600
@@ -322,6 +326,8 @@ object StairForm: TStairForm
     WordWrap = True
   end
   object memAdvice: TMemo
+    Font.Height = -12
+    ParentFont = False
     Left = 360
     Height = 146
     Top = 498
@@ -331,6 +337,7 @@ object StairForm: TStairForm
     TabOrder = 10
   end
   object btnCancel: TBCButton
+    Tag = 2
     Left = 740
     Height = 32
     Top = 656
@@ -339,6 +346,7 @@ object StairForm: TStairForm
     OnClick = CancelClick
   end
   object btnBuild: TBCButton
+    Tag = 1
     Left = 860
     Height = 32
     Top = 656

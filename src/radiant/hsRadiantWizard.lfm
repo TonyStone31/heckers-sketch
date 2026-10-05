@@ -32,6 +32,7 @@ object RadiantForm: TRadiantForm
       ParentFont = False
     end
     object lblUnits: TLabel
+      Tag = 1
       Left = 16
       Height = 36
       Top = 42
@@ -99,6 +100,7 @@ object RadiantForm: TRadiantForm
       OnChange = RoutingChange
     end
     object lblMaxLoopHint: TLabel
+      Tag = 1
       Left = 252
       Height = 18
       Top = 168
@@ -255,6 +257,7 @@ object RadiantForm: TRadiantForm
       OnClick = btnSearchAllClick
     end
     object lblZonesHint: TLabel
+      Tag = 1
       Left = 16
       Height = 54
       Top = 454
@@ -312,6 +315,7 @@ object RadiantForm: TRadiantForm
       OnChange = AnyChange
     end
     object lblTagHint: TLabel
+      Tag = 1
       Left = 100
       Height = 18
       Top = 610
@@ -333,6 +337,7 @@ object RadiantForm: TRadiantForm
       ParentFont = False
     end
     object btnBuild: TBCButton
+      Tag = 1
       Left = 16
       Height = 34
       Top = 654
@@ -341,6 +346,7 @@ object RadiantForm: TRadiantForm
       OnClick = btnBuildClick
     end
     object btnCancel: TBCButton
+      Tag = 2
       Left = 152
       Height = 34
       Top = 654
@@ -385,6 +391,7 @@ object RadiantForm: TRadiantForm
     BevelOuter = bvNone
     TabOrder = 1
     object lblNeed: TLabel
+      Tag = 1
       Left = 12
       Height = 20
       Top = 10

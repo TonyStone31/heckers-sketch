@@ -162,18 +162,8 @@ end;
 procedure THelloForm.FormShow(Sender: TObject);
 begin
   FVersion := Version;
-  hsDialogSkin.SkinForm(Self);
-  { bold labels have their own font, so set their color }
-  lblHead.Font.Color := PixToColor(DlgTheme.Text);
-  lblWhat.Font.Color := PixToColor(DlgTheme.Text);
-  { No and Send look the same on purpose: neither is the one to press }
-  hsDialogSkin.SkinButton(btnSave, bkQuiet);
-  hsDialogSkin.SkinButton(btnNo, bkPlain);
-  hsDialogSkin.SkinButton(btnSend, bkPlain);
-  memText.Color := PixToColor(DlgTheme.Shell2);
-  memText.Font.Color := PixToColor(DlgTheme.Text);
-  memNote.Color := PixToColor(DlgTheme.Shell2);
-  memNote.Font.Color := PixToColor(DlgTheme.Text);
+  { No and Send are both plain on purpose: neither is the one to press }
+  hsDialogSkin.ThemeForm(Self);
   lblWhy.Caption :=
     'Two people are making this, and we cannot tell whether anyone is ' +
     'trying it: GitHub counts downloads, and most of those are our own ' +

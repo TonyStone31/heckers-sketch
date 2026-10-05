@@ -330,54 +330,14 @@ begin
   LoadLast;
 end;
 
-{ The program's own theme (hsDialogSkin) on the panels, buttons, edits and
-  lists, and every label at one size, so the layout stays as drawn
-  whatever the desktop's font is.  Build it is the loud button. }
+{ The program's theme on everything; Build it is the loud button and the
+  hints are dim (their Tags), the trouble red. }
 procedure TRadiantForm.Dress;
-var
-  I: Integer;
-  C: TComponent;
-  Dim: array of TLabel;
 begin
-  hsDialogSkin.SkinForm(Self);
-  hsDialogSkin.SkinPanel(pnSettings, False, 12);
-  hsDialogSkin.SkinPanel(pnPlanArea, False, 12);
-  hsDialogSkin.SkinPanel(pnZoneArea, False, 12);
-  pnZone.Color := PixToColor(DlgTheme.Panel);
-  pnZone.ParentColor := False;
-  hsDialogSkin.SkinButton(btnBuild, bkGo);
-  hsDialogSkin.SkinButton(btnCancel, bkQuiet);
+  hsDialogSkin.ThemeForm(Self);
   FZoneTabs := THsTabStrip.Create(pbZoneTabs, nil, []);
   FZoneTabs.OnChange := @tcZonesChange;
-  pnZone.ParentFont := False;
-  pnZone.Font.Color := PixToColor(DlgTheme.Text);
-  pnZone.Font.Height := -13;
-  for I := 0 to ComponentCount - 1 do
-  begin
-    C := Components[I];
-    if (C is TBCButton) and (C <> btnBuild) and (C <> btnCancel) then hsDialogSkin.SkinButton(TBCButton(C), bkPlain)
-    else if C is TBCTrackbarUpdown then hsDialogSkin.SkinSpin(TBCTrackbarUpdown(C))
-    else if C is TEdit then hsDialogSkin.SkinEdit(TEdit(C))
-    else if C is TBCComboBox then hsDialogSkin.SkinCombo(TBCComboBox(C))
-    else if C is TInkListBox then hsDialogSkin.SkinList(TInkListBox(C))
-    else if C is TMemo then
-    begin
-      TWinControl(C).Color := PixToColor(DlgTheme.Shell2);
-      TWinControl(C).Font.Color := PixToColor(DlgTheme.Text);
-    end
-    else if C is TBGRAThemeCheckBox then hsDialogSkin.SkinCheck(TBGRAThemeCheckBox(C))
-    else if C is TLabel then
-    begin
-      TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
-      if TLabel(C) <> lblTitle then TLabel(C).Font.Height := -13;
-      TLabel(C).Transparent := True;
-    end;
-  end;
-  { the hints dim, the trouble red }
-  Dim := [lblUnits, lblMaxLoopHint, lblZonesHint, lblTagHint, lblNeed];
-  for I := 0 to High(Dim) do Dim[I].Font.Color := PixToColor(DlgTheme.TextDim);
   lblProblem.Font.Color := $004040E0;
-  cbTube.Font.Height := -13;
 end;
 
 { Build it, Cancel: drawn buttons carry no modal result of their own }

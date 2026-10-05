@@ -77,6 +77,7 @@ object HelpForm: THelpForm
       Transparent = True
     end
     object btnRefresh: TBCButton
+      Tag = 2
       Left = 714
       Height = 32
       Hint = 'Download the help pages again from GitHub'
@@ -88,6 +89,7 @@ object HelpForm: THelpForm
       OnClick = btnRefreshClick
     end
     object btnWeb: TBCButton
+      Tag = 2
       Left = 870
       Height = 32
       Hint = 'Open this page on the website, in your browser'
@@ -150,6 +152,7 @@ object HelpForm: THelpForm
       Transparent = True
     end
     object lblEmptyText: TLabel
+      Tag = 1
       Left = 60
       Height = 80
       Top = 100
@@ -168,6 +171,7 @@ object HelpForm: THelpForm
       MaxValue = 100
     end
     object btnEmptyGet: TBCButton
+      Tag = 1
       Left = 60
       Height = 36
       Top = 224
