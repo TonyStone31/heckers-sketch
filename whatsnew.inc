@@ -26,6 +26,10 @@ const
     '  back filled in.' + LineEnding +
     '- A loft between two points (a body from tail to nose) grew a face through' + LineEnding +
     '  its middle.' + LineEnding +
+    '- A painted rectangle standing up faced the wall behind it, and turned' + LineEnding +
+    '  round on every save.' + LineEnding +
+    '- A face filling another''s hole (glass in a wall) could be lost on saving.' + LineEnding +
+    '- A hole of an odd shape in a face turned round on every save.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.08.1' + LineEnding +
     '' + LineEnding +

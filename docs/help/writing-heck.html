@@ -210,7 +210,10 @@ when something about it is not automatic: it is painted, it has a hole the
 lines would not cut, or it faces the other way.</p>
 <ul>
 <li>A face you write goes round <b>anticlockwise seen from its front</b> -
-the side <code>paint</code> is on - and a <code>hole</code> the other way.
+the side <code>paint</code> is on - and a <code>hole</code> the other way;
+<code>hole = Name</code> takes a circle, whichever way it faces.  A
+<code>noface</code> has no way round: write it either way.  A painted
+<code>rect</code> faces east, north or up, as a plain face would.
 It is kept the way it was written: written the wrong way round, its paint is
 on the inside.  A loop in a <code>face</code> or <code>noface</code> closes by
 itself; do not repeat the first corner (a <code>line</code> run, by contrast,

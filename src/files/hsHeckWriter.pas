@@ -2569,7 +2569,7 @@ var
     Match: array of Integer;
     Taken: array of Boolean;
     Found: Boolean;
-    DFaces, DLines: TLoopIndex;
+    DFaces, DLines, DHoles: TLoopIndex;
     Cands: TIntArrayW;
     GrpMap: array of record E, D: Integer; end;
     Seg: TP3Array;
@@ -2665,6 +2665,21 @@ var
         end;
       end;
     end;
+
+  { is face F's outline the ring of a whole circle in its group? }
+  function RingOfCircle(F: Integer): Boolean;
+  var
+    A, N: Integer;
+  begin
+    Result := False;
+    N := Length(D[F].Poly);
+    if N < 8 then Exit;
+    for A := 0 to D.Live - 1 do
+      if (D[A].Kind = ekArc) and FullCircle(D[A].Sweep) and (D[A].Part = D[F].Part) and
+         (Abs(Dist(D[A].C, D[F].Poly[0]) - D[A].R) < 1E-5) and
+         (Abs(Dist(D[A].C, D[F].Poly[N div 2]) - D[A].R) < 1E-5) and
+         (Abs(Dist(D[A].C, D[F].Poly[N div 4]) - D[A].R) < 1E-5) then Exit(True);
+  end;
 
   begin
     SetLength(ImpliedGeom, D.Live);
@@ -2773,6 +2788,31 @@ var
               ImpliedGeom[I] := False;
               Break;
             end;
+      { Nor may a face that fills another's hole go unwritten: the hole's
+        lines are that face's sides and are not written, and a hole read
+        without its lines is an opening.  A circle's disk is the exception:
+        the circle draws its own ring. }
+      DHoles := TLoopIndex.Create;
+      try
+        for I := 0 to D.Live - 1 do
+          if D[I].Kind = ekFace then
+            for K := 0 to High(D[I].Holes) do DHoles.Add(D[I].Holes[K], I);
+        for I := 0 to D.Live - 1 do
+          if ImpliedGeom[I] and not RingOfCircle(I) then
+          begin
+            Cands := DHoles.Near(D[I].Poly);
+            for C := 0 to High(Cands) do
+            begin
+              F := Cands[C];
+              if (F = I) or (D[F].Part <> D[I].Part) then Continue;
+              for K := 0 to High(D[F].Holes) do
+                if SameLoopTol(D[F].Holes[K], D[I].Poly, 1E-4) then ImpliedGeom[I] := False;
+              if not ImpliedGeom[I] then Break;
+            end;
+          end;
+      finally
+        DHoles.Free;
+      end;
     finally
       DLines.Free;
       DFaces.Free;

@@ -1557,10 +1557,10 @@ begin
     { A hole named by a circle comes the way the circle goes, and holes run
       opposite to their face.  Reverse a copy: the loop is the circle's own, and
       a later "face = c1" needs it unchanged. }
+    { the whole loop's way round: its first three corners can turn in or
+      lie on a line }
     for K := 0 to High(Holes) do
-      if Dot3(Cross3(Sub3(Holes[K][1], Holes[K][0]),
-                     Sub3(Holes[K][2], Holes[K][1])),
-              D.FaceNormal(Idx)) > 0 then
+      if Dot3(LoopNormal(Holes[K]), D.FaceNormal(Idx)) > 0 then
       begin
         Holes[K] := Copy(Holes[K]);
         for J := 0 to (Length(Holes[K]) div 2) - 1 do
@@ -2429,6 +2429,12 @@ begin
   for I := 0 to 3 do D.AddLine(C[I], C[(I + 1) mod 4], DefInk, DefWidth, False);
   if HasPaint then
   begin
+    { painted, it faces as the plain one its lines make: east, north or up }
+    EU := Cross3(Sub3(C[1], C[0]), Sub3(C[3], C[0]));
+    if EU.X + EU.Y + EU.Z < 0 then
+    begin
+      EV := C[1]; C[1] := C[3]; C[3] := EV;
+    end;
     D.AddFaceRaw(C, DefInk, False);
     D.SetMaterial(D.Live - 1, Paint);
   end;

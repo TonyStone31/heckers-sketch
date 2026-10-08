@@ -23,6 +23,10 @@
   back filled in.
 - A loft between two points (a body from tail to nose) grew a face through
   its middle.
+- A painted rectangle standing up faced the wall behind it, and turned
+  round on every save.
+- A face filling another's hole (glass in a wall) could be lost on saving.
+- A hole of an odd shape in a face turned round on every save.
 
 ## v2026.10.08.1
 
