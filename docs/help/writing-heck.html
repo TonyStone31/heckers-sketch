@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Writing Heck - Heckers Sketch</title>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script></head>
+<body><div class="wrap"><a class="themebtn" id="themebtn" href="#theme" title="Light or dark">Theme</a><nav class="crumbs"><a href="index.html">Help</a> &rsaquo; <a href="heck.html">Heck</a> &rsaquo; Writing Heck</nav>
+<header><h1>Writing Heck</h1><p class="lead">The whole language on one page - for typing a drawing, or writing one from another program.</p></header>
+
+<p><a href="heck.html">Heck</a> says what a drawing is.  This page is all
+of it: the words, the marks, every kind of thing and what it takes, what the
+program works out for itself, and what it writes back.  Every example here is
+read by the program as it stands.  Paste one into <code>/source</code> and
+press <b>Apply</b> to see it.</p>
+
+<nav class="jump"><b>On this page:</b> <a href="#file">A file</a> &middot; <a href="#rule">The one rule</a> &middot; <a href="#marks">Words and marks</a> &middot; <a href="#lengths">Lengths</a> &middot; <a href="#places">Places and steps</a> &middot; <a href="#points">Points and rings</a> &middot; <a href="#things">Every thing</a> &middot; <a href="#faces">Faces</a> &middot; <a href="#solids">Solids</a> &middot; <a href="#groups">Groups</a> &middot; <a href="#back">What comes back</a> &middot; <a href="#examples">Examples</a> &middot; <a href="#checklist">A checklist</a></nav>
+
+<h2 id="file">A file</h2>
+<p>A header, then a <code>sheet</code> block for each sheet:</p>
+<pre>HeckersSketch 2
+units = ft in
+
+// a comment here belongs to the first sheet
+sheet 'Shop'
+  scale = '1/4"'
+  snap = '1/16"'
+  view = 3d
+  box Bench = 0 east, 0 north, 0 up; 6' east, 2' north, 3' up
+end</pre>
+<p>The sheet's settings come first and are all optional: <code>units</code>,
+<code>scale</code>, <code>snap</code>, <code>view</code> (<code>plan</code>,
+<code>iso</code> or <code>3d</code>), <code>camera</code>, <code>cut</code>,
+and the sheet's own <code>ink</code>, <code>width</code> and
+<code>sides</code> - the defaults for everything on it.  Text pasted into
+<code>/source</code> without a header or a sheet is read as one sheet.</p>
+
+<h2 id="rule">The one rule</h2>
+<p><b>A line with <code>=</code> is complete.  A line without one opens a
+block, and <code>end</code> closes it.</b>  That is the whole block grammar.
+Every thing has both forms, and you may write either:</p>
+<pre>line = a to b
+
+line Rafter
+  points = a to b
+  ink = red
+  width = 2
+end</pre>
+<p>A list too long for a line opens a bracket after the <code>=</code> and
+runs to the line that closes it:</p>
+<pre>face = (
+  p1 p2 p3 p4 p5 p6 p7 p8
+  p9 p10 p11 p12
+)</pre>
+<p>A reader skips any block or line it does not know, so a newer drawing
+still opens in an older program.  There is no <code>begin</code> (one is let
+pass if typed), and nothing in a file ever runs.</p>
+
+<h2 id="marks">Words and marks</h2>
+<ul>
+<li><b>Case does not matter</b>; the program writes words in lower case.</li>
+<li><b>Spaces do not matter.</b>  Indentation is for the eye; blank lines go
+anywhere.</li>
+<li><b>Comments</b> are <code>// to the end of the line</code> or
+<code>{ in braces }</code>.  A comment above a thing, or at the end of its
+line, stays with that thing through every save.  The program's own
+<code>{ facing up }</code> notes on faces are never read as anything.</li>
+<li><b>Names</b>: a letter, then letters, digits or <code>_</code> -
+<code>a</code>, <code>p272</code>, <code>LegSW</code>.  Not <code>x</code>,
+<code>y</code> or <code>z</code>.  A name with spaces goes in quotes:
+<code>group 'Left turbine'</code>.  Names are not case sensitive.</li>
+<li><b>Text</b> is in single quotes, a quote inside doubled:
+<code>'the fitter''s bracket'</code>.</li>
+<li><b>A <code>'</code> straight after a digit is feet</b>; anywhere else it
+opens text.  Where quote marks are a nuisance there are words:
+<code>4ft</code>, <code>6in</code>, <code>90deg</code>.</li>
+<li><b>True and false</b> are <code>true</code> and <code>false</code>
+(<code>1</code> and <code>0</code> are read too); nothing is
+<code>none</code>.</li>
+<li><b>Colors</b> are <code>#RRGGBB</code>, or <code>black white gray red
+orange yellow green blue purple brown</code>.</li>
+</ul>
+
+<h2 id="lengths">Lengths</h2>
+<table>
+<tr><th><code>units =</code></th><th>Lengths look like</th></tr>
+<tr><td><code>ft in</code></td><td><code>5' 10 5/8"</code> <code>4'</code> <code>18"</code> <code>3/4"</code> <code>1.5'</code> <code>2.84"</code> <code>5ft 10 5/8in</code></td></tr>
+<tr><td><code>in</code>, <code>ft</code></td><td>the same marks</td></tr>
+<tr><td><code>mm</code>, <code>m</code></td><td><code>1200</code> <code>12.5</code> <code>1200mm</code> <code>1.2m</code></td></tr>
+</table>
+<ul>
+<li>A bare number is inches (millimeters on a metric sheet).  A whole number
+and a fraction together need their mark: <code>70 5/8"</code>.</li>
+<li>Fractions go down to sixty-fourths.  Anything else is written as a
+decimal in full, <code>2.843721934"</code>, and never rounded to look
+friendlier than it is.</li>
+<li><b>Sums</b> go anywhere a length goes: <code>4' + 2"</code>,
+<code>(Width - 1') / 2</code>.  The program writes back the answer.</li>
+<li><b>Constants</b> name numbers for the sums below them:
+<pre>const
+  Width = 4'
+  Gap = (Width - 1') / 2
+end</pre></li>
+</ul>
+
+<h2 id="places">Places and steps</h2>
+<p>A <b>place</b> says all three directions, always: <code>east</code> or
+<code>west</code>, <code>north</code> or <code>south</code>, <code>up</code>
+or <code>down</code>.  No number in a place is ever negative - the word
+carries the way.  <code>0 up</code> is on the floor.</p>
+<pre>2' east, 3' north, 0 up
+3' west, 2' south, 6" down
+x 2' y 3' z 0                  the letters are read too</pre>
+<p>A <b>step</b> says only what changes: <code>4' east</code>, or
+<code>3" east, 2" up</code>.</p>
+<p>Wherever a place is wanted it may be <b>a place, a name, or a name and a
+step</b>: <code>a</code>, <code>a + 1" up</code>.  In a list, places are
+joined with <code>to</code>, and <code>+</code> and a step means "from the
+one before", so a list is a walk:</p>
+<pre>face = 0 east, 0 north, 0 up to + 4' east to + 4' north to + 4' west</pre>
+<p>A list of names needs only spaces: <code>face = a b c d</code>, and
+<code>a..h</code> or <code>ra1..ra24</code> is every name from one to the
+other.</p>
+
+<h2 id="points">Points and rings</h2>
+<p>A <code>points</code> block names places.  Everything in the same block
+and the blocks inside it can use them, which is what makes a corner shared by
+three faces one corner:</p>
+<pre>points
+  a = 0 east, 0 north, 0 up
+  b = a + 4' east
+  c = b + 4' north
+  d = a + 4' north
+end</pre>
+<p><code>b = a + 4' east</code> is how <code>b</code>'s place is written
+down, not a link: change the <code>4'</code> and <code>b</code> moves, and
+so does whatever was written from it.</p>
+<p>A <b>ring</b> is corners spaced evenly round a circle, said once.  Its
+corners are its name and a number, counted anticlockwise seen from the side
+it faces:</p>
+<pre>points
+  ring ra
+    center = 2' east, 2' north, 2' up
+    radius = 1'
+    sides = 24
+    facing = up
+    starts = 15deg       where corner 1 is; 0 if left out
+  end
+end
+face = ra1..ra24</pre>
+<p><b><code>facing</code></b> is the way a flat thing looks:
+<code>up</code>, <code>down</code>, <code>east</code>, <code>west</code>,
+<code>north</code>, <code>south</code>; one that leans,
+<code>up, leaning 30&deg; toward east</code>; or three numbers,
+<code>0.5 east, 0.5 north, 0.7071 up</code>.  <code>starts</code> is
+measured from east for a thing facing up or down, otherwise from its level
+line.</p>
+
+<h2 id="things">Every thing</h2>
+<p>Any thing may have a name after its word - <code>box Lid</code>,
+<code>line Rafter</code>.  Defaults are in brackets; what is left out is the
+default.</p>
+<table>
+<tr><th>Thing</th><th>One line</th><th>As a block</th></tr>
+<tr><td><code>line</code></td><td><code>line = a to b</code></td><td><code>points</code>; <code>ink</code>, <code>width</code>, <code>soft</code> (false - an edge of a curved surface, hidden but for the outline), <code>ref</code> (false - a reference line)</td></tr>
+<tr><td><code>circle</code></td><td><code>circle Hole = center; radius</code>, and <code>; facing</code> when it does not face up</td><td><code>center</code>, <code>radius</code>, <code>facing</code>; <code>starts</code> (0), <code>sides</code> (24), <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>arc</code></td><td>-</td><td><code>center</code>, <code>radius</code>, <code>facing</code>, <code>sweep</code>; <code>starts</code> (0), <code>sides</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>face</code></td><td><code>face = a b c d</code>, or <code>face = Hole</code> for the disk in a circle</td><td><code>points</code>, <code>hole</code> (as many as it has), <code>paint</code>, <code>ink</code></td></tr>
+<tr><td><code>noface</code></td><td><code>noface = a b c d</code> - a loop of lines that is not a face</td><td>-</td></tr>
+<tr><td><code>rect</code></td><td><code>rect = corner; size</code> - two parts: <code>3' east, 2' north</code> lies flat, <code>3' east, 2' up</code> stands</td><td><code>at</code>, <code>size</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>box</code></td><td><code>box = corner; size</code> - the low south-west corner and a three-part size</td><td><code>at</code>, <code>size</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>pull</code></td><td><code>pull = outline; step</code> - <code>pull = Hole; 3' up</code> is a cylinder</td><td><code>points</code>, <code>by</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>solid</code></td><td>-</td><td><code>paint</code> first, then its <code>points</code>, faces, lines and bores</td></tr>
+<tr><td><code>bore</code></td><td>-</td><td>inside a solid: <code>points</code> (the opening), <code>goes</code> (a step through)</td></tr>
+<tr><td><code>group</code></td><td>-</td><td><code>locked</code> (false), <code>hidden</code> (false), <code>jig</code>, <code>data</code>, then everything in it</td></tr>
+<tr><td><code>note</code></td><td>-</td><td><code>at</code>, <code>text</code> (a line each, repeated); <code>to</code> (a leader's end), <code>size</code> (1), <code>ink</code></td></tr>
+<tr><td><code>dim</code></td><td>-</td><td><code>from</code>, <code>to</code>, <code>off</code> (a step); <code>label</code>, <code>ink</code></td></tr>
+<tr><td><code>guide</code></td><td><code>guide = place to place</code>, or one place for a guide point</td><td>-</td></tr>
+<tr><td><code>points</code>, <code>const</code></td><td>-</td><td>names, as above</td></tr>
+</table>
+
+<h2 id="faces">Faces</h2>
+<p><b>Faces are what closed lines become.</b>  Twelve lines that close a cube
+give you its six faces, so a plain face is never written.  Write a face only
+when something about it is not automatic: it is painted, it has a hole the
+lines would not cut, or it faces the other way.</p>
+<ul>
+<li>A face's outline goes round <b>anticlockwise seen from its front</b> -
+the side <code>paint</code> is on.  A <code>hole</code> goes the other way.
+In a solid, faces turn away from the solid's middle.</li>
+<li><b><code>noface</code></b> is a loop of lines that is not a face: an
+open top, a window.  It is how you leave something open, instead of drawing
+a face and rubbing it out.</li>
+<li><b>A circle on a face cuts it</b> into the face with a hole and a disk in
+the hole.  <code>noface = Hole</code> takes the disk away and leaves the
+opening.  A hole right through a solid is a <code>bore</code>.</li>
+<li><code>paint = none</code> on a face in a painted solid leaves that one
+face unpainted.</li>
+</ul>
+
+<h2 id="solids">Solids</h2>
+<p>A <code>solid</code> is one piece: push/pull moves only its own geometry,
+and what is drawn against it does not fuse into it.  It names its corners,
+then gives its lines, and faces only where needed:</p>
+<pre>solid Wedge
+  paint = gray
+  points
+    a = 5' east, 0 north, 0 up
+    b = a + 1' east
+    c = a + 1' north
+    d = a + 1' up
+  end
+  line = a to b
+  line = b to c
+  line = c to a
+  line = a to d
+  line = b to d
+  line = c to d
+end</pre>
+<p><b><code>box</code> and <code>pull</code> are solids in one line.</b>  A
+<code>box</code> is a rectangle pulled up; a <code>pull</code> is any flat
+outline - corners, or a circle by name - moved a step.  The program writes a
+solid back as a box or a pull while it still is exactly one, and as its
+corners and lines once it has been changed.</p>
+
+<h2 id="groups">Groups</h2>
+<p>A <code>group</code> keeps a piece to itself: it is picked, moved, hidden
+and locked as one thing, its geometry never joins its neighbor's, and groups
+go inside groups for an assembly.  Names given in a group's
+<code>points</code> are its own.</p>
+<pre>group 'Hangers'
+  locked = true
+  jig = 'hangers' with Count = 6, Spacing = 16"
+  ...
+end</pre>
+<p><code>jig</code> names a program that writes the group's contents (see
+<a href="heck.html#jigs">Jigs</a>); <code>data</code> is a block a tool keeps
+for itself, kept as it is.</p>
+
+<h2 id="back">What comes back</h2>
+<p>The program reads Heck into a drawing and writes the drawing out again -
+on every save, and in <code>/source</code> as you work.  What it keeps and
+what it puts its own way:</p>
+<ul>
+<li><b>Kept</b>: every name you gave - things, groups, circles and a solid's
+corners - and every comment, with the thing it was written with.</li>
+<li><b>Its own way</b>: the order of things, the spacing, which earlier
+corner a point is written from, and the short or block form of each thing.
+A comment that was inside a block goes above the block.</li>
+<li><b>Folded</b>: lines that are exactly a box, a pull or a rect come back
+as one; a face the lines already make is left out.</li>
+<li><b>Named for you</b>: a corner you did not name, by where it stands -
+<code>floor1</code>, <code>top1</code> - and an unnamed circle as
+<code>c1</code>.  Lines that belong to no solid are written with their
+places, not names.</li>
+</ul>
+<p>A mistake stops the whole Apply, marked on its line with what was
+expected; nothing on the sheet changes until the text reads.</p>
+
+<h2 id="examples">Examples</h2>
+<p>A chest with its lid propped open on the back edge, and a post and a
+plate beside it:</p>
+<pre>// a chest: a box, and its lid swung up 30 degrees on the back edge
+group 'Chest'
+  box Body
+    at = 0 east, 0 north, 0 up
+    size = 3' east, 2' north, 1' 6" up
+    paint = brown
+  end
+  // the front edge has swung up: 2' cos 30 = 20.7846" back,
+  // 2' sin 30 = 12" up
+  solid Lid
+    paint = brown
+    points
+      h1 = 0 east, 2' north, 1' 6" up
+      h2 = h1 + 3' east
+      f1 = h1 + 20.7846" south, 12" up
+      f2 = f1 + 3' east
+    end
+    line = h1 to h2
+    line = h2 to f2
+    line = f2 to f1
+    line = f1 to h1
+  end
+end
+// a cylinder is a pulled circle; a circle on a box's top cuts it
+group 'Post and plate'
+  circle Post = 6' east, 1' north, 0 up; 3"
+  pull Column = Post; 3' up
+  circle Hole = 9' east, 1' north, 2" up; 3"
+  box Plate = 8' east, 0 north, 0 up; 2' east, 2' north, 2" up
+end</pre>
+<p>A painted panel with a square window in it:</p>
+<pre>face Panel
+  points = 20' east, 0 north, 0 up to + 4' east to + 4' north to + 4' west
+  hole = 21' east, 1' north, 0 up to + 1' north to + 1' east to + 1' south
+  paint = #3366CC
+end</pre>
+<p>An open tray on legs, built in groups, is on the
+<a href="heck.html#models">Heck page</a>.</p>
+
+<h2 id="checklist">A checklist for writing a model</h2>
+<ol>
+<li><b>A group for each part</b>, groups inside groups for an assembly.</li>
+<li><b>A name on each part</b> you will want to talk about later, and a
+comment above it saying what it is.</li>
+<li><b>Name the corners</b> of a solid you write by hand; the names are kept,
+so a later change can say which corner it means.</li>
+<li><b>Lines, not faces.</b>  Faces come from closed lines.  Write a face
+only for paint, a hole, or a way round; use <code>noface</code> for what is
+open.</li>
+<li><b>The shorthand where it fits</b>: <code>box</code> for blocks,
+<code>pull</code> for a profile pushed some distance, <code>circle</code>
+with <code>pull</code> for round things.</li>
+<li><b>Places exact</b>: every corner of a face on one flat plane, and
+shared corners written once, by name, so they meet.</li>
+<li><b>Read it back.</b>  Paste it into <code>/source</code> and press
+<b>Apply</b>; a mistake is marked on its line.</li>
+</ol>
+
+<footer><a href="heck.html">Back to Heck</a> &middot; <a href="index.html">Back to the contents</a> &middot; Heckers Sketch help</footer>
+</div></body></html>

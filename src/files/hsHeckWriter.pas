@@ -80,6 +80,9 @@ function Place2(const P: TP3; U: TUnitSystem; Offset: Boolean): string;
 
 implementation
 
+uses
+  Contnrs;
+
 function FullCircle(Sweep: Double): Boolean;
 begin
   Result := Abs(Abs(Sweep) - 2 * Pi) < 1E-5;
@@ -325,6 +328,9 @@ var
   NLine: Integer;
   Circles: TIntArrayW;        { the whole circles on the sheet: c1, c2... }
   CircleNames: TStringArray;  { their names: the one each was given, or c1, c2... }
+  { the solid being written has corners named by the text, so a name made
+    up for another corner has to be checked against them }
+  Given: Boolean;
   { from pass one: the faces the reader restores by itself, and the loops it
     closes that are not faces of the drawing }
   ImpliedGeom: array of Boolean;
@@ -772,21 +778,154 @@ var
     Result := Result + Format('%.4d', [StrToIntDef(Copy(Nm, P + 1, 9), 0)]);
   end;
 
+  { by NameKey; the keys are worked out once, since names kept from the text
+    come in any order and an insertion sort of thousands is too slow }
   procedure SortByName(var Pts: TPts);
   var
-    I, J: Integer;
-    T: TPt;
+    Keys: TStringList;
+    Was: TPts;
+    I: Integer;
   begin
-    for I := 1 to High(Pts) do
+    if Length(Pts) < 2 then Exit;
+    Keys := TStringList.Create;
+    try
+      Keys.CaseSensitive := True;
+      Keys.UseLocale := False;
+      for I := 0 to High(Pts) do
+        Keys.AddObject(NameKey(Pts[I].Name) + #1 + Format('%.9d', [I]), TObject(PtrInt(I)));
+      Keys.Sort;
+      Was := Copy(Pts);
+      for I := 0 to High(Pts) do Pts[I] := Was[PtrInt(Keys.Objects[I])];
+    finally
+      Keys.Free;
+    end;
+  end;
+
+  function TakenName(const Pts: TPts; const Nm: string): Boolean;
+  var
+    I: Integer;
+  begin
+    for I := 0 to High(Pts) do
+      if SameText(Pts[I].Name, Nm) then Exit(True);
+    Result := False;
+  end;
+
+  { Stem and N, or the next number up that no corner has yet }
+  function Fresh(const Pts: TPts; const Stem: string; N: Integer): string;
+  begin
+    if not Given then Exit(Stem + IntToStr(N));
+    repeat
+      Result := Stem + IntToStr(N);
+      Inc(N);
+    until not TakenName(Pts, Result);
+  end;
+
+  { The names the text gave a solid's corners, from its faces, edges and
+    bores (TWorkEnt.Corners).  A face split or copied can carry a name to the
+    wrong place, so each name goes to the place most of them give it. }
+  procedure GivenNames(var Pts: TPts; Part_, G: Integer);
+  var
+    Votes, At, Taken: TFPHashList;
+    VPt, VCount: array of Integer;
+    VName: TStringArray;
+    NV, I, J, K, H, N, Pt, Most, C: Integer;
+    Parts: TStringArray;
+    Nm: string;
+
+    function KeyOf(const P: TP3): shortstring;
     begin
-      T := Pts[I];
-      J := I - 1;
-      while (J >= 0) and (NameKey(Pts[J].Name) > NameKey(T.Name)) do
+      Result := IntToStr(Round(P.X * 1E7)) + ',' + IntToStr(Round(P.Y * 1E7)) + ',' + IntToStr(Round(P.Z * 1E7));
+    end;
+
+    procedure Vote(const P: TP3; const Name_: string);
+    var
+      X, V: Integer;
+    begin
+      if Name_ = '' then Exit;
+      X := At.FindIndexOf(KeyOf(P));
+      if X < 0 then Exit;
+      X := PtrInt(At.Items[X]) - 1;
+      if Pts[X].Ring >= 0 then Exit;
+      V := Votes.FindIndexOf(IntToStr(X) + '|' + Name_);
+      if V >= 0 then V := PtrInt(Votes.Items[V]) - 1
+      else
       begin
-        Pts[J + 1] := Pts[J];
-        Dec(J);
+        if NV >= Length(VPt) then
+        begin
+          SetLength(VPt, NV * 2 + 64);
+          SetLength(VCount, Length(VPt));
+          SetLength(VName, Length(VPt));
+        end;
+        V := NV;
+        VPt[V] := X;
+        VName[V] := Name_;
+        VCount[V] := 0;
+        Inc(NV);
+        Votes.Add(IntToStr(X) + '|' + Name_, Pointer(PtrInt(V + 1)));
       end;
-      Pts[J + 1] := T;
+      Inc(VCount[V]);
+    end;
+
+  begin
+    Given := False;
+    K := -1;
+    for I := 0 to D.Live - 1 do
+      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Corners <> '') then begin K := I; Break; end;
+    if K < 0 then Exit;
+    NV := 0;
+    Votes := TFPHashList.Create;
+    At := TFPHashList.Create;
+    Taken := TFPHashList.Create;
+    try
+      { stored one up: a nil item is an empty slot to TFPHashList }
+      for I := 0 to High(Pts) do
+      begin
+        if At.FindIndexOf(KeyOf(Pts[I].P)) < 0 then At.Add(KeyOf(Pts[I].P), Pointer(PtrInt(I + 1)));
+        if Pts[I].Name <> '' then Taken.Add(LowerCase(Pts[I].Name), Pointer(1));
+      end;
+      for I := K to D.Live - 1 do
+      begin
+        if (D[I].Grp <> G) or (D[I].Part <> Part_) or (D[I].Corners = '') then Continue;
+        Parts := D[I].Corners.Split(['|']);
+        case D[I].Kind of
+          ekLine:
+            if Length(Parts) = 2 then
+            begin
+              Vote(D[I].A, Parts[0]);
+              Vote(D[I].B, Parts[1]);
+            end;
+          ekFace, ekBore:
+            begin
+              N := Length(D[I].Poly);
+              for H := 0 to High(D[I].Holes) do Inc(N, Length(D[I].Holes[H]));
+              if Length(Parts) <> N then Continue;
+              N := 0;
+              for J := 0 to High(D[I].Poly) do begin Vote(D[I].Poly[J], Parts[N]); Inc(N); end;
+              for H := 0 to High(D[I].Holes) do
+                for J := 0 to High(D[I].Holes[H]) do begin Vote(D[I].Holes[H][J], Parts[N]); Inc(N); end;
+            end;
+        end;
+      end;
+      { the names with most votes first; a name or a corner already given
+        is passed over }
+      Most := 0;
+      for I := 0 to NV - 1 do Most := Max(Most, VCount[I]);
+      for C := Most downto 1 do
+        for I := 0 to NV - 1 do
+        begin
+          if VCount[I] <> C then Continue;
+          Pt := VPt[I];
+          Nm := VName[I];
+          if (Pts[Pt].Name <> '') or (Trim(NameWord(Nm)) <> Nm) or
+             (Taken.FindIndexOf(LowerCase(Nm)) >= 0) then Continue;
+          Pts[Pt].Name := Nm;
+          Taken.Add(LowerCase(Nm), Pointer(1));
+          Given := True;
+        end;
+    finally
+      Taken.Free;
+      At.Free;
+      Votes.Free;
     end;
   end;
 
@@ -888,7 +1027,7 @@ var
           end;
         end;
         if Pass = 1 then W := W + 'in';
-        Pts[Best].Name := W + IntToStr(N + 1);
+        Pts[Best].Name := Fresh(Pts, W, N + 1);
         Inc(N);
       end;
       end;
@@ -907,6 +1046,7 @@ var
   procedure PutPoints(Depth: Integer; var Pts: TPts; const Rings: TRings);
   var
     I, J, From, Loose, K: Integer;
+    Nm: string;
     V: TP3;
     Tmp: TPt;
     Slots: TIntArrayW;
@@ -941,8 +1081,13 @@ var
     for I := 0 to High(Pts) do
       if (Pts[I].Ring < 0) and (Pts[I].Name = '') then
       begin
-        if Length(Rings) > 0 then Pts[I].Name := 'p' + IntToStr(K + 1)
-        else Pts[I].Name := PointName(K, Loose);
+        if Length(Rings) > 0 then Pts[I].Name := Fresh(Pts, 'p', K + 1)
+        else
+        begin
+          Nm := PointName(K, Loose);
+          if Given and TakenName(Pts, Nm) then Nm := Fresh(Pts, 'p', K + 1);
+          Pts[I].Name := Nm;
+        end;
         Inc(K);
       end;
     { in name order: floor1, floor2... then top1... }
@@ -972,7 +1117,9 @@ var
       begin
         V := Sub3(Pts[I].P, Pts[J].P);
         if AxesUsed(V) <> 1 then Continue;
-        if (V.X > 0) or (V.Y > 0) or (V.Z > 0) then begin From := J; Break; end;
+        { the axis it runs along, not the noise on the other two, or the
+          choice flips from one save to the next }
+        if (V.X > 1E-9) or (V.Y > 1E-9) or (V.Z > 1E-9) then begin From := J; Break; end;
         if From < 0 then From := J;
       end;
       if From >= 0 then NextHint := Place2(Pts[I].P, U, False);
@@ -992,6 +1139,7 @@ var
       end;
     end;
     Put(Depth, 'end', -1);
+    Given := False;
   end;
 
   { If these corners are spaced evenly around a circle, they are a ring. }
@@ -1823,6 +1971,7 @@ var
           end;
         end;
     Header := NLine;
+    GivenNames(Pts, Part_, G);
     SolidNaming(Part_, G, Nm, Note);
     PutNote(Depth, Note, -1);
     Put(Depth, 'solid' + NameWord(Nm) + TailNote(Note), -1);
@@ -2242,6 +2391,7 @@ begin
   end;
   NLine := 0;
   NextHint := '';
+  Given := False;
   SetLength(LineThing, 256);
   SetLength(First, D.Live);
   SetLength(Last, D.Live);

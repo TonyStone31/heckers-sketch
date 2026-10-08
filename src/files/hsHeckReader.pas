@@ -48,7 +48,7 @@ function HeckValue(const S: string; U: TUnitSystem; out V: Double;
 implementation
 
 uses
-  StrUtils;
+  StrUtils, Contnrs;
 
 type
   TValKind = (vPlain, vLen, vAngle);
@@ -62,6 +62,7 @@ type
   TScope = record
     Names: TStringList;       { point names, lower case; Objects = index into Pts }
     Pts: array of TP3;
+    Shown: array of string;   { each point's name as it was typed }
     Shapes: TStringList;      { named outlines - circles - index into Loops }
     Loops: array of TLoop;
   end;
@@ -109,6 +110,7 @@ type
     function FindPoint(const Name: string; out P: TP3): Boolean;
     function FindShape(const Name: string; out Lp: TLoop): Boolean;
     procedure DefinePoint(const Name: string; const P: TP3);
+    procedure NameCorners(Start, G: Integer);
     { the lexer }
     procedure SkipSp(const S: string; var P: Integer);
     function PeekWord(const S: string; P: Integer): string;
@@ -449,11 +451,90 @@ begin
     if K < 0 then
     begin
       SetLength(Pts, Length(Pts) + 1);
+      SetLength(Shown, Length(Pts));
       Names.AddObject(LowerCase(Name), TObject(PtrInt(High(Pts))));
       K := High(Pts);
     end
     else K := PtrInt(Names.Objects[K]);
     Pts[K] := P;
+    Shown[K] := Name;
+  end;
+end;
+
+{ Each face, edge and bore of solid G made since Start learns the names of
+  the corners it was made from, so the writer can give them back.  The
+  innermost name for a place wins. }
+procedure THeckReader.NameCorners(Start, G: Integer);
+var
+  Map: TFPHashList;
+  Keep: TStringList;
+  I, K, H, N: Integer;
+  S: string;
+  Any: Boolean;
+
+  function KeyOf(const P: TP3): shortstring;
+  begin
+    Result := IntToStr(Round(P.X * 1E7)) + ',' + IntToStr(Round(P.Y * 1E7)) + ',' + IntToStr(Round(P.Z * 1E7));
+  end;
+
+  function NameAt(const P: TP3): string;
+  var
+    J: Integer;
+  begin
+    J := Map.FindIndexOf(KeyOf(P));
+    if J < 0 then Result := '' else Result := Keep[PtrInt(Map.Items[J]) - 1];
+  end;
+
+  procedure Add(const P: TP3);
+  var
+    Nm: string;
+  begin
+    Nm := NameAt(P);
+    if Nm <> '' then Any := True;
+    if N > 0 then S := S + '|';
+    S := S + Nm;
+    Inc(N);
+  end;
+
+begin
+  Map := TFPHashList.Create;
+  Keep := TStringList.Create;
+  try
+    for I := High(Scopes) downto 0 do
+      for K := 0 to High(Scopes[I].Pts) do
+        if (K <= High(Scopes[I].Shown)) and (Map.FindIndexOf(KeyOf(Scopes[I].Pts[K])) < 0) then
+        begin
+          Keep.Add(Scopes[I].Shown[K]);
+          { stored one up: a nil item is an empty slot to TFPHashList }
+          Map.Add(KeyOf(Scopes[I].Pts[K]), Pointer(PtrInt(Keep.Count)));
+        end;
+    if Keep.Count = 0 then Exit;
+    for I := Start to D.Live - 1 do
+    begin
+      if D[I].Grp <> G then Continue;
+      S := '';
+      N := 0;
+      Any := False;
+      case D[I].Kind of
+        ekLine:
+          begin
+            Add(D[I].A);
+            Add(D[I].B);
+          end;
+        ekFace, ekBore:
+          begin
+            for K := 0 to High(D[I].Poly) do Add(D[I].Poly[K]);
+            for H := 0 to High(D[I].Holes) do
+              for K := 0 to High(D[I].Holes[H]) do Add(D[I].Holes[H][K]);
+          end;
+      else
+        Continue;
+      end;
+      if Any then D.SetCorners(I, S);
+    end;
+  finally
+    Keep.Free;
+    Map.Free;
   end;
 end;
 
@@ -1196,7 +1277,7 @@ begin
       if (Key = '') or not (Key[1] in LETTERS) or (Pos(' ', Key) > 0) then
         Fail('"' + Key + '" is not a name for a point');
       P := 1;
-      DefinePoint(Key, ReadPlace(Value, P, False, P3(0, 0, 0)));
+      DefinePoint(Copy(Src[Cur], 1, Length(Key)), ReadPlace(Value, P, False, P3(0, 0, 0)));
       SkipSp(Value, P);
       if P <= Length(Value) then Fail('"' + Trim(Copy(Value, P, 16)) + '" - what is that after the place?');
       Inc(Cur);
@@ -1519,12 +1600,13 @@ end;
 
 procedure THeckReader.DoSolid;
 var
-  G, Save: Integer;
+  G, Save, First: Integer;
   Key, V: string;
   HasPaint: Boolean;
   Paint: TColor;
 begin
   G := D.NewGroup;
+  First := D.Live;
   HasPaint := False;
   Paint := 0;
   Inc(Cur);
@@ -1546,6 +1628,7 @@ begin
       Fail('the solid is never closed: an "end" is missing');
     end;
     Inc(Cur);
+    NameCorners(First, G);
   finally
     PopScope;
   end;

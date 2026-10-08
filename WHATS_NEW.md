@@ -17,10 +17,18 @@
 - **Names and comments are kept.**  Name anything in the source -
   `box Lid`, `solid Hinge`, `line Rafter`, `circle Hole` - and write notes
   above it or at the end of its line; saving, editing on the sheet and
-  copying all keep them where they were.  Notes at the top of a file stay
-  with the first sheet, not every sheet.
+  copying all keep them where they were.  A solid's corners keep their
+  names too - `a`, `p1`, `hinge1` stay what you called them.  Notes at the
+  top of a file stay with the first sheet, not every sheet.
+- **Writing Heck**, a new page in the manual: the whole language on one
+  page, every kind of thing and what it takes, with examples.
 - **The Heck page in the manual** shows how to build a model in groups,
   with names, and how to leave a top open with `noface`.
+
+### Fixed
+
+- A drawing saved over and over no longer changes a few lines each time
+  (which corner a point was measured from flipped back and forth).
 
 ## v2026.10.05.2
 

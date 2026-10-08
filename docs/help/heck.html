@@ -13,7 +13,8 @@ drawing is, never how to make it.  Plain text - a file format you can read
 program works out the rest.  Not a programming language, not a scripting
 language, not G-code; its kin are CSS and a spreadsheet.  The programming
 goes in a <a href="#jigs">jig</a>, in any language, and a jig prints
-Heck.</p>
+Heck.  <a href="writing-heck.html"><b>Writing Heck</b></a> is the whole
+language on one page.</p>
 
 <p><b>The file is Heck.</b>  Since 30 September the <code>.hsk</code> file
 the program saves is Heck - a block for each sheet, and in it the drawing as
@@ -129,12 +130,12 @@ either.</p>
 it has spaces.  A name you give is yours: it is kept through every save,
 and a copy keeps it too.  A circle keeps its name for faces and pulls to
 call it by; the ones you did not name are <code>c1</code>, <code>c2</code>.</p>
-<p>Corners inside a solid are the exception for now: the program names them
-by where they stand - <code>floor1</code> to <code>floor4</code> and
-<code>top1</code> to <code>top4</code> on a block, <code>ra1</code>.. round
-a ring - so <code>line = floor1 to top1</code> is an upright, and corners you
-named <code>a</code>, <code>b</code>, <code>c</code> come back named that
-way.</p>
+<p>A solid's corners keep the names you gave them too.  The ones nobody
+named, the program names by where they stand - <code>floor1</code> to
+<code>floor4</code> and <code>top1</code> to <code>top4</code> on a block,
+<code>ra1</code>.. round a ring - so <code>line = floor1 to top1</code> is an
+upright.  Lines that belong to no solid are written with their places, not
+names.</p>
 
 <h2 id="models">Building a model in text</h2>
 <p>Whether you type it or a program writes it, a model reads

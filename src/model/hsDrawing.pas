@@ -131,6 +131,9 @@ type
       line starting with a tab went at the end of its first line.  SName and
       SNote are its solid's, carried by every member.  A group's name is Txt. }
     Name, Note, SName, SNote: string;
+    { the names of its corners as the text gave them, "|" between, in the
+      order of A and B, or of Poly and then each hole }
+    Corners: string;
   end;
 
   TWorkEntArray = array of TWorkEnt;
@@ -348,6 +351,7 @@ type
     { what the text named it and said about it; see TWorkEnt.Name }
     procedure SetNaming(Index: Integer; const AName, ANote: string);
     procedure SetSolidNaming(Index: Integer; const AName, ANote: string);
+    procedure SetCorners(Index: Integer; const ACorners: string);
     { a fresh solid identity, for something built rather than pulled }
     function NewGroup: Integer;
     procedure SetSoft(Index: Integer; Soft: Boolean);
@@ -3973,6 +3977,7 @@ begin
   if FEnts[Index].Kind <> ekFace then Exit;
   if Length(FEnts[Index].Poly) < 3 then Exit;
   Flip(FEnts[Index].Poly);
+  FEnts[Index].Corners := '';
   for K := 0 to High(FEnts[Index].Holes) do
     Flip(FEnts[Index].Holes[K]);
   FEnts[Index].A := FEnts[Index].Poly[0];
@@ -4050,6 +4055,7 @@ begin
   SetLength(T, N);
   for I := 0 to N - 1 do T[I] := FEnts[Index].Poly[N - 1 - I];
   FEnts[Index].Poly := T;
+  FEnts[Index].Corners := '';
   for H := 0 to High(FEnts[Index].Holes) do
   begin
     N := Length(FEnts[Index].Holes[H]);
@@ -5002,6 +5008,12 @@ begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].SName := AName;
   FEnts[Index].SNote := ANote;
+end;
+
+procedure TWorkDoc.SetCorners(Index: Integer; const ACorners: string);
+begin
+  if (Index < 0) or (Index >= FLive) then Exit;
+  FEnts[Index].Corners := ACorners;
 end;
 
 procedure TWorkDoc.SetGroup(Index, G: Integer);
