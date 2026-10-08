@@ -24,6 +24,12 @@ function NetGetText(const URL, Accept: string; out Body, Err: string): Boolean;
 function NetPost(const URL: string; Data: TStream; const ContentType: string;
   out Status: Integer; out Err: string): Boolean;
 
+{ A POST whose reply is written into Dest as it arrives, for an answer that
+  streams.  Headers are "Name: value" lines.  Dest may raise EAbort from its
+  Write to stop early. }
+function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream;
+  out Status: Integer; out Err: string): Boolean;
+
 { 'openssl' or 'winhttp', for reports. }
 function NetBackend: string;
 
@@ -49,6 +55,16 @@ uses
   {$ELSE}
   fphttpclient, opensslsockets
   {$ENDIF};
+
+{ --offline keeps everything on this machine; a server on it is allowed }
+function OnThisMachine(const URL: string): Boolean;
+var
+  U: string;
+begin
+  U := LowerCase(URL);
+  Result := (Copy(U, 1, 17) = 'http://localhost:') or (Copy(U, 1, 17) = 'http://localhost/') or
+    (Copy(U, 1, 17) = 'http://127.0.0.1:') or (Copy(U, 1, 17) = 'http://127.0.0.1/');
+end;
 
 function NetFriendlyError(const Err: string): string;
 begin
@@ -329,7 +345,81 @@ begin
     60000, Status, Err);
 end;
 
+function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream;
+  out Status: Integer; out Err: string): Boolean;
+var
+  H: string;
+  K: Integer;
+begin
+  Status := 0;
+  Err := '';
+  if NetOffline and not OnThisMachine(URL) then
+  begin
+    Err := 'offline (--offline)';
+    Exit(False);
+  end;
+  H := 'User-Agent: ' + USER_AGENT;
+  for K := 0 to Headers.Count - 1 do H := H + #13#10 + Headers[K];
+  try
+    Result := Exchange('POST', URL, H, Body, Dest, 180000, Status, Err);
+  except
+    on E: EAbort do
+    begin
+      Result := False;
+      Err := 'stopped';
+    end;
+  end;
+end;
+
 {$ELSE}
+
+function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream;
+  out Status: Integer; out Err: string): Boolean;
+var
+  C: TFPHTTPClient;
+  K: Integer;
+begin
+  Result := False;
+  Status := 0;
+  Err := '';
+  if NetOffline and not OnThisMachine(URL) then
+  begin
+    Err := 'offline (--offline)';
+    Exit;
+  end;
+  C := TFPHTTPClient.Create(nil);
+  try
+    Body.Position := 0;
+    C.AllowRedirect := True;
+    C.ConnectTimeout := 8000;
+    { a model can think a long while before its first word }
+    C.IOTimeout := 180000;
+    C.AddHeader('User-Agent', USER_AGENT);
+    for K := 0 to Headers.Count - 1 do
+      C.AddHeader(Trim(Copy(Headers[K], 1, Pos(':', Headers[K]) - 1)),
+        Trim(Copy(Headers[K], Pos(':', Headers[K]) + 1, MaxInt)));
+    C.RequestBody := Body;
+    try
+      C.Post(URL, Dest);
+      Status := C.ResponseStatusCode;
+      Result := (Status >= 200) and (Status < 300);
+      if not Result then Err := 'the server answered ' + IntToStr(Status);
+    except
+      on E: EAbort do
+      begin
+        Status := C.ResponseStatusCode;
+        Err := 'stopped';
+      end;
+      on E: Exception do
+      begin
+        Status := C.ResponseStatusCode;
+        Err := E.Message;
+      end;
+    end;
+  finally
+    C.Free;
+  end;
+end;
 
 function NetBackend: string;
 begin

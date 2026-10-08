@@ -1,8 +1,8 @@
 unit hsAssistant;
 
 { The assistant: a conversation about the sheet, in a window of its own so
-  it can later dock under the source window.  Not connected to anything
-  yet - it shows what it would be given, and keeps the conversation. }
+  it can later dock under the source window.  Each question goes with the
+  manual, the sheet and what is picked, as ticked; the answer streams in. }
 
 {$mode objfpc}{$H+}
 
@@ -11,7 +11,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, ExtCtrls, LCLType,
   BCButton, InkLabel, BGRATheme, BGRAThemeCheckBox, InkMemo, InkCodeMemo,
-  hsDrawing, hsSourceWindow, hsAssistantContext;
+  hsDrawing, hsSourceWindow, hsAssistantContext, hsAssistantChat;
 
 type
 
@@ -36,6 +36,7 @@ type
     btnClear: TBCButton;
     lblStatus: TInkLabel;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btnSettingsClick(Sender: TObject);
@@ -47,11 +48,18 @@ type
   private
     FSettings: TAssistantSettings;
     FLoading: Boolean;
+    FChat: TChatThread;
+    FHistory: TChatMsgs;
+    FAnswer: string;
+    procedure ChatPiece(Sender: TObject; const Piece: string);
+    procedure ChatDone(Sender: TObject; OK: Boolean; const Err: string);
+    procedure Busy(On: Boolean);
     procedure ShowWho;
     procedure ShowGiven;
     procedure Say(const Who, Txt: string; C: TColor);
     function SheetText(out Lines: Integer; out Picked: string; out NPicked: Integer): string;
     function GivenText: string;
+    function SystemText: string;
   public
     { the same questions the source window asks the sheet }
     OnAskSource: TSourceAskSource;
@@ -70,7 +78,7 @@ implementation
 {$R *.lfm}
 
 uses
-  hsDialogSkin, hsSurface, hsLongText, hsAssistantSettings;
+  hsDialogSkin, hsSurface, hsLongText, hsAssistantSettings, InkMarkdown;
 
 procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource;
   AskPicked: TSourceAskPicked);
@@ -92,11 +100,16 @@ begin
   chkPicked.Checked := FSettings.SendPicked;
   FLoading := False;
   ShowWho;
-  Say('', 'Ask about this sheet, or ask for a change to it.  The answer will ' +
-    'come back as Heck for the source window, to look over before it is applied.',
+  Say('', 'Ask about this sheet, or ask for a change to it.  A change comes ' +
+    'back as Heck, to look over before it goes into the drawing.',
     PixToColor(DlgTheme.TextDim));
-  Say('', 'Nothing is connected yet: this window shows what it would be given ' +
-    'and keeps what you type.', PixToColor(DlgTheme.TextDim));
+end;
+
+procedure TAssistantForm.FormDestroy(Sender: TObject);
+begin
+  if FChat <> nil then FChat.Detach;
+  FChat := nil;
+  if AssistantForm = Self then AssistantForm := nil;
 end;
 
 procedure TAssistantForm.FormActivate(Sender: TObject);
@@ -235,21 +248,92 @@ begin
   TLongTextForm.ShowText(Self, 'What the assistant would be given', GivenText);
 end;
 
+{ what goes ahead of the conversation, as the boxes are ticked }
+function TAssistantForm.SystemText: string;
+var
+  Manual, Missing, Sheet, Picked: string;
+  N, NP: Integer;
+begin
+  Manual := '';
+  if chkManual.Checked then Manual := ManualText(Missing);
+  Sheet := SheetText(N, Picked, NP);
+  if not chkSheet.Checked then Sheet := '';
+  if not chkPicked.Checked or (NP = 0) then Picked := '';
+  Result := ChatSystemText(Manual, Sheet, Picked);
+end;
+
+procedure TAssistantForm.Busy(On: Boolean);
+begin
+  if On then btnSend.Caption := 'Stop' else btnSend.Caption := 'Send';
+  btnClear.Enabled := not On;
+  btnSettings.Enabled := not On;
+end;
+
 procedure TAssistantForm.btnSendClick(Sender: TObject);
 var
-  Q: string;
+  Q, Why, Key: string;
+  Msgs: TChatMsgs;
+  I: Integer;
 begin
+  { Send stops an answer still coming }
+  if FChat <> nil then
+  begin
+    FChat.Stop;
+    Exit;
+  end;
   Q := Trim(memAsk.Text);
   if Q = '' then Exit;
-  Say('You', Q, PixToColor(DlgTheme.Text));
-  Say('', 'Not connected yet - this is where the answer will come.', ToneColor(False));
+  Key := LoadAssistantKey;
+  Why := ChatRefusal(FSettings, Key);
+  if Why <> '' then
+  begin
+    Say('', Why, ToneColor(False));
+    Exit;
+  end;
+  memChat.AppendBlock(Q, itfPlain, FieldColor, 24);
   memAsk.Text := '';
+  SetLength(FHistory, Length(FHistory) + 1);
+  FHistory[High(FHistory)].Role := 'user';
+  FHistory[High(FHistory)].Text := Q;
+  { the manual and the sheet as they are now, then the conversation }
+  SetLength(Msgs, Length(FHistory) + 1);
+  Msgs[0].Role := 'system';
+  Msgs[0].Text := SystemText;
+  for I := 0 to High(FHistory) do Msgs[I + 1] := FHistory[I];
+  FAnswer := '';
+  memChat.AppendBlock('...', itfMarkdown);
+  Busy(True);
+  FChat := TChatThread.Create(FSettings, Key, Msgs, @ChatPiece, @ChatDone);
   ShowGiven;
+end;
+
+procedure TAssistantForm.ChatPiece(Sender: TObject; const Piece: string);
+begin
+  FAnswer := FAnswer + Piece;
+  memChat.ReplaceLast(FAnswer);
+end;
+
+procedure TAssistantForm.ChatDone(Sender: TObject; OK: Boolean; const Err: string);
+begin
+  FChat := nil;
+  Busy(False);
+  if FAnswer <> '' then
+  begin
+    SetLength(FHistory, Length(FHistory) + 1);
+    FHistory[High(FHistory)].Role := 'assistant';
+    FHistory[High(FHistory)].Text := FAnswer;
+  end
+  else
+    memChat.ReplaceLast('*(no answer)*');
+  if not OK then
+    if Err = 'stopped' then Say('', 'Stopped.', PixToColor(DlgTheme.TextDim))
+    else Say('', 'It went wrong: ' + Err, ToneColor(False));
 end;
 
 procedure TAssistantForm.btnClearClick(Sender: TObject);
 begin
   memChat.Lines.Clear;
+  SetLength(FHistory, 0);
 end;
 
 procedure TAssistantForm.chkGivenChange(Sender: TObject);

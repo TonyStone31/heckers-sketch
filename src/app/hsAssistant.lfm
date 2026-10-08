@@ -12,6 +12,7 @@ object AssistantForm: TAssistantForm
   KeyPreview = True
   OnActivate = FormActivate
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   Position = poMainFormCenter
   object pnlTop: TPanel

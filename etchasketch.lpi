@@ -340,6 +340,10 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
+        <Filename Value="src/app/hsAssistantChat.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
         <Filename Value="src/app/hsPostcard.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="HelloForm"/>
