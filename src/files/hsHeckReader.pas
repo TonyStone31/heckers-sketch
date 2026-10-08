@@ -1967,6 +1967,19 @@ var
   Parts: TStringArray;
   P, I, N, G, ArcAt, K: Integer;
   Top: TP3;
+
+  { the way circle I faces }
+  function ArcNormalOf(I: Integer): TP3;
+  begin
+    case D[I].Plane of
+      plXY: Result := P3(0, 0, 1);
+      plXZ: Result := P3(0, 1, 0);
+      plYZ: Result := P3(1, 0, 0);
+    else
+      Result := D[I].Nm;
+    end;
+  end;
+
 begin
   OutlineText := '';
   ByText := '';
@@ -2020,9 +2033,14 @@ begin
   if (Pos(' ', Trim(OutlineText)) = 0) and (Pos(',', OutlineText) = 0) then
   begin
     for I := D.Live - 1 downto 0 do
+      { the outline lies in the circle's plane: two circles of a size round
+        one center (tubes meeting at a joint) share every distance, and two
+        opposite corners, but not a plane }
       if (D[I].Kind = ekArc) and FullCircle(D[I].Sweep) and
          (Abs(Dist(D[I].C, Lp[0]) - D[I].R) < 1E-6) and
-         (Abs(Dist(D[I].C, Lp[N div 2]) - D[I].R) < 1E-6) then
+         (Abs(Dist(D[I].C, Lp[N div 2]) - D[I].R) < 1E-6) and
+         (Abs(Dot3(Sub3(Lp[0], D[I].C), ArcNormalOf(I))) < 1E-6) and
+         (Abs(Dot3(Sub3(Lp[N div 4], D[I].C), ArcNormalOf(I))) < 1E-6) then
       begin
         ArcAt := I;
         Break;
@@ -2290,8 +2308,10 @@ var
   var
     L: Integer;
   begin
+    { the face's own solid's lines, or loose ones in its group: a rectangle
+      drawn on a solid's face is the hole's edges }
     for L := 0 to D.Live - 1 do
-      if (D[L].Kind = ekLine) and (D[L].Grp = D[F].Grp) and (D[L].Part = D[F].Part) and
+      if (D[L].Kind = ekLine) and ((D[L].Grp = D[F].Grp) or (D[L].Grp = 0)) and (D[L].Part = D[F].Part) and
          OnLine(A, L) and OnLine(B, L) then Exit(True);
     Result := False;
   end;
@@ -2300,6 +2320,7 @@ var
   begin
     if SamePt(A, B, 1E-9) then Exit;
     if Have.FindIndexOf(KeyOf(A, B, D[F].Grp, D[F].Part)) >= 0 then Exit;
+    if Have.FindIndexOf(KeyOf(A, B, 0, D[F].Part)) >= 0 then Exit;
     if OnCircle(A, B) then Exit;
     if AlongLine(A, B, F) then Exit;
     Added := True;
@@ -2385,6 +2406,49 @@ var
     Result := False;
   end;
 
+
+  { A loop of loose lines lying flat inside a solid's face cuts it, as a
+    rectangle drawn on a face does on the sheet and a circle does here (see
+    CutCircles).  Whether the loop is a face itself is the noface's say. }
+  procedure CutWith(const Lp: TP3Array; Part: Integer);
+  var
+    F, J, H: Integer;
+    Nm, T: TP3;
+    Inside: Boolean;
+    Holes: array of TP3Array;
+    Hole: TP3Array;
+  begin
+    for F := FirstNew to D.Live - 1 do
+    begin
+      if (D[F].Kind <> ekFace) or (D[F].Grp = 0) or (D[F].Part <> Part) then Continue;
+      if SameLoopTol(D[F].Poly, Lp, 1E-4) then Continue;
+      Nm := D.FaceNormal(F);
+      Inside := True;
+      for J := 0 to High(Lp) do
+        if (Abs(Dot3(Sub3(Lp[J], D[F].Poly[0]), Nm)) > 1E-6) or not PointInLoop(Lp[J], D[F].Poly, Nm) then
+        begin
+          Inside := False;
+          Break;
+        end;
+      if not Inside then Continue;
+      for H := 0 to High(D[F].Holes) do
+        if SameLoopTol(D[F].Holes[H], Lp, 1E-4) then Inside := False;
+      if not Inside then Continue;
+      Hole := Copy(Lp);
+      if Dot3(LoopNormal(Hole), Nm) > 0 then
+        for J := 0 to Length(Hole) div 2 - 1 do
+        begin
+          T := Hole[J];
+          Hole[J] := Hole[High(Hole) - J];
+          Hole[High(Hole) - J] := T;
+        end;
+      SetLength(Holes, Length(D[F].Holes) + 1);
+      for H := 0 to High(D[F].Holes) do Holes[H] := D[F].Holes[H];
+      Holes[High(Holes)] := Hole;
+      D.SetFaceHoles(F, Holes);
+    end;
+  end;
+
 begin
   SetLength(Implied, D.Live);
   for F := 0 to D.Live - 1 do Implied[F] := False;
@@ -2417,6 +2481,7 @@ begin
     Mid := ScopeMid(Segs);
     for I := 0 to High(Regs) do
     begin
+      if (Keys[K].Grp = 0) and (Length(Regs[I].Outer) >= 3) then CutWith(Regs[I].Outer, Keys[K].Part);
       { Already the outline of a face in this scope, or of any face for a loose
         loop: a solid resting on another keeps its own faces, and a disk given
         inside a box is not made again.  Outline only: a face with this outline

@@ -10,6 +10,18 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- A rectangle written in the source on a box's face cut no hole in it until
+  something was drawn on the sheet; it cuts it as soon as it is read, and
+  with a `noface` it is an opening.
+- Two round tubes of one size starting from the same joint could swap their
+  circles when read, opening the tube ends after a save.
+- A tilted circle's facing could be saved in a form that would not read
+  back (`-0.28 north`, `8E-15 west`), and the drawing then would not open.
+
 ## v2026.10.08
 
 ### New

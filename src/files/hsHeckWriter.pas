@@ -291,6 +291,15 @@ var
   Tilt, Head, T2, H2: Double;
   W: string;
   Back: TP3;
+
+  { a plain decimal, never 8.28E-15: noise that small is nought }
+  function Way(V: Double; const Plus, Minus: string): string;
+  begin
+    if Abs(V) < 1E-9 then V := 0;
+    if V < 0 then Result := FormatFloat('0.#########', -V, DotFS) + ' ' + Minus
+    else Result := FormatFloat('0.#########', V, DotFS) + ' ' + Plus;
+  end;
+
 begin
   Result := FacingWord(N);
   if Result <> '' then Exit;
@@ -308,7 +317,8 @@ begin
     else W := Deg2(H2) + ' round from east';
     Exit('up, leaning ' + Deg2(T2) + ' toward ' + W);
   end;
-  Result := Format('%.9g east, %.9g north, %.9g up', [N.X, N.Y, N.Z], DotFS);
+  { the word carries the sign, as in a place: 0.28 south, not -0.28 north }
+  Result := Way(N.X, 'east', 'west') + ', ' + Way(N.Y, 'north', 'south') + ', ' + Way(N.Z, 'up', 'down');
 end;
 
 function Color2(C: TColor): string;
@@ -1563,6 +1573,43 @@ var
     Result := N > 0;
   end;
 
+  { a hole whose sides are all loose lines of the group (a rectangle drawn
+    on the face): written on its own, it cuts the face again when read }
+  function LooseLoop(const Lp: array of TP3; Part_: Integer): Boolean;
+  var
+    K, L: Integer;
+    Found: Boolean;
+
+    function OnLine(const P: TP3; L: Integer): Boolean;
+    var
+      T, Len2: Double;
+      Q: TP3;
+    begin
+      Q := Sub3(D[L].B, D[L].A);
+      Len2 := Dot3(Q, Q);
+      if Len2 < 1E-18 then Exit(False);
+      T := Dot3(Sub3(P, D[L].A), Q) / Len2;
+      if (T < -1E-9) or (T > 1 + 1E-9) then Exit(False);
+      Result := Dist(P, Add3(D[L].A, Mul3(Q, T))) < 1E-6;
+    end;
+
+  begin
+    Result := False;
+    for K := 0 to High(Lp) do
+    begin
+      Found := False;
+      for L := 0 to D.Live - 1 do
+        if (D[L].Kind = ekLine) and (D[L].Grp = 0) and (D[L].Part = Part_) and
+           OnLine(Lp[K], L) and OnLine(Lp[(K + 1) mod Length(Lp)], L) then
+        begin
+          Found := True;
+          Break;
+        end;
+      if not Found then Exit;
+    end;
+    Result := True;
+  end;
+
   { Is this solid exactly a box and nothing more?  Eight corners on two
     heights, twelve ordinary edges, and a four-corner face facing out on
     each side but those left open (Open, a bit per BOX_SIDES), with no
@@ -1596,7 +1643,7 @@ var
             { a hole is allowed when it is a circle drawn on the face: the box is
               still a box, and the circle is written on its own }
             for K := 0 to High(D[I].Holes) do
-              if CircleNamed(D[I].Holes[K], Part_) = '' then Exit;
+              if (CircleNamed(D[I].Holes[K], Part_) = '') and not LooseLoop(D[I].Holes[K], Part_) then Exit;
             W := FacingWord(D.FaceNormal(I));
             Side := High(FACINGS);
             while (Side >= 0) and (FACINGS[Side] <> W) do Dec(Side);

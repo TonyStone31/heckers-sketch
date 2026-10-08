@@ -13,6 +13,14 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- A rectangle written in the source on a box''s face cut no hole in it until' + LineEnding +
+    '  something was drawn on the sheet; it cuts it as soon as it is read, and' + LineEnding +
+    '  with a `noface` it is an opening.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.08' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

@@ -32,7 +32,8 @@ end</pre>
 from the program's own lists: <code>'1/4"'</code>, <code>'1/16"'</code>),
 <code>view</code> (<code>plan</code>, <code>iso</code> or <code>3d</code>), and
 the sheet's own <code>ink</code>, <code>width</code> and <code>sides</code> -
-the defaults for everything on it.  The program also writes
+the defaults for everything on it (<code>sides</code> is how many straight
+pieces a circle is drawn in, 24 unless said).  The program also writes
 <code>camera</code> and <code>cut</code> there to remember the view; leave
 them out and it frames the drawing itself.  A <code>points</code> block at
 the sheet's top level only names places: it draws nothing.  Text pasted into
@@ -165,7 +166,10 @@ there).</p>
 <code>up</code>, <code>down</code>, <code>east</code>, <code>west</code>,
 <code>north</code>, <code>south</code>; one that leans,
 <code>up, leaning 30&deg; toward east</code>; or three numbers,
-<code>0.5 east, 0.5 north, 0.7071 up</code>.  <code>starts</code> is
+<code>0.5 east, 0.5 north, 0.7071 up</code>.  Only the direction counts, so
+the numbers need not make a length of one: <code>3 east, 4 up</code> is the
+same as <code>0.6 east, 0.8 up</code>, and a step can be used as a facing
+as it stands.  <code>starts</code> is
 measured from east for a thing facing up or down, otherwise from its level
 line.</p>
 
@@ -210,9 +214,11 @@ or <code>open = top north</code> in a block.</li>
 <li><b><code>noface</code></b> is a loop of lines that is not a face: an
 open top on anything that is not a box, a window.  It is how you leave
 something open, instead of drawing a face and rubbing it out.</li>
-<li><b>A circle on a face cuts it</b> into the face with a hole and a disk in
-the hole.  <code>noface = Hole</code> takes the disk away and leaves the
-opening.  A hole right through a solid is a <code>bore</code>.</li>
+<li><b>A circle or a closed loop of lines on a face cuts it</b> into the face
+with a hole and a face in the hole, as drawing one on the sheet does.
+<code>noface</code> on the loop takes the inner face away and leaves the
+opening (<code>noface = Hole</code> for a circle).  That opens one face only;
+a hole right through a solid is a <code>bore</code>.</li>
 <li><code>paint = none</code> on a face in a painted solid leaves that one
 face unpainted.</li>
 <li>A face typed without its lines is given them when it is read; a
@@ -254,8 +260,11 @@ names go with them.</p>
 <h2 id="groups">Groups</h2>
 <p>A <code>group</code> keeps a piece to itself: it is picked, moved, hidden
 and locked as one thing, its geometry never joins its neighbor's, and groups
-go inside groups for an assembly.  Names given in a group's
-<code>points</code> are its own.</p>
+go inside groups for an assembly.  A point or circle named in a group or a
+solid is known inside it and the blocks within it; a name given at the
+sheet's top level is known everywhere.  Keeping every name different is
+simplest.  There is no paint for a whole group: paint goes on each solid,
+box or pull.</p>
 <pre>group 'Hangers'
   locked = true
   jig = 'hangers' with Count = 6, Spacing = 16"
@@ -318,6 +327,14 @@ group 'Post and plate'
   circle Hole = 9' east, 1' north, 2" up; 3"
   box Plate = 8' east, 0 north, 0 up; 2' east, 2' north, 2" up
 end</pre>
+<p>A round tube from one place along any step - a roll cage, a pipe - is a
+circle facing the way the tube runs, pulled by the step.  The step is its own
+facing, so there is nothing to work out:</p>
+<pre>// 1 3/4" tube from the top of the front hoop, back 7" and up 24"
+circle HoopTop = 15" west, 62" north, 29" up; 7/8"; 7 south, 24 up
+pull UpperHoop = HoopTop; 7" south, 24" up</pre>
+<p>Tubes meeting at a joint simply overlap there; each stays a tube of its
+own.</p>
 <p>A painted panel with a square window in it:</p>
 <pre>face Panel
   points = 20' east, 0 north, 0 up to + 4' east to + 4' north to + 4' west
@@ -327,7 +344,8 @@ end</pre>
 <p>An open tray on legs, built in groups, is on the
 <a href="heck.html#models">Heck page</a>.</p>
 <p><b>What there is not yet</b>: a statement for a turned or swept shape - an
-elbow, a dome, a sphere - and paint on a one-line thing.  A round solid with
+elbow, a dome, a sphere - and paint on a <code>box</code>, <code>pull</code>
+or <code>rect</code> written on one line (write it as a block to paint it).  A round solid with
 different ends is a <code>solid</code> of rings with lines between them; an
 elbow is two pulls meeting.</p>
 
