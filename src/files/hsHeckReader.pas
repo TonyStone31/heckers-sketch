@@ -99,9 +99,20 @@ type
     { one flag per thing: a face its scope's edges close exactly, alone, and
       facing the way it would have been made; for the writer }
     Implied: array of Boolean;
+    { a face its scope's edges close exactly and alone, whichever way it
+      faces: HomeLooseFaces settles Implied for a disk it gives a solid }
+    Closes: array of Boolean;
+    { loose faces whose lines the reader had to add: never implied, since
+      the text the writer writes for them will not have those lines }
+    Edged: array of Boolean;
+    { solids given as their faces alone, with no line of their own, whose
+      lines the reader drew: those faces are all of it, and no loop of the
+      new lines (a ring round a ball's middle) is made a face }
+    FacesGiven: array of Integer;
     procedure Fail(const Msg: string);
     procedure NoteSolid(G: Integer; HasPaint: Boolean; Paint: TColor);
     procedure ImplyFaces(FirstNew: Integer);
+    procedure EdgeFaces(FirstNew: Integer);
     procedure HomeLooseFaces(FirstNew: Integer);
     procedure Prepare(L: TStrings);
     procedure Attach(Here, Start: Integer; const Kind, Rest, Before: string);
@@ -151,7 +162,8 @@ type
       faces the tools would have made, and nothing else. }
     procedure DoBox(const Value: string; Block: Boolean);
     procedure DoRect(const Value: string; Block: Boolean);
-    procedure MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
+    procedure MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor; Open: Integer = 0);
+    function ReadOpen(const S: string): Integer;
     procedure MakeRect(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
     { "place; step": two parts with a semicolon between }
     procedure PlaceAndStep(const Value: string; out Corner, Size: TP3);
@@ -1562,7 +1574,7 @@ begin
   begin
     Ends := ReadList(Value);
     { given in one line: the wrong count is that line's mistake }
-    if Length(Ends) <> 2 then Fail('a line is two points: "line = a to b"');
+    if Length(Ends) < 2 then Fail('a line is two points: "line = a to b"');
     Inc(Cur);
   end
   else
@@ -1584,10 +1596,15 @@ begin
     if Cur >= Src.Count then Fail('the line is never closed: an "end" is missing');
     Inc(Cur);
   end;
-  if Length(Ends) <> 2 then Fail('a line is two points: "line = a to b"');
-  D.AddLine(Ends[0], Ends[1], Ink, Wd, Ref);
-  if Solid <> 0 then D.SetLineGroup(D.Live - 1, Solid);
-  if Soft then D.SetSoft(D.Live - 1, True);
+  if Length(Ends) < 2 then Fail('a line is two points: "line = a to b"');
+  { more places than two are a run of lines, one after another - a cable,
+    a pipe route }
+  for P := 0 to High(Ends) - 1 do
+  begin
+    D.AddLine(Ends[P], Ends[P + 1], Ink, Wd, Ref);
+    if Solid <> 0 then D.SetLineGroup(D.Live - 1, Solid);
+    if Soft then D.SetSoft(D.Live - 1, True);
+  end;
 end;
 
 procedure THeckReader.NoteSolid(G: Integer; HasPaint: Boolean; Paint: TColor);
@@ -1785,15 +1802,50 @@ end;
 
 { eight corners, twelve lines, six faces, one solid: the same as a
   rectangle pulled up by the tool }
-procedure THeckReader.MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
+{ "open = top north": the sides a box is left without, one bit each in the
+  order of BOX_SIDES }
+function THeckReader.ReadOpen(const S: string): Integer;
+var
+  W: string;
+  K: Integer;
+begin
+  Result := 0;
+  for W in LowerCase(StringReplace(S, ',', ' ', [rfReplaceAll])).Split([' '], TStringSplitOptions.ExcludeEmpty) do
+  begin
+    if W = 'up' then K := 1
+    else if W = 'down' then K := 0
+    else
+    begin
+      K := High(BOX_SIDES);
+      while (K >= 0) and (BOX_SIDES[K] <> W) do Dec(K);
+    end;
+    if K < 0 then Fail('"' + W + '" - open takes top, bottom, east, west, north and south');
+    Result := Result or (1 shl K);
+  end;
+end;
+
+procedure THeckReader.MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor; Open: Integer);
 var
   C: array[0..7] of TP3;
   G, I, F0: Integer;
   X, Y, Z: Double;
   Sx, Sy, Sz: Double;
   Save: Integer;
-  procedure Face4(A, B, Cc, Dd: Integer);
+  procedure Face4(Side, A, B, Cc, Dd: Integer);
   begin
+    { an open side is a loop of edges that is not a face }
+    if Open and (1 shl Side) <> 0 then
+    begin
+      SetLength(NoFaces, Length(NoFaces) + 1);
+      SetLength(NoFaces[High(NoFaces)], 4);
+      NoFaces[High(NoFaces)][0] := C[A];
+      NoFaces[High(NoFaces)][1] := C[B];
+      NoFaces[High(NoFaces)][2] := C[Cc];
+      NoFaces[High(NoFaces)][3] := C[Dd];
+      SetLength(NoFaceGrp, Length(NoFaceGrp) + 1);
+      NoFaceGrp[High(NoFaceGrp)] := G;
+      Exit;
+    end;
     D.AddFaceRaw([C[A], C[B], C[Cc], C[Dd]], DefInk, True);
     D.SetFaceGroup(D.Live - 1, G);
     if HasPaint then D.SetMaterial(D.Live - 1, Paint);
@@ -1813,12 +1865,12 @@ begin
   for I := 0 to 3 do C[I + 4] := P3(C[I].X, C[I].Y, Z + Sz);
   G := D.NewGroup;
   NoteSolid(G, HasPaint, Paint);
-  Face4(3, 2, 1, 0);        { bottom, facing down }
-  Face4(4, 5, 6, 7);        { top, facing up }
-  Face4(0, 1, 5, 4);        { south }
-  Face4(1, 2, 6, 5);        { east }
-  Face4(2, 3, 7, 6);        { north }
-  Face4(3, 0, 4, 7);        { west }
+  Face4(0, 3, 2, 1, 0);        { bottom, facing down }
+  Face4(1, 4, 5, 6, 7);        { top, facing up }
+  Face4(2, 0, 1, 5, 4);        { south }
+  Face4(3, 1, 2, 6, 5);        { east }
+  Face4(4, 2, 3, 7, 6);        { north }
+  Face4(5, 3, 0, 4, 7);        { west }
   for I := 0 to 3 do
   begin
     Edge(I, (I + 1) mod 4);
@@ -1829,7 +1881,9 @@ end;
 
 procedure THeckReader.DoBox(const Value: string; Block: Boolean);
 var
-  Key, V: string;
+  Key, V, W: string;
+  Parts: TStringArray;
+  Open: Integer;
   Corner, Size: TP3;
   HasPaint, HasAt, HasSize: Boolean;
   Ink, WasInk: TColor;
@@ -1841,10 +1895,21 @@ begin
   Paint := 0;
   Ink := DefInk;
   Wd := DefWidth;
+  Open := 0;
   if not Block then
   begin
-    PlaceAndStep(Value, Corner, Size);
-    MakeBox(Corner, Size, False, 0);
+    { "corner; size", and "; open top" after it when a side is left open }
+    Parts := Value.Split([';']);
+    if Length(Parts) = 3 then
+    begin
+      W := Trim(Parts[2]);
+      if LowerCase(Copy(W, 1, 4)) <> 'open' then
+        Fail('"' + W + '" - after a box''s size only "open" and its sides: ; open top');
+      Open := ReadOpen(Copy(W, 5, MaxInt));
+      PlaceAndStep(Parts[0] + ';' + Parts[1], Corner, Size);
+    end
+    else PlaceAndStep(Value, Corner, Size);
+    MakeBox(Corner, Size, False, 0, Open);
     Inc(Cur);
     Exit;
   end;
@@ -1866,7 +1931,8 @@ begin
         if HasPaint then Paint := ReadColor(V);
       end
       else if Key = 'ink' then Ink := ReadColor(V)
-      else if Key = 'width' then Wd := Expr(V, P).V;
+      else if Key = 'width' then Wd := Expr(V, P).V
+      else if Key = 'open' then Open := ReadOpen(V);
     end;
     Inc(Cur);
   end;
@@ -1877,7 +1943,7 @@ begin
   WasInk := DefInk; WasWd := DefWidth;
   DefInk := Ink; DefWidth := Wd;
   try
-    MakeBox(Corner, Size, HasPaint, Paint);
+    MakeBox(Corner, Size, HasPaint, Paint, Open);
   finally
     DefInk := WasInk; DefWidth := WasWd;
   end;
@@ -2168,6 +2234,132 @@ end;
   solid, or one group's loose things.  A region that is already a face stays
   that face, a noface stays open, and the rest become faces turned as the tool
   would turn them and painted as their solid is. }
+{ A face typed without its lines gets them: a face is what its edges
+  enclose, here as on the sheet, and the program works loose faces out from
+  edges after every edit, so one with none is gone at the next.  A side
+  already drawn in the same solid and group, along a longer line, or on a
+  circle or an arc, is left alone. }
+procedure THeckReader.EdgeFaces(FirstNew: Integer);
+var
+  Have: TFPHashList;
+  I, K, H, N: Integer;
+  Lp: TP3Array;
+  Rounds: TIntArrayW;
+  Added: Boolean;
+  Lined: TFPHashList;     { the solids that came with lines of their own }
+
+  function KeyOf(const A, B: TP3; Grp, Part: Integer): shortstring;
+  var
+    P, Q: TP3;
+  begin
+    { either way round }
+    if (A.X < B.X) or ((A.X = B.X) and ((A.Y < B.Y) or ((A.Y = B.Y) and (A.Z <= B.Z)))) then
+    begin P := A; Q := B; end
+    else begin P := B; Q := A; end;
+    Result := Format('%d,%d,%d,%d,%d,%d|%d|%d', [Round(P.X * 1E6), Round(P.Y * 1E6), Round(P.Z * 1E6),
+      Round(Q.X * 1E6), Round(Q.Y * 1E6), Round(Q.Z * 1E6), Grp, Part]);
+  end;
+
+  function OnCircle(const A, B: TP3): Boolean;
+  var
+    J: Integer;
+  begin
+    for J := 0 to High(Rounds) do
+      if (Abs(Dist(D[Rounds[J]].C, A) - D[Rounds[J]].R) < 1E-6) and
+         (Abs(Dist(D[Rounds[J]].C, B) - D[Rounds[J]].R) < 1E-6) then
+        Exit(True);
+    Result := False;
+  end;
+
+  { P on the line L, between its ends }
+  function OnLine(const P: TP3; L: Integer): Boolean;
+  var
+    T, Len2: Double;
+    Q: TP3;
+  begin
+    Q := Sub3(D[L].B, D[L].A);
+    Len2 := Dot3(Q, Q);
+    if Len2 < 1E-18 then Exit(False);
+    T := Dot3(Sub3(P, D[L].A), Q) / Len2;
+    if (T < -1E-9) or (T > 1 + 1E-9) then Exit(False);
+    Result := Dist(P, Add3(D[L].A, Mul3(Q, T))) < 1E-6;
+  end;
+
+  { a side that is part of a longer line: a corner where another line meets it }
+  function AlongLine(const A, B: TP3; F: Integer): Boolean;
+  var
+    L: Integer;
+  begin
+    for L := 0 to D.Live - 1 do
+      if (D[L].Kind = ekLine) and (D[L].Grp = D[F].Grp) and (D[L].Part = D[F].Part) and
+         OnLine(A, L) and OnLine(B, L) then Exit(True);
+    Result := False;
+  end;
+
+  procedure Edge(const A, B: TP3; F: Integer);
+  begin
+    if SamePt(A, B, 1E-9) then Exit;
+    if Have.FindIndexOf(KeyOf(A, B, D[F].Grp, D[F].Part)) >= 0 then Exit;
+    if OnCircle(A, B) then Exit;
+    if AlongLine(A, B, F) then Exit;
+    Added := True;
+    D.AddLine(A, B, DefInk, DefWidth, False);
+    if D[F].Grp <> 0 then D.SetLineGroup(D.Live - 1, D[F].Grp);
+    D.SetPart(D.Live - 1, D[F].Part);
+    Have.Add(KeyOf(A, B, D[F].Grp, D[F].Part), Pointer(1));
+  end;
+
+begin
+  Have := TFPHashList.Create;
+  Lined := TFPHashList.Create;
+  try
+    SetLength(Rounds, 0);
+    for I := 0 to D.Live - 1 do
+      if (D[I].Kind = ekLine) and (D[I].Grp <> 0) and (Lined.FindIndexOf(IntToStr(D[I].Grp)) < 0) then
+        Lined.Add(IntToStr(D[I].Grp), Pointer(1));
+    for I := 0 to D.Live - 1 do
+      if D[I].Kind = ekLine then Have.Add(KeyOf(D[I].A, D[I].B, D[I].Grp, D[I].Part), Pointer(1))
+      else if D[I].Kind = ekArc then
+      begin
+        SetLength(Rounds, Length(Rounds) + 1);
+        Rounds[High(Rounds)] := I;
+      end;
+    N := D.Live;
+    for I := FirstNew to N - 1 do
+    begin
+      if D[I].Kind <> ekFace then Continue;
+      for H := -1 to High(D[I].Holes) do
+      begin
+        if H < 0 then Lp := D[I].Poly else Lp := D[I].Holes[H];
+        Added := False;
+        for K := 0 to High(Lp) do Edge(Lp[K], Lp[(K + 1) mod Length(Lp)], I);
+        if Added then
+        begin
+          if Length(Edged) < D.Live then SetLength(Edged, D.Live);
+          Edged[I] := True;
+          if (D[I].Grp <> 0) and (Lined.FindIndexOf(IntToStr(D[I].Grp)) < 0) and
+             ((Length(FacesGiven) = 0) or (FacesGiven[High(FacesGiven)] <> D[I].Grp)) then
+          begin
+            SetLength(FacesGiven, Length(FacesGiven) + 1);
+            FacesGiven[High(FacesGiven)] := D[I].Grp;
+          end;
+        end;
+        { a hole typed without its lines is an opening, not a face to fill }
+        if Added and (H >= 0) then
+        begin
+          SetLength(NoFaces, Length(NoFaces) + 1);
+          NoFaces[High(NoFaces)] := Copy(Lp);
+          SetLength(NoFaceGrp, Length(NoFaceGrp) + 1);
+          NoFaceGrp[High(NoFaceGrp)] := D[I].Grp;
+        end;
+      end;
+    end;
+  finally
+    Lined.Free;
+    Have.Free;
+  end;
+end;
+
 procedure THeckReader.ImplyFaces(FirstNew: Integer);
 type
   TKey = record Part, Grp: Integer; end;
@@ -2183,9 +2375,21 @@ var
   SolidAt, Hit, NHit: Integer;
   Faces: TLoopIndex;
   Cands: TIntArrayW;
+
+  function FaceSaid(G: Integer): Boolean;
+  var
+    J: Integer;
+  begin
+    for J := 0 to High(FacesGiven) do
+      if FacesGiven[J] = G then Exit(True);
+    Result := False;
+  end;
+
 begin
   SetLength(Implied, D.Live);
   for F := 0 to D.Live - 1 do Implied[F] := False;
+  SetLength(Closes, D.Live);
+  for F := 0 to D.Live - 1 do Closes[F] := False;
   Faces := TLoopIndex.Create;
   for F := FirstNew to D.Live - 1 do
     if D[F].Kind = ekFace then Faces.Add(D[F].Poly, F);
@@ -2239,8 +2443,11 @@ begin
         faces the way an implied one would. }
       if NHit = 1 then
       begin
+        if Length(Closes) < D.Live then SetLength(Closes, D.Live);
+        Closes[Hit] := True;
         ImpliedLoop(Regs[I], InSolid, Mid, Outer, Holes);
-        if Dot3(LoopNormal(Outer), D.FaceNormal(Hit)) > 0 then
+        if (Dot3(LoopNormal(Outer), D.FaceNormal(Hit)) > 0) and
+           not ((Hit <= High(Edged)) and Edged[Hit]) then
         begin
           if Length(Implied) < D.Live then SetLength(Implied, D.Live);
           Implied[Hit] := True;
@@ -2258,6 +2465,7 @@ begin
             Break;
           end;
       if Known then Continue;
+      if (Keys[K].Grp <> 0) and FaceSaid(Keys[K].Grp) then Continue;
       ImpliedLoop(Regs[I], InSolid, Mid, Outer, Holes);
       D.AddFaceRaw(Outer, DefInk, InSolid);
       F := D.Live - 1;
@@ -2283,6 +2491,30 @@ var
   F, S, J, C: Integer;
   Holes: TLoopIndex;
   Cands: TIntArrayW;
+
+  function WrittenOut(Face: Integer): Boolean;
+  var
+    K: Integer;
+  begin
+    for K := 0 to High(Explicit) do
+      if Explicit[K] = Face then Exit(True);
+    Result := False;
+  end;
+
+  { another solid's edges meet the disk: it is that solid's end too (a
+    cylinder pulled up from a circle drawn on a box), and faces its way }
+  function Shared(Face, G: Integer): Boolean;
+  var
+    K, L: Integer;
+  begin
+    for L := 0 to D.Live - 1 do
+      if (D[L].Kind = ekLine) and (D[L].Grp <> 0) and (D[L].Grp <> G) then
+        for K := 0 to High(D[Face].Poly) do
+          if SamePt(D[L].A, D[Face].Poly[K], 1E-6) or SamePt(D[L].B, D[Face].Poly[K], 1E-6) then
+            Exit(True);
+    Result := False;
+  end;
+
 begin
   Holes := TLoopIndex.Create;
   try
@@ -2301,6 +2533,21 @@ begin
           if SameLoopTol(D[S].Holes[J], D[F].Poly, 1E-4) then
           begin
             D.SetFaceGroup(F, D[S].Grp);
+            { a disk the reader made faces out of the solid with the face it
+              fills, not east, north or up as a loose face would; one written
+              out keeps the way it was written }
+            if Shared(F, D[S].Grp) then
+              { as it was }
+            else if not WrittenOut(F) then
+            begin
+              if Dot3(D.FaceNormal(F), D.FaceNormal(S)) < 0 then D.FlipFace(F);
+              { and is made of what that face is, as the tool leaves it }
+              if not D[F].MatSet and D[S].MatSet then D.SetMaterial(F, D[S].Mat);
+            end
+            { written out, it is what the reader would have made when it faces
+              the way that face does }
+            else if (F <= High(Closes)) and Closes[F] and (F <= High(Implied)) then
+              Implied[F] := Dot3(D.FaceNormal(F), D.FaceNormal(S)) > 0;
             Break;
           end;
         if D[F].Grp <> 0 then Break;
@@ -2323,6 +2570,7 @@ begin
   Things(0, False, 0);
   if Cur < Src.Count then Fail('there is an "end" here with nothing to close');
   D.TailNote := Carry;
+  EdgeFaces(FirstNew);
   T1 := GetTickCount64;
   if not AllSaid then ImplyFaces(FirstNew);
   T2 := GetTickCount64;

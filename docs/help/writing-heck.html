@@ -28,10 +28,14 @@ sheet 'Shop'
   box Bench = 0 east, 0 north, 0 up; 6' east, 2' north, 3' up
 end</pre>
 <p>The sheet's settings come first and are all optional: <code>units</code>,
-<code>scale</code>, <code>snap</code>, <code>view</code> (<code>plan</code>,
-<code>iso</code> or <code>3d</code>), <code>camera</code>, <code>cut</code>,
-and the sheet's own <code>ink</code>, <code>width</code> and
-<code>sides</code> - the defaults for everything on it.  Text pasted into
+<code>scale</code> and <code>snap</code> (in quotes, because they are names
+from the program's own lists: <code>'1/4"'</code>, <code>'1/16"'</code>),
+<code>view</code> (<code>plan</code>, <code>iso</code> or <code>3d</code>), and
+the sheet's own <code>ink</code>, <code>width</code> and <code>sides</code> -
+the defaults for everything on it.  The program also writes
+<code>camera</code> and <code>cut</code> there to remember the view; leave
+them out and it frames the drawing itself.  A <code>points</code> block at
+the sheet's top level only names places: it draws nothing.  Text pasted into
 <code>/source</code> without a header or a sheet is read as one sheet.</p>
 
 <h2 id="rule">The one rule</h2>
@@ -88,18 +92,23 @@ orange yellow green blue purple brown</code>.</li>
 <tr><td><code>mm</code>, <code>m</code></td><td><code>1200</code> <code>12.5</code> <code>1200mm</code> <code>1.2m</code></td></tr>
 </table>
 <ul>
-<li>A bare number is inches (millimeters on a metric sheet).  A whole number
-and a fraction together need their mark: <code>70 5/8"</code>.</li>
+<li>A bare number is inches on any feet-and-inches sheet, even
+<code>units = ft</code>, and millimeters on a metric one, even
+<code>units = m</code>.  A whole number and a fraction together need their
+mark: <code>70 5/8"</code>.</li>
 <li>Fractions go down to sixty-fourths.  Anything else is written as a
 decimal in full, <code>2.843721934"</code>, and never rounded to look
 friendlier than it is.</li>
 <li><b>Sums</b> go anywhere a length goes: <code>4' + 2"</code>,
 <code>(Width - 1') / 2</code>.  The program writes back the answer.</li>
-<li><b>Constants</b> name numbers for the sums below them:
+<li><b>Constants</b> name numbers for the sums below them, anywhere a length
+goes - <code>Width east</code>, <code>RU * 4 up</code>:
 <pre>const
   Width = 4'
   Gap = (Width - 1') / 2
-end</pre></li>
+end</pre>
+The program writes back the answers; the <code>const</code> block itself is
+not kept yet.</li>
 </ul>
 
 <h2 id="places">Places and steps</h2>
@@ -147,6 +156,11 @@ it faces:</p>
   end
 end
 face = ra1..ra24</pre>
+<p>A ring only names corners.  Its edge loop is a run of lines like any
+other - <code>line = ra1..ra24 ra1</code> goes round and back to the first.
+A <code>face</code> gets its edges drawn for it; a <code>noface</code> does
+not (it says which loop of lines is not a face, so the lines must be
+there).</p>
 <p><b><code>facing</code></b> is the way a flat thing looks:
 <code>up</code>, <code>down</code>, <code>east</code>, <code>west</code>,
 <code>north</code>, <code>south</code>; one that leans,
@@ -161,40 +175,52 @@ line.</p>
 default.</p>
 <table>
 <tr><th>Thing</th><th>One line</th><th>As a block</th></tr>
-<tr><td><code>line</code></td><td><code>line = a to b</code></td><td><code>points</code>; <code>ink</code>, <code>width</code>, <code>soft</code> (false - an edge of a curved surface, hidden but for the outline), <code>ref</code> (false - a reference line)</td></tr>
-<tr><td><code>circle</code></td><td><code>circle Hole = center; radius</code>, and <code>; facing</code> when it does not face up</td><td><code>center</code>, <code>radius</code>, <code>facing</code>; <code>starts</code> (0), <code>sides</code> (24), <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>line</code></td><td><code>line = a to b</code>, or <code>a to b to c</code> for a run of lines - a cable, a pipe route, a ring's edge loop</td><td><code>points</code>; <code>ink</code>, <code>width</code>, <code>soft</code> (false - an edge of a curved surface, hidden but for the outline), <code>ref</code> (false - a reference line).  What a block says holds for every line of its run.</td></tr>
+<tr><td><code>circle</code></td><td><code>circle Hole = center; radius</code>, and a third part, the way it faces, when that is not up: <code>circle Port = 0 east, 0 north, 1' up; 6"; north</code></td><td><code>center</code>, <code>radius</code>, <code>facing</code>; <code>starts</code> (0), <code>sides</code> (24), <code>ink</code>, <code>width</code></td></tr>
 <tr><td><code>arc</code></td><td>-</td><td><code>center</code>, <code>radius</code>, <code>facing</code>, <code>sweep</code>; <code>starts</code> (0), <code>sides</code>, <code>ink</code>, <code>width</code></td></tr>
-<tr><td><code>face</code></td><td><code>face = a b c d</code>, or <code>face = Hole</code> for the disk in a circle</td><td><code>points</code>, <code>hole</code> (as many as it has), <code>paint</code>, <code>ink</code></td></tr>
+<tr><td><code>face</code></td><td><code>face = a b c d</code>, or <code>face = Hole</code> for the disk in a circle (and <code>points = Hole</code> in a block, to paint it)</td><td><code>points</code>, <code>hole</code> (as many as it has), <code>paint</code>, <code>ink</code></td></tr>
 <tr><td><code>noface</code></td><td><code>noface = a b c d</code> - a loop of lines that is not a face</td><td>-</td></tr>
 <tr><td><code>rect</code></td><td><code>rect = corner; size</code> - two parts: <code>3' east, 2' north</code> lies flat, <code>3' east, 2' up</code> stands</td><td><code>at</code>, <code>size</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
-<tr><td><code>box</code></td><td><code>box = corner; size</code> - the low south-west corner and a three-part size</td><td><code>at</code>, <code>size</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
-<tr><td><code>pull</code></td><td><code>pull = outline; step</code> - <code>pull = Hole; 3' up</code> is a cylinder</td><td><code>points</code>, <code>by</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>box</code></td><td><code>box = corner; size</code> - the low south-west corner and a three-part size - and <code>; open top</code> for sides left open</td><td><code>at</code>, <code>size</code>; <code>open</code> (none - any of <code>top bottom east west north south</code>), <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>pull</code></td><td><code>pull = outline; step</code> - <code>pull = Hole; 3' up</code> is a cylinder</td><td><code>points</code> (corners, or a circle's name: <code>points = Hole</code>), <code>by</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
 <tr><td><code>solid</code></td><td>-</td><td><code>paint</code> first, then its <code>points</code>, faces, lines and bores</td></tr>
 <tr><td><code>bore</code></td><td>-</td><td>inside a solid: <code>points</code> (the opening), <code>goes</code> (a step through)</td></tr>
 <tr><td><code>group</code></td><td>-</td><td><code>locked</code> (false), <code>hidden</code> (false), <code>jig</code>, <code>data</code>, then everything in it</td></tr>
-<tr><td><code>note</code></td><td>-</td><td><code>at</code>, <code>text</code> (a line each, repeated); <code>to</code> (a leader's end), <code>size</code> (1), <code>ink</code></td></tr>
-<tr><td><code>dim</code></td><td>-</td><td><code>from</code>, <code>to</code>, <code>off</code> (a step); <code>label</code>, <code>ink</code></td></tr>
+<tr><td><code>note</code></td><td>-</td><td><code>at</code> (where the text is), <code>text</code> (a line each, repeated); <code>to</code> (where a leader from it points), <code>size</code> (1: a multiple of the normal text size), <code>ink</code> (its color)</td></tr>
+<tr><td><code>dim</code></td><td>-</td><td><code>from</code>, <code>to</code>, <code>off</code> (a step: how far and which way the dimension line stands off from the two points); <code>label</code> (text in place of the measured length), <code>ink</code></td></tr>
 <tr><td><code>guide</code></td><td><code>guide = place to place</code>, or one place for a guide point</td><td>-</td></tr>
 <tr><td><code>points</code>, <code>const</code></td><td>-</td><td>names, as above</td></tr>
 </table>
 
 <h2 id="faces">Faces</h2>
-<p><b>Faces are what closed lines become.</b>  Twelve lines that close a cube
-give you its six faces, so a plain face is never written.  Write a face only
+<p><b>Faces are what closed lines become</b>, and a face always has edges
+round it - as in SketchUp, there is no face without them.  Twelve lines that
+close a cube give you its six faces, so a plain face is never written.  Write a face only
 when something about it is not automatic: it is painted, it has a hole the
 lines would not cut, or it faces the other way.</p>
 <ul>
-<li>A face's outline goes round <b>anticlockwise seen from its front</b> -
-the side <code>paint</code> is on.  A <code>hole</code> goes the other way.
-In a solid, faces turn away from the solid's middle.</li>
+<li>A face you write goes round <b>anticlockwise seen from its front</b> -
+the side <code>paint</code> is on - and a <code>hole</code> the other way.
+A face the program makes from lines picks its own way: in a solid, out of
+the solid; a loose one toward east, north or up.  So in a solid you need
+only write the lines, and the faces come out facing out.</li>
+<li><b><code>open</code></b> on a box leaves sides off:
+<code>box Tray = 0 east, 0 north, 0 up; 3' east, 1' north, 10" up; open top</code>,
+or <code>open = top north</code> in a block.</li>
 <li><b><code>noface</code></b> is a loop of lines that is not a face: an
-open top, a window.  It is how you leave something open, instead of drawing
-a face and rubbing it out.</li>
+open top on anything that is not a box, a window.  It is how you leave
+something open, instead of drawing a face and rubbing it out.</li>
 <li><b>A circle on a face cuts it</b> into the face with a hole and a disk in
 the hole.  <code>noface = Hole</code> takes the disk away and leaves the
 opening.  A hole right through a solid is a <code>bore</code>.</li>
 <li><code>paint = none</code> on a face in a painted solid leaves that one
 face unpainted.</li>
+<li>A face typed without its lines is given them when it is read; a
+<code>hole</code> typed without lines stays an opening.  A solid written as
+its faces alone is taken as all of them: no other loop of the lines the
+reader draws becomes a face.  A solid with lines of its own works the
+usual way: write its lines, and a face only where it needs paint or a
+hole.</li>
 </ul>
 
 <h2 id="solids">Solids</h2>
@@ -220,7 +246,10 @@ end</pre>
 <code>box</code> is a rectangle pulled up; a <code>pull</code> is any flat
 outline - corners, or a circle by name - moved a step.  The program writes a
 solid back as a box or a pull while it still is exactly one, and as its
-corners and lines once it has been changed.</p>
+corners and lines once it has been changed.  A box with a side rubbed out on
+the sheet is still a box, written with <code>open</code>.  A solid that is
+exactly a box is written as one even if you wrote out its corners, and their
+names go with them.</p>
 
 <h2 id="groups">Groups</h2>
 <p>A <code>group</code> keeps a piece to itself: it is picked, moved, hidden
@@ -297,6 +326,10 @@ end</pre>
 end</pre>
 <p>An open tray on legs, built in groups, is on the
 <a href="heck.html#models">Heck page</a>.</p>
+<p><b>What there is not yet</b>: a statement for a turned or swept shape - an
+elbow, a dome, a sphere - and paint on a one-line thing.  A round solid with
+different ends is a <code>solid</code> of rings with lines between them; an
+elbow is two pulls meeting.</p>
 
 <h2 id="checklist">A checklist for writing a model</h2>
 <ol>
@@ -306,8 +339,8 @@ comment above it saying what it is.</li>
 <li><b>Name the corners</b> of a solid you write by hand; the names are kept,
 so a later change can say which corner it means.</li>
 <li><b>Lines, not faces.</b>  Faces come from closed lines.  Write a face
-only for paint, a hole, or a way round; use <code>noface</code> for what is
-open.</li>
+only for paint, a hole, or a way round; use <code>open</code> on a box and
+<code>noface</code> elsewhere for what is open.</li>
 <li><b>The shorthand where it fits</b>: <code>box</code> for blocks,
 <code>pull</code> for a profile pushed some distance, <code>circle</code>
 with <code>pull</code> for round things.</li>

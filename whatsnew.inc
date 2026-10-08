@@ -13,6 +13,29 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Open boxes.**  `box Tray = 0 east, 0 north, 0 up; 3'' east, 1'' north,' + LineEnding +
+    '  10" up; open top` - or `open = top north` in a block - leaves those sides' + LineEnding +
+    '  off.  A box with a side rubbed out on the sheet is written that way too.' + LineEnding +
+    '- **A run of lines in one statement**: `line Cable = a to b to c` - for a' + LineEnding +
+    '  cable or a pipe route - and it is written back that way.' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- Drawing anything could damage solids that touch each other in a group: a' + LineEnding +
+    '  box standing on another cut into it, and things resting on a face opened' + LineEnding +
+    '  holes in it.  Only what is drawn on a face cuts it now.' + LineEnding +
+    '- A face typed in the source without its lines vanished at the next edit.' + LineEnding +
+    '- A hole rubbed out of a circle on a box came back filled after a save.' + LineEnding +
+    '- A circle on the side of a box was written as a long list of corners.' + LineEnding +
+    '- A circle drawn on the end of a cylinder (a motor on a housing) turned the' + LineEnding +
+    '  cylinder into hundreds of lines of corners when saved.' + LineEnding +
+    '- A face always has its edges now, as in SketchUp: one written without' + LineEnding +
+    '  them gets them when read, so it can be seen, picked and pushed.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.07' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

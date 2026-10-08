@@ -1334,7 +1334,7 @@ implementation
 
 uses
   FileUtil, Clipbrd, LazUTF8, hsHelpDocs, hsHelpView, hsReportDialog, hsLongText, hsAbout,
-  hsFacts, hsText;
+  hsFacts, hsText, hsImpliedFaces;
 
 {$R *.lfm}
 

@@ -4045,6 +4045,10 @@ type
     { the paint carries across too, or a rebuild resets painted faces }
     Mat: TColor;
     MatSet: Boolean;
+    { and the name and comments the text gave it; the comments go to one
+      piece only, if it is cut in two }
+    Name, Note: string;
+    NoteGiven: Boolean;
   end;
 var
   R: TRegionArray;
@@ -4078,6 +4082,7 @@ var
   Cands, RCands: TIntArrayW;
   CI, RC: Integer;
   Tk: QWord;
+  Kept: TLoopArray;
   { which group each area was found in, side by side with R }
   RPart, Parts: TIntArrayW;
   RP: TRegionArray;
@@ -4095,6 +4100,36 @@ var
     if (T < -1E-6) or (T > 1 + 1E-6) then Exit(False);
     Q := P3(A.X + (B.X - A.X) * T, A.Y + (B.Y - A.Y) * T, A.Z + (B.Z - A.Z) * T);
     Result := Dist(P, Q) < 1E-6;
+  end;
+
+  { Every side of the loop lies along a line or circle of solid G or a loose
+    one in its group: it was drawn on G's face, not left by another solid
+    standing against it. }
+  function OwnLoop(const Lp: TP3Array; G, Part: Integer): Boolean;
+  var
+    K, L: Integer;
+    A, B: TP3;
+    Found: Boolean;
+  begin
+    Result := False;
+    for K := 0 to High(Lp) do
+    begin
+      A := Lp[K];
+      B := Lp[(K + 1) mod Length(Lp)];
+      Found := False;
+      for L := 0 to FD.Doc.Live - 1 do
+      begin
+        if (FD.Doc[L].Part <> Part) or ((FD.Doc[L].Grp <> 0) and (FD.Doc[L].Grp <> G)) then Continue;
+        if FD.Doc[L].Kind = ekLine then
+          Found := OnSegment(A, FD.Doc[L].A, FD.Doc[L].B) and OnSegment(B, FD.Doc[L].A, FD.Doc[L].B)
+        else if FD.Doc[L].Kind = ekArc then
+          Found := (Abs(Dist(A, FD.Doc[L].C) - FD.Doc[L].R) < 1E-6) and
+                   (Abs(Dist(B, FD.Doc[L].C) - FD.Doc[L].R) < 1E-6);
+        if Found then Break;
+      end;
+      if not Found then Exit;
+    end;
+    Result := True;
   end;
 
   { an end, and the group it is in: a solid's line in another group is not
@@ -4484,6 +4519,11 @@ begin
     end;
     if (Length(Pieces) < 2) or not Shares then Continue;
     if Abs(PiecesArea - FArea) > 1E-3 * (1 + FArea) then Continue;
+    { a box standing on another is not drawn on it }
+    Shares := True;
+    for I := 0 to High(Pieces) do
+      if Shares and not OwnLoop(R[Pieces[I]].Outer, FE.Grp, FE.Part) then Shares := False;
+    if not Shares then Continue;
 
     { replace it: the pieces become faces of the same solid }
     G := FD.Doc[J].Grp;
@@ -4522,6 +4562,9 @@ begin
       Was[NWas].Part := FD.Doc[I].Part;
       Was[NWas].Mat := FD.Doc[I].Mat;
       Was[NWas].MatSet := FD.Doc[I].MatSet;
+      Was[NWas].Name := FD.Doc[I].Name;
+      Was[NWas].Note := FD.Doc[I].Note;
+      Was[NWas].NoteGiven := False;
       Mid := P3(0, 0, 0);
       for K := 0 to High(Was[NWas].Poly) do
         Mid := Add3(Mid, Was[NWas].Poly[K]);
@@ -4651,7 +4694,25 @@ begin
       { The solid already has this face, but the area may have gained a hole
         (a rectangle drawn inside a column's side): hand the holes to the
         solid's face so the window opens. }
-      if DupAt >= 0 then FD.Doc.SetFaceHoles(DupAt, R[I].Holes);
+      if DupAt >= 0 then
+      begin
+        { the holes it has, and new ones drawn on it: another solid standing
+          on the face does not open it, but a circle drawn on it and pulled
+          out into a solid of its own leaves the hole it cut }
+        SetLength(Kept, 0);
+        for K := 0 to High(R[I].Holes) do
+        begin
+          Known := OwnLoop(R[I].Holes[K], FD.Doc[DupAt].Grp, FD.Doc[DupAt].Part);
+          for M := 0 to High(FD.Doc[DupAt].Holes) do
+            if not Known and SameLoopTol(FD.Doc[DupAt].Holes[M], R[I].Holes[K], 1E-4) then Known := True;
+          if Known then
+          begin
+            SetLength(Kept, Length(Kept) + 1);
+            Kept[High(Kept)] := R[I].Holes[K];
+          end;
+        end;
+        FD.Doc.SetFaceHoles(DupAt, Kept);
+      end;
       Continue;
     end;
 
@@ -4708,6 +4769,14 @@ begin
         FD.Doc.SetMaterial(FD.Doc.Live - 1, Was[WasHit].Mat);
       if Dot3(FD.Doc.FaceNormal(FD.Doc.Live - 1), Was[WasHit].Nm) < 0 then
         FD.Doc.FlipFace(FD.Doc.Live - 1);
+      if (Was[WasHit].Name <> '') or (Was[WasHit].Note <> '') then
+      begin
+        if Was[WasHit].NoteGiven then
+          FD.Doc.SetNaming(FD.Doc.Live - 1, Was[WasHit].Name, '')
+        else
+          FD.Doc.SetNaming(FD.Doc.Live - 1, Was[WasHit].Name, Was[WasHit].Note);
+        Was[WasHit].NoteGiven := True;
+      end;
     end;
     { and whatever is cut out of it }
     if Length(R[I].Holes) > 0 then

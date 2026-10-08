@@ -23,6 +23,9 @@ const
   HECK_COLOR_VALUES: array[0..9] of Integer = ($000000, $FFFFFF, $808080,
     $0000FF, $3CB0FF, $00FFFF, $008000, $FF0000, $800080, $2A2AA5);
 
+  { a box's sides, in the order the reader makes them; "open = top" names them }
+  BOX_SIDES: array[0..5] of string = ('bottom', 'top', 'south', 'east', 'north', 'west');
+
   { Sides of a circle when none are given: what the circle tool draws and
     what a one-line circle reads back with. }
   HECK_SIDES = 24;
@@ -1256,6 +1259,39 @@ var
     Put(Depth, 'end', I);
   end;
 
+  { Named lines joined end to end, as the reader makes them from
+    "line Cable = a to b to c": one statement again.  Chain is in order and
+    Poly its places. }
+  procedure PutChain(Depth: Integer; const Chain: TIntArrayW; const Poly: TP3Array);
+  var
+    I, K, Header: Integer;
+    It: TStringArray;
+    None: TPts;
+  begin
+    I := Chain[0];
+    SetLength(None, 0);
+    It := Items(None, Poly);
+    Header := NLine;
+    PutNote(Depth, D[I].Note, I);
+    if (D[I].Ink = DefInk) and (Abs(D[I].Weight - DefWidth) <= 1E-3) and
+       (not D[I].Soft) and (not D[I].Dim) then
+      PutList(Depth, 'line' + NameWord(D[I].Name), It, I, TailNote(D[I].Note))
+    else
+    begin
+      Put(Depth, 'line' + NameWord(D[I].Name) + TailNote(D[I].Note), I);
+      PutList(Depth + 1, 'points', It, I);
+      PutInk(Depth + 1, I);
+      if D[I].Soft then Put(Depth + 1, 'soft = true', I);
+      if D[I].Dim then Put(Depth + 1, 'ref = true', I);
+      Put(Depth, 'end', I);
+    end;
+    for K := 0 to High(Chain) do
+    begin
+      First[Chain[K]] := Header;
+      Last[Chain[K]] := NLine - 1;
+    end;
+  end;
+
   procedure PutOther(Depth, I: Integer);
   var
     Parts: TStringList;
@@ -1381,7 +1417,8 @@ var
         for F := 0 to High(Pts) do
           if SamePt(Pts[F].P, Lp[K], 1E-5) then begin Lp[K] := Pts[F].P; Break; end;
       end;
-      PutList(Depth, 'noface', Outline(Pts, Lp, Part_), -1);
+      { a loop that is no face has no way round: a circle by its name either way }
+      PutList(Depth, 'noface', Outline(Pts, Lp, Part_, True), -1);
     end;
   end;
 
@@ -1526,16 +1563,25 @@ var
     Result := N > 0;
   end;
 
+  { Is this solid exactly a box and nothing more?  Eight corners on two
+    heights, twelve ordinary edges, and a four-corner face facing out on
+    each side but those left open (Open, a bit per BOX_SIDES), with no
+    hole but a circle drawn on it; one paint or none. }
   function IsBox(Part_, G: Integer; out Lo, Hi: TP3; out HasPaint: Boolean; out Paint: TColor;
-    out Ink: TColor; out Wd: Single): Boolean;
+    out Ink: TColor; out Wd: Single; out Open: Integer): Boolean;
+  const
+    FACINGS: array[0..5] of string = ('down', 'up', 'south', 'east', 'north', 'west');
   var
-    I, K, NF, NL, NPaint: Integer;
+    I, K, NF, NL, NPaint, Side, Have: Integer;
     Pts: TPts;
-    Nm: TP3;
+    W: string;
+    OnSide: Boolean;
+    Sides: array[0..5] of Integer;
   begin
     Result := False;
+    Open := 0;
     SetLength(Pts, 0);
-    NF := 0; NL := 0; NPaint := 0;
+    NF := 0; NL := 0; NPaint := 0; Have := 0;
     HasPaint := False; Paint := 0;
     if not OnePen(Part_, G, Ink, Wd) then Exit;
     for I := 0 to D.Live - 1 do
@@ -1551,8 +1597,12 @@ var
               still a box, and the circle is written on its own }
             for K := 0 to High(D[I].Holes) do
               if CircleNamed(D[I].Holes[K], Part_) = '' then Exit;
-            if FacingWord(D.FaceNormal(I)) = '' then Exit;
-            for K := 0 to 3 do AddPt(Pts, D[I].Poly[K]);
+            W := FacingWord(D.FaceNormal(I));
+            Side := High(FACINGS);
+            while (Side >= 0) and (FACINGS[Side] <> W) do Dec(Side);
+            if (Side < 0) or (Have and (1 shl Side) <> 0) then Exit;
+            Have := Have or (1 shl Side);
+            Sides[Side] := I;
             if D[I].MatSet then
             begin
               if (NPaint > 0) and (D[I].Mat <> Paint) then Exit;
@@ -1565,13 +1615,15 @@ var
             Inc(NL);
             if D[I].Soft or D[I].Dim then Exit;
             if AxesUsed(Sub3(D[I].B, D[I].A)) <> 1 then Exit;
+            AddPt(Pts, D[I].A);
+            AddPt(Pts, D[I].B);
           end;
         ekBore: Exit;
       end;
     end;
-    if (NF <> 6) or (NL <> 12) or (Length(Pts) <> 8) then Exit;
-    if (NPaint <> 0) and (NPaint <> 6) then Exit;
-    HasPaint := NPaint = 6;
+    if (NF < 1) or (NL <> 12) or (Length(Pts) <> 8) then Exit;
+    if (NPaint <> 0) and (NPaint <> NF) then Exit;
+    HasPaint := NPaint = NF;
     Lo := Pts[0].P; Hi := Pts[0].P;
     for I := 1 to 7 do
     begin
@@ -1584,7 +1636,43 @@ var
          not ((Abs(Pts[I].P.Y - Lo.Y) < 1E-9) or (Abs(Pts[I].P.Y - Hi.Y) < 1E-9)) or
          not ((Abs(Pts[I].P.Z - Lo.Z) < 1E-9) or (Abs(Pts[I].P.Z - Hi.Z) < 1E-9)) then Exit;
     if (Hi.X - Lo.X < 1E-9) or (Hi.Y - Lo.Y < 1E-9) or (Hi.Z - Lo.Z < 1E-9) then Exit;
+    { each face on its own side, facing out }
+    for Side := 0 to 5 do
+    begin
+      if Have and (1 shl Side) = 0 then
+      begin
+        Open := Open or (1 shl Side);
+        Continue;
+      end;
+      for K := 0 to 3 do
+      begin
+        case Side of
+          0: OnSide := Abs(D[Sides[Side]].Poly[K].Z - Lo.Z) < 1E-9;
+          1: OnSide := Abs(D[Sides[Side]].Poly[K].Z - Hi.Z) < 1E-9;
+          2: OnSide := Abs(D[Sides[Side]].Poly[K].Y - Lo.Y) < 1E-9;
+          3: OnSide := Abs(D[Sides[Side]].Poly[K].X - Hi.X) < 1E-9;
+          4: OnSide := Abs(D[Sides[Side]].Poly[K].Y - Hi.Y) < 1E-9;
+        else
+          OnSide := Abs(D[Sides[Side]].Poly[K].X - Lo.X) < 1E-9;
+        end;
+        if not OnSide then Exit;
+      end;
+    end;
     Result := True;
+  end;
+
+  { the open sides as words, "top north" }
+  function OpenWords(Open: Integer): string;
+  var
+    K: Integer;
+  begin
+    Result := '';
+    for K := 0 to High(BOX_SIDES) do
+      if Open and (1 shl K) <> 0 then
+      begin
+        if Result <> '' then Result := Result + ' ';
+        Result := Result + BOX_SIDES[K];
+      end;
   end;
 
   { the pen of a fold's lines, when it is not the sheet's }
@@ -1600,7 +1688,7 @@ var
   end;
 
   procedure PutBox(Depth, Part_, G: Integer; const Lo, Hi: TP3; HasPaint: Boolean; Paint: TColor;
-    Ink: TColor; Wd: Single);
+    Ink: TColor; Wd: Single; Open: Integer);
   var
     I, Header: Integer;
     NoPts: TPts;
@@ -1614,10 +1702,14 @@ var
       Put(Depth, 'box' + NameWord(Nm) + TailNote(Note), -1);
       Put(Depth + 1, 'at   = ' + Place2(Lo, U, False), -1);
       Put(Depth + 1, 'size = ' + Place2(Sub3(Hi, Lo), U, True), -1);
+      if Open <> 0 then Put(Depth + 1, 'open = ' + OpenWords(Open), -1);
       if HasPaint then Put(Depth + 1, 'paint = ' + Color2(Paint), -1);
       PutPen(Depth + 1, Ink, Wd);
       Put(Depth, 'end', -1);
     end
+    else if Open <> 0 then
+      Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) +
+        '; open ' + OpenWords(Open) + TailNote(Note), -1)
     else
       Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) +
         TailNote(Note), -1);
@@ -1642,6 +1734,8 @@ var
         end
         else
           PutFace(Depth, I, NoPts, HasPaint, Paint);
+    { and a disk rubbed out of a circle on it, or the loop would close again }
+    PutNoFaces(Depth, NoPts, Part_, G);
   end;
 
   { A pull: a flat outline moved some distance, what push/pull makes of a
@@ -1687,7 +1781,11 @@ var
       case D[I].Kind of
         ekFace:
           begin
-            if (Length(D[I].Holes) > 0) or (D[I].Ink <> DefInk) then Exit;
+            if D[I].Ink <> DefInk then Exit;
+            { a circle drawn on an end (a motor on a housing) is written on
+              its own and cuts the end again when read, as on a box }
+            for K := 0 to High(D[I].Holes) do
+              if CircleNamed(D[I].Holes[K], Part_) = '' then Exit;
             SetLength(Faces, Length(Faces) + 1);
             Faces[High(Faces)] := I;
             if D[I].MatSet then
@@ -1891,6 +1989,7 @@ var
         First[I] := Header;
         Last[I] := NLine - 1;
       end;
+    PutNoFaces(Depth, NoPts, Part_, G);
   end;
 
   { One solid: its corners once, its faces, and only unusual edges; the rest
@@ -2010,21 +2109,59 @@ var
   { everything in one group (Part_ 0 is the sheet), then the groups inside it }
   procedure PutLevel(Depth, Part_: Integer);
   var
-    I, J, G, LinesFrom, PBottom, RFace, Header: Integer;
+    I, J, G, LinesFrom, PBottom, RFace, Header, BOpen: Integer;
     Done: array of Integer;
     Seen, BPaintOn, PRound: Boolean;
     None: TPts;
     BLo, BHi, PBy, RLo, RSize: TP3;
     BPaint, PInk: TColor;
     PWd: Single;
-    Implied, RectDone, RectAt: array of Boolean;
-    RLines: TIntArrayW;
+    Implied, RectDone, RectAt, ChainDone: array of Boolean;
+    RLines, Chain: TIntArrayW;
+    ChainPoly: TP3Array;
+
+    { the named loose lines that carry on from line I, end to end, in the
+      same pen }
+    procedure FindChain(I: Integer);
+    var
+      K: Integer;
+      Tip: TP3;
+      More: Boolean;
+    begin
+      SetLength(Chain, 1);
+      Chain[0] := I;
+      SetLength(ChainPoly, 2);
+      ChainPoly[0] := D[I].A;
+      ChainPoly[1] := D[I].B;
+      Tip := D[I].B;
+      repeat
+        More := False;
+        for K := I + 1 to D.Live - 1 do
+          if (D[K].Kind = ekLine) and not ChainDone[K] and not RectDone[K] and (D[K].Part = Part_) and
+             (D[K].Grp = 0) and (D[K].Name = D[I].Name) and (D[K].Ink = D[I].Ink) and
+             (Abs(D[K].Weight - D[I].Weight) <= 1E-3) and (D[K].Soft = D[I].Soft) and
+             (D[K].Dim = D[I].Dim) and (SameP(D[K].A, Tip) or SameP(D[K].B, Tip)) then
+          begin
+            if SameP(D[K].A, Tip) then Tip := D[K].B else Tip := D[K].A;
+            ChainDone[K] := True;
+            SetLength(Chain, Length(Chain) + 1);
+            Chain[High(Chain)] := K;
+            SetLength(ChainPoly, Length(ChainPoly) + 1);
+            ChainPoly[High(ChainPoly)] := Tip;
+            More := True;
+            Break;
+          end;
+      until not More;
+    end;
+
   begin
     SetLength(None, 0);
     SetLength(Done, 0);
     SetLength(Implied, D.Live);
     SetLength(RectDone, D.Live);
     for I := 0 to D.Live - 1 do RectDone[I] := False;
+    SetLength(ChainDone, D.Live);
+    for I := 0 to D.Live - 1 do ChainDone[I] := False;
     { Rectangles first, so a face met before its lines is known to be one;
       each is written where its first line falls. }
     SetLength(RectAt, D.Live);
@@ -2058,8 +2195,8 @@ var
         if Seen then Continue;
         SetLength(Done, Length(Done) + 1);
         Done[High(Done)] := G;
-        if IsBox(Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd) then
-          PutBox(Depth, Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd)
+        if IsBox(Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen) then
+          PutBox(Depth, Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen)
         else if IsPull(Part_, G, PBottom, PBy, PRound, BPaintOn, BPaint, PInk, PWd) then
           PutPull(Depth, Part_, G, PBottom, PBy, PRound, BPaintOn, BPaint, PInk, PWd)
         else
@@ -2067,6 +2204,7 @@ var
         Continue;
       end;
       if RectDone[I] and not RectAt[I] then Continue;
+      if ChainDone[I] then Continue;
       case D[I].Kind of
         ekFace:
           begin
@@ -2103,7 +2241,9 @@ var
           else
           begin
             if LinesFrom < 0 then LinesFrom := NLine;
-            PutLine(Depth, I, None);
+            if D[I].Name <> '' then FindChain(I) else SetLength(Chain, 1);
+            if Length(Chain) > 1 then PutChain(Depth, Chain, ChainPoly)
+            else PutLine(Depth, I, None);
           end;
       else
         PutOther(Depth, I);

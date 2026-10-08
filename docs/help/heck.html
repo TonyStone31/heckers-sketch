@@ -77,7 +77,7 @@ are allowed - <code>4' + 2"</code>, <code>(Width - 1') / 2</code> - and a
 <tr><td><code>line</code></td><td><code>line = a to b</code></td><td><code>points</code>; <code>ink</code>, <code>width</code>, <code>soft</code></td></tr>
 <tr><td><code>circle</code></td><td><code>circle c1 = 2' east, 2' north, 0 up; 1'</code> - and <code>; north</code> when it does not face up</td><td><code>center</code>, <code>radius</code>, <code>facing</code>; <code>starts</code>, <code>sides</code></td></tr>
 <tr><td><code>arc</code></td><td>-</td><td><code>center</code>, <code>radius</code>, <code>facing</code>, <code>sweep</code></td></tr>
-<tr><td><code>box</code></td><td><code>box = corner; size</code></td><td><code>at</code>, <code>size</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>box</code></td><td><code>box = corner; size</code>, and <code>; open top</code> for a side left open</td><td><code>at</code>, <code>size</code>; <code>open</code>, <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
 <tr><td><code>rect</code></td><td><code>rect = corner; size with two parts</code></td><td>the same</td></tr>
 <tr><td><code>pull</code></td><td><code>pull = outline; how far</code> - <code>pull = c1; 2' up</code> is a cylinder</td><td><code>points</code>, <code>by</code>; <code>paint</code></td></tr>
 <tr><td><code>face</code></td><td><code>face = a b c d</code>, or <code>face = c1</code> for the disk in a circle</td><td><code>points</code>, <code>hole</code>, <code>paint</code></td></tr>
@@ -149,7 +149,8 @@ whole, and its geometry never joins its neighbor's.</li>
 saying what it is.  Picking a thing on the sheet lights up its lines in the
 source window, notes included.</li>
 <li><b>No faces you did not mean.</b>  Faces come from closed lines, so
-an open top is a <code>noface</code>, not a face rubbed out afterwards.</li>
+an open box is <code>open = top</code>, and any other opening a
+<code>noface</code> - not a face rubbed out afterwards.</li>
 <li><b>The shorthand where it fits</b>: <code>box</code> for blocks,
 <code>pull</code> for a profile pushed some distance, <code>circle</code>
 and <code>pull = Hole; 2' up</code> for round things.</li>
@@ -158,31 +159,11 @@ and <code>pull = Hole; 2' up</code> for round things.</li>
 group 'Planter'
   group 'Tray'
     // open at the top
-    solid Tray
+    box Tray
+      at = 0 east, 0 north, 1' up
+      size = 3' east, 1' north, 10" up
+      open = top
       paint = brown
-      points
-        a = 0 east, 0 north, 1' up
-        b = a + 3' east
-        c = b + 1' north
-        d = a + 1' north
-        e = a + 10" up
-        f = b + 10" up
-        g = c + 10" up
-        h = d + 10" up
-      end
-      line = a to b
-      line = b to c
-      line = c to d
-      line = d to a
-      line = e to f
-      line = f to g
-      line = g to h
-      line = h to e
-      line = a to e
-      line = b to f
-      line = c to g
-      line = d to h
-      noface = e f g h
     end
   end
   group 'Legs'
@@ -192,8 +173,9 @@ group 'Planter'
     box LegNW = 0 east, 10" north, 0 up; 2" east, 2" north, 1' up
   end
 end</pre>
-<p>The twelve lines of the tray close six loops; five become its bottom
-and sides, and <code>noface</code> keeps the sixth open.</p>
+<p><code>open = top</code> leaves the tray its bottom and four sides.  A
+shape that is not a box is left open the same way with <code>noface</code>
+and the corners of the loop that is not to be a face.</p>
 
 <h2 id="pick">Picking points from the sheet</h2>
 <p>Press <b>Pick</b> and the sheet becomes a point picker: each click,

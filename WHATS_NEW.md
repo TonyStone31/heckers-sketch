@@ -10,6 +10,29 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **Open boxes.**  `box Tray = 0 east, 0 north, 0 up; 3' east, 1' north,
+  10" up; open top` - or `open = top north` in a block - leaves those sides
+  off.  A box with a side rubbed out on the sheet is written that way too.
+- **A run of lines in one statement**: `line Cable = a to b to c` - for a
+  cable or a pipe route - and it is written back that way.
+
+### Fixed
+
+- Drawing anything could damage solids that touch each other in a group: a
+  box standing on another cut into it, and things resting on a face opened
+  holes in it.  Only what is drawn on a face cuts it now.
+- A face typed in the source without its lines vanished at the next edit.
+- A hole rubbed out of a circle on a box came back filled after a save.
+- A circle on the side of a box was written as a long list of corners.
+- A circle drawn on the end of a cylinder (a motor on a housing) turned the
+  cylinder into hundreds of lines of corners when saved.
+- A face always has its edges now, as in SketchUp: one written without
+  them gets them when read, so it can be seen, picked and pushed.
+
 ## v2026.10.07
 
 ### New
