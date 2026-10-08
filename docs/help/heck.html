@@ -67,7 +67,8 @@ can be said from another: <code>b = a + 4' east</code>, or in a list,
 <h2 id="lengths">Lengths</h2>
 <p>Written the way a tradesman says them: <code>4'</code>,
 <code>2 1/2"</code>, <code>1' 6"</code>, <code>1200mm</code>,
-<code>1.2m</code>.  A number with no mark is in the sheet's units.  Sums
+<code>1.2m</code>.  A number with no mark is inches on a feet-and-inches
+sheet and millimeters on a metric one.  Sums
 are allowed - <code>4' + 2"</code>, <code>(Width - 1') / 2</code> - and a
 <code>const</code> block names numbers: <code>Width = 4'</code>.</p>
 
@@ -82,6 +83,7 @@ are allowed - <code>4' + 2"</code>, <code>(Width - 1') / 2</code> - and a
 <tr><td><code>pull</code></td><td><code>pull = outline; how far</code> - <code>pull = c1; 2' up</code> is a cylinder</td><td><code>points</code>, <code>by</code>; <code>paint</code></td></tr>
 <tr><td><code>face</code></td><td><code>face = a b c d</code>, or <code>face = c1</code> for the disk in a circle</td><td><code>points</code>, <code>hole</code>, <code>paint</code></td></tr>
 <tr><td><code>noface</code></td><td><code>noface = a b c d</code> - lines that close, and are not a face</td><td>-</td></tr>
+<tr><td><code>loft</code></td><td><code>loft = Big; Small</code> - through outlines in order: a cone, a body, a transition</td><td><code>through</code>; <code>open</code>, <code>paint</code></td></tr>
 <tr><td><code>solid</code></td><td>-</td><td><code>paint</code>, then its <code>points</code>, lines and faces</td></tr>
 <tr><td><code>group</code></td><td>-</td><td><code>locked</code>, <code>hidden</code>, <code>jig</code>, <code>data</code>, and everything inside it</td></tr>
 <tr><td><code>guide</code></td><td><code>guide = a to b</code>, or one place</td><td>-</td></tr>

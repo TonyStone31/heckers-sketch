@@ -109,6 +109,9 @@ type
       lines the reader drew: those faces are all of it, and no loop of the
       new lines (a ring round a ball's middle) is made a face }
     FacesGiven: array of Integer;
+    { lofts read, their statement as it will be written back; FinishLofts
+      gives each its fingerprint once everything is read }
+    Lofts: array of record G: Integer; Said: string; end;
     procedure Fail(const Msg: string);
     procedure NoteSolid(G: Integer; HasPaint: Boolean; Paint: TColor);
     procedure ImplyFaces(FirstNew: Integer);
@@ -149,6 +152,8 @@ type
     procedure DoConst;
     procedure DoCircle(const Name: string; IsArc: Boolean; const Value: string = ''; Solid: Integer = 0);
     procedure DoPull(const Value: string; Block: Boolean);
+    procedure DoLoft(const Value: string; Block: Boolean);
+    procedure FinishLofts;
     procedure DoFace(const Value: string; Block: Boolean; Solid: Integer;
       HasPaint: Boolean; Paint: TColor);
     procedure DoLine(const Value: string; Block: Boolean; Solid: Integer);
@@ -373,7 +378,7 @@ begin
     Exit;
   end;
   Nm := Unquote(Rest);
-  if (Kind = 'solid') or (Kind = 'box') or (Kind = 'pull') then
+  if (Kind = 'solid') or (Kind = 'box') or (Kind = 'pull') or (Kind = 'loft') then
   begin
     G := D[Start].Grp;
     for K := Start to D.Live - 1 do
@@ -1185,6 +1190,7 @@ begin
       else if Kind = 'circle' then DoCircle(Rest, False, '', Solid)
       else if Kind = 'arc' then DoCircle(Rest, True, '', Solid)
       else if Kind = 'pull' then DoPull('', True)
+      else if Kind = 'loft' then DoLoft('', True)
       else if Kind = 'face' then DoFace('', True, Solid, HasPaint, Paint)
       else if Kind = 'line' then DoLine('', True, Solid)
       else if Kind = 'solid' then DoSolid
@@ -1235,6 +1241,12 @@ begin
       NoFaceGrp[High(NoFaceGrp)] := Solid;
       Attach(Here, Start, '', '', Before);
       Inc(Cur);
+      Continue;
+    end
+    else if Kind = 'loft' then
+    begin
+      DoLoft(Value, False);
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'box' then
@@ -1956,6 +1968,318 @@ end;
   It expands to edges only (bottom, top, an upright at each corner, soft
   around a circle) in a solid of its own; the faces come from the edges.
   A pulled circle's arc joins the solid, as when the tool pulls a disk. }
+{ "loft = A; B; C": outlines with the same number of corners, each a
+  circle by name or a list of corners, joined corner to corner in the order
+  given - a cone, a reducer, a tapered body, a duct transition.  The ends are
+  capped unless "open" says otherwise.  A side that is not flat is two
+  triangles.  A named circle's ring becomes the loft's own edge, as a pull's
+  does; between round outlines the lengthwise edges are soft. }
+procedure THeckReader.DoLoft(const Value: string; Block: Boolean);
+var
+  Key, V, Through, OpenText, W, Said, Exact: string;
+  Parts: TStringArray;
+  Outs: array of TLoop;
+  Tips: array of Boolean;
+  Arcs: TIntArrayW;
+  HasPaint, Round_, OpenStart, OpenEnd, Fwd: Boolean;
+  Paint, Ink: TColor;
+  Wd: Single;
+  P, I, J, K, N, M, G, Start: Integer;
+  Q: TLoop;
+  D0, Nm: TP3;
+
+  function Centroid(const L: TLoop): TP3;
+  var
+    C: Integer;
+  begin
+    Result := P3(0, 0, 0);
+    for C := 0 to High(L) do Result := Add3(Result, L[C]);
+    Result := Mul3(Result, 1 / Length(L));
+  end;
+
+  { the circle whose ring this outline is, or -1 }
+  function ArcOf(const Lp: TLoop): Integer;
+  var
+    C: Integer;
+    Nrm: TP3;
+  begin
+    for C := D.Live - 1 downto 0 do
+      if (D[C].Kind = ekArc) and FullCircle(D[C].Sweep) and
+         (Abs(Dist(D[C].C, Lp[0]) - D[C].R) < 1E-6) and
+         (Abs(Dist(D[C].C, Lp[Length(Lp) div 2]) - D[C].R) < 1E-6) then
+      begin
+        case D[C].Plane of
+          plXY: Nrm := P3(0, 0, 1);
+          plXZ: Nrm := P3(0, 1, 0);
+          plYZ: Nrm := P3(1, 0, 0);
+        else
+          Nrm := D[C].Nm;
+        end;
+        if (Abs(Dot3(Sub3(Lp[0], D[C].C), Nrm)) < 1E-6) and
+           (Abs(Dot3(Sub3(Lp[Length(Lp) div 4], D[C].C), Nrm)) < 1E-6) then Exit(C);
+      end;
+    Result := -1;
+  end;
+
+  procedure Edge(const A, B: TP3; Soft: Boolean);
+  begin
+    if SamePt(A, B, 1E-9) then Exit;
+    D.AddLine(A, B, Ink, Wd, False);
+    D.SetLineGroup(D.Live - 1, G);
+    if Soft then D.SetSoft(D.Live - 1, True);
+  end;
+
+  procedure Face(const F: array of TP3);
+  var
+    L: TLoop;
+    C: Integer;
+  begin
+    { a corner where two outlines meet at a point (a cone's tip) is one }
+    SetLength(L, 0);
+    for C := 0 to High(F) do
+      if (Length(L) = 0) or not SamePt(L[High(L)], F[C], 1E-9) then
+      begin
+        SetLength(L, Length(L) + 1);
+        L[High(L)] := F[C];
+      end;
+    if (Length(L) > 1) and SamePt(L[0], L[High(L)], 1E-9) then SetLength(L, Length(L) - 1);
+    if Length(L) < 3 then Exit;
+    D.AddFaceRaw(L, Ink, True);
+    D.SetFaceGroup(D.Live - 1, G);
+    if HasPaint then D.SetMaterial(D.Live - 1, Paint);
+  end;
+
+  { off its plane by more than a hair: then two triangles }
+  function Flat(const A, B, C, E: TP3): Boolean;
+  var
+    Nn: TP3;
+    L: Double;
+  begin
+    Nn := Cross3(Sub3(B, A), Sub3(C, A));
+    L := Len3(Nn);
+    if L < 1E-12 then Exit(True);
+    Result := Abs(Dot3(Sub3(E, A), Nn)) / L < 1E-7;
+  end;
+
+  procedure NoFace(const L: TLoop);
+  begin
+    SetLength(NoFaces, Length(NoFaces) + 1);
+    NoFaces[High(NoFaces)] := Copy(L);
+    SetLength(NoFaceGrp, Length(NoFaceGrp) + 1);
+    NoFaceGrp[High(NoFaceGrp)] := G;
+  end;
+
+begin
+  Through := '';
+  OpenText := '';
+  HasPaint := False;
+  Paint := 0;
+  Ink := DefInk;
+  Wd := DefWidth;
+  { a points block inside the loft names its corners for it alone }
+  PushScope;
+  try
+  if not Block then
+  begin
+    Through := Value;
+    Inc(Cur);
+  end
+  else
+  begin
+    Inc(Cur);
+    while (Cur < Src.Count) and (LowerCase(Src[Cur]) <> 'end') do
+    begin
+      if LowerCase(Src[Cur]) = 'points' then
+      begin
+        DoPoints;
+        Continue;
+      end;
+      if SplitProp(Src[Cur], Key, V) then
+      begin
+        if Key = 'through' then Through := V
+        else if Key = 'open' then OpenText := V
+        else if Key = 'paint' then
+        begin
+          HasPaint := LowerCase(Trim(V)) <> 'none';
+          if HasPaint then Paint := ReadColor(V);
+        end
+        else if Key = 'ink' then Ink := ReadColor(V)
+        else if Key = 'width' then begin P := 1; Wd := Expr(V, P).V; end;
+      end;
+      Inc(Cur);
+    end;
+    if Cur >= Src.Count then Fail('the loft is never closed: an "end" is missing');
+    Inc(Cur);
+  end;
+  { the one-line form may end "; open start" }
+  Parts := Through.Split([';']);
+  if (Length(Parts) > 0) and (LowerCase(Copy(Trim(Parts[High(Parts)]), 1, 4)) = 'open') then
+  begin
+    OpenText := Copy(Trim(Parts[High(Parts)]), 5, MaxInt);
+    SetLength(Parts, Length(Parts) - 1);
+  end;
+  if Length(Parts) < 2 then Fail('a loft goes through two outlines or more: loft = Big; Small');
+  OpenStart := False;
+  OpenEnd := False;
+  for W in LowerCase(StringReplace(OpenText, ',', ' ', [rfReplaceAll])).Split([' '], TStringSplitOptions.ExcludeEmpty) do
+    if W = 'start' then OpenStart := True
+    else if W = 'end' then OpenEnd := True
+    else if W = 'ends' then begin OpenStart := True; OpenEnd := True; end
+    else Fail('"' + W + '" - a loft is open at its start, its end, or both ends');
+  SetLength(Outs, Length(Parts));
+  SetLength(Arcs, Length(Parts));
+  Said := '';
+  Exact := '';
+  Round_ := True;
+  for I := 0 to High(Parts) do
+  begin
+    Outs[I] := ReadList(Trim(Parts[I]));
+    if Length(Outs[I]) = 2 then
+      Fail('a loft''s outline wants three corners or more, a circle''s name, or one point for a tip');
+    Arcs[I] := -1;
+    W := Trim(Parts[I]);
+    if (Length(Outs[I]) >= 3) and (Pos(' ', W) = 0) and (Pos(',', W) = 0) then Arcs[I] := ArcOf(Outs[I]);
+    if (Arcs[I] < 0) and (Length(Outs[I]) > 1) then Round_ := False;
+    { as it will be written back: a circle by its name, else its places;
+      and the places exactly, for the writer to give their names back }
+    if I > 0 then begin Said := Said + '; '; Exact := Exact + ';'; end;
+    if Arcs[I] < 0 then
+      for K := 0 to High(Outs[I]) do
+      begin
+        if K > 0 then Exact := Exact + ' ';
+        Exact := Exact + FloatToStrF(Outs[I][K].X, ffGeneral, 17, 0, DotFS) + ',' +
+          FloatToStrF(Outs[I][K].Y, ffGeneral, 17, 0, DotFS) + ',' +
+          FloatToStrF(Outs[I][K].Z, ffGeneral, 17, 0, DotFS);
+      end;
+    if Arcs[I] >= 0 then Said := Said + W
+    else
+      for K := 0 to High(Outs[I]) do
+      begin
+        if K > 0 then Said := Said + ' to ';
+        Said := Said + Place2(Outs[I][K], U, False);
+      end;
+  end;
+  if OpenStart then Said := Said + #1 + 'start';
+  if OpenEnd then if OpenStart then Said := Said + ' end' else Said := Said + #1 + 'end';
+  M := Length(Outs);
+  N := 0;
+  for I := 0 to M - 1 do
+    if Length(Outs[I]) > 1 then
+      if N = 0 then N := Length(Outs[I])
+      else if Length(Outs[I]) <> N then
+        Fail(Format('every outline of a loft has as many corners: %d here, %d in the first',
+          [Length(Outs[I]), N]));
+  { a tip is one point, met by every corner of the outline beside it }
+  SetLength(Tips, M);
+  for I := 0 to M - 1 do
+  begin
+    Tips[I] := Length(Outs[I]) = 1;
+    if not Tips[I] then Continue;
+    if (I > 0) and (I < M - 1) then Fail('a tip, one point, is a loft''s first outline or its last');
+    if (M = 2) and Tips[1 - I] then Fail('a loft from a point to a point encloses nothing');
+    D0 := Outs[I][0];
+    SetLength(Outs[I], N);
+    for K := 0 to N - 1 do Outs[I][K] := D0;
+  end;
+  { two outlines in one plane enclose nothing }
+  for I := 0 to M - 2 do
+  begin
+    if Tips[I] then J := I + 1 else J := I;
+    Nm := LoopNormal(Outs[J]);
+    if Len3(Nm) < 1E-12 then Fail('a loft''s outline is not flat: its corners lie on a line');
+    Nm := Mul3(Nm, 1 / Len3(Nm));
+    P := J;
+    if J = I then J := I + 1 else J := I;
+    K := 0;
+    for G := 0 to N - 1 do
+      if Abs(Dot3(Sub3(Outs[J][G], Outs[P][0]), Nm)) > 1E-9 then Inc(K);
+    if K = 0 then Fail(Format('outlines %d and %d of the loft lie in one plane: a loft goes from one to the next across space', [I + 1, I + 2]));
+  end;
+  G := D.NewGroup;
+  Start := D.Live;
+  NoteSolid(G, HasPaint, Paint);
+  { each outline's edges: a circle's own ring, or its lines }
+  for I := 0 to M - 1 do
+    if Arcs[I] >= 0 then
+    begin
+      if D[Arcs[I]].Grp = 0 then D.SetGroup(Arcs[I], G);
+    end
+    else
+      for K := 0 to N - 1 do Edge(Outs[I][K], Outs[I][(K + 1) mod N], False);
+  for I := 0 to M - 2 do
+  begin
+    { the sides face out: the way round the first outline goes says which
+      way the corners run }
+    D0 := Sub3(Centroid(Outs[I + 1]), Centroid(Outs[I]));
+    if Tips[I] then Fwd := Dot3(LoopNormal(Outs[I + 1]), D0) > 0
+    else Fwd := Dot3(LoopNormal(Outs[I]), D0) > 0;
+    for K := 0 to N - 1 do
+    begin
+      J := (K + 1) mod N;
+      Edge(Outs[I][K], Outs[I + 1][K], Round_);
+      SetLength(Q, 4);
+      if Fwd then
+      begin
+        Q[0] := Outs[I][K]; Q[1] := Outs[I][J]; Q[2] := Outs[I + 1][J]; Q[3] := Outs[I + 1][K];
+      end
+      else
+      begin
+        Q[0] := Outs[I + 1][K]; Q[1] := Outs[I + 1][J]; Q[2] := Outs[I][J]; Q[3] := Outs[I][K];
+      end;
+      if Flat(Q[0], Q[1], Q[2], Q[3]) then Face(Q)
+      else
+      begin
+        Face([Q[0], Q[1], Q[2]]);
+        Face([Q[0], Q[2], Q[3]]);
+        Edge(Q[0], Q[2], True);
+      end;
+    end;
+  end;
+  { the ends, facing away from the rest; the outlines between are no faces }
+  D0 := Sub3(Centroid(Outs[1]), Centroid(Outs[0]));
+  Q := Copy(Outs[0]);
+  if Dot3(LoopNormal(Q), D0) > 0 then
+    for K := 0 to N div 2 - 1 do begin Nm := Q[K]; Q[K] := Q[N - 1 - K]; Q[N - 1 - K] := Nm; end;
+  if Tips[0] then { a tip has no end }
+  else if OpenStart then NoFace(Outs[0]) else Face(Q);
+  D0 := Sub3(Centroid(Outs[M - 1]), Centroid(Outs[M - 2]));
+  Q := Copy(Outs[M - 1]);
+  if Dot3(LoopNormal(Q), D0) < 0 then
+    for K := 0 to N div 2 - 1 do begin Nm := Q[K]; Q[K] := Q[N - 1 - K]; Q[N - 1 - K] := Nm; end;
+  if Tips[M - 1] then { a tip has no end }
+  else if OpenEnd then NoFace(Outs[M - 1]) else Face(Q);
+  for I := 1 to M - 2 do NoFace(Outs[I]);
+  NameCorners(Start, G);
+  SetLength(Lofts, Length(Lofts) + 1);
+  Lofts[High(Lofts)].G := G;
+  Lofts[High(Lofts)].Said := Said + #3 + Exact;
+  finally
+    PopScope;
+  end;
+end;
+
+{ Every loft read is fingerprinted as it stands once everything is read (a
+  circle cut in it included), so the writer can tell whether it still is
+  what the statement makes. }
+procedure THeckReader.FinishLofts;
+var
+  L, I, Part: Integer;
+  Fp: string;
+begin
+  for L := 0 to High(Lofts) do
+  begin
+    Part := -1;
+    { a group's record keeps its own number in Grp; it is no solid's }
+    for I := 0 to D.Live - 1 do
+      if (D[I].Grp = Lofts[L].G) and (D[I].Kind <> ekPart) then begin Part := D[I].Part; Break; end;
+    if Part < 0 then Continue;
+    Fp := SolidPrint(D, Lofts[L].G, Part);
+    for I := 0 to D.Live - 1 do
+      if (D[I].Grp = Lofts[L].G) and (D[I].Part = Part) and (D[I].Kind <> ekPart) then
+        D.SetMade(I, Lofts[L].Said + #2 + Fp);
+  end;
+end;
+
 procedure THeckReader.DoPull(const Value: string; Block: Boolean);
 var
   Key, V, OutlineText, ByText: string;
@@ -2645,6 +2969,7 @@ begin
   CutCircles(FirstNew);
   T3 := GetTickCount64;
   HomeLooseFaces(FirstNew);
+  FinishLofts;
   if GetEnvironmentVariable('HECK_TIMING') <> '' then
     WriteLn(StdErr, Format('read: things %d ms, imply %d ms, circles %d ms, home %d ms',
       [T1 - T0, T2 - T1, T3 - T2, GetTickCount64 - T3]));

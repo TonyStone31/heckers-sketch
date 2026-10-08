@@ -70,6 +70,12 @@ var
   tool's circles as sweeps a hair short of 2 pi (359.9999824 degrees). }
 function FullCircle(Sweep: Double): Boolean;
 
+{ A fingerprint of solid G's geometry in group Part: its faces, lines and
+  circles, in any order, to a hundred-thousandth of a foot.  A statement the
+  writer cannot work out from geometry (a loft) is kept with the fingerprint
+  of what it made, and written back only while that still matches. }
+function SolidPrint(D: TWorkDoc; G, Part: Integer): string;
+
 { the two directions a flat thing's angles are measured in: from east when
   facing up or down, otherwise from its level line (up x facing) }
 procedure SpecAxes(const F: TP3; out AU, AV: TP3);
@@ -89,6 +95,67 @@ uses
 function FullCircle(Sweep: Double): Boolean;
 begin
   Result := Abs(Abs(Sweep) - 2 * Pi) < 1E-5;
+end;
+
+function SolidPrint(D: TWorkDoc; G, Part: Integer): string;
+var
+  All, One: TStringList;
+  I, K, H: Integer;
+  Hash: QWord;
+  Txt: string;
+
+  function Key(const P: TP3): string;
+  begin
+    Result := Format('%d,%d,%d', [Round(P.X * 1E5), Round(P.Y * 1E5), Round(P.Z * 1E5)]);
+  end;
+
+begin
+  All := TStringList.Create;
+  One := TStringList.Create;
+  try
+    for I := 0 to D.Live - 1 do
+    begin
+      { a group's record keeps its own number in Grp; it is no solid's }
+      if (D[I].Grp <> G) or (D[I].Part <> Part) or (D[I].Kind = ekPart) then Continue;
+      One.Clear;
+      case D[I].Kind of
+        ekFace:
+          begin
+            for K := 0 to High(D[I].Poly) do One.Add(Key(D[I].Poly[K]));
+            for H := 0 to High(D[I].Holes) do
+              for K := 0 to High(D[I].Holes[H]) do One.Add('h' + Key(D[I].Holes[H][K]));
+          end;
+        ekLine:
+          begin
+            One.Add(Key(D[I].A));
+            One.Add(Key(D[I].B));
+            if D[I].Soft then One.Add('soft');
+          end;
+        ekArc:
+          begin
+            One.Add(Key(D[I].C));
+            One.Add(IntToStr(Round(D[I].R * 1E5)));
+          end;
+      end;
+      One.Sort;
+      All.Add(IntToStr(Ord(D[I].Kind)) + ':' + One.CommaText);
+    end;
+    All.Sort;
+    { FNV-1a over the lot; it wraps on purpose }
+    Txt := All.Text;
+    Hash := QWord($CBF29CE484222325);
+    {$PUSH}{$Q-}{$R-}
+    for I := 1 to Length(Txt) do
+    begin
+      Hash := Hash xor Ord(Txt[I]);
+      Hash := Hash * QWord($100000001B3);
+    end;
+    {$POP}
+    Result := IntToHex(Hash, 16) + '.' + IntToStr(All.Count);
+  finally
+    One.Free;
+    All.Free;
+  end;
 end;
 
 var
@@ -2039,6 +2106,161 @@ var
     PutNoFaces(Depth, NoPts, Part_, G);
   end;
 
+  { A solid a statement made (a loft) and nothing since: its fingerprint
+    still matches, one paint or none, one pen, and every circle it names is
+    still there by that name.  Gives the statement's outlines and open ends. }
+  function MadeAs(Part_, G: Integer; out Through, OpenW, Exact: string; out HasPaint: Boolean;
+    out Paint: TColor; out Ink: TColor; out Wd: Single): Boolean;
+  var
+    I, K, NPaint, NF: Integer;
+    Made, Stmt, Fp, W: string;
+    Found: Boolean;
+  begin
+    Result := False;
+    Through := '';
+    OpenW := '';
+    Exact := '';
+    HasPaint := False;
+    Paint := 0;
+    Made := '';
+    NPaint := 0;
+    NF := 0;
+    for I := 0 to D.Live - 1 do
+      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind <> ekPart) then
+      begin
+        if D[I].Made = '' then Exit;
+        if Made = '' then Made := D[I].Made
+        else if D[I].Made <> Made then Exit;
+        if D[I].Kind = ekFace then
+        begin
+          Inc(NF);
+          if D[I].MatSet then
+          begin
+            if (NPaint > 0) and (D[I].Mat <> Paint) then Exit;
+            Paint := D[I].Mat;
+            Inc(NPaint);
+          end;
+        end;
+      end;
+    if Made = '' then Exit;
+    if (NPaint <> 0) and (NPaint <> NF) then Exit;
+    HasPaint := NPaint > 0;
+    if not OnePen(Part_, G, Ink, Wd) then Exit;
+    K := Pos(#2, Made);
+    if K = 0 then Exit;
+    Stmt := Copy(Made, 1, K - 1);
+    Fp := Copy(Made, K + 1, MaxInt);
+    if SolidPrint(D, G, Part_) <> Fp then Exit;
+    K := Pos(#3, Stmt);
+    if K > 0 then
+    begin
+      Exact := Copy(Stmt, K + 1, MaxInt);
+      Stmt := Copy(Stmt, 1, K - 1);
+    end;
+    K := Pos(#1, Stmt);
+    if K > 0 then
+    begin
+      Through := Copy(Stmt, 1, K - 1);
+      OpenW := Copy(Stmt, K + 1, MaxInt);
+    end
+    else Through := Stmt;
+    for W in Through.Split([';']) do
+      if (Pos(' ', Trim(W)) = 0) and (Pos(',', Trim(W)) = 0) then
+      begin
+        Found := False;
+        for K := 0 to High(CircleNames) do
+          if SameText(CircleNames[K], Trim(W)) then Found := True;
+        if not Found then Exit;
+      end;
+    Result := True;
+  end;
+
+  procedure PutMade(Depth, Part_, G: Integer; Through: string; const OpenW, Exact: string;
+    HasPaint: Boolean; Paint: TColor; Ink: TColor; Wd: Single);
+  var
+    I, K, Header: Integer;
+    Nm, Note, W, C: string;
+    Outlines, Ex, It: TStringArray;
+    Polys: array of array of TP3;
+    Pts, NoPts: TPts;
+    Named_: Boolean;
+
+    { on one line if it fits, else an outline to a line between brackets }
+    procedure PutThrough(D_: Integer; const Head: string);
+    var
+      K: Integer;
+    begin
+      if D_ * 2 + Length(Head) + 3 + Length(Through) <= 78 then
+      begin
+        Put(D_, Head + ' = ' + Through, -1);
+        Exit;
+      end;
+      Put(D_, Head + ' = (', -1);
+      Outlines := Through.Split([';']);
+      for K := 0 to High(Outlines) do
+        if K < High(Outlines) then Put(D_ + 1, Trim(Outlines[K]) + ';', -1)
+        else Put(D_ + 1, Trim(Outlines[K]), -1);
+      Put(D_, ')', -1);
+    end;
+
+  begin
+    Header := NLine;
+    { corners named when it was read are named again, in its own points }
+    SetLength(Pts, 0);
+    SetLength(NoPts, 0);
+    Ex := Exact.Split([';']);
+    Outlines := Through.Split([';']);
+    SetLength(Polys, Length(Ex));
+    for I := 0 to High(Ex) do
+    begin
+      SetLength(Polys[I], 0);
+      for C in Ex[I].Split([' '], TStringSplitOptions.ExcludeEmpty) do
+      begin
+        It := C.Split([',']);
+        SetLength(Polys[I], Length(Polys[I]) + 1);
+        Polys[I][High(Polys[I])] := P3(StrToFloat(It[0], DotFS), StrToFloat(It[1], DotFS), StrToFloat(It[2], DotFS));
+      end;
+      for K := 0 to High(Polys[I]) do
+      begin
+        AddPt(Pts, Polys[I][K]);
+        Pts[High(Pts)].InHole := False;
+      end;
+    end;
+    GivenNames(Pts, Part_, G);
+    Named_ := Given and (Length(Ex) = Length(Outlines));
+    SolidNaming(Part_, G, Nm, Note);
+    PutNote(Depth, Note, -1);
+    W := TailNote(Note);
+    if not Named_ and not HasPaint and PlainPen(Ink, Wd) and (OpenW = '') and (W = '') then
+      PutThrough(Depth, 'loft' + NameWord(Nm))
+    else
+    begin
+      Put(Depth, 'loft' + NameWord(Nm) + W, -1);
+      if Named_ then
+      begin
+        PutPoints(Depth + 1, Pts, nil);
+        Through := '';
+        for I := 0 to High(Outlines) do
+        begin
+          if I > 0 then Through := Through + '; ';
+          if Length(Polys[I]) = 0 then Through := Through + Trim(Outlines[I])
+          else Through := Through + String.Join(' ', Runs(Items(Pts, Polys[I])));
+        end;
+      end;
+      PutThrough(Depth + 1, 'through');
+      if OpenW <> '' then Put(Depth + 1, 'open = ' + OpenW, -1);
+      if HasPaint then Put(Depth + 1, 'paint = ' + Color2(Paint), -1);
+      PutPen(Depth + 1, Ink, Wd);
+      Put(Depth, 'end', -1);
+    end;
+    for I := 0 to D.Live - 1 do
+      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind in [ekFace, ekLine]) then
+      begin
+        First[I] := Header;
+        Last[I] := NLine - 1;
+      end;
+  end;
+
   { One solid: its corners once, its faces, and only unusual edges; the rest
     are the faces' sides and go unwritten. }
   procedure PutSolid(Depth, Part_, G: Integer);
@@ -2157,6 +2379,7 @@ var
   procedure PutLevel(Depth, Part_: Integer);
   var
     I, J, G, LinesFrom, PBottom, RFace, Header, BOpen: Integer;
+    MThrough, MOpen, MExact: string;
     Done: array of Integer;
     Seen, BPaintOn, PRound: Boolean;
     None: TPts;
@@ -2242,7 +2465,9 @@ var
         if Seen then Continue;
         SetLength(Done, Length(Done) + 1);
         Done[High(Done)] := G;
-        if IsBox(Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen) then
+        if MadeAs(Part_, G, MThrough, MOpen, MExact, BPaintOn, BPaint, PInk, PWd) then
+          PutMade(Depth, Part_, G, MThrough, MOpen, MExact, BPaintOn, BPaint, PInk, PWd)
+        else if IsBox(Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen) then
           PutBox(Depth, Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen)
         else if IsPull(Part_, G, PBottom, PBy, PRound, BPaintOn, BPaint, PInk, PWd) then
           PutPull(Depth, Part_, G, PBottom, PBy, PRound, BPaintOn, BPaint, PInk, PWd)

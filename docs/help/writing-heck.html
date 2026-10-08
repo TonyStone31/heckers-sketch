@@ -13,7 +13,7 @@ program works out for itself, and what it writes back.  Every example here is
 read by the program as it stands.  Paste one into <code>/source</code> and
 press <b>Apply</b> to see it.</p>
 
-<nav class="jump"><b>On this page:</b> <a href="#file">A file</a> &middot; <a href="#rule">The one rule</a> &middot; <a href="#marks">Words and marks</a> &middot; <a href="#lengths">Lengths</a> &middot; <a href="#places">Places and steps</a> &middot; <a href="#points">Points and rings</a> &middot; <a href="#things">Every thing</a> &middot; <a href="#faces">Faces</a> &middot; <a href="#solids">Solids</a> &middot; <a href="#groups">Groups</a> &middot; <a href="#back">What comes back</a> &middot; <a href="#examples">Examples</a> &middot; <a href="#checklist">A checklist</a></nav>
+<nav class="jump"><b>On this page:</b> <a href="#file">A file</a> &middot; <a href="#rule">The one rule</a> &middot; <a href="#marks">Words and marks</a> &middot; <a href="#lengths">Lengths</a> &middot; <a href="#places">Places and steps</a> &middot; <a href="#points">Points and rings</a> &middot; <a href="#things">Every thing</a> &middot; <a href="#faces">Faces</a> &middot; <a href="#solids">Solids</a> &middot; <a href="#lofts">Lofts</a> &middot; <a href="#groups">Groups</a> &middot; <a href="#back">What comes back</a> &middot; <a href="#examples">Examples</a> &middot; <a href="#checklist">A checklist</a></nav>
 
 <h2 id="file">A file</h2>
 <p>A header, then a <code>sheet</code> block for each sheet:</p>
@@ -192,6 +192,7 @@ default.</p>
 <tr><td><code>rect</code></td><td><code>rect = corner; size</code> - two parts: <code>3' east, 2' north</code> lies flat, <code>3' east, 2' up</code> stands</td><td><code>at</code>, <code>size</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
 <tr><td><code>box</code></td><td><code>box = corner; size</code> - the low south-west corner and a three-part size - and <code>; open top</code> for sides left open</td><td><code>at</code>, <code>size</code>; <code>open</code> (none - any of <code>top bottom east west north south</code>), <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
 <tr><td><code>pull</code></td><td><code>pull = outline; step</code> - <code>pull = Hole; 3' up</code> is a cylinder</td><td><code>points</code> (corners, or a circle's name: <code>points = Hole</code>), <code>by</code>; <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
+<tr><td><code>loft</code></td><td><code>loft = outline; outline; ...</code> - <code>loft Boom = Big; Small</code></td><td><code>through</code>; <code>open</code> (none - <code>start</code>, <code>end</code> or <code>ends</code>), <code>paint</code>, <code>ink</code>, <code>width</code></td></tr>
 <tr><td><code>solid</code></td><td>-</td><td><code>paint</code> first, then its <code>points</code>, faces, lines and bores</td></tr>
 <tr><td><code>bore</code></td><td>-</td><td>inside a solid: <code>points</code> (the opening), <code>goes</code> (a step through)</td></tr>
 <tr><td><code>group</code></td><td>-</td><td><code>locked</code> (false), <code>hidden</code> (false), <code>jig</code>, <code>data</code>, then everything in it</td></tr>
@@ -269,6 +270,75 @@ the sheet is still a box, written with <code>open</code>.  A solid that is
 exactly a box is written as one even if you wrote out its corners, and their
 names go with them.</p>
 
+<h2 id="lofts">Lofts</h2>
+<p>A <code>loft</code> is a solid that runs through outlines in order - a
+cone, a reducer, a tapered boom, a fuselage, a duct transition.  Each
+outline is a circle by name or a list of corners, and every outline has as
+many corners as the first (a circle has its <code>sides</code>, 24 unless
+said).  The first or the last outline may be <b>one point</b> instead, a
+tip every corner of the outline beside it runs to - a cone, a spinner, a
+nose.  Corner 1 of one outline joins corner 1 of the next, and so on round,
+so give the outlines the same start (see where a ring's corner 1 is, above)
+or the sides twist.</p>
+<pre>// a tail boom: 8" round to 3" round, rising a little
+circle BoomFront = 3' west, 0 north, 4' 8" up; 8"; east
+circle BoomTail = 21' west, 0 north, 5' up; 3"; east
+loft Boom = BoomFront; BoomTail
+
+// a spinner: a circle to a point in front of it
+circle SpinnerBase = 9' east, 0 north, 4' up; 6"; east
+loft Spinner = SpinnerBase; 9' 10" east, 0 north, 4' up
+
+// an airfoil wing: a points block inside the loft names its corners
+loft Wing
+  points
+    r1 = 0 east, 0 north, 7' up
+    r2 = r1 + 16" west, 5" up
+    r3 = r1 + 64" west
+    r4 = r1 + 12" west, 2" down
+    t1 = 0 east, 16' north, 7' 9" up
+    t2 = t1 + 12" west, 4" up
+    t3 = t1 + 48" west
+    t4 = t1 + 9" west, 1 1/2" down
+  end
+  through = r1..r4; t1..t4
+  paint = white
+end
+
+// a body through several rings: Nose, Front, Middle and Rear are
+// circles drawn before it, all facing the way the body runs
+loft Cabin
+  through = Nose; Front; Middle; Rear
+  paint = red
+end
+
+// a duct from 12" square to 6" square, 3' up and offset: open both ends
+loft Transition
+  through = 0 east, 0 north, 0 up to + 1' east to + 1' north to + 1' west; 3" east, 3" north, 3' up to + 6" east to + 6" north to + 6" west
+  open = ends
+end</pre>
+<ul>
+<li><b>The ends are capped</b> unless <code>open</code> says
+<code>start</code>, <code>end</code> or <code>ends</code>; the outlines between
+are never faces.</li>
+<li><b>Between circles the long edges are soft</b>, so a round loft looks
+round; the circles themselves stay drawn, rings round the body.</li>
+<li><b>A side that is not flat</b> - a square turned against the next - is
+made two triangles.</li>
+<li><b>Square to round</b>: the square needs as many corners as the circle -
+a 24-sided circle wants a square given with 24 corners, six along each
+side.</li>
+<li>Outlines in one plane enclose nothing and are refused.</li>
+<li><b>Paint, ink, <code>open</code> and a <code>points</code> block need
+the block form</b>; the one line says only the outlines.  Points named
+inside a loft are its own; points named outside it can be used too, and two
+lofts may go through the same circle or the same corners - each is still
+its own solid.</li>
+<li><b>It stays a loft</b> through every save while it is what the statement
+makes.  Push or move part of it on the sheet and it is written as the solid
+it has become.</li>
+</ul>
+
 <h2 id="groups">Groups</h2>
 <p>A <code>group</code> keeps a piece to itself: it is picked, moved, hidden
 and locked as one thing, its geometry never joins its neighbor's, and groups
@@ -291,8 +361,8 @@ for itself, kept as it is.</p>
 on every save, and in <code>/source</code> as you work.  What it keeps and
 what it puts its own way:</p>
 <ul>
-<li><b>Kept</b>: every name you gave - things, groups, circles and a solid's
-corners - and every comment, with the thing it was written with.</li>
+<li><b>Kept</b>: every name you gave - things, groups, circles and the
+corners of a solid or a loft - and every comment, with the thing it was written with.</li>
 <li><b>Its own way</b>: the order of things, the spacing, which earlier
 corner a point is written from, and the short or block form of each thing.
 A comment that was inside a block goes above the block.</li>
@@ -356,10 +426,10 @@ end</pre>
 <p>An open tray on legs, built in groups, is on the
 <a href="heck.html#models">Heck page</a>.</p>
 <p><b>What there is not yet</b>: a statement for a turned or swept shape - an
-elbow, a dome, a sphere - and paint on a <code>box</code>, <code>pull</code>
+elbow, a dome, a sphere (a <code>loft</code> through rings does a lot of it) - and paint on a <code>box</code>, <code>pull</code>
 or <code>rect</code> written on one line (write it as a block to paint it).  A round solid with
 different ends is a <code>solid</code> of rings with lines between them; an
-elbow is two pulls meeting.</p>
+elbow is two pulls meeting, or a loft through rings turned a little each.</p>
 
 <h2 id="checklist">A checklist for writing a model</h2>
 <ol>

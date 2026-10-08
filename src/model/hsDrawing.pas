@@ -134,6 +134,11 @@ type
     { the names of its corners as the text gave them, "|" between, in the
       order of A and B, or of Poly and then each hole }
     Corners: string;
+    { A solid made by a statement the writer cannot work out from geometry
+      (a loft): the statement, and a fingerprint of what it made.  Written
+      back while the fingerprint still matches; an edit breaks it, and the
+      solid is written as itself. }
+    Made: string;
   end;
 
   TWorkEntArray = array of TWorkEnt;
@@ -352,6 +357,7 @@ type
     procedure SetNaming(Index: Integer; const AName, ANote: string);
     procedure SetSolidNaming(Index: Integer; const AName, ANote: string);
     procedure SetCorners(Index: Integer; const ACorners: string);
+    procedure SetMade(Index: Integer; const AMade: string);
     { a fresh solid identity, for something built rather than pulled }
     function NewGroup: Integer;
     procedure SetSoft(Index: Integer; Soft: Boolean);
@@ -5014,6 +5020,12 @@ procedure TWorkDoc.SetCorners(Index: Integer; const ACorners: string);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Corners := ACorners;
+end;
+
+procedure TWorkDoc.SetMade(Index: Integer; const AMade: string);
+begin
+  if (Index < 0) or (Index >= FLive) then Exit;
+  FEnts[Index].Made := AMade;
 end;
 
 procedure TWorkDoc.SetGroup(Index, G: Integer);

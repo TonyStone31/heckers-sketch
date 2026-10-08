@@ -12,6 +12,15 @@
 
 ## Next release
 
+### New
+
+- **Loft**: a solid through outlines in order - `loft Boom = Big; Small`
+  makes a cone between two circles, and a body, a reducer or a duct
+  transition is as short.  Ends capped or `open`; round lofts look round.
+  It stays one line in the file until you change it on the sheet.
+  An end can be one point, for a cone or a spinner, and corners
+  you named for a loft keep their names.
+
 ### Fixed
 
 - A rectangle written in the source on a box's face cut no hole in it until

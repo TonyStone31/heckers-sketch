@@ -15,6 +15,15 @@ const
     '' + LineEnding +
     '## Next release' + LineEnding +
     '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Loft**: a solid through outlines in order - `loft Boom = Big; Small`' + LineEnding +
+    '  makes a cone between two circles, and a body, a reducer or a duct' + LineEnding +
+    '  transition is as short.  Ends capped or `open`; round lofts look round.' + LineEnding +
+    '  It stays one line in the file until you change it on the sheet.' + LineEnding +
+    '  An end can be one point, for a cone or a spinner, and corners' + LineEnding +
+    '  you named for a loft keep their names.' + LineEnding +
+    '' + LineEnding +
     '### Fixed' + LineEnding +
     '' + LineEnding +
     '- A rectangle written in the source on a box''s face cut no hole in it until' + LineEnding +
@@ -24,6 +33,8 @@ const
     '  circles when read, opening the tube ends after a save.' + LineEnding +
     '- A tilted circle''s facing could be saved in a form that would not read' + LineEnding +
     '  back (`-0.28 north`, `8E-15 west`), and the drawing then would not open.' + LineEnding +
+    '- A circle in one group cut a hole in a face of another group it lay on (a' + LineEnding +
+    '  tail rotor''s hub on the fin); groups keep to themselves now.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.08' + LineEnding +
     '' + LineEnding +
