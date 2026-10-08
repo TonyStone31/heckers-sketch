@@ -19,6 +19,10 @@
   the painted face written beside it.
 - A solid's opening named by a circle moved out of the solid on the next
   save.
+- Openings cut in a loft (gun ports in a hull) were lost on saving and came
+  back filled in.
+- A loft between two points (a body from tail to nose) grew a face through
+  its middle.
 
 ## v2026.10.08.1
 

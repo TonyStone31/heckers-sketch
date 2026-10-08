@@ -2273,6 +2273,8 @@ var
       end;
     SetLength(NoPts, 0);
     for I := 0 to High(Extras) do PutFace(Depth, Extras[I], NoPts);
+    { openings cut in it (a port in a hull); the loft's own rings it makes again }
+    PutNoFaces(Depth, NoPts, Part_, G);
   end;
 
   { One solid: its corners once, its faces, and only unusual edges; the rest

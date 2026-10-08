@@ -2205,6 +2205,10 @@ begin
   G := D.NewGroup;
   Start := D.Live;
   NoteSolid(G, HasPaint, Paint);
+  { it makes its own faces: a flat loop of its edges (a profile through a
+    body between two tips) is not one }
+  SetLength(FacesGiven, Length(FacesGiven) + 1);
+  FacesGiven[High(FacesGiven)] := G;
   { each outline's edges: a circle's own ring, or its lines }
   for I := 0 to M - 1 do
     if Arcs[I] >= 0 then

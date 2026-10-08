@@ -22,6 +22,10 @@ const
     '  the painted face written beside it.' + LineEnding +
     '- A solid''s opening named by a circle moved out of the solid on the next' + LineEnding +
     '  save.' + LineEnding +
+    '- Openings cut in a loft (gun ports in a hull) were lost on saving and came' + LineEnding +
+    '  back filled in.' + LineEnding +
+    '- A loft between two points (a body from tail to nose) grew a face through' + LineEnding +
+    '  its middle.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.08.1' + LineEnding +
     '' + LineEnding +
