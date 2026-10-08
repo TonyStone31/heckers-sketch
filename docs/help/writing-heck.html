@@ -228,7 +228,11 @@ ring of lines round the middle of a body included.  Give such a loop a
 open top on anything that is not a box, a window.  It is how you leave
 something open, instead of drawing a face and rubbing it out.</li>
 <li><b>A circle or a closed loop of lines on a face cuts it</b> into the face
-with a hole and a face in the hole, as drawing one on the sheet does.
+with a hole and a face in the hole, as drawing one on the sheet does - a
+face the program made, that is: one the lines close, or a side of a box,
+pull or loft, in the same group as the circle.  A <code>face</code> you
+write out gives its own holes with <code>hole =</code>, and nothing drawn on
+it cuts it.  A circle in another group never cuts.
 <code>noface</code> on the loop takes the inner face away and leaves the
 opening (<code>noface = Hole</code> for a circle).  That opens one face only;
 a hole right through a solid is a <code>bore</code>.</li>
@@ -244,7 +248,11 @@ hole.</li>
 
 <h2 id="solids">Solids</h2>
 <p>A <code>solid</code> is one piece: push/pull moves only its own geometry,
-and what is drawn against it does not fuse into it.  It names its corners,
+and lines drawn against it do not join its edges (a circle or loop drawn on
+one of its faces in its group still cuts that face, as above).  A
+<code>points</code> block goes inside a <code>solid</code> or a
+<code>loft</code>; for a <code>box</code> or a <code>pull</code>, name the
+points in the group around it.  It names its corners,
 then gives its lines, and faces only where needed:</p>
 <pre>solid Wedge
   paint = gray

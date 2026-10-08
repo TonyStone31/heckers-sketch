@@ -13,6 +13,16 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- A loft with something painted on it - a cannon with a black bore on its' + LineEnding +
+    '  muzzle - was saved as hundreds of lines of faces.  It stays a loft, with' + LineEnding +
+    '  the painted face written beside it.' + LineEnding +
+    '- A solid''s opening named by a circle moved out of the solid on the next' + LineEnding +
+    '  save.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.08.1' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

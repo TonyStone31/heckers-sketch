@@ -152,6 +152,7 @@ type
     procedure DoConst;
     procedure DoCircle(const Name: string; IsArc: Boolean; const Value: string = ''; Solid: Integer = 0);
     procedure DoPull(const Value: string; Block: Boolean);
+    function ArcOf(const Lp: TLoop): Integer;
     procedure DoLoft(const Value: string; Block: Boolean);
     procedure FinishLofts;
     procedure DoFace(const Value: string; Block: Boolean; Solid: Integer;
@@ -1142,7 +1143,7 @@ procedure THeckReader.Things(Solid: Integer; HasPaint: Boolean; Paint: TColor);
 var
   Line, Key, Value, Kind, Rest: string;
   Block: Boolean;
-  P, Here, Start: Integer;
+  P, K, Here, Start: Integer;
   Ends: TLoop;
   Before: string;
 begin
@@ -1235,6 +1236,12 @@ begin
       { a closed loop of lines that is not a face }
       Ends := ReadList(Value);
       if Length(Ends) < 3 then Fail('noface wants the corners of the loop that is not a face');
+      { a circle named for a solid's noface is that solid's ring, as a loft's is }
+      if (Solid <> 0) and (Pos(' ', Trim(Value)) = 0) and (Pos(',', Value) = 0) then
+      begin
+        K := ArcOf(Ends);
+        if (K >= 0) and (D[K].Grp = 0) then D.SetGroup(K, Solid);
+      end;
       SetLength(NoFaces, Length(NoFaces) + 1);
       NoFaces[High(NoFaces)] := Ends;
       SetLength(NoFaceGrp, Length(NoFaceGrp) + 1);
@@ -1974,6 +1981,30 @@ end;
   capped unless "open" says otherwise.  A side that is not flat is two
   triangles.  A named circle's ring becomes the loft's own edge, as a pull's
   does; between round outlines the lengthwise edges are soft. }
+{ the circle whose ring this outline is, or -1 }
+function THeckReader.ArcOf(const Lp: TLoop): Integer;
+var
+  C: Integer;
+  Nrm: TP3;
+begin
+  for C := D.Live - 1 downto 0 do
+    if (D[C].Kind = ekArc) and FullCircle(D[C].Sweep) and
+       (Abs(Dist(D[C].C, Lp[0]) - D[C].R) < 1E-6) and
+       (Abs(Dist(D[C].C, Lp[Length(Lp) div 2]) - D[C].R) < 1E-6) then
+    begin
+      case D[C].Plane of
+        plXY: Nrm := P3(0, 0, 1);
+        plXZ: Nrm := P3(0, 1, 0);
+        plYZ: Nrm := P3(1, 0, 0);
+      else
+        Nrm := D[C].Nm;
+      end;
+      if (Abs(Dot3(Sub3(Lp[0], D[C].C), Nrm)) < 1E-6) and
+         (Abs(Dot3(Sub3(Lp[Length(Lp) div 4], D[C].C), Nrm)) < 1E-6) then Exit(C);
+    end;
+  Result := -1;
+end;
+
 procedure THeckReader.DoLoft(const Value: string; Block: Boolean);
 var
   Key, V, Through, OpenText, W, Said, Exact: string;
@@ -1995,30 +2026,6 @@ var
     Result := P3(0, 0, 0);
     for C := 0 to High(L) do Result := Add3(Result, L[C]);
     Result := Mul3(Result, 1 / Length(L));
-  end;
-
-  { the circle whose ring this outline is, or -1 }
-  function ArcOf(const Lp: TLoop): Integer;
-  var
-    C: Integer;
-    Nrm: TP3;
-  begin
-    for C := D.Live - 1 downto 0 do
-      if (D[C].Kind = ekArc) and FullCircle(D[C].Sweep) and
-         (Abs(Dist(D[C].C, Lp[0]) - D[C].R) < 1E-6) and
-         (Abs(Dist(D[C].C, Lp[Length(Lp) div 2]) - D[C].R) < 1E-6) then
-      begin
-        case D[C].Plane of
-          plXY: Nrm := P3(0, 0, 1);
-          plXZ: Nrm := P3(0, 1, 0);
-          plYZ: Nrm := P3(1, 0, 0);
-        else
-          Nrm := D[C].Nm;
-        end;
-        if (Abs(Dot3(Sub3(Lp[0], D[C].C), Nrm)) < 1E-6) and
-           (Abs(Dot3(Sub3(Lp[Length(Lp) div 4], D[C].C), Nrm)) < 1E-6) then Exit(C);
-      end;
-    Result := -1;
   end;
 
   procedure Edge(const A, B: TP3; Soft: Boolean);
@@ -2250,6 +2257,9 @@ begin
   else if OpenEnd then NoFace(Outs[M - 1]) else Face(Q);
   for I := 1 to M - 2 do NoFace(Outs[I]);
   NameCorners(Start, G);
+  { what the loft made, as against what joins it later (a disk drawn on it) }
+  for I := Start to D.Live - 1 do
+    if D[I].Grp = G then D.SetMade(I, #5);
   SetLength(Lofts, Length(Lofts) + 1);
   Lofts[High(Lofts)].G := G;
   Lofts[High(Lofts)].Said := Said + #3 + Exact;
@@ -2274,9 +2284,12 @@ begin
       if (D[I].Grp = Lofts[L].G) and (D[I].Kind <> ekPart) then begin Part := D[I].Part; Break; end;
     if Part < 0 then Continue;
     Fp := SolidPrint(D, Lofts[L].G, Part);
+    { its own rings and what it made carry the statement; a face that joined
+      it is marked #4, to be written on its own beside it }
     for I := 0 to D.Live - 1 do
       if (D[I].Grp = Lofts[L].G) and (D[I].Part = Part) and (D[I].Kind <> ekPart) then
-        D.SetMade(I, Lofts[L].Said + #2 + Fp);
+        if (D[I].Made = #5) or (D[I].Kind = ekArc) then D.SetMade(I, Lofts[L].Said + #2 + Fp)
+        else D.SetMade(I, #4 + Fp);
   end;
 end;
 

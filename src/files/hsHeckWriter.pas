@@ -2110,7 +2110,7 @@ var
     still matches, one paint or none, one pen, and every circle it names is
     still there by that name.  Gives the statement's outlines and open ends. }
   function MadeAs(Part_, G: Integer; out Through, OpenW, Exact: string; out HasPaint: Boolean;
-    out Paint: TColor; out Ink: TColor; out Wd: Single): Boolean;
+    out Paint: TColor; out Ink: TColor; out Wd: Single; out Extras: TIntArrayW): Boolean;
   var
     I, K, NPaint, NF: Integer;
     Made, Stmt, Fp, W: string;
@@ -2123,12 +2123,21 @@ var
     HasPaint := False;
     Paint := 0;
     Made := '';
+    SetLength(Extras, 0);
     NPaint := 0;
     NF := 0;
     for I := 0 to D.Live - 1 do
       if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind <> ekPart) then
       begin
         if D[I].Made = '' then Exit;
+        { a face that joined the loft is written beside it }
+        if D[I].Made[1] = #4 then
+        begin
+          if D[I].Kind <> ekFace then Exit;
+          SetLength(Extras, Length(Extras) + 1);
+          Extras[High(Extras)] := I;
+          Continue;
+        end;
         if Made = '' then Made := D[I].Made
         else if D[I].Made <> Made then Exit;
         if D[I].Kind = ekFace then
@@ -2151,6 +2160,8 @@ var
     Stmt := Copy(Made, 1, K - 1);
     Fp := Copy(Made, K + 1, MaxInt);
     if SolidPrint(D, G, Part_) <> Fp then Exit;
+    for I := 0 to High(Extras) do
+      if D[Extras[I]].Made <> #4 + Fp then Exit;
     K := Pos(#3, Stmt);
     if K > 0 then
     begin
@@ -2176,7 +2187,7 @@ var
   end;
 
   procedure PutMade(Depth, Part_, G: Integer; Through: string; const OpenW, Exact: string;
-    HasPaint: Boolean; Paint: TColor; Ink: TColor; Wd: Single);
+    HasPaint: Boolean; Paint: TColor; Ink: TColor; Wd: Single; const Extras: TIntArrayW);
   var
     I, K, Header: Integer;
     Nm, Note, W, C: string;
@@ -2254,11 +2265,14 @@ var
       Put(Depth, 'end', -1);
     end;
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind in [ekFace, ekLine]) then
+      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind in [ekFace, ekLine]) and
+         (D[I].Made[1] <> #4) then
       begin
         First[I] := Header;
         Last[I] := NLine - 1;
       end;
+    SetLength(NoPts, 0);
+    for I := 0 to High(Extras) do PutFace(Depth, Extras[I], NoPts);
   end;
 
   { One solid: its corners once, its faces, and only unusual edges; the rest
@@ -2380,6 +2394,7 @@ var
   var
     I, J, G, LinesFrom, PBottom, RFace, Header, BOpen: Integer;
     MThrough, MOpen, MExact: string;
+    MExtras: TIntArrayW;
     Done: array of Integer;
     Seen, BPaintOn, PRound: Boolean;
     None: TPts;
@@ -2465,8 +2480,8 @@ var
         if Seen then Continue;
         SetLength(Done, Length(Done) + 1);
         Done[High(Done)] := G;
-        if MadeAs(Part_, G, MThrough, MOpen, MExact, BPaintOn, BPaint, PInk, PWd) then
-          PutMade(Depth, Part_, G, MThrough, MOpen, MExact, BPaintOn, BPaint, PInk, PWd)
+        if MadeAs(Part_, G, MThrough, MOpen, MExact, BPaintOn, BPaint, PInk, PWd, MExtras) then
+          PutMade(Depth, Part_, G, MThrough, MOpen, MExact, BPaintOn, BPaint, PInk, PWd, MExtras)
         else if IsBox(Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen) then
           PutBox(Depth, Part_, G, BLo, BHi, BPaintOn, BPaint, PInk, PWd, BOpen)
         else if IsPull(Part_, G, PBottom, PBy, PRound, BPaintOn, BPaint, PInk, PWd) then

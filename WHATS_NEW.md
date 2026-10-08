@@ -10,6 +10,16 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- A loft with something painted on it - a cannon with a black bore on its
+  muzzle - was saved as hundreds of lines of faces.  It stays a loft, with
+  the painted face written beside it.
+- A solid's opening named by a circle moved out of the solid on the next
+  save.
+
 ## v2026.10.08.1
 
 ### New
