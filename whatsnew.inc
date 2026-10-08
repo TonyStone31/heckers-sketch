@@ -30,6 +30,8 @@ const
     '  round on every save.' + LineEnding +
     '- A face filling another''s hole (glass in a wall) could be lost on saving.' + LineEnding +
     '- A hole of an odd shape in a face turned round on every save.' + LineEnding +
+    '- Anything written after a file''s last sheet was dropped without a word' + LineEnding +
+    '  when the file was opened; it is refused now, with its line.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.08.1' + LineEnding +
     '' + LineEnding +

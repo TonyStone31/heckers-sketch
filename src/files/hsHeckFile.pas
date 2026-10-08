@@ -247,6 +247,16 @@ begin
       Sheets[Base] := S;
       Exit(True);
     end;
+    { after the last sheet's end only comments; anything else is outside
+      every sheet and would be lost without a word }
+    for K := Spans[High(Spans)].Tail + 1 to L.Count - 1 do
+      if (Trim(L[K]) <> '') and not IsComment(L[K]) then
+      begin
+        ErrLine := K;
+        Err := '"' + Trim(L[K]) + '" is after the last sheet''s "end": everything ' +
+          'goes inside a sheet';
+        Exit;
+      end;
     for I := 0 to High(Spans) do
     begin
       S := NewHeckSheet(Spans[I].Name);

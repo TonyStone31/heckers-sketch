@@ -27,6 +27,8 @@
   round on every save.
 - A face filling another's hole (glass in a wall) could be lost on saving.
 - A hole of an odd shape in a face turned round on every save.
+- Anything written after a file's last sheet was dropped without a word
+  when the file was opened; it is refused now, with its line.
 
 ## v2026.10.08.1
 
