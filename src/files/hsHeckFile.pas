@@ -128,11 +128,13 @@ begin
       One.Clear;
       WriteFormat2(Sheets[I].Doc, Sheets[I].Name, Sheets[I].Units, One, First, Last, LineThing,
         nil, nil, Extra, Quick);
-      { Header from the first sheet only; later sheets start at their "sheet" line. }
+      { Header from the first sheet only; later sheets start after it, with
+        the comments written above their "sheet" line }
       Start := 0;
       if I > 0 then
       begin
-        while (Start < One.Count) and not AnsiStartsStr('sheet ', One[Start]) do Inc(Start);
+        while (Start < One.Count) and (One[Start] <> '') do Inc(Start);
+        Inc(Start);
         L.Add('');
       end;
       for K := Start to One.Count - 1 do L.Add(One[K]);
@@ -200,8 +202,22 @@ var
   Spans: THeckSheetSpans;
   Head, Chunk: TStringList;
   I, K, Base, E: Integer;
+  LineOf: array of Integer;    { each line of Chunk in L }
   S: THeckSheet;
   U: TUnitSystem;
+
+  procedure Take(K: Integer);
+  begin
+    Chunk.Add(L[K]);
+    SetLength(LineOf, Chunk.Count);
+    LineOf[Chunk.Count - 1] := K;
+  end;
+
+  function IsComment(const Line: string): Boolean;
+  begin
+    Result := (Copy(Trim(Line), 1, 2) = '//') or (Copy(Trim(Line), 1, 1) = '{');
+  end;
+
 begin
   Result := False;
   ErrLine := -1;
@@ -236,13 +252,20 @@ begin
       S := NewHeckSheet(Spans[I].Name);
       S.Units := U;
       ApplyProps(S, Spans[I].Props);
-      Chunk.Assign(Head);
-      for K := Spans[I].Head to Spans[I].Tail do Chunk.Add(L[K]);
+      { the header for its units; the comments at the top of the file are
+        the first sheet's, and those between two sheets the second's }
+      Chunk.Clear;
+      SetLength(LineOf, 0);
+      for K := 0 to Head.Count - 1 do
+        if (I = 0) or not IsComment(Head[K]) then Take(K);
+      if I > 0 then
+        for K := Spans[I - 1].Tail + 1 to Spans[I].Head - 1 do Take(K);
+      for K := Spans[I].Head to Spans[I].Tail do Take(K);
       if not ReadHeck(Chunk, S.Doc, S.Units, E, Err) then
       begin
         S.Doc.Free;
         { Map the error back to the file's own line number. }
-        if E >= Head.Count then ErrLine := Spans[I].Head + E - Head.Count else ErrLine := E;
+        if (E >= 0) and (E < Length(LineOf)) then ErrLine := LineOf[E] else ErrLine := Spans[I].Head;
         for K := Base to High(Sheets) do Sheets[K].Doc.Free;
         SetLength(Sheets, Base);
         Exit;

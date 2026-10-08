@@ -10,6 +10,18 @@
   "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **Names and comments are kept.**  Name anything in the source -
+  `box Lid`, `solid Hinge`, `line Rafter`, `circle Hole` - and write notes
+  above it or at the end of its line; saving, editing on the sheet and
+  copying all keep them where they were.  Notes at the top of a file stay
+  with the first sheet, not every sheet.
+- **The Heck page in the manual** shows how to build a model in groups,
+  with names, and how to leave a top open with `noface`.
+
 ## v2026.10.05.2
 
 ### New

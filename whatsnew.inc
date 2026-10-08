@@ -13,6 +13,18 @@ const
     '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Names and comments are kept.**  Name anything in the source -' + LineEnding +
+    '  `box Lid`, `solid Hinge`, `line Rafter`, `circle Hole` - and write notes' + LineEnding +
+    '  above it or at the end of its line; saving, editing on the sheet and' + LineEnding +
+    '  copying all keep them where they were.  Notes at the top of a file stay' + LineEnding +
+    '  with the first sheet, not every sheet.' + LineEnding +
+    '- **The Heck page in the manual** shows how to build a model in groups,' + LineEnding +
+    '  with names, and how to leave a top open with `noface`.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.05.2' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

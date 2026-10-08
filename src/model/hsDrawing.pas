@@ -126,6 +126,11 @@ type
       with every group inside it.  Kept on the group so its members hide as
       one; see EntHidden. }
     Hidden: Boolean;
+    { What the text said about it, kept for when it is written again: the
+      name it was given and the comments around it, as written.  A comment
+      line starting with a tab went at the end of its first line.  SName and
+      SNote are its solid's, carried by every member.  A group's name is Txt. }
+    Name, Note, SName, SNote: string;
   end;
 
   TWorkEntArray = array of TWorkEnt;
@@ -217,6 +222,8 @@ type
     procedure RebuildSnapCache;
     procedure ArcSnaps(var N: Integer);
   public
+    { the comments above the sheet's first thing and after its last }
+    HeadNote, TailNote: string;
     procedure AddLine(const A, B: TP3; Ink: TColor; Weight: Single; Dim: Boolean);
     { True when a line with these ends is already there, either way round. }
     function HasLine(const A, B: TP3): Boolean;
@@ -338,6 +345,9 @@ type
     procedure SetArcFacing(Index: Integer; const Nm: TP3; A0: Double);
     { the same for anything - a line that belongs to a solid, say }
     procedure SetGroup(Index, G: Integer);
+    { what the text named it and said about it; see TWorkEnt.Name }
+    procedure SetNaming(Index: Integer; const AName, ANote: string);
+    procedure SetSolidNaming(Index: Integer; const AName, ANote: string);
     { a fresh solid identity, for something built rather than pulled }
     function NewGroup: Integer;
     procedure SetSoft(Index: Integer; Soft: Boolean);
@@ -2934,6 +2944,8 @@ end;
 
 procedure TWorkDoc.Clear;
 begin
+  HeadNote := '';
+  TailNote := '';
   SetLength(FEnts, 0);
   FLive := 0;
   FNextPart := 0;
@@ -4976,6 +4988,20 @@ function TWorkDoc.NewGroup: Integer;
 begin
   Inc(FNextGrp);
   Result := FNextGrp;
+end;
+
+procedure TWorkDoc.SetNaming(Index: Integer; const AName, ANote: string);
+begin
+  if (Index < 0) or (Index >= FLive) then Exit;
+  FEnts[Index].Name := AName;
+  FEnts[Index].Note := ANote;
+end;
+
+procedure TWorkDoc.SetSolidNaming(Index: Integer; const AName, ANote: string);
+begin
+  if (Index < 0) or (Index >= FLive) then Exit;
+  FEnts[Index].SName := AName;
+  FEnts[Index].SNote := ANote;
 end;
 
 procedure TWorkDoc.SetGroup(Index, G: Integer);

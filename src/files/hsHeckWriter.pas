@@ -324,6 +324,7 @@ var
   DefWidth: Single;
   NLine: Integer;
   Circles: TIntArrayW;        { the whole circles on the sheet: c1, c2... }
+  CircleNames: TStringArray;  { their names: the one each was given, or c1, c2... }
   { from pass one: the faces the reader restores by itself, and the loops it
     closes that are not faces of the drawing }
   ImpliedGeom: array of Boolean;
@@ -337,7 +338,7 @@ var
   begin
     Result := '';
     for K := 0 to High(Circles) do
-      if Circles[K] = I then Exit('c' + IntToStr(K + 1));
+      if Circles[K] = I then Exit(CircleNames[K]);
   end;
 
   procedure Put(Depth: Integer; const S: string; Thing: Integer);
@@ -353,6 +354,108 @@ var
       Last[Thing] := NLine;
     end;
     Inc(NLine);
+  end;
+
+  { A name as written after its kind: bare when it is a word, quoted when
+    not, nothing when there is none. }
+  function NameWord(const Nm: string): string;
+  var
+    K: Integer;
+    Bare: Boolean;
+  begin
+    if Nm = '' then Exit('');
+    Bare := Nm[1] in ['A'..'Z', 'a'..'z', '_'];
+    for K := 2 to Length(Nm) do
+      if not (Nm[K] in ['A'..'Z', 'a'..'z', '_', '0'..'9']) then Bare := False;
+    if Bare then Result := ' ' + Nm else Result := ' ' + QuotedStr(Nm);
+  end;
+
+  { the comments kept with a thing (TWorkEnt.Note): those above it here, and
+    TailNote gives the one that goes at the end of its first line }
+  procedure PutNote(Depth: Integer; const Note: string; Thing: Integer);
+  var
+    Parts: TStringList;
+    K: Integer;
+  begin
+    if Note = '' then Exit;
+    Parts := TStringList.Create;
+    try
+      Parts.Text := Note;
+      for K := 0 to Parts.Count - 1 do
+        if (Parts[K] <> '') and (Parts[K][1] <> #9) then Put(Depth, Parts[K], Thing);
+    finally
+      Parts.Free;
+    end;
+  end;
+
+  function TailNote(const Note: string): string;
+  var
+    Parts: TStringList;
+    K: Integer;
+  begin
+    Result := '';
+    if Pos(#9, Note) = 0 then Exit;
+    Parts := TStringList.Create;
+    try
+      Parts.Text := Note;
+      for K := 0 to Parts.Count - 1 do
+        if (Parts[K] <> '') and (Parts[K][1] = #9) then
+          Result := Result + '   ' + Copy(Parts[K], 2, MaxInt);
+    finally
+      Parts.Free;
+    end;
+  end;
+
+  { a solid's name and comments, from whichever member carries them }
+  procedure SolidNaming(Part_, G: Integer; out Nm, Note: string);
+  var
+    I: Integer;
+  begin
+    Nm := '';
+    Note := '';
+    for I := 0 to D.Live - 1 do
+      if (D[I].Grp = G) and (D[I].Part = Part_) and ((D[I].SName <> '') or (D[I].SNote <> '')) then
+      begin
+        Nm := D[I].SName;
+        Note := D[I].SNote;
+        Exit;
+      end;
+  end;
+
+  { A circle keeps the name it was given when that is a word no other
+    circle has; the rest are c1, c2... skipping names taken. }
+  procedure NameCircles;
+  var
+    K, N: Integer;
+    Taken: TStringList;
+  begin
+    SetLength(CircleNames, Length(Circles));
+    Taken := TStringList.Create;
+    try
+      Taken.CaseSensitive := False;
+      for K := 0 to High(Circles) do
+      begin
+        CircleNames[K] := '';
+        if (D[Circles[K]].Name <> '') and (Trim(NameWord(D[Circles[K]].Name)) = D[Circles[K]].Name) and
+           (Taken.IndexOf(D[Circles[K]].Name) < 0) then
+        begin
+          CircleNames[K] := D[Circles[K]].Name;
+          Taken.Add(CircleNames[K]);
+        end;
+      end;
+      N := 0;
+      for K := 0 to High(Circles) do
+        if CircleNames[K] = '' then
+        begin
+          repeat
+            Inc(N);
+          until Taken.IndexOf('c' + IntToStr(N)) < 0;
+          CircleNames[K] := 'c' + IntToStr(N);
+          Taken.Add(CircleNames[K]);
+        end;
+    finally
+      Taken.Free;
+    end;
   end;
 
   { The commonest ink and width become the sheet's and go unwritten.  Count
@@ -602,7 +705,7 @@ var
           if SamePt(Poly[Q], P, 2E-5) then begin Hit := Q; Break; end;
         if Hit < 0 then begin Ok_ := False; Break; end;
       end;
-      if Ok_ then Exit('c' + IntToStr(C + 1));
+      if Ok_ then Exit(CircleNames[C]);
     end;
   end;
 
@@ -965,13 +1068,15 @@ var
   begin
     W := FacingWord(D.FaceNormal(I));
     if W <> '' then Note := '   { facing ' + W + ' }' else Note := '';
+    Note := Note + TailNote(D[I].Note);
+    PutNote(Depth, D[I].Note, I);
     SameMat := (D[I].MatSet = HasMat) and ((not HasMat) or (D[I].Mat = Mat));
     if SameMat and (Length(D[I].Holes) = 0) and (D[I].Ink = DefInk) then
     begin
-      PutList(Depth, 'face', Outline(Pts, D[I].Poly, D[I].Part), I, Note);
+      PutList(Depth, 'face' + NameWord(D[I].Name), Outline(Pts, D[I].Poly, D[I].Part), I, Note);
       Exit;
     end;
-    Put(Depth, 'face' + Note, I);
+    Put(Depth, 'face' + NameWord(D[I].Name) + Note, I);
     PutList(Depth + 1, 'points', Outline(Pts, D[I].Poly, D[I].Part), I);
     for K := 0 to High(D[I].Holes) do
       PutList(Depth + 1, 'hole', Outline(Pts, D[I].Holes[K], D[I].Part, True), I);
@@ -988,13 +1093,14 @@ var
     Ends: string;
   begin
     Ends := Ref(Pts, D[I].A) + ' to ' + Ref(Pts, D[I].B);
+    PutNote(Depth, D[I].Note, I);
     if (D[I].Ink = DefInk) and (Abs(D[I].Weight - DefWidth) <= 1E-3) and
        (not D[I].Soft) and (not D[I].Dim) then
     begin
-      Put(Depth, 'line = ' + Ends, I);
+      Put(Depth, 'line' + NameWord(D[I].Name) + ' = ' + Ends + TailNote(D[I].Note), I);
       Exit;
     end;
-    Put(Depth, 'line', I);
+    Put(Depth, 'line' + NameWord(D[I].Name) + TailNote(D[I].Note), I);
     Put(Depth + 1, 'points = ' + Ends, I);
     PutInk(Depth + 1, I);
     if D[I].Soft then Put(Depth + 1, 'soft = true', I);
@@ -1008,7 +1114,10 @@ var
     K: Integer;
     Nm, AU, AV, P0: TP3;
     A0: Double;
+    Tl: string;
   begin
+    PutNote(Depth, D[I].Note, I);
+    Tl := TailNote(D[I].Note);
     case D[I].Kind of
       ekArc:
         begin
@@ -1031,14 +1140,14 @@ var
           begin
             if Abs(Nm.Z - 1) < 1E-9 then
               Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D[I].C, U, False) +
-                '; ' + Len2(D[I].R, U), I)
+                '; ' + Len2(D[I].R, U) + Tl, I)
             else
               Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D[I].C, U, False) +
-                '; ' + Len2(D[I].R, U) + '; ' + Facing2(Nm), I);
+                '; ' + Len2(D[I].R, U) + '; ' + Facing2(Nm) + Tl, I);
             Exit;
           end;
-          if FullCircle(D[I].Sweep) then Put(Depth, 'circle ' + CircleName(I), I)
-          else Put(Depth, 'arc', I);
+          if FullCircle(D[I].Sweep) then Put(Depth, 'circle ' + CircleName(I) + Tl, I)
+          else Put(Depth, 'arc' + NameWord(D[I].Name) + Tl, I);
           Put(Depth + 1, 'center = ' + Place2(D[I].C, U, False), I);
           Put(Depth + 1, 'radius = ' + Len2(D[I].R, U), I);
           Put(Depth + 1, 'facing = ' + Facing2(Nm), I);
@@ -1053,7 +1162,7 @@ var
         end;
       ekDim:
         begin
-          Put(Depth, 'dim', I);
+          Put(Depth, 'dim' + NameWord(D[I].Name) + Tl, I);
           Put(Depth + 1, 'from = ' + Place2(D[I].A, U, False), I);
           Put(Depth + 1, 'to = ' + Place2(D[I].B, U, False), I);
           Put(Depth + 1, 'off = ' + Place2(D[I].C, U, True), I);
@@ -1063,13 +1172,13 @@ var
         end;
       ekGuide:
         if SameP(D[I].A, D[I].B) then
-          Put(Depth, 'guide = ' + Place2(D[I].A, U, False), I)
+          Put(Depth, 'guide' + NameWord(D[I].Name) + ' = ' + Place2(D[I].A, U, False) + Tl, I)
         else
-          Put(Depth, 'guide = ' + Place2(D[I].A, U, False) + ' to ' +
-            Place2(D[I].B, U, False), I);
+          Put(Depth, 'guide' + NameWord(D[I].Name) + ' = ' + Place2(D[I].A, U, False) + ' to ' +
+            Place2(D[I].B, U, False) + Tl, I);
       ekText:
         begin
-          Put(Depth, 'note', I);
+          Put(Depth, 'note' + NameWord(D[I].Name) + Tl, I);
           Put(Depth + 1, 'at = ' + Place2(D[I].A, U, False), I);
           if not SameP(D[I].A, D[I].B) then
             Put(Depth + 1, 'to = ' + Place2(D[I].B, U, False), I);
@@ -1347,11 +1456,14 @@ var
   var
     I, Header: Integer;
     NoPts: TPts;
+    Nm, Note: string;
   begin
     Header := NLine;
+    SolidNaming(Part_, G, Nm, Note);
+    PutNote(Depth, Note, -1);
     if HasPaint or not PlainPen(Ink, Wd) then
     begin
-      Put(Depth, 'box', -1);
+      Put(Depth, 'box' + NameWord(Nm) + TailNote(Note), -1);
       Put(Depth + 1, 'at   = ' + Place2(Lo, U, False), -1);
       Put(Depth + 1, 'size = ' + Place2(Sub3(Hi, Lo), U, True), -1);
       if HasPaint then Put(Depth + 1, 'paint = ' + Color2(Paint), -1);
@@ -1359,7 +1471,8 @@ var
       Put(Depth, 'end', -1);
     end
     else
-      Put(Depth, 'box = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True), -1);
+      Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) +
+        TailNote(Note), -1);
     { every face and edge maps to this statement, so picking on the sheet
       lights up the box }
     for I := 0 to D.Live - 1 do
@@ -1584,10 +1697,12 @@ var
     I, Header, Best: Integer;
     NoPts: TPts;
     It: TStringArray;
-    Step: string;
+    Step, Nm, Note: string;
     Poly: TP3Array;
   begin
     Header := NLine;
+    SolidNaming(Part_, G, Nm, Note);
+    PutNote(Depth, Note, -1);
     SetLength(NoPts, 0);
     { Start from the corner nearest the origin, going the way the face goes,
       so the same solid is always written the same way. }
@@ -1611,11 +1726,11 @@ var
     Step := Place2(By, U, True);
     { one line while it fits ("pull = c1; 2' up"), a block when the outline
       runs long or there is a paint }
-    if not HasPaint and PlainPen(Ink, Wd) and (Depth * 2 + 9 + Length(Joined(It)) + Length(Step) <= 78) then
-      Put(Depth, 'pull = ' + Joined(It) + '; ' + Step, -1)
+    if not HasPaint and PlainPen(Ink, Wd) and (Depth * 2 + 9 + Length(NameWord(Nm)) + Length(Joined(It)) + Length(Step) <= 78) then
+      Put(Depth, 'pull' + NameWord(Nm) + ' = ' + Joined(It) + '; ' + Step + TailNote(Note), -1)
     else
     begin
-      Put(Depth, 'pull', -1);
+      Put(Depth, 'pull' + NameWord(Nm) + TailNote(Note), -1);
       PutList(Depth + 1, 'points', It, -1);
       Put(Depth + 1, 'by = ' + Step, -1);
       if HasPaint then Put(Depth + 1, 'paint = ' + Color2(Paint), -1);
@@ -1641,6 +1756,7 @@ var
     Rings: TRings;
     Rg: TRing;
     Implied: array of Boolean;
+    Nm, Note: string;
 
   begin
     SetLength(Implied, D.Live);
@@ -1707,7 +1823,9 @@ var
           end;
         end;
     Header := NLine;
-    Put(Depth, 'solid', -1);
+    SolidNaming(Part_, G, Nm, Note);
+    PutNote(Depth, Note, -1);
+    Put(Depth, 'solid' + NameWord(Nm) + TailNote(Note), -1);
     if HasMat then Put(Depth + 1, 'paint = ' + Color2(SMat), -1);
     PutPoints(Depth + 1, Pts, Rings);
     for I := 0 to D.Live - 1 do
@@ -1810,9 +1928,10 @@ var
           if RectAt[I] and IsRect(Part_, I, RLines, RFace, RLo, RSize, BPaintOn, BPaint, PInk, PWd) then
           begin
             Header := NLine;
+            PutNote(Depth, D[RLines[0]].Note, -1);
             if BPaintOn or not PlainPen(PInk, PWd) then
             begin
-              Put(Depth, 'rect', -1);
+              Put(Depth, 'rect' + NameWord(D[RLines[0]].Name) + TailNote(D[RLines[0]].Note), -1);
               Put(Depth + 1, 'at   = ' + Place2(RLo, U, False), -1);
               Put(Depth + 1, 'size = ' + Place2(RSize, U, True), -1);
               if BPaintOn then Put(Depth + 1, 'paint = ' + Color2(BPaint), -1);
@@ -1820,7 +1939,8 @@ var
               Put(Depth, 'end', -1);
             end
             else
-              Put(Depth, 'rect = ' + Place2(RLo, U, False) + '; ' + Place2(RSize, U, True), -1);
+              Put(Depth, 'rect' + NameWord(D[RLines[0]].Name) + ' = ' + Place2(RLo, U, False) + '; ' +
+                Place2(RSize, U, True) + TailNote(D[RLines[0]].Note), -1);
             for J := 0 to 3 do
             begin
               RectDone[RLines[J]] := True;
@@ -1850,7 +1970,8 @@ var
     for I := 0 to D.Live - 1 do
       if (D[I].Kind = ekPart) and (D[I].Part = Part_) then
       begin
-        Put(Depth, 'group ' + QuotedStr(D[I].Txt), I);
+        PutNote(Depth, D[I].Note, I);
+        Put(Depth, 'group ' + QuotedStr(D[I].Txt) + TailNote(D[I].Note), I);
         if D[I].Solid then Put(Depth + 1, 'locked = true', I);
         if D[I].Hidden then Put(Depth + 1, 'hidden = true', I);
         if D[I].Jig <> '' then Put(Depth + 1, 'jig = ' + D[I].Jig, I);
@@ -2133,11 +2254,13 @@ begin
       SetLength(Circles, Length(Circles) + 1);
       Circles[High(Circles)] := I;
     end;
+  NameCircles;
 
   Put(0, HECK_MAGIC, -1);
   if U = usMetric then Put(0, 'units = mm', -1)
   else Put(0, 'units = ft in', -1);
   Put(0, '', -1);
+  PutNote(0, D.HeadNote, -1);
   Put(0, 'sheet ' + QuotedStr(SheetName), -1);
   Put(1, 'ink = ' + Color2(DefInk), -1);
   Put(1, 'width = ' + FloatToStrF(DefWidth, ffGeneral, 4, 0, DotFS), -1);
@@ -2149,6 +2272,7 @@ begin
   if not InPass1 and (Length(ImpliedGeom) = 0) then Put(1, 'faces = said', -1);
   Put(0, '', -1);
   PutLevel(1, 0);
+  PutNote(1, D.TailNote, -1);
   Put(0, 'end', -1);
   SetLength(LineThing, NLine);
 end;

@@ -47,6 +47,8 @@ function HeckValue(const S: string; U: TUnitSystem; out V: Double;
 
 implementation
 
+uses
+  StrUtils;
 
 type
   TValKind = (vPlain, vLen, vAngle);
@@ -68,6 +70,10 @@ type
   private
     Src: TStringList;         { logical lines: notes gone, bracketed lists joined }
     At: array of Integer;     { the line of the text each came from }
+    { the comments of each logical line: the lines above it and the one at its
+      end; Carry is what is waiting for the next thing }
+    LeadOf, TailOf: array of string;
+    Carry: string;
     Cur: Integer;
     D: TWorkDoc;
     U: TUnitSystem;
@@ -97,6 +103,7 @@ type
     procedure ImplyFaces(FirstNew: Integer);
     procedure HomeLooseFaces(FirstNew: Integer);
     procedure Prepare(L: TStrings);
+    procedure Attach(Here, Start: Integer; const Kind, Rest, Before: string);
     procedure PushScope;
     procedure PopScope;
     function FindPoint(const Name: string; out P: TP3): Boolean;
@@ -142,7 +149,7 @@ type
       faces the tools would have made, and nothing else. }
     procedure DoBox(const Value: string; Block: Boolean);
     procedure DoRect(const Value: string; Block: Boolean);
-    procedure MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor; const Name: string);
+    procedure MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
     procedure MakeRect(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
     { "place; step": two parts with a semicolon between }
     procedure PlaceAndStep(const Value: string; out Corner, Size: TP3);
@@ -199,18 +206,45 @@ end;
 procedure THeckReader.Prepare(L: TStrings);
 var
   I, K, N, Depth: Integer;
-  S, Acc: string;
+  S, Acc, Said, AccSaid, Pending: string;
   InText: Boolean;
+
+  procedure Keep(const Piece: string);
+  var
+    W: string;
+  begin
+    { the writer's "{ facing down }" on a face says what it worked out, not
+      what anybody wrote }
+    W := Trim(Piece);
+    if AnsiStartsStr('{ facing ', W) and AnsiEndsStr(' }', W) and
+       (Pos(' ', Trim(Copy(W, 10, Length(W) - 11))) = 0) then Exit;
+    if Said <> '' then Said := Said + ' ';
+    Said := Said + W;
+  end;
+
+  procedure AddSrc(const Line, Tail: string);
+  begin
+    Src.Add(Line);
+    SetLength(LeadOf, Src.Count);
+    SetLength(TailOf, Src.Count);
+    LeadOf[Src.Count - 1] := Pending;
+    TailOf[Src.Count - 1] := Tail;
+    Pending := '';
+  end;
+
 begin
   Src.Clear;
   SetLength(At, L.Count);
   N := 0;
   Acc := '';
+  AccSaid := '';
+  Pending := '';
   Depth := 0;
   for I := 0 to L.Count - 1 do
   begin
     S := L[I];
     InText := False;
+    Said := '';
     K := 1;
     while K <= Length(S) do
     begin
@@ -221,6 +255,7 @@ begin
       else if (S[K] = '''') and ((K = 1) or not (S[K - 1] in DIGITS)) then InText := True
       else if (S[K] = '/') and (K < Length(S)) and (S[K + 1] = '/') then
       begin
+        Keep(Copy(S, K, MaxInt));
         SetLength(S, K - 1);
         Break;
       end
@@ -229,6 +264,7 @@ begin
         { a note runs to its closing brace or the end of the line }
         Depth := K;
         while (K <= Length(S)) and (S[K] <> '}') do Inc(K);
+        Keep(Copy(S, Depth, K - Depth + 1));
         Delete(S, Depth, K - Depth + 1);
         K := Depth - 1;
         Depth := 0;
@@ -236,17 +272,27 @@ begin
       Inc(K);
     end;
     S := Trim(StringReplace(S, #9, ' ', [rfReplaceAll]));
-    if S = '' then Continue;
+    if S = '' then
+    begin
+      { a comment on a line of its own belongs to what comes next, or inside
+        a list to the list }
+      if Said <> '' then
+        if Acc <> '' then AccSaid := Trim(AccSaid + ' ' + Said)
+        else if Pending = '' then Pending := Said
+        else Pending := Pending + LineEnding + Said;
+      Continue;
+    end;
     if Acc <> '' then
     begin
+      if Said <> '' then AccSaid := Trim(AccSaid + ' ' + Said);
       if S = ')' then
       begin
-        Src.Add(Acc);
+        AddSrc(Acc, AccSaid);
         Acc := '';
       end
       else if S[Length(S)] = ')' then
       begin
-        Src.Add(Acc + ' ' + Trim(Copy(S, 1, Length(S) - 1)));
+        AddSrc(Acc + ' ' + Trim(Copy(S, 1, Length(S) - 1)), AccSaid);
         Acc := '';
       end
       else
@@ -256,16 +302,83 @@ begin
     if (Pos('=', S) > 0) and (S[Length(S)] = '(') then
     begin
       Acc := Trim(Copy(S, 1, Length(S) - 1));
+      AccSaid := Said;
       At[N] := I;
       Inc(N);
       Continue;
     end;
     At[N] := I;
     Inc(N);
-    Src.Add(S);
+    AddSrc(S, Said);
   end;
-  if Acc <> '' then Src.Add(Acc);
+  if Acc <> '' then AddSrc(Acc, AccSaid);
   SetLength(At, Max(N, Src.Count));
+  SetLength(LeadOf, Src.Count);
+  SetLength(TailOf, Src.Count);
+  Carry := Pending;
+end;
+
+{ Comment lines one after the other; a line written at the end of a thing
+  (tab first) stays one only with KeepTail }
+function JoinNotes(const A, B: string; KeepTail: Boolean = False): string;
+var
+  T: string;
+begin
+  T := B;
+  if not KeepTail then T := StringReplace(T, LineEnding + #9, LineEnding, [rfReplaceAll]);
+  if not KeepTail and (T <> '') and (T[1] = #9) then T := Copy(T, 2, MaxInt);
+  if A = '' then Result := T
+  else if T = '' then Result := A
+  else Result := A + LineEnding + T;
+end;
+
+{ What the statement at logical line Here made (things Start to D.Live - 1)
+  takes its name and every comment from where it starts to where it ends.
+  A statement that made nothing hands its comments on to the next thing. }
+procedure THeckReader.Attach(Here, Start: Integer; const Kind, Rest, Before: string);
+var
+  Note, Nm: string;
+  J, K, G: Integer;
+begin
+  if (Here < 0) or (Here >= Src.Count) then Exit;
+  Note := JoinNotes(Before, LeadOf[Here]);
+  if TailOf[Here] <> '' then Note := JoinNotes(Note, #9 + TailOf[Here], True);
+  LeadOf[Here] := '';
+  TailOf[Here] := '';
+  for J := Here + 1 to Min(Cur, Src.Count) - 1 do
+  begin
+    Note := JoinNotes(JoinNotes(Note, LeadOf[J], True), TailOf[J], True);
+    LeadOf[J] := '';
+    TailOf[J] := '';
+  end;
+  Note := JoinNotes(Note, Carry, True);
+  Carry := '';
+  if D.Live <= Start then
+  begin
+    Carry := JoinNotes('', Note);
+    Exit;
+  end;
+  Nm := Unquote(Rest);
+  if (Kind = 'solid') or (Kind = 'box') or (Kind = 'pull') then
+  begin
+    G := D[Start].Grp;
+    for K := Start to D.Live - 1 do
+      if D[K].Grp = G then D.SetSolidNaming(K, Nm, Note);
+  end
+  else if Kind = 'group' then
+  begin
+    for K := Start to D.Live - 1 do
+      if D[K].Kind = ekPart then
+      begin
+        D.SetNaming(K, '', Note);
+        Break;
+      end;
+  end
+  else if Kind = 'rect' then
+    for K := Start to D.Live - 1 do D.SetNaming(K, Nm, Note)
+  else
+    for K := Start to D.Live - 1 do
+      if K = Start then D.SetNaming(K, Nm, Note) else D.SetNaming(K, Nm, '');
 end;
 
 procedure THeckReader.PushScope;
@@ -931,26 +1044,44 @@ procedure THeckReader.Things(Solid: Integer; HasPaint: Boolean; Paint: TColor);
 var
   Line, Key, Value, Kind, Rest: string;
   Block: Boolean;
-  P: Integer;
+  P, Here, Start: Integer;
   Ends: TLoop;
+  Before: string;
 begin
   while Cur < Src.Count do
   begin
     Line := Src[Cur];
-    if LowerCase(Line) = 'end' then Exit;
-    if LowerCase(Line) = 'begin' then begin Inc(Cur); Continue; end;
+    Here := Cur;
+    Start := D.Live;
+    { what was waiting is this statement's; what is inside it is its own }
+    Before := Carry;
+    Carry := '';
+    if LowerCase(Line) = 'end' then
+    begin
+      { comments closing a block stay with the block }
+      Carry := JoinNotes(JoinNotes(Before, LeadOf[Cur]), TailOf[Cur]);
+      LeadOf[Cur] := '';
+      TailOf[Cur] := '';
+      Exit;
+    end;
+    if LowerCase(Line) = 'begin' then begin Attach(Here, Start, '', '', Before); Inc(Cur); Continue; end;
     Block := not SplitProp(Line, Key, Value);
     P := 1;
     Kind := TakeWord(Key + ' ', P);
-    Rest := Trim(Copy(Key, P, MaxInt));
+    { a name as it was typed: the key is lower case }
+    Rest := Trim(Copy(Copy(Line, 1, Length(Key)), P, MaxInt));
     if Block then Rest := Trim(Copy(Line, Length(Kind) + 1, MaxInt));
 
-    if (Kind = 'heckerssketch') and Block then begin Inc(Cur); Continue; end;
+    if (Kind = 'heckerssketch') and Block then begin Attach(Here, Start, '', '', Before); Inc(Cur); Continue; end;
 
     if Block then
     begin
       if Kind = 'sheet' then
       begin
+        { what is written above the sheet is the sheet's }
+        D.HeadNote := JoinNotes(JoinNotes(Before, LeadOf[Cur]), TailOf[Cur]);
+        LeadOf[Cur] := '';
+        TailOf[Cur] := '';
         Inc(Cur);
         Things(0, False, 0);
         if Cur >= Src.Count then Fail('the sheet is never closed: an "end" is missing');
@@ -971,6 +1102,7 @@ begin
       else if Kind = 'box' then DoBox(Rest, True)
       else if Kind = 'rect' then DoRect(Rest, True)
       else SkipBlock;
+      if Kind <> 'sheet' then Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end;
 
@@ -978,21 +1110,25 @@ begin
     if Kind = 'face' then
     begin
       DoFace(Value, False, Solid, HasPaint, Paint);     { moves on by itself }
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'line' then
     begin
       DoLine(Value, False, Solid);
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'circle' then
     begin
       DoCircle(Rest, False, Value, Solid);
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'pull' then
     begin
       DoPull(Value, False);
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'noface' then
@@ -1004,17 +1140,20 @@ begin
       NoFaces[High(NoFaces)] := Ends;
       SetLength(NoFaceGrp, Length(NoFaceGrp) + 1);
       NoFaceGrp[High(NoFaceGrp)] := Solid;
+      Attach(Here, Start, '', '', Before);
       Inc(Cur);
       Continue;
     end
     else if Kind = 'box' then
     begin
       DoBox(Value, False);
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'rect' then
     begin
       DoRect(Value, False);
+      Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end
     else if Kind = 'guide' then
@@ -1037,6 +1176,7 @@ begin
     else if Key = 'faces' then AllSaid := LowerCase(Trim(Value)) = 'said';
     { anything else (shows, scale, snap, view, camera, later additions) is
       let pass }
+    Attach(Here, Start, Kind, Rest, Before);
     Inc(Cur);
   end;
 end;
@@ -1562,7 +1702,7 @@ end;
 
 { eight corners, twelve lines, six faces, one solid: the same as a
   rectangle pulled up by the tool }
-procedure THeckReader.MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor; const Name: string);
+procedure THeckReader.MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
 var
   C: array[0..7] of TP3;
   G, I, F0: Integer;
@@ -1602,12 +1742,11 @@ begin
     Edge(I + 4, (I + 1) mod 4 + 4);
     Edge(I, I + 4);
   end;
-  if Name <> '' then ;   { a name on a solid: nowhere to keep it yet }
 end;
 
 procedure THeckReader.DoBox(const Value: string; Block: Boolean);
 var
-  Key, V, Name: string;
+  Key, V: string;
   Corner, Size: TP3;
   HasPaint, HasAt, HasSize: Boolean;
   Ink, WasInk: TColor;
@@ -1619,16 +1758,13 @@ begin
   Paint := 0;
   Ink := DefInk;
   Wd := DefWidth;
-  Name := '';
   if not Block then
   begin
     PlaceAndStep(Value, Corner, Size);
-    MakeBox(Corner, Size, False, 0, '');
+    MakeBox(Corner, Size, False, 0);
     Inc(Cur);
     Exit;
   end;
-  { "box Foot": a name after the word }
-  Name := Trim(Copy(Trim(Src[Cur]), 4, MaxInt));
   HasAt := False;
   HasSize := False;
   Corner := P3(0, 0, 0);
@@ -1658,7 +1794,7 @@ begin
   WasInk := DefInk; WasWd := DefWidth;
   DefInk := Ink; DefWidth := Wd;
   try
-    MakeBox(Corner, Size, HasPaint, Paint, Name);
+    MakeBox(Corner, Size, HasPaint, Paint);
   finally
     DefInk := WasInk; DefWidth := WasWd;
   end;
@@ -2103,6 +2239,7 @@ begin
   FirstNew := D.Live;
   Things(0, False, 0);
   if Cur < Src.Count then Fail('there is an "end" here with nothing to close');
+  D.TailNote := Carry;
   T1 := GetTickCount64;
   if not AllSaid then ImplyFaces(FirstNew);
   T2 := GetTickCount64;

@@ -35,7 +35,7 @@ sheet 'Shop'
   rect = 0 east, 0 north, 0 up; 20' east, 12' north
 end</pre>
 
-<nav class="jump"><b>On this page:</b> <a href="#the-window">The window</a> &middot; <a href="#a-place">A place</a> &middot; <a href="#lengths">Lengths</a> &middot; <a href="#things">Things</a> &middot; <a href="#faces">Faces come from lines</a> &middot; <a href="#primitives">Box, rect, circle, pull</a> &middot; <a href="#blocks">Blocks and one-liners</a> &middot; <a href="#names">Names</a> &middot; <a href="#pick">Picking points from the sheet</a> &middot; <a href="#jigs">Jigs</a> &middot; <a href="#why-text">Why text</a> &middot; <a href="#the-rules">The rules</a></nav>
+<nav class="jump"><b>On this page:</b> <a href="#the-window">The window</a> &middot; <a href="#a-place">A place</a> &middot; <a href="#lengths">Lengths</a> &middot; <a href="#things">Things</a> &middot; <a href="#faces">Faces come from lines</a> &middot; <a href="#primitives">Box, rect, circle, pull</a> &middot; <a href="#blocks">Blocks and one-liners</a> &middot; <a href="#names">Names</a> &middot; <a href="#models">Building a model in text</a> &middot; <a href="#pick">Picking points from the sheet</a> &middot; <a href="#jigs">Jigs</a> &middot; <a href="#why-text">Why text</a> &middot; <a href="#the-rules">The rules</a></nav>
 
 <h2 id="the-window">The window</h2>
 <p><code>/source</code> opens a window beside the drawing with the sheet
@@ -86,8 +86,12 @@ are allowed - <code>4' + 2"</code>, <code>(Width - 1') / 2</code> - and a
 <tr><td><code>guide</code></td><td><code>guide = a to b</code>, or one place</td><td>-</td></tr>
 <tr><td><code>dim</code>, <code>note</code></td><td>-</td><td><code>from</code>, <code>to</code>, <code>off</code>; <code>at</code>, <code>text</code></td></tr>
 </table>
-<p>Notes go in <code>// ...</code> or <code>{ ... }</code>.  A list too long
-for a line runs from <code>(</code> to <code>)</code>.</p>
+<p>Notes go in <code>// ...</code> or <code>{ ... }</code>.  A note above a
+thing, or at the end of its line, belongs to that thing and is written back
+with it; one inside a block goes above the block, since the program writes a
+block's insides afresh.  Notes above the <code>sheet</code> line and before
+its <code>end</code> stay there.  A list too long for a line runs from
+<code>(</code> to <code>)</code>.</p>
 
 <h2 id="faces">Faces come from lines</h2>
 <p>As on the sheet: close a loop of lines and the face appears.  So a
@@ -119,13 +123,76 @@ the block when something is - a paint, a width, a name.  You may type
 either.</p>
 
 <h2 id="names">Names</h2>
-<p>Corners are named by where they stand - <code>floor1</code> to
-<code>floor4</code> and <code>top1</code> to <code>top4</code> on a block,
-<code>ra1</code>.. round a ring - so <code>line = floor1 to top1</code> is
-an upright.  A circle is <code>c1</code>, <code>c2</code>.  A thing can be
-given a name - <code>line Rafter</code>, <code>group 'Left eye'</code> - and
-a name you give is yours; keeping it through the next write is still to
-come.</p>
+<p>Any thing can have a name after its kind - <code>box Lid</code>,
+<code>solid Hinge</code>, <code>pull Fin</code>, <code>line Rafter</code>,
+<code>circle Hole</code>, <code>group 'Left turbine'</code> - in quotes when
+it has spaces.  A name you give is yours: it is kept through every save,
+and a copy keeps it too.  A circle keeps its name for faces and pulls to
+call it by; the ones you did not name are <code>c1</code>, <code>c2</code>.</p>
+<p>Corners inside a solid are the exception for now: the program names them
+by where they stand - <code>floor1</code> to <code>floor4</code> and
+<code>top1</code> to <code>top4</code> on a block, <code>ra1</code>.. round
+a ring - so <code>line = floor1 to top1</code> is an upright, and corners you
+named <code>a</code>, <code>b</code>, <code>c</code> come back named that
+way.</p>
+
+<h2 id="models">Building a model in text</h2>
+<p>Whether you type it or a program writes it, a model reads
+best, and is easiest to change later, built like this:</p>
+<ul>
+<li><b>A group for each part</b>, groups inside groups for an assembly.
+A group is one thing on the sheet: picked, moved, hidden and locked
+whole, and its geometry never joins its neighbor's.</li>
+<li><b>Names on what you will want to talk about</b> -
+<code>box LegSW</code>, <code>solid Lid</code> - and a note above a part
+saying what it is.  Picking a thing on the sheet lights up its lines in the
+source window, notes included.</li>
+<li><b>No faces you did not mean.</b>  Faces come from closed lines, so
+an open top is a <code>noface</code>, not a face rubbed out afterwards.</li>
+<li><b>The shorthand where it fits</b>: <code>box</code> for blocks,
+<code>pull</code> for a profile pushed some distance, <code>circle</code>
+and <code>pull = Hole; 2' up</code> for round things.</li>
+</ul>
+<pre>// a planter: an open tray on four legs
+group 'Planter'
+  group 'Tray'
+    // open at the top
+    solid Tray
+      paint = brown
+      points
+        a = 0 east, 0 north, 1' up
+        b = a + 3' east
+        c = b + 1' north
+        d = a + 1' north
+        e = a + 10" up
+        f = b + 10" up
+        g = c + 10" up
+        h = d + 10" up
+      end
+      line = a to b
+      line = b to c
+      line = c to d
+      line = d to a
+      line = e to f
+      line = f to g
+      line = g to h
+      line = h to e
+      line = a to e
+      line = b to f
+      line = c to g
+      line = d to h
+      noface = e f g h
+    end
+  end
+  group 'Legs'
+    box LegSW = 0 east, 0 north, 0 up; 2" east, 2" north, 1' up
+    box LegSE = 2' 10" east, 0 north, 0 up; 2" east, 2" north, 1' up
+    box LegNE = 2' 10" east, 10" north, 0 up; 2" east, 2" north, 1' up
+    box LegNW = 0 east, 10" north, 0 up; 2" east, 2" north, 1' up
+  end
+end</pre>
+<p>The twelve lines of the tray close six loops; five become its bottom
+and sides, and <code>noface</code> keeps the sixth open.</p>
 
 <h2 id="pick">Picking points from the sheet</h2>
 <p>Press <b>Pick</b> and the sheet becomes a point picker: each click,
