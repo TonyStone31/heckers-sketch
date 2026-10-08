@@ -33,7 +33,7 @@ uses
   Classes, SysUtils, Types, Math, StrUtils, IniFiles, Forms, Controls, Graphics,
   Dialogs, ExtCtrls, StdCtrls, Menus, LCLType, LCLIntf, Printers, PrintersDlgs, Contnrs,
   hsSurface, hsSkin, hsViewCube, hsDialogSkin, hsFilm, hsRecorder, hsExport, hsExToy, hsExamples, hsDrawing, hsSplash, hsSysInfo, hsTouch, hsFaceFinder, hsUpdater, hsUpdateForm, hsWhatsNew, hsPaths,
-  hsBugReport, hsNet, hsUnfold, hsFlatView, hsTunnels, hsSendReport, hsSourceWindow, hsPostcard, hsHeckWriter, hsHeckReader, hsJigRun, hsJigFiles, hsFittings, hsTransitionWizard, hsSpoolWizard, hsPipe,
+  hsBugReport, hsNet, hsUnfold, hsFlatView, hsTunnels, hsSendReport, hsSourceWindow, hsAssistant, hsPostcard, hsHeckWriter, hsHeckReader, hsJigRun, hsJigFiles, hsFittings, hsTransitionWizard, hsSpoolWizard, hsPipe,
   hsStairs, hsStairWizard, hsStringerSheet, hsHeckFile, hsRadiantData, hsRadiant, hsRadiantWizard, hsRadiantSubmittal, hsRadiantJob,
   hsCommandText, InkPage, InkDraw;
 
@@ -1411,9 +1411,10 @@ type
 const
   { Alphabetical, with recently used ones floated to the top.  One row per
     action; the other words for it are in Also. }
-  CMD_LIST: array[0..89] of TCmdItem = (
+  CMD_LIST: array[0..90] of TCmdItem = (
     (Name: 'all';        Hint: 'select everything on this sheet';      Arg: False; Eg: ''; Also: 'selectall'),
     (Name: 'arc';        Hint: 'the arc tool';                          Arg: False; Eg: ''; Also: 'a'),
+    (Name: 'assistant';  Hint: 'ask about the sheet - not connected yet'; Arg: False; Eg: ''; Also: 'ai chat'),
     (Name: 'back';       Hint: 'look from behind';                      Arg: False),
     (Name: 'center';     Hint: 'center it on the floor at 0,0';         Arg: False; Eg: ''; Also: 'middle'),
     (Name: 'circle';     Hint: 'the circle tool';                       Arg: False; Eg: ''; Also: 'c'),

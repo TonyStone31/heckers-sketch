@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox, InkEdit, InkMemo, InkRichEdit, hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox, InkEdit, InkMemo, InkRichEdit, InkLabel, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -105,7 +105,7 @@ procedure SkinList(L: TInkListBox);
 procedure SkinSlider(T: TBCFluentSlider);
 { Themes every control on a form by kind, colors only; sizes and fonts stay
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
-  panel Tag 1: dim text or raised panel.  Call from OnCreate, after UseTheme. }
+  panel Tag 1: dim text or raised panel; a TInkLabel too.  Call from OnCreate, after UseTheme. }
 procedure ThemeForm(F: TForm);
 { Keep the message loop turning this long, so what was just put up paints
   and the window stays responsive. }
@@ -677,6 +677,13 @@ begin
       SkinProgress(TBGRAFlashProgressBar(C))
     else if C is TInkListBox then
       SkinList(TInkListBox(C))
+    else if C is TInkLabel then
+    begin
+      if C.Tag = 1 then TInkLabel(C).Font.Color := PixToColor(DlgTheme.TextDim)
+      else TInkLabel(C).Font.Color := PixToColor(DlgTheme.Text);
+      if TInkLabel(C).Font.Height = 0 then TInkLabel(C).Font.Height := -13;
+      TInkLabel(C).Transparent := True;
+    end
     else if (C is TInkEdit) or (C is TInkMemo) or (C is TInkRichEdit) then
     begin
       TWinControl(C).Color := FieldColor;

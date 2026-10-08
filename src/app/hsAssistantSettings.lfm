@@ -1,0 +1,158 @@
+object AssistantSettingsForm: TAssistantSettingsForm
+  Left = 400
+  Height = 420
+  Top = 200
+  Width = 520
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Assistant settings'
+  ClientHeight = 420
+  ClientWidth = 520
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  Position = poOwnerFormCenter
+  object pnlBody: TPanel
+    Left = 0
+    Height = 420
+    Top = 0
+    Width = 520
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 420
+    ClientWidth = 520
+    TabOrder = 0
+    object lblHead: TInkLabel
+      Left = 24
+      Height = 26
+      Top = 18
+      Width = 472
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'Who answers'
+      Font.Height = -19
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblProvider: TInkLabel
+      Left = 24
+      Height = 18
+      Top = 60
+      Width = 140
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'Provider'
+    end
+    object cbProvider: TBCComboBox
+      Left = 170
+      Height = 26
+      Top = 56
+      Width = 326
+      ItemHeight = 22
+      TabOrder = 0
+    end
+    object lblEndpoint: TInkLabel
+      Left = 24
+      Height = 18
+      Top = 100
+      Width = 140
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'Address'
+    end
+    object edEndpoint: TInkEdit
+      Left = 170
+      Height = 26
+      Top = 96
+      Width = 326
+      TabOrder = 1
+      TextHint = 'blank for the provider''s own'
+    end
+    object lblModel: TInkLabel
+      Left = 24
+      Height = 18
+      Top = 140
+      Width = 140
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'Model'
+    end
+    object edModel: TInkEdit
+      Left = 170
+      Height = 26
+      Top = 136
+      Width = 326
+      TabOrder = 2
+      TextHint = 'blank for the provider''s usual'
+    end
+    object lblKey: TInkLabel
+      Left = 24
+      Height = 18
+      Top = 190
+      Width = 140
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'Key'
+    end
+    object lblKeyState: TInkLabel
+      Left = 170
+      Height = 18
+      Top = 190
+      Width = 326
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'lblKeyState'
+    end
+    object btnPasteKey: TBCButton
+      Tag = 2
+      Left = 170
+      Height = 32
+      Top = 216
+      Width = 160
+      Caption = 'Paste a key'
+      OnClick = btnPasteKeyClick
+    end
+    object btnForgetKey: TBCButton
+      Tag = 2
+      Left = 338
+      Height = 32
+      Top = 216
+      Width = 158
+      Caption = 'Forget it'
+      OnClick = btnForgetKeyClick
+    end
+    object lblKeyWhere: TInkLabel
+      Tag = 1
+      Left = 24
+      Height = 40
+      Top = 262
+      Width = 472
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'lblKeyWhere'
+      WordWrap = True
+      Font.Height = -12
+      ParentFont = False
+    end
+    object btnCancel: TBCButton
+      Tag = 2
+      Left = 268
+      Height = 32
+      Top = 368
+      Width = 110
+      Anchors = [akRight, akBottom]
+      Caption = 'Cancel'
+      OnClick = btnCancelClick
+    end
+    object btnSave: TBCButton
+      Tag = 1
+      Left = 386
+      Height = 32
+      Top = 368
+      Width = 110
+      Anchors = [akRight, akBottom]
+      Caption = 'Save'
+      OnClick = btnSaveClick
+    end
+  end
+end

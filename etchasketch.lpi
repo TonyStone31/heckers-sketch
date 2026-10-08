@@ -322,6 +322,24 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
+        <Filename Value="src/app/hsAssistant.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AssistantForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsAssistantSettings.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AssistantSettingsForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/app/hsAssistantContext.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
         <Filename Value="src/app/hsPostcard.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="HelloForm"/>

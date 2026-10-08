@@ -2123,6 +2123,11 @@ begin
       FCmdMsg := 'A move stretches what it is joined to again, which is how ' +
         'SketchUp does it.';
   end
+  else if (W = 'assistant') or (W = 'ai') or (W = 'chat') then
+  begin
+    hsDialogSkin.UseTheme(Themes[FThemeIdx]);
+    ShowAssistant(Self, @SourceAskSource, @SourceAskPicked);
+  end
   else if (W = 'postcard') or (W = 'hello') then
   begin
     hsDialogSkin.UseTheme(Themes[FThemeIdx]);
