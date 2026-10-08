@@ -20,6 +20,10 @@ const
     '- A rectangle written in the source on a box''s face cut no hole in it until' + LineEnding +
     '  something was drawn on the sheet; it cuts it as soon as it is read, and' + LineEnding +
     '  with a `noface` it is an opening.' + LineEnding +
+    '- Two round tubes of one size starting from the same joint could swap their' + LineEnding +
+    '  circles when read, opening the tube ends after a save.' + LineEnding +
+    '- A tilted circle''s facing could be saved in a form that would not read' + LineEnding +
+    '  back (`-0.28 north`, `8E-15 west`), and the drawing then would not open.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.08' + LineEnding +
     '' + LineEnding +

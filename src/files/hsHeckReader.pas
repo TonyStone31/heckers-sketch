@@ -2199,6 +2199,9 @@ begin
     for F := FirstNew to D.Live - 1 do
     begin
       if D[F].Kind <> ekFace then Continue;
+      { a circle in one group does not cut a face in another: groups keep
+        to themselves }
+      if D[F].Part <> D[I].Part then Continue;
       { A written-out face gives its own holes; only faces the reader made (a
         box's top, a pull's, one the lines closed) are cut. }
       Known := False;

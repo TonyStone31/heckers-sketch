@@ -101,7 +101,10 @@ mark: <code>70 5/8"</code>.</li>
 decimal in full, <code>2.843721934"</code>, and never rounded to look
 friendlier than it is.</li>
 <li><b>Sums</b> go anywhere a length goes: <code>4' + 2"</code>,
-<code>(Width - 1') / 2</code>.  The program writes back the answer.</li>
+<code>(Width - 1') / 2</code>.  The program writes back the answer.  A sum
+that comes out below nought turns the way round: <code>(1' - 3') east</code>
+is <code>2' west</code>.  There is no sine or cosine; a corner at an angle is
+worked out beforehand and written as its numbers.</li>
 <li><b>Constants</b> name numbers for the sums below them, anywhere a length
 goes - <code>Width east</code>, <code>RU * 4 up</code>:
 <pre>const
@@ -171,7 +174,9 @@ the numbers need not make a length of one: <code>3 east, 4 up</code> is the
 same as <code>0.6 east, 0.8 up</code>, and a step can be used as a facing
 as it stands.  <code>starts</code> is
 measured from east for a thing facing up or down, otherwise from its level
-line.</p>
+line - <code>up x facing</code>: facing east, corner 1 is on the north side
+of the center; facing north, on the west; facing south, on the east; facing
+west, on the south.</p>
 
 <h2 id="things">Every thing</h2>
 <p>Any thing may have a name after its word - <code>box Lid</code>,
@@ -205,12 +210,19 @@ lines would not cut, or it faces the other way.</p>
 <ul>
 <li>A face you write goes round <b>anticlockwise seen from its front</b> -
 the side <code>paint</code> is on - and a <code>hole</code> the other way.
+It is kept the way it was written: written the wrong way round, its paint is
+on the inside.  A loop in a <code>face</code> or <code>noface</code> closes by
+itself; do not repeat the first corner (a <code>line</code> run, by contrast,
+has to come back to it to close).
 A face the program makes from lines picks its own way: in a solid, out of
 the solid; a loose one toward east, north or up.  So in a solid you need
 only write the lines, and the faces come out facing out.</li>
 <li><b><code>open</code></b> on a box leaves sides off:
 <code>box Tray = 0 east, 0 north, 0 up; 3' east, 1' north, 10" up; open top</code>,
 or <code>open = top north</code> in a block.</li>
+<li><b>In a solid, every flat loop its lines close becomes a face</b> - a
+ring of lines round the middle of a body included.  Give such a loop a
+<code>noface</code> when it is not one.</li>
 <li><b><code>noface</code></b> is a loop of lines that is not a face: an
 open top on anything that is not a box, a window.  It is how you leave
 something open, instead of drawing a face and rubbing it out.</li>

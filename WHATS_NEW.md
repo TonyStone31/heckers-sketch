@@ -21,6 +21,8 @@
   circles when read, opening the tube ends after a save.
 - A tilted circle's facing could be saved in a form that would not read
   back (`-0.28 north`, `8E-15 west`), and the drawing then would not open.
+- A circle in one group cut a hole in a face of another group it lay on (a
+  tail rotor's hub on the fin); groups keep to themselves now.
 
 ## v2026.10.08
 
