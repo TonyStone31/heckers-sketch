@@ -672,6 +672,9 @@ type
       renderer searches every face, so a late or dropped result is harmless.
       See docs/render-acceleration.md. }
     Threads: Boolean;
+    { notes put away for the view (/hide notes): drawn, picked and snapped
+      to no more, still saved }
+    NotesHidden: Boolean;
     FEditSeq: Integer;
     { how many of FEditSeq's steps were only a group opened or left }
     FContextSteps: Integer;
@@ -4781,6 +4784,7 @@ end;
 
 function TWorkDoc.EntHidden(I: Integer): Boolean;
 begin
+  if NotesHidden and (I >= 0) and (I < FLive) and (FEnts[I].Kind = ekText) then Exit(True);
   if (FHideSeq <> FEditSeq) or (Length(FHideOf) <> FLive) then WorkOutHidden;
   Result := FAnyHidden and (I >= 0) and (I < FLive) and FHideOf[I];
 end;

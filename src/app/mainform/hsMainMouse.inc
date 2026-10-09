@@ -2162,6 +2162,50 @@ begin
   pbScreen.Invalidate;
 end;
 
+{ /hide notes, /show notes: the notes out of the drawing's way for a look,
+  and back - still saved either way }
+procedure TMainForm.ShowNotes(On: Boolean);
+begin
+  if FD = nil then Exit;
+  FD.Doc.NotesHidden := not On;
+  SetLength(FSel, 0);
+  RenderInk;
+  RecomposeAll;
+  FScreenDirty := True;
+  if On then FCmdMsg := 'Notes shown again.'
+  else FCmdMsg := 'Notes put away for now - /show notes brings them back.  They are still saved.';
+  InvalidateStatus;
+  pbScreen.Invalidate;
+end;
+
+{ The assistant's Heck into the source window as an edit: looked over, then
+  Applied by hand.  A short one for a long sheet is said plainly - Apply
+  replaces the whole sheet with what is there. }
+procedure TMainForm.AssistantUseHeck(const Code: string);
+var
+  L, Cur: TStringList;
+  First, Last, LineThing: TIntArrayW;
+  Sheet, Msg: string;
+begin
+  if FD = nil then Exit;
+  ShowSource;
+  L := TStringList.Create;
+  Cur := TStringList.Create;
+  try
+    L.Text := Code;
+    SourceAskSource(Cur, nil, nil, First, Last, LineThing, Sheet);
+    Msg := 'From the assistant: look it over, then Apply.  Revert puts the sheet''s own text back.';
+    if L.Count * 2 < Cur.Count then
+      Msg := Format('From the assistant: %d lines, and the sheet is %d.  Apply makes the ' +
+        'sheet exactly this - is it all there?', [L.Count, Cur.Count]);
+    SourceForm.LoadEdited(Code, Msg);
+    SourceForm.BringToFront;
+  finally
+    Cur.Free;
+    L.Free;
+  end;
+end;
+
 { The source window's text read as Apply would, into a scratch drawing
   that is thrown away: whether it reads, and where it does not. }
 function TMainForm.SourceCheck(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;

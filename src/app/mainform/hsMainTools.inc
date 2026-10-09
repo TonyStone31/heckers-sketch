@@ -1852,10 +1852,12 @@ begin
   end
   else if (W = 'hide') or (W = 'putaway') then
     { the name as typed; groups match it whatever the case }
-    if Rest = '' then HideGroups(True, '')
+    if LowerCase(Rest) = 'notes' then ShowNotes(False)
+    else if Rest = '' then HideGroups(True, '')
     else HideGroups(True, Copy(Trim(S), Pos(' ', Trim(S)) + 1, MaxInt))
   else if (W = 'show') or (W = 'unhide') then
-    if Rest = '' then HideGroups(False, '')
+    if LowerCase(Rest) = 'notes' then ShowNotes(True)
+    else if Rest = '' then HideGroups(False, '')
     else HideGroups(False, Copy(Trim(S), Pos(' ', Trim(S)) + 1, MaxInt))
   else if W = 'lock' then LockGroups(True)
   else if W = 'unlock' then LockGroups(False)
@@ -2126,7 +2128,7 @@ begin
   else if (W = 'assistant') or (W = 'ai') or (W = 'chat') then
   begin
     hsDialogSkin.UseTheme(Themes[FThemeIdx]);
-    ShowAssistant(Self, @SourceAskSource, @SourceAskPicked);
+    ShowAssistant(Self, @SourceAskSource, @SourceAskPicked, @AssistantUseHeck);
   end
   else if (W = 'postcard') or (W = 'hello') then
   begin

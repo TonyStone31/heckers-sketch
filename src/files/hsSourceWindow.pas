@@ -175,6 +175,9 @@ type
     function LineOfThing(I: Integer; out LineNo: Integer; out Line: string): Boolean;
     { Public so a command or a test can press them. }
     procedure LoadSample;
+    { Text put in as if typed, to look over and Apply - the assistant's
+      answer; Msg says where it came from }
+    procedure LoadEdited(const AText, Msg: string);
     procedure ToggleComment;
     procedure Changed;
     procedure DuplicateLines;
@@ -368,6 +371,20 @@ begin
     FBusy := False;
   end;
   SetEdited(True, 'A sample, and its jigs are in ' + JigsDir + '.  Press Apply, then Run jigs.');
+end;
+
+procedure TSourceForm.LoadEdited(const AText, Msg: string);
+begin
+  FBusy := True;
+  try
+    Editor.ReadOnly := False;
+    Editor.Lines.Text := AText;
+    Editor.CaretXY := Point(1, 1);
+  finally
+    FBusy := False;
+  end;
+  SetEdited(True, Msg);
+  Changed;
 end;
 
 procedure TSourceForm.ApplyNow;

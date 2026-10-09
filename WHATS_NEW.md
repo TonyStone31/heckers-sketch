@@ -7,7 +7,15 @@
   heading to the tag when it cuts a release.  Sections are shown newest
   first, and an update shows only the ones newer than the version it
   replaced.  Headings: "## v2026.09.05.25" or "## Next release", then
-  "### New" and "### Fixed"
+  "### New"
+- **`/hide notes`** puts the drawing's notes out of the way for a look;
+  `/show notes` brings them back.  They are still saved.
+- **The assistant (`/assistant`)** asks a model running on this machine
+  (LM Studio, Ollama) or a hosted service about the sheet.  Code in its
+  answers has a header with **Copy**, folds when it is long, and **Use
+  this** puts it in the source window to look over and Apply - it never
+  changes the drawing by itself.  Enter sends; Ctrl+Enter is a new line.
+ and "### Fixed"
 - Ticking **On top** on the source window could lose it behind the main
   window, and two windows on top could not be brought in front of each other.
 , then "- " bullets.  Keep the bullets short.

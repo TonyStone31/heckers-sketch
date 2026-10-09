@@ -268,6 +268,8 @@ type
     procedure SourcePickThings(const Things: TIntArrayW);
     function SourceApply(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
     function SourceCheck(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
+    procedure AssistantUseHeck(const Code: string);
+    procedure ShowNotes(On: Boolean);
     { run the jig that makes this group again; 0 runs every jig on the sheet }
     function RunJigOf(PartId: Integer): Boolean;
     { the same, from the group's record - the source window's play button }
@@ -1447,7 +1449,7 @@ const
                          Also: 'outliner'),
     (Name: 'guides';     Hint: 'clear the guide lines';                 Arg: False; Eg: ''; Also: 'noguides'),
     (Name: 'help';       Hint: 'about this program';                    Arg: False; Eg: ''; Also: '?'),
-    (Name: 'hide';       Hint: 'put away the picked groups, or every group so named';  Arg: True;
+    (Name: 'hide';       Hint: 'put away the picked groups, every group so named, or the notes';  Arg: True;
                          Eg:   '/hide labels';
                          Also: 'putaway'),
     (Name: 'holes';      Hint: 'draw where a solid is not closed';      Arg: False; Eg: ''; Also: 'openedges notclosed'),

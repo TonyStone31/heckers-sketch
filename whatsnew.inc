@@ -10,7 +10,15 @@ const
     '  heading to the tag when it cuts a release.  Sections are shown newest' + LineEnding +
     '  first, and an update shows only the ones newer than the version it' + LineEnding +
     '  replaced.  Headings: "## v2026.09.05.25" or "## Next release", then' + LineEnding +
-    '  "### New" and "### Fixed"' + LineEnding +
+    '  "### New"' + LineEnding +
+    '- **`/hide notes`** puts the drawing''s notes out of the way for a look;' + LineEnding +
+    '  `/show notes` brings them back.  They are still saved.' + LineEnding +
+    '- **The assistant (`/assistant`)** asks a model running on this machine' + LineEnding +
+    '  (LM Studio, Ollama) or a hosted service about the sheet.  Code in its' + LineEnding +
+    '  answers has a header with **Copy**, folds when it is long, and **Use' + LineEnding +
+    '  this** puts it in the source window to look over and Apply - it never' + LineEnding +
+    '  changes the drawing by itself.  Enter sends; Ctrl+Enter is a new line.' + LineEnding +
+    ' and "### Fixed"' + LineEnding +
     '- Ticking **On top** on the source window could lose it behind the main' + LineEnding +
     '  window, and two windows on top could not be brought in front of each other.' + LineEnding +
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +

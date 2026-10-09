@@ -17,6 +17,9 @@ type
 
   { TAssistantForm }
 
+  { the Heck of an answer, to go into the source window }
+  TUseHeckEvent = procedure(const Code: string) of object;
+
   TAssistantForm = class(TForm)
     pnlTop: TPanel;
     lblTitle: TInkLabel;
@@ -62,10 +65,12 @@ type
     function SheetText(out Lines: Integer; out Picked: string; out NPicked: Integer): string;
     function GivenText: string;
     function SystemParts: TChatSystem;
+    procedure CodeAction(Sender: TObject; ABlock: Integer; const AAction, ACode, ALanguage: string);
   public
     { the same questions the source window asks the sheet }
     OnAskSource: TSourceAskSource;
     OnAskPicked: TSourceAskPicked;
+    OnUseHeck: TUseHeckEvent;
   end;
 
 var
@@ -73,7 +78,7 @@ var
 
 { Opens the one assistant window, making it on first use. }
 procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource;
-  AskPicked: TSourceAskPicked);
+  AskPicked: TSourceAskPicked; UseHeck: TUseHeckEvent);
 
 implementation
 
@@ -83,11 +88,12 @@ uses
   hsDialogSkin, hsSurface, hsLongText, hsAssistantSettings, InkMarkdown;
 
 procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource;
-  AskPicked: TSourceAskPicked);
+  AskPicked: TSourceAskPicked; UseHeck: TUseHeckEvent);
 begin
   if AssistantForm = nil then AssistantForm := TAssistantForm.Create(AOwner);
   AssistantForm.OnAskSource := AskSource;
   AssistantForm.OnAskPicked := AskPicked;
+  AssistantForm.OnUseHeck := UseHeck;
   AssistantForm.Show;
   AssistantForm.BringToFront;
 end;
@@ -101,6 +107,11 @@ begin
   chkSheet.Checked := FSettings.SendSheet;
   chkPicked.Checked := FSettings.SendPicked;
   FLoading := False;
+  { a long answer's code folds to its first lines; Use this takes it to
+    the source window }
+  memChat.CodeFoldLines := 20;
+  memChat.CodeActions.Add('Use this');
+  memChat.OnCodeAction := @CodeAction;
   ShowWho;
   Say('', 'Ask about this sheet, or ask for a change to it.  A change comes ' +
     'back as Heck, to look over before it goes into the drawing.',
@@ -143,6 +154,20 @@ begin
   if (ProviderOf(FSettings) <> PROV_OWN) and (LoadAssistantKey = '') then
     S := S + InkSpan(' - no key yet', ToneColor(False), False, False);
   lblWho.Caption := S;
+end;
+
+{ Use this on a code block: its Heck into the source window, to look over
+  and Apply - never into the drawing by itself }
+procedure TAssistantForm.CodeAction(Sender: TObject; ABlock: Integer;
+  const AAction, ACode, ALanguage: string);
+begin
+  if AAction <> 'Use this' then Exit;
+  if (ALanguage <> '') and not SameText(ALanguage, 'heck') then
+  begin
+    Say('', 'That block is ' + ALanguage + ', not Heck.', ToneColor(False));
+    Exit;
+  end;
+  if Assigned(OnUseHeck) then OnUseHeck(ACode);
 end;
 
 { what the sheet would give, on the status line }
