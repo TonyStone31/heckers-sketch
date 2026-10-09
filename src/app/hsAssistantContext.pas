@@ -19,6 +19,7 @@ type
     SendManual: Boolean;   { Writing Heck and the Heck page }
     SendSheet: Boolean;    { the whole sheet as Heck }
     SendPicked: Boolean;   { which lines are picked }
+    Think: Boolean;        { a model that reasons may first; off answers at once }
   end;
 
 const
@@ -62,6 +63,7 @@ begin
   Result.SendManual := True;
   Result.SendSheet := True;
   Result.SendPicked := True;
+  Result.Think := True;
 end;
 
 function LoadAssistantSettings: TAssistantSettings;
@@ -78,6 +80,7 @@ begin
       Result.SendManual := Ini.ReadBool(SECTION, 'sendmanual', Result.SendManual);
       Result.SendSheet := Ini.ReadBool(SECTION, 'sendsheet', Result.SendSheet);
       Result.SendPicked := Ini.ReadBool(SECTION, 'sendpicked', Result.SendPicked);
+      Result.Think := Ini.ReadBool(SECTION, 'think', Result.Think);
     finally
       Ini.Free;
     end;
@@ -99,6 +102,7 @@ begin
       Ini.WriteBool(SECTION, 'sendmanual', S.SendManual);
       Ini.WriteBool(SECTION, 'sendsheet', S.SendSheet);
       Ini.WriteBool(SECTION, 'sendpicked', S.SendPicked);
+      Ini.WriteBool(SECTION, 'think', S.Think);
     finally
       Ini.Free;
     end;

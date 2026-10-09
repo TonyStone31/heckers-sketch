@@ -134,6 +134,14 @@ object AssistantSettingsForm: TAssistantSettingsForm
       Font.Height = -12
       ParentFont = False
     end
+    object chkThink: TBGRAThemeCheckBox
+      Left = 24
+      Height = 26
+      Top = 314
+      Width = 472
+      Caption = 'Let a model that reasons think first - slower, often better'
+      TabOrder = 3
+    end
     object btnCancel: TBCButton
       Tag = 2
       Left = 268

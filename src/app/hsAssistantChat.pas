@@ -29,8 +29,8 @@ type
     FLine: string;
     FAll: string;
     FStreamed: Boolean;
-    FOnPiece: TChatPiece;
-    function PieceOf(const Json: string; Streamed: Boolean): string;
+    FOnPiece, FOnThink: TChatPiece;
+    function PieceOf(const Json: string; Streamed: Boolean; const Field: string = 'content'): string;
     procedure TakeLine(const L: string);
   public
     Stopped: Boolean;
@@ -42,6 +42,8 @@ type
     { the reply as it came, for an error message }
     property All: string read FAll;
     property OnPiece: TChatPiece read FOnPiece write FOnPiece;
+    { the model's reasoning before it answers, where a server sends it }
+    property OnThink: TChatPiece read FOnThink write FOnThink;
   end;
 
   { The question on its own thread; OnPiece and OnDone run on the main
@@ -52,16 +54,19 @@ type
     FStream: TChatStream;
     FPiece, FErr: string;
     FOK: Boolean;
-    FOnPiece: TChatPiece;
+    FOnPiece, FOnThink: TChatPiece;
     FOnDone: TChatDone;
     procedure GotPiece(Sender: TObject; const Piece: string);
+    procedure GotThink(Sender: TObject; const Piece: string);
     procedure SyncPiece;
+    procedure SyncThink;
     procedure SyncDone;
   protected
     procedure Execute; override;
   public
     constructor Create(const S: TAssistantSettings; const Key: string;
-      const Msgs: TChatMsgs; AOnPiece: TChatPiece; AOnDone: TChatDone);
+      const Msgs: TChatMsgs; AOnPiece: TChatPiece; AOnDone: TChatDone;
+      AOnThink: TChatPiece = nil);
     procedure Stop;
     { stops it and drops its events, for a window going away }
     procedure Detach;
@@ -111,6 +116,9 @@ begin
   try
     if S.Model <> '' then O.Add('model', S.Model);
     O.Add('stream', True);
+    { a reasoning model answers at once; a server that does not know it
+      lets it pass }
+    if not S.Think then O.Add('reasoning_effort', 'none');
     A := TJSONArray.Create;
     for I := 0 to High(Msgs) do
     begin
@@ -166,7 +174,7 @@ end;
 
 { TChatStream }
 
-function TChatStream.PieceOf(const Json: string; Streamed: Boolean): string;
+function TChatStream.PieceOf(const Json: string; Streamed: Boolean; const Field: string): string;
 var
   D: TJSONData;
   C: TJSONArray;
@@ -182,8 +190,8 @@ begin
     if not (D is TJSONObject) then Exit;
     C := TJSONObject(D).Find('choices', jtArray) as TJSONArray;
     if (C = nil) or (C.Count = 0) or not (C.Items[0] is TJSONObject) then Exit;
-    if Streamed then E := TJSONObject(C.Items[0]).FindPath('delta.content')
-    else E := TJSONObject(C.Items[0]).FindPath('message.content');
+    if Streamed then E := TJSONObject(C.Items[0]).FindPath('delta.' + Field)
+    else E := TJSONObject(C.Items[0]).FindPath('message.' + Field);
     if (E <> nil) and (E.JSONType = jtString) then Result := E.AsString;
   finally
     D.Free;
@@ -192,12 +200,17 @@ end;
 
 procedure TChatStream.TakeLine(const L: string);
 var
-  P: string;
+  P, T: string;
 begin
   if Copy(L, 1, 5) <> 'data:' then Exit;
   FStreamed := True;
   P := Trim(Copy(L, 6, MaxInt));
   if (P = '') or (P = '[DONE]') then Exit;
+  if Assigned(FOnThink) then
+  begin
+    T := PieceOf(P, True, 'reasoning_content');
+    if T <> '' then FOnThink(Self, T);
+  end;
   P := PieceOf(P, True);
   if (P <> '') and Assigned(FOnPiece) then FOnPiece(Self, P);
 end;
@@ -244,15 +257,17 @@ end;
 { TChatThread }
 
 constructor TChatThread.Create(const S: TAssistantSettings; const Key: string;
-  const Msgs: TChatMsgs; AOnPiece: TChatPiece; AOnDone: TChatDone);
+  const Msgs: TChatMsgs; AOnPiece: TChatPiece; AOnDone: TChatDone; AOnThink: TChatPiece);
 begin
   FURL := ChatURL(S);
   FKey := Key;
   FBody := ChatBody(S, Msgs);
   FOnPiece := AOnPiece;
+  FOnThink := AOnThink;
   FOnDone := AOnDone;
   FStream := TChatStream.Create;
   FStream.OnPiece := @GotPiece;
+  if Assigned(AOnThink) then FStream.OnThink := @GotThink;
   FreeOnTerminate := True;
   inherited Create(False);
 end;
@@ -266,6 +281,7 @@ end;
 procedure TChatThread.Detach;
 begin
   FOnPiece := nil;
+  FOnThink := nil;
   FOnDone := nil;
   Stop;
 end;
@@ -274,6 +290,17 @@ procedure TChatThread.GotPiece(Sender: TObject; const Piece: string);
 begin
   FPiece := Piece;
   Synchronize(@SyncPiece);
+end;
+
+procedure TChatThread.GotThink(Sender: TObject; const Piece: string);
+begin
+  FPiece := Piece;
+  Synchronize(@SyncThink);
+end;
+
+procedure TChatThread.SyncThink;
+begin
+  if Assigned(FOnThink) then FOnThink(Self, FPiece);
 end;
 
 procedure TChatThread.SyncPiece;

@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, ExtCtrls, LCLType, Clipbrd,
-  BCButton, InkLabel, BCComboBox, InkEdit, hsAssistantContext;
+  BCButton, InkLabel, BCComboBox, InkEdit, BGRATheme, BGRAThemeCheckBox, hsAssistantContext;
 
 type
 
@@ -30,6 +30,7 @@ type
     btnPasteKey: TBCButton;
     btnForgetKey: TBCButton;
     lblKeyWhere: TInkLabel;
+    chkThink: TBGRAThemeCheckBox;
     btnCancel: TBCButton;
     btnSave: TBCButton;
     procedure FormCreate(Sender: TObject);
@@ -78,6 +79,7 @@ begin
   if cbProvider.ItemIndex < 0 then cbProvider.ItemIndex := 0;
   edEndpoint.Text := S.Endpoint;
   edModel.Text := S.Model;
+  chkThink.Checked := S.Think;
   lblKeyWhere.Caption := DimSpan('Kept in ', False) + TextSpan(AssistantKeyFile, False, False) +
     DimSpan(', apart from the settings, and never shown here.', False);
   FKey := LoadAssistantKey;
@@ -137,6 +139,7 @@ begin
   S.Provider := cbProvider.Text;
   S.Endpoint := Trim(edEndpoint.Text);
   S.Model := Trim(edModel.Text);
+  S.Think := chkThink.Checked;
   SaveAssistantSettings(S);
   if FKey <> LoadAssistantKey then SaveAssistantKey(FKey);
   ModalResult := mrOK;

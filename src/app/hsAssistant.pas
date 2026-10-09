@@ -51,7 +51,9 @@ type
     FChat: TChatThread;
     FHistory: TChatMsgs;
     FAnswer: string;
+    FThought: Integer;
     procedure ChatPiece(Sender: TObject; const Piece: string);
+    procedure ChatThink(Sender: TObject; const Piece: string);
     procedure ChatDone(Sender: TObject; OK: Boolean; const Err: string);
     procedure Busy(On: Boolean);
     procedure ShowWho;
@@ -301,16 +303,28 @@ begin
   Msgs[0].Text := SystemText;
   for I := 0 to High(FHistory) do Msgs[I + 1] := FHistory[I];
   FAnswer := '';
+  FThought := 0;
   memChat.AppendBlock('...', itfMarkdown);
   Busy(True);
-  FChat := TChatThread.Create(FSettings, Key, Msgs, @ChatPiece, @ChatDone);
+  FChat := TChatThread.Create(FSettings, Key, Msgs, @ChatPiece, @ChatDone, @ChatThink);
   ShowGiven;
 end;
 
 procedure TAssistantForm.ChatPiece(Sender: TObject; const Piece: string);
 begin
+  if (FAnswer = '') and (FThought > 0) then ShowGiven;
   FAnswer := FAnswer + Piece;
   memChat.ReplaceLast(FAnswer);
+end;
+
+{ a model reasoning before it answers: say so, and how far it has got }
+procedure TAssistantForm.ChatThink(Sender: TObject; const Piece: string);
+begin
+  if FAnswer <> '' then Exit;
+  if FThought = 0 then memChat.ReplaceLast('*thinking...*');
+  Inc(FThought, Length(Piece));
+  lblStatus.Caption := DimSpan('Thinking first - ', False) +
+    TextSpan(IntToStr(FThought), True) + DimSpan(' characters so far', False);
 end;
 
 procedure TAssistantForm.ChatDone(Sender: TObject; OK: Boolean; const Err: string);
