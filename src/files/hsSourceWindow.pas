@@ -16,7 +16,7 @@ uses
   SynGutterLineNumber, SynEditMarkupHighAll, SynEditMarkupWordGroup, SynEditMouseCmds, LCLIntf,
   SynEditMiscProcs, LazSynEditText, SynEditFoldedView,
   BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsHeckHighlight, hsJigRun, hsHeckSample, hsHeckComplete,
-  hsHeckWriter, StrUtils, hsDialogSkin, InkEdit;
+  hsHeckWriter, StrUtils, hsDialogSkin, InkEdit, InkListBox;
 
 type
   TSourceAskState = procedure(out DocSeq, PickSeq: Int64) of object;
@@ -46,7 +46,6 @@ type
     btnFold: TBCButton;
     btnApply: TBCButton;
     btnRevert: TBCButton;
-    btnSample: TBCButton;
     btnJigs: TBCButton;
     btnPick: TBCButton;
     lblApply: TLabel;
@@ -57,16 +56,19 @@ type
     pnlTop: TPanel;
     Status: TLabel;
     tmrFollow: TTimer;
+    tmrCheck: TTimer;
+    lstMessages: TInkListBox;
     pmEditor: TPopupMenu;
     miCenter: TMenuItem;
     miGoTo: TMenuItem;
     miRunJig: TMenuItem;
+    procedure tmrCheckTimer(Sender: TObject);
+    procedure lstMessagesClick(Sender: TObject);
     procedure chkOnlyPickedChange(Sender: TObject);
     procedure chkOnTopChange(Sender: TObject);
     procedure btnFoldClick(Sender: TObject);
     procedure btnApplyClick(Sender: TObject);
     procedure btnRevertClick(Sender: TObject);
-    procedure btnSampleClick(Sender: TObject);
     procedure btnJigsClick(Sender: TObject);
     procedure btnPickClick(Sender: TObject);
     procedure EditorChange(Sender: TObject);
@@ -140,6 +142,9 @@ type
     OnAskPicked: TSourceAskPicked;
     OnPickThings: TSourcePickThings;
     OnApply: TSourceApply;
+    { Reads the text as Apply would, without changing the drawing: for the
+      messages below the text while it is being edited. }
+    OnCheck: TSourceApply;
     OnRunJigs: TSourceRunJigs;
     OnRunJig: TSourceRunJig;
     OnCenter: TSourceCenter;
@@ -159,6 +164,8 @@ type
     procedure RunJigAt(Line: Integer);
     { Check now instead of waiting for the next tick. }
     procedure Refresh_;
+    procedure Say(Good: Boolean; Row: Integer; const Txt: string);
+    procedure EditRows(out A, B: Integer);
     { Match the program's theme, including the picked-line wash and axis colors. }
     procedure UseDark(Dark: Boolean; Back, Fore: TColor);
     { The window around the page in the dialog theme (hsDialogSkin); the page
@@ -168,6 +175,9 @@ type
     function LineOfThing(I: Integer; out LineNo: Integer; out Line: string): Boolean;
     { Public so a command or a test can press them. }
     procedure LoadSample;
+    procedure ToggleComment;
+    procedure Changed;
+    procedure DuplicateLines;
     procedure ApplyNow;
     { Completion opens by itself, or only on Ctrl+Space. }
     procedure SetAutoComplete(On: Boolean);
@@ -281,6 +291,11 @@ begin
     Enabled := True;
   end;
   Editor.MouseOptions := Editor.MouseOptions + [emShowCtrlMouseLinks, emCtrlWheelZoom];
+  { Enter keeps the indent; Tab and Shift+Tab move picked lines in and out
+    by Heck's two spaces }
+  Editor.Options := Editor.Options + [eoAutoIndent, eoTabIndent, eoTabsToSpaces];
+  Editor.BlockIndent := 2;
+  Editor.TabWidth := 2;
   Editor.OnKeyDown := @EditorKeyDown;   { passes keys on to the completer }
   Editor.OnMouseLink := @EditorMouseLink;
   Editor.OnClickLink := @EditorClickLink;
@@ -340,9 +355,19 @@ begin
   CloseAction := caHide;
 end;
 
+{ A sample drawing and jigs in the editor as if typed; Apply makes it
+  happen.  /source sample. }
 procedure TSourceForm.LoadSample;
 begin
-  btnSampleClick(nil);
+  WriteSampleJigs(JigsDir);
+  FBusy := True;
+  try
+    Editor.ReadOnly := False;
+    Editor.Lines.Text := SampleHeck;
+  finally
+    FBusy := False;
+  end;
+  SetEdited(True, 'A sample, and its jigs are in ' + JigsDir + '.  Press Apply, then Run jigs.');
 end;
 
 procedure TSourceForm.ApplyNow;
@@ -734,7 +759,93 @@ begin
   begin
     FindNext(ssShift in Shift);
     Key := 0;
+  end
+  else if ((Key = 191) or (Key = 111)) and (ssCtrl in Shift) then   { Ctrl+/ }
+  begin
+    ToggleComment;
+    Key := 0;
+  end
+  else if (Key = Ord('D')) and (ssCtrl in Shift) then
+  begin
+    DuplicateLines;
+    Key := 0;
   end;
+end;
+
+{ the picked lines, or the caret's: first and last, 0-based }
+procedure TSourceForm.EditRows(out A, B: Integer);
+begin
+  A := Editor.CaretY - 1;
+  B := A;
+  if Editor.SelAvail then
+  begin
+    A := Editor.BlockBegin.Y - 1;
+    B := Editor.BlockEnd.Y - 1;
+    if (Editor.BlockEnd.X = 1) and (B > A) then Dec(B);
+  end;
+end;
+
+{ Ctrl+/: the lines become comments, or stop being them when all are }
+procedure TSourceForm.ToggleComment;
+var
+  A, B, R, P: Integer;
+  All: Boolean;
+  L: string;
+begin
+  EditRows(A, B);
+  FBusy := True;      { no completion popping up for an edit of its own }
+  All := True;
+  for R := A to B do
+    if (Trim(Editor.Lines[R]) <> '') and (Copy(TrimLeft(Editor.Lines[R]), 1, 2) <> '//') then All := False;
+  Editor.BeginUndoBlock;
+  try
+    for R := A to B do
+    begin
+      L := Editor.Lines[R];
+      if Trim(L) = '' then Continue;
+      P := Length(L) - Length(TrimLeft(L)) + 1;
+      if All then
+      begin
+        Delete(L, P, 2);
+        if Copy(L, P, 1) = ' ' then Delete(L, P, 1);
+      end
+      else
+        Insert('// ', L, P);
+      Editor.TextBetweenPoints[Point(1, R + 1), Point(Length(Editor.Lines[R]) + 1, R + 1)] := L;
+    end;
+  finally
+    Editor.EndUndoBlock;
+    FBusy := False;
+  end;
+  Changed;
+end;
+
+{ an edit made here and not typed: counted as typing, checked once it rests }
+procedure TSourceForm.Changed;
+begin
+  if not FEdited then SetEdited(True);
+  tmrCheck.Enabled := False;
+  tmrCheck.Enabled := True;
+end;
+
+{ Ctrl+D: the line, or the picked lines, again below }
+procedure TSourceForm.DuplicateLines;
+var
+  A, B, R: Integer;
+  T: string;
+begin
+  EditRows(A, B);
+  T := '';
+  for R := A to B do T := T + LineEnding + Editor.Lines[R];
+  FBusy := True;
+  try
+    Editor.TextBetweenPoints[Point(Length(Editor.Lines[B]) + 1, B + 1),
+      Point(Length(Editor.Lines[B]) + 1, B + 1)] := T;
+    Editor.CaretXY := Point(Editor.CaretX, B + 2);
+  finally
+    FBusy := False;
+  end;
+  Changed;
 end;
 
 { The text has been edited.  Until Apply or Revert the drawing is not
@@ -745,20 +856,79 @@ begin
   pnlApply.Visible := On_;
   if Msg <> '' then lblApply.Caption := Msg
   else lblApply.Caption := 'Changed.  Apply makes the drawing match; nothing on the sheet moves until then.';
-  if not On_ then FErrRow := -1;
+  if not On_ then
+  begin
+    FErrRow := -1;
+    tmrCheck.Enabled := False;
+    lstMessages.Items.Clear;
+  end;
   Editor.Invalidate;
+end;
+
+{ A line in the messages below the text.  Row is the text's 0-based line it
+  is about, -1 for none; a click on it goes there. }
+procedure TSourceForm.Say(Good: Boolean; Row: Integer; const Txt: string);
+var
+  S: string;
+begin
+  if Row >= 0 then
+    S := InkSpan(Format('Line %d', [Row + 1]), ToneColor(Good), True) + TextSpan('  ' + Txt, False, False)
+  else
+    S := InkSpan(Txt, ToneColor(Good), False, False);
+  lstMessages.Items.AddObject(S, TObject(PtrInt(Row + 1)));
+end;
+
+{ The text read as Apply would read it, a moment after typing stops: what
+  is wrong, and where, before anything changes on the sheet. }
+procedure TSourceForm.tmrCheckTimer(Sender: TObject);
+var
+  ErrLine: Integer;
+  Err: string;
+  T0: QWord;
+  Ok_: Boolean;
+begin
+  tmrCheck.Enabled := False;
+  if not FEdited or not Assigned(OnCheck) then Exit;
+  T0 := GetTickCount64;
+  Ok_ := OnCheck(Editor.Lines, ErrLine, Err);
+  T0 := GetTickCount64 - T0;
+  lstMessages.Items.BeginUpdate;
+  try
+    lstMessages.Items.Clear;
+    if Ok_ then
+    begin
+      FErrRow := -1;
+      Say(True, -1, Format('It reads (checked in %d ms).  Apply puts it on the sheet.', [T0]));
+    end
+    else
+    begin
+      FErrRow := ErrLine;
+      Say(False, ErrLine, Err);
+    end;
+  finally
+    lstMessages.Items.EndUpdate;
+  end;
+  Editor.Invalidate;
+end;
+
+procedure TSourceForm.lstMessagesClick(Sender: TObject);
+var
+  Row: Integer;
+begin
+  if (lstMessages.ItemIndex < 0) or (lstMessages.ItemIndex >= lstMessages.Items.Count) then Exit;
+  Row := PtrInt(lstMessages.Items.Objects[lstMessages.ItemIndex]) - 1;
+  if (Row < 0) or (Row >= Editor.Lines.Count) then Exit;
+  Editor.CaretXY := Point(1, Row + 1);
+  Editor.EnsureCursorPosVisible;
+  Editor.SetFocus;
 end;
 
 procedure TSourceForm.EditorChange(Sender: TObject);
 begin
   if Assigned(FCompleteChange) and not FBusy then FCompleteChange(Sender);
   if FBusy or Editor.ReadOnly then Exit;
-  if not FEdited then SetEdited(True)
-  else if FErrRow >= 0 then
-  begin
-    FErrRow := -1;
-    Editor.Invalidate;
-  end;
+  { checked again once typing pauses }
+  Changed;
 end;
 
 procedure TSourceForm.btnApplyClick(Sender: TObject);
@@ -786,6 +956,8 @@ begin
   FErrRow := ErrLine;
   SetEdited(True, Format('What the Heck?  Line %d: %s', [ErrLine + 1, Err]));
   FErrRow := ErrLine;
+  lstMessages.Items.Clear;
+  Say(False, ErrLine, Err);
   if (ErrLine >= 0) and (ErrLine < Editor.Lines.Count) then
   begin
     FBusy := True;
@@ -805,20 +977,6 @@ begin
   Refresh_;
 end;
 
-{ Load a sample drawing and jigs into the editor as if typed; Apply makes
-  it happen. }
-procedure TSourceForm.btnSampleClick(Sender: TObject);
-begin
-  WriteSampleJigs(JigsDir);
-  FBusy := True;
-  try
-    Editor.ReadOnly := False;
-    Editor.Lines.Text := SampleHeck;
-  finally
-    FBusy := False;
-  end;
-  SetEdited(True, 'A sample, and its jigs are in ' + JigsDir + '.  Press Apply, then Run jigs.');
-end;
 
 procedure TSourceForm.btnJigsClick(Sender: TObject);
 begin
@@ -1194,8 +1352,7 @@ end;
 
 procedure TSourceForm.chkOnTopChange(Sender: TObject);
 begin
-  if chkOnTop.Checked then FormStyle := fsSystemStayOnTop
-  else FormStyle := fsNormal;
+  hsDialogSkin.SetOnTop(Self, chkOnTop.Checked);
 end;
 
 { Buttons and boxes in the program's theme, as in every dialog.  UseDark

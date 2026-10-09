@@ -2051,6 +2051,7 @@ begin
     SourceForm.OnAskPicked := @SourceAskPicked;
     SourceForm.OnPickThings := @SourcePickThings;
     SourceForm.OnApply := @SourceApply;
+    SourceForm.OnCheck := @SourceCheck;
     SourceForm.OnRunJigs := @RunAllJigs;
     SourceForm.OnRunJig := @RunJigOfThing;
     SourceForm.OnPick := @SourcePick;
@@ -2159,6 +2160,24 @@ begin
   InfoChanged;
   Took('source: pick, panels', T1);
   pbScreen.Invalidate;
+end;
+
+{ The source window's text read as Apply would, into a scratch drawing
+  that is thrown away: whether it reads, and where it does not. }
+function TMainForm.SourceCheck(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
+var
+  T: TWorkDoc;
+begin
+  Result := False;
+  ErrLine := -1;
+  Err := 'there is no sheet open';
+  if FD = nil then Exit;
+  T := TWorkDoc.Create;
+  try
+    Result := ReadHeck(L, T, FD.Units, ErrLine, Err);
+  finally
+    T.Free;
+  end;
 end;
 
 { Apply the source window's text to the drawing.  Read into a scratch

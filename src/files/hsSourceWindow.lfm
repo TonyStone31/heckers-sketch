@@ -48,16 +48,8 @@ object SourceForm: TSourceForm
       Caption = 'Unfold'
       OnClick = btnUnfoldClick
     end
-    object btnSample: TBCButton
-      Left = 266
-      Height = 26
-      Top = 6
-      Width = 66
-      Caption = 'Sample'
-      OnClick = btnSampleClick
-    end
     object btnJigs: TBCButton
-      Left = 336
+      Left = 266
       Height = 26
       Top = 6
       Width = 74
@@ -65,7 +57,7 @@ object SourceForm: TSourceForm
       OnClick = btnJigsClick
     end
     object btnPick: TBCButton
-      Left = 414
+      Left = 344
       Height = 26
       Top = 6
       Width = 48
@@ -140,6 +132,19 @@ object SourceForm: TSourceForm
       end
     end
   end
+  object lstMessages: TInkListBox
+    Left = 0
+    Height = 96
+    Top = 710
+    Width = 1202
+    Align = alBottom
+    Borders.Left = 6
+    LineSpacing = 2
+    EditMode = emNone
+    TabOrder = 3
+    TabStop = False
+    OnClick = lstMessagesClick
+  end
   object pnlApply: TPanel
     Left = 0
     Height = 40
@@ -212,6 +217,13 @@ object SourceForm: TSourceForm
       Caption = 'Run the Jig Again'
       OnClick = miRunJigClick
     end
+  end
+  object tmrCheck: TTimer
+    Enabled = False
+    Interval = 600
+    OnTimer = tmrCheckTimer
+    Left = 120
+    Top = 80
   end
   object tmrFollow: TTimer
     Interval = 150

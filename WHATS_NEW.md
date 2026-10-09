@@ -7,7 +7,10 @@
   heading to the tag when it cuts a release.  Sections are shown newest
   first, and an update shows only the ones newer than the version it
   replaced.  Headings: "## v2026.09.05.25" or "## Next release", then
-  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.
+  "### New" and "### Fixed"
+- Ticking **On top** on the source window could lose it behind the main
+  window, and two windows on top could not be brought in front of each other.
+, then "- " bullets.  Keep the bullets short.
 -->
 
 ## Next release

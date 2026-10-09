@@ -107,6 +107,10 @@ procedure SkinSlider(T: TBCFluentSlider);
   as laid out.  Button Tag: 1 main action, 2 quiet, 0 plain.  Label or
   panel Tag 1: dim text or raised panel; a TInkLabel too.  Call from OnCreate, after UseTheme. }
 procedure ThemeForm(F: TForm);
+{ A window kept above the others, or not.  On GTK3 the style changed on a
+  window already showing lost it behind the main window, so a showing one
+  is hidden, changed and shown again. }
+procedure SetOnTop(F: TForm; On: Boolean);
 { Keep the message loop turning this long, so what was just put up paints
   and the window stays responsive. }
 procedure PauseFor(Milliseconds: QWord);
@@ -621,6 +625,23 @@ begin
       Exit(C.Color);
     C := C.Parent;
   end;
+end;
+
+procedure SetOnTop(F: TForm; On: Boolean);
+var
+  Want: TFormStyle;
+begin
+  if On then Want := fsStayOnTop else Want := fsNormal;
+  if F.FormStyle = Want then Exit;
+  if not F.Visible then
+  begin
+    F.FormStyle := Want;
+    Exit;
+  end;
+  F.Hide;
+  F.FormStyle := Want;
+  F.Show;
+  F.BringToFront;
 end;
 
 procedure PauseFor(Milliseconds: QWord);

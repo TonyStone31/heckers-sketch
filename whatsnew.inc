@@ -10,7 +10,10 @@ const
     '  heading to the tag when it cuts a release.  Sections are shown newest' + LineEnding +
     '  first, and an update shows only the ones newer than the version it' + LineEnding +
     '  replaced.  Headings: "## v2026.09.05.25" or "## Next release", then' + LineEnding +
-    '  "### New" and "### Fixed", then "- " bullets.  Keep the bullets short.' + LineEnding +
+    '  "### New" and "### Fixed"' + LineEnding +
+    '- Ticking **On top** on the source window could lose it behind the main' + LineEnding +
+    '  window, and two windows on top could not be brought in front of each other.' + LineEnding +
+    ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
     '## Next release' + LineEnding +

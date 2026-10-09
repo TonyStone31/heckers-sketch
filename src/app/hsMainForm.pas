@@ -267,6 +267,7 @@ type
     procedure SourceAskPicked(out Picked: TIntArrayW);
     procedure SourcePickThings(const Things: TIntArrayW);
     function SourceApply(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
+    function SourceCheck(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
     { run the jig that makes this group again; 0 runs every jig on the sheet }
     function RunJigOf(PartId: Integer): Boolean;
     { the same, from the group's record - the source window's play button }
