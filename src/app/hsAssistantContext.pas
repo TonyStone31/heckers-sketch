@@ -16,7 +16,7 @@ type
     Provider: string;      { one of PROVIDERS }
     Endpoint: string;      { '' for the provider's own }
     Model: string;
-    SendManual: Boolean;   { Writing Heck and the Heck page }
+    SendManual: Boolean;   { the manual: Writing Heck }
     SendSheet: Boolean;    { the whole sheet as Heck }
     SendPicked: Boolean;   { which lines are picked }
     Think: Boolean;        { a model that reasons may first; off answers at once }
@@ -28,8 +28,10 @@ const
   PROV_OPENAI = 1;
   PROV_OWN = 2;
 
-  { the pages the assistant reads, in order, from the help folder }
-  MANUAL_PAGES: array[0..1] of string = ('writing-heck.html', 'heck.html');
+  { the pages the assistant reads, from the help folder: Writing Heck is the
+    whole language, and the overview beside it only says much of it again
+    in tokens a small model cannot spare }
+  MANUAL_PAGES: array[0..0] of string = ('writing-heck.html');
 
 function DefaultAssistantSettings: TAssistantSettings;
 { which of PROVIDERS; a name from an older settings file asks the

@@ -335,7 +335,16 @@ begin
     FHistory[High(FHistory)].Text := FAnswer;
   end
   else
+  begin
     memChat.ReplaceLast('*(no answer)*');
+    { a question with no answer leaves the conversation - two questions in a
+      row are refused by many models - and goes back in the box to send again }
+    if (Length(FHistory) > 0) and (FHistory[High(FHistory)].Role = 'user') then
+    begin
+      if Trim(memAsk.Text) = '' then memAsk.Text := FHistory[High(FHistory)].Text;
+      SetLength(FHistory, Length(FHistory) - 1);
+    end;
+  end;
   if not OK then
     if Err = 'stopped' then Say('', 'Stopped.', PixToColor(DlgTheme.TextDim))
     else
