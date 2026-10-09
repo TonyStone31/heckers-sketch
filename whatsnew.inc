@@ -17,6 +17,13 @@ const
     '' + LineEnding +
     '### Fixed' + LineEnding +
     '' + LineEnding +
+    '- Opening or leaving a group with the source window open stalled for a' + LineEnding +
+    '  second or two on a big drawing, and could lose your place in the text;' + LineEnding +
+    '  the text no longer gets rewritten for it.' + LineEnding +
+    '- Saving, and the source window catching up after an edit, are several' + LineEnding +
+    '  times faster on big drawings (a barn of 1,500 lines: from over a second' + LineEnding +
+    '  to about a seventh of one).' + LineEnding +
+    '' + LineEnding +
     '- A loft with something painted on it - a cannon with a black bore on its' + LineEnding +
     '  muzzle - was saved as hundreds of lines of faces.  It stays a loft, with' + LineEnding +
     '  the painted face written beside it.' + LineEnding +

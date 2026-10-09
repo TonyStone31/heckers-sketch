@@ -134,25 +134,25 @@ begin
   SetLength(Result, 64);
   for I := First to D.Live - 1 do
   begin
-    if (D[I].Part <> Part) or (D[I].Grp <> Grp) then Continue;
-    case D[I].Kind of
+    if (D.EntRef(I)^.Part <> Part) or (D.EntRef(I)^.Grp <> Grp) then Continue;
+    case D.EntRef(I)^.Kind of
       ekLine:
         begin
           if N >= Length(Result) then SetLength(Result, N * 2);
-          Result[N].A := D[I].A;
-          Result[N].B := D[I].B;
+          Result[N].A := D.EntRef(I)^.A;
+          Result[N].B := D.EntRef(I)^.B;
           Inc(N);
         end;
       ekArc:
         begin
-          A := ArcPoint(D[I].C, D[I].R, D[I].A0, D[I].Plane, D[I].Nm);
+          A := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
           Steps := ArcSteps(D[I]);
           for K := 1 to Steps do
           begin
             if N >= Length(Result) then SetLength(Result, N * 2);
             Result[N].A := A;
-            A := ArcPoint(D[I].C, D[I].R, D[I].A0 + D[I].Sweep * K / Steps,
-              D[I].Plane, D[I].Nm);
+            A := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0 + D.EntRef(I)^.Sweep * K / Steps,
+              D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
             Result[N].B := A;
             Inc(N);
           end;
@@ -203,14 +203,14 @@ var
   Hit: Boolean;
 begin
   Result := False;
-  if D[F].Kind <> ekFace then Exit;
-  if not SameLoop(R.Outer, D[F].Poly) then Exit;
-  if Length(R.Holes) <> Length(D[F].Holes) then Exit;
+  if D.EntRef(F)^.Kind <> ekFace then Exit;
+  if not SameLoop(R.Outer, D.EntRef(F)^.Poly) then Exit;
+  if Length(R.Holes) <> Length(D.EntRef(F)^.Holes) then Exit;
   for H := 0 to High(R.Holes) do
   begin
     Hit := False;
-    for K := 0 to High(D[F].Holes) do
-      if SameLoop(R.Holes[H], D[F].Holes[K]) then begin Hit := True; Break; end;
+    for K := 0 to High(D.EntRef(F)^.Holes) do
+      if SameLoop(R.Holes[H], D.EntRef(F)^.Holes[K]) then begin Hit := True; Break; end;
     if not Hit then Exit;
   end;
   Result := True;

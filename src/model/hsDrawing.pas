@@ -76,6 +76,7 @@ type
     ekLine uses A and B.  ekArc uses C (center), R, A0 (start angle) and
     Sweep - a circle is a sweep of 2*pi - and keeps A and B as its endpoints
     for snapping.  ekText uses A and Txt.  ekDim uses A and B. }
+  PWorkEnt = ^TWorkEnt;
   TWorkEnt = record
     Kind: TEntKind;
     A, B, C: TP3;
@@ -495,6 +496,9 @@ type
     function DimIf(I: Integer; const C: TPix): TPix;
     function InkPix(I: Integer): TPix;
     property Context: Integer read FContext write SetContext;
+    { changes when the drawing does, not when a group is opened or left:
+      for what shows the drawing's text and need not redo it then }
+    function ContentSeq: Integer;
     property Stamp: Integer read FStamp write FStamp;
     property NextPart: Integer read FNextPart;
     { Copy these entities, offset.  A copy stretches nothing. }
@@ -669,6 +673,8 @@ type
       See docs/render-acceleration.md. }
     Threads: Boolean;
     FEditSeq: Integer;
+    { how many of FEditSeq's steps were only a group opened or left }
+    FContextSteps: Integer;
     { EntHidden's answers, worked out once per edit: FHideOf[I] for each
       entity, good while FHideSeq is FEditSeq and the list is as long }
     FHideOf: array of Boolean;
@@ -711,6 +717,10 @@ type
       against the others }
     property LastBore: Integer read FLastBore;
     property Ent[I: Integer]: TWorkEnt read GetEnt; default;
+    { The thing itself, for reading a field without copying the whole
+      record (D[I] copies it, strings and outlines and all, which made a big
+      drawing's save take seconds).  Read only; good until the next change. }
+    function EntRef(I: Integer): PWorkEnt; inline;
   end;
 
 const
@@ -2599,6 +2609,11 @@ end;
 function TWorkDoc.GetEnt(I: Integer): TWorkEnt;
 begin
   Result := FEnts[I];
+end;
+
+function TWorkDoc.EntRef(I: Integer): PWorkEnt;
+begin
+  Result := @FEnts[I];
 end;
 
 function TWorkDoc.Stored: Integer;
@@ -4656,6 +4671,12 @@ begin
   FSnapDirty := True;
   FOnFaceOK := False;
   Inc(FEditSeq);
+  Inc(FContextSteps);
+end;
+
+function TWorkDoc.ContentSeq: Integer;
+begin
+  Result := FEditSeq - FContextSteps;
 end;
 
 function TWorkDoc.NewPart(const Name: string; Parent: Integer): Integer;

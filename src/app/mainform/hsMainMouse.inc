@@ -2095,9 +2095,11 @@ begin
   DocSeq := 0;
   PickSeq := 0;
   if FD = nil then Exit;
-  DocSeq := Int64(PtrUInt(FD)) xor (Int64(FD.Doc.FEditSeq) shl 20) xor
+  { the text does not change when a group is opened or left, and writing
+    it costs a second or two on a big drawing }
+  DocSeq := Int64(PtrUInt(FD)) xor (Int64(FD.Doc.ContentSeq) shl 20) xor
             (Int64(FD.Doc.Live) shl 8) xor (Int64(FD.UndoTop) shl 40) xor
-            (Int64(FD.RedoTop) shl 50) xor FD.Doc.Context;
+            (Int64(FD.RedoTop) shl 50);
   PickSeq := Length(FSel);
   for I := 0 to High(FSel) do
     PickSeq := (PickSeq * 1000003) xor FSel[I];
@@ -2106,6 +2108,8 @@ end;
 
 procedure TMainForm.SourceAskSource(L, Hints, Names: TStrings;
   out First, Last, LineThing: TIntArrayW; out SheetName: string);
+var
+  T0: QWord;
 begin
   SetLength(First, 0);
   SetLength(Last, 0);
@@ -2113,7 +2117,9 @@ begin
   SheetName := '';
   if FD = nil then Exit;
   SheetName := FD.Name;
+  T0 := GetTickCount64;
   WriteFormat2(FD.Doc, FD.Name, FD.Units, L, First, Last, LineThing, Hints, Names);
+  Took('source: the sheet written as Heck', T0);
 end;
 
 procedure TMainForm.SourceAskPicked(out Picked: TIntArrayW);
@@ -2131,8 +2137,10 @@ procedure TMainForm.SourcePickThings(const Things: TIntArrayW);
 var
   I: Integer;
   M: TIntArrayW;
+  T0, T1: QWord;
 begin
   if FD = nil then Exit;
+  T0 := GetTickCount64;
   SelectNone;
   BeginBulkSelect;
   for I := 0 to High(Things) do
@@ -2145,8 +2153,11 @@ begin
     else
       SelectAdd(Things[I]);
   EndBulkSelect;
+  Took('source: pick', T0);
+  T1 := GetTickCount64;
   FScreenDirty := True;
   InfoChanged;
+  Took('source: pick, panels', T1);
   pbScreen.Invalidate;
 end;
 
@@ -3373,6 +3384,8 @@ begin
 end;
 
 procedure TMainForm.OpenGroup(Id: Integer);
+var
+  T0: QWord;
 begin
   if Id <= 0 then Exit;
   if FD.Doc.PartLockedUp(Id) then
@@ -3384,9 +3397,15 @@ begin
   SetLength(FSel, 0);
   FD.Doc.Context := Id;
   FShotOK := False;
+  T0 := GetTickCount64;
   RenderInk;
+  Took('OpenGroup: ink', T0);
+  T0 := GetTickCount64;
   RecomposeAll;
+  Took('OpenGroup: recompose', T0);
+  T0 := GetTickCount64;
   InfoChanged;
+  Took('OpenGroup: panels', T0);
   FCmdMsg := Format('Inside "%s".  What you draw now belongs to it; ' +
     'Esc or a click on nothing leaves it.', [FD.Doc.PartName(Id)]);
   InvalidateStatus;
@@ -3396,15 +3415,22 @@ end;
 procedure TMainForm.CloseGroup;
 var
   Was: Integer;
+  T0: QWord;
 begin
   if FD.Doc.Context = 0 then Exit;
   Was := FD.Doc.Context;
   SetLength(FSel, 0);
   FD.Doc.Context := FD.Doc.PartParent(Was);
   FShotOK := False;
+  T0 := GetTickCount64;
   RenderInk;
+  Took('CloseGroup: ink', T0);
+  T0 := GetTickCount64;
   RecomposeAll;
+  Took('CloseGroup: recompose', T0);
+  T0 := GetTickCount64;
   InfoChanged;
+  Took('CloseGroup: panels', T0);
   if FD.Doc.Context = 0 then FCmdMsg := Format('Left "%s".', [FD.Doc.PartName(Was)])
   else FCmdMsg := Format('Left "%s" - inside "%s" now.',
     [FD.Doc.PartName(Was), FD.Doc.PartName(FD.Doc.Context)]);

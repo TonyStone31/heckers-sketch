@@ -116,29 +116,29 @@ begin
     for I := 0 to D.Live - 1 do
     begin
       { a group's record keeps its own number in Grp; it is no solid's }
-      if (D[I].Grp <> G) or (D[I].Part <> Part) or (D[I].Kind = ekPart) then Continue;
+      if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part) or (D.EntRef(I)^.Kind = ekPart) then Continue;
       One.Clear;
-      case D[I].Kind of
+      case D.EntRef(I)^.Kind of
         ekFace:
           begin
-            for K := 0 to High(D[I].Poly) do One.Add(Key(D[I].Poly[K]));
-            for H := 0 to High(D[I].Holes) do
-              for K := 0 to High(D[I].Holes[H]) do One.Add('h' + Key(D[I].Holes[H][K]));
+            for K := 0 to High(D.EntRef(I)^.Poly) do One.Add(Key(D.EntRef(I)^.Poly[K]));
+            for H := 0 to High(D.EntRef(I)^.Holes) do
+              for K := 0 to High(D.EntRef(I)^.Holes[H]) do One.Add('h' + Key(D.EntRef(I)^.Holes[H][K]));
           end;
         ekLine:
           begin
-            One.Add(Key(D[I].A));
-            One.Add(Key(D[I].B));
-            if D[I].Soft then One.Add('soft');
+            One.Add(Key(D.EntRef(I)^.A));
+            One.Add(Key(D.EntRef(I)^.B));
+            if D.EntRef(I)^.Soft then One.Add('soft');
           end;
         ekArc:
           begin
-            One.Add(Key(D[I].C));
-            One.Add(IntToStr(Round(D[I].R * 1E5)));
+            One.Add(Key(D.EntRef(I)^.C));
+            One.Add(IntToStr(Round(D.EntRef(I)^.R * 1E5)));
           end;
       end;
       One.Sort;
-      All.Add(IntToStr(Ord(D[I].Kind)) + ':' + One.CommaText);
+      All.Add(IntToStr(Ord(D.EntRef(I)^.Kind)) + ':' + One.CommaText);
     end;
     All.Sort;
     { FNV-1a over the lot; it wraps on purpose }
@@ -500,10 +500,10 @@ var
     Nm := '';
     Note := '';
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and ((D[I].SName <> '') or (D[I].SNote <> '')) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and ((D.EntRef(I)^.SName <> '') or (D.EntRef(I)^.SNote <> '')) then
       begin
-        Nm := D[I].SName;
-        Note := D[I].SNote;
+        Nm := D.EntRef(I)^.SName;
+        Note := D.EntRef(I)^.SNote;
         Exit;
       end;
   end;
@@ -522,10 +522,10 @@ var
       for K := 0 to High(Circles) do
       begin
         CircleNames[K] := '';
-        if (D[Circles[K]].Name <> '') and (Trim(NameWord(D[Circles[K]].Name)) = D[Circles[K]].Name) and
-           (Taken.IndexOf(D[Circles[K]].Name) < 0) then
+        if (D.EntRef(Circles[K])^.Name <> '') and (Trim(NameWord(D.EntRef(Circles[K])^.Name)) = D.EntRef(Circles[K])^.Name) and
+           (Taken.IndexOf(D.EntRef(Circles[K])^.Name) < 0) then
         begin
-          CircleNames[K] := D[Circles[K]].Name;
+          CircleNames[K] := D.EntRef(Circles[K])^.Name;
           Taken.Add(CircleNames[K]);
         end;
       end;
@@ -557,26 +557,26 @@ var
     SetLength(Inks, 0);
     SetLength(Wds, 0);
     for I := 0 to D.Live - 1 do
-      if D[I].Kind in [ekLine, ekArc, ekFace] then
+      if D.EntRef(I)^.Kind in [ekLine, ekArc, ekFace] then
       begin
         { lines, arcs and faces all carry an ink; the commonest over all of them
           is left unwritten most }
         K := 0;
-        while (K < Length(Inks)) and (Inks[K].C <> D[I].Ink) do Inc(K);
+        while (K < Length(Inks)) and (Inks[K].C <> D.EntRef(I)^.Ink) do Inc(K);
         if K = Length(Inks) then
         begin
           SetLength(Inks, K + 1);
-          Inks[K].C := D[I].Ink;
+          Inks[K].C := D.EntRef(I)^.Ink;
           Inks[K].N := 0;
         end;
         Inc(Inks[K].N);
-        if D[I].Kind = ekFace then Continue;
+        if D.EntRef(I)^.Kind = ekFace then Continue;
         K := 0;
-        while (K < Length(Wds)) and (Abs(Wds[K].W - D[I].Weight) > 1E-3) do Inc(K);
+        while (K < Length(Wds)) and (Abs(Wds[K].W - D.EntRef(I)^.Weight) > 1E-3) do Inc(K);
         if K = Length(Wds) then
         begin
           SetLength(Wds, K + 1);
-          Wds[K].W := D[I].Weight;
+          Wds[K].W := D.EntRef(I)^.Weight;
           Wds[K].N := 0;
         end;
         Inc(Wds[K].N);
@@ -778,12 +778,12 @@ var
     if N < 8 then Exit;
     for C := 0 to High(Circles) do
     begin
-      if D[Circles[C]].Part <> Part_ then Continue;
+      if D.EntRef(Circles[C])^.Part <> Part_ then Continue;
       Ok_ := True;
       for K := 0 to N - 1 do
       begin
-        P := ArcPoint(D[Circles[C]].C, D[Circles[C]].R,
-          D[Circles[C]].A0 + K * D[Circles[C]].Sweep / N, D[Circles[C]].Plane, D[Circles[C]].Nm);
+        P := ArcPoint(D.EntRef(Circles[C])^.C, D.EntRef(Circles[C])^.R,
+          D.EntRef(Circles[C])^.A0 + K * D.EntRef(Circles[C])^.Sweep / N, D.EntRef(Circles[C])^.Plane, D.EntRef(Circles[C])^.Nm);
         { Tolerance covers the six-place rounding older drawings carry; ring
           corners are far further apart than that. }
         Hit := -1;
@@ -803,10 +803,10 @@ var
     Result := P3(0, 0, 1);
     I := StrToIntDef(Copy(Nm, 2, MaxInt), 0) - 1;
     if (I < 0) or (I > High(Circles)) then Exit;
-    case D[Circles[I]].Plane of
+    case D.EntRef(Circles[I])^.Plane of
       plXZ: Result := P3(0, -1, 0);
       plYZ: Result := P3(1, 0, 0);
-      plFree: Result := D[Circles[I]].Nm;
+      plFree: Result := D.EntRef(Circles[I])^.Nm;
     end;
   end;
 
@@ -950,7 +950,7 @@ var
     Given := False;
     K := -1;
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Corners <> '') then begin K := I; Break; end;
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Corners <> '') then begin K := I; Break; end;
     if K < 0 then Exit;
     NV := 0;
     Votes := TFPHashList.Create;
@@ -965,24 +965,24 @@ var
       end;
       for I := K to D.Live - 1 do
       begin
-        if (D[I].Grp <> G) or (D[I].Part <> Part_) or (D[I].Corners = '') then Continue;
-        Parts := D[I].Corners.Split(['|']);
-        case D[I].Kind of
+        if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part_) or (D.EntRef(I)^.Corners = '') then Continue;
+        Parts := D.EntRef(I)^.Corners.Split(['|']);
+        case D.EntRef(I)^.Kind of
           ekLine:
             if Length(Parts) = 2 then
             begin
-              Vote(D[I].A, Parts[0]);
-              Vote(D[I].B, Parts[1]);
+              Vote(D.EntRef(I)^.A, Parts[0]);
+              Vote(D.EntRef(I)^.B, Parts[1]);
             end;
           ekFace, ekBore:
             begin
-              N := Length(D[I].Poly);
-              for H := 0 to High(D[I].Holes) do Inc(N, Length(D[I].Holes[H]));
+              N := Length(D.EntRef(I)^.Poly);
+              for H := 0 to High(D.EntRef(I)^.Holes) do Inc(N, Length(D.EntRef(I)^.Holes[H]));
               if Length(Parts) <> N then Continue;
               N := 0;
-              for J := 0 to High(D[I].Poly) do begin Vote(D[I].Poly[J], Parts[N]); Inc(N); end;
-              for H := 0 to High(D[I].Holes) do
-                for J := 0 to High(D[I].Holes[H]) do begin Vote(D[I].Holes[H][J], Parts[N]); Inc(N); end;
+              for J := 0 to High(D.EntRef(I)^.Poly) do begin Vote(D.EntRef(I)^.Poly[J], Parts[N]); Inc(N); end;
+              for H := 0 to High(D.EntRef(I)^.Holes) do
+                for J := 0 to High(D.EntRef(I)^.Holes[H]) do begin Vote(D.EntRef(I)^.Holes[H][J], Parts[N]); Inc(N); end;
             end;
         end;
       end;
@@ -1280,9 +1280,9 @@ var
 
   procedure PutInk(Depth, I: Integer);
   begin
-    if D[I].Ink <> DefInk then Put(Depth, 'ink = ' + Color2(D[I].Ink), I);
-    if (D[I].Kind in [ekLine, ekArc]) and (Abs(D[I].Weight - DefWidth) > 1E-3) then
-      Put(Depth, 'width = ' + FloatToStrF(D[I].Weight, ffGeneral, 4, 0, DotFS), I);
+    if D.EntRef(I)^.Ink <> DefInk then Put(Depth, 'ink = ' + Color2(D.EntRef(I)^.Ink), I);
+    if (D.EntRef(I)^.Kind in [ekLine, ekArc]) and (Abs(D.EntRef(I)^.Weight - DefWidth) > 1E-3) then
+      Put(Depth, 'width = ' + FloatToStrF(D.EntRef(I)^.Weight, ffGeneral, 4, 0, DotFS), I);
   end;
 
   { HasMat/Mat: what the solid says its faces are made of, so a face only
@@ -1296,22 +1296,22 @@ var
   begin
     W := FacingWord(D.FaceNormal(I));
     if W <> '' then Note := '   { facing ' + W + ' }' else Note := '';
-    Note := Note + TailNote(D[I].Note);
-    PutNote(Depth, D[I].Note, I);
-    SameMat := (D[I].MatSet = HasMat) and ((not HasMat) or (D[I].Mat = Mat));
-    if SameMat and (Length(D[I].Holes) = 0) and (D[I].Ink = DefInk) then
+    Note := Note + TailNote(D.EntRef(I)^.Note);
+    PutNote(Depth, D.EntRef(I)^.Note, I);
+    SameMat := (D.EntRef(I)^.MatSet = HasMat) and ((not HasMat) or (D.EntRef(I)^.Mat = Mat));
+    if SameMat and (Length(D.EntRef(I)^.Holes) = 0) and (D.EntRef(I)^.Ink = DefInk) then
     begin
-      PutList(Depth, 'face' + NameWord(D[I].Name), Outline(Pts, D[I].Poly, D[I].Part), I, Note);
+      PutList(Depth, 'face' + NameWord(D.EntRef(I)^.Name), Outline(Pts, D.EntRef(I)^.Poly, D.EntRef(I)^.Part), I, Note);
       Exit;
     end;
-    Put(Depth, 'face' + NameWord(D[I].Name) + Note, I);
-    PutList(Depth + 1, 'points', Outline(Pts, D[I].Poly, D[I].Part), I);
-    for K := 0 to High(D[I].Holes) do
-      PutList(Depth + 1, 'hole', Outline(Pts, D[I].Holes[K], D[I].Part, True), I);
+    Put(Depth, 'face' + NameWord(D.EntRef(I)^.Name) + Note, I);
+    PutList(Depth + 1, 'points', Outline(Pts, D.EntRef(I)^.Poly, D.EntRef(I)^.Part), I);
+    for K := 0 to High(D.EntRef(I)^.Holes) do
+      PutList(Depth + 1, 'hole', Outline(Pts, D.EntRef(I)^.Holes[K], D.EntRef(I)^.Part, True), I);
     if not SameMat then
-      if D[I].MatSet then Put(Depth + 1, 'paint = ' + Color2(D[I].Mat), I)
+      if D.EntRef(I)^.MatSet then Put(Depth + 1, 'paint = ' + Color2(D.EntRef(I)^.Mat), I)
       else Put(Depth + 1, 'paint = none', I);
-    if D[I].Ink <> DefInk then Put(Depth + 1, 'ink = ' + Color2(D[I].Ink), I);
+    if D.EntRef(I)^.Ink <> DefInk then Put(Depth + 1, 'ink = ' + Color2(D.EntRef(I)^.Ink), I);
     Put(Depth, 'end', I);
   end;
 
@@ -1320,19 +1320,19 @@ var
   var
     Ends: string;
   begin
-    Ends := Ref(Pts, D[I].A) + ' to ' + Ref(Pts, D[I].B);
-    PutNote(Depth, D[I].Note, I);
-    if (D[I].Ink = DefInk) and (Abs(D[I].Weight - DefWidth) <= 1E-3) and
-       (not D[I].Soft) and (not D[I].Dim) then
+    Ends := Ref(Pts, D.EntRef(I)^.A) + ' to ' + Ref(Pts, D.EntRef(I)^.B);
+    PutNote(Depth, D.EntRef(I)^.Note, I);
+    if (D.EntRef(I)^.Ink = DefInk) and (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) and
+       (not D.EntRef(I)^.Soft) and (not D.EntRef(I)^.Dim) then
     begin
-      Put(Depth, 'line' + NameWord(D[I].Name) + ' = ' + Ends + TailNote(D[I].Note), I);
+      Put(Depth, 'line' + NameWord(D.EntRef(I)^.Name) + ' = ' + Ends + TailNote(D.EntRef(I)^.Note), I);
       Exit;
     end;
-    Put(Depth, 'line' + NameWord(D[I].Name) + TailNote(D[I].Note), I);
+    Put(Depth, 'line' + NameWord(D.EntRef(I)^.Name) + TailNote(D.EntRef(I)^.Note), I);
     Put(Depth + 1, 'points = ' + Ends, I);
     PutInk(Depth + 1, I);
-    if D[I].Soft then Put(Depth + 1, 'soft = true', I);
-    if D[I].Dim then Put(Depth + 1, 'ref = true', I);
+    if D.EntRef(I)^.Soft then Put(Depth + 1, 'soft = true', I);
+    if D.EntRef(I)^.Dim then Put(Depth + 1, 'ref = true', I);
     Put(Depth, 'end', I);
   end;
 
@@ -1349,17 +1349,17 @@ var
     SetLength(None, 0);
     It := Items(None, Poly);
     Header := NLine;
-    PutNote(Depth, D[I].Note, I);
-    if (D[I].Ink = DefInk) and (Abs(D[I].Weight - DefWidth) <= 1E-3) and
-       (not D[I].Soft) and (not D[I].Dim) then
-      PutList(Depth, 'line' + NameWord(D[I].Name), It, I, TailNote(D[I].Note))
+    PutNote(Depth, D.EntRef(I)^.Note, I);
+    if (D.EntRef(I)^.Ink = DefInk) and (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) and
+       (not D.EntRef(I)^.Soft) and (not D.EntRef(I)^.Dim) then
+      PutList(Depth, 'line' + NameWord(D.EntRef(I)^.Name), It, I, TailNote(D.EntRef(I)^.Note))
     else
     begin
-      Put(Depth, 'line' + NameWord(D[I].Name) + TailNote(D[I].Note), I);
+      Put(Depth, 'line' + NameWord(D.EntRef(I)^.Name) + TailNote(D.EntRef(I)^.Note), I);
       PutList(Depth + 1, 'points', It, I);
       PutInk(Depth + 1, I);
-      if D[I].Soft then Put(Depth + 1, 'soft = true', I);
-      if D[I].Dim then Put(Depth + 1, 'ref = true', I);
+      if D.EntRef(I)^.Soft then Put(Depth + 1, 'soft = true', I);
+      if D.EntRef(I)^.Dim then Put(Depth + 1, 'ref = true', I);
       Put(Depth, 'end', I);
     end;
     for K := 0 to High(Chain) do
@@ -1377,44 +1377,44 @@ var
     A0: Double;
     Tl: string;
   begin
-    PutNote(Depth, D[I].Note, I);
-    Tl := TailNote(D[I].Note);
-    case D[I].Kind of
+    PutNote(Depth, D.EntRef(I)^.Note, I);
+    Tl := TailNote(D.EntRef(I)^.Note);
+    case D.EntRef(I)^.Kind of
       ekArc:
         begin
           { Facing follows its own turning, and the start is measured the grammar's
             way (from the level line), whatever axes the program keeps for the plane. }
           Nm := P3(0, 0, 1);
-          case D[I].Plane of
+          case D.EntRef(I)^.Plane of
             plXZ: Nm := P3(0, -1, 0);
             plYZ: Nm := P3(1, 0, 0);
-            plFree: Nm := D[I].Nm;
+            plFree: Nm := D.EntRef(I)^.Nm;
           end;
           SpecAxes(Nm, AU, AV);
-          P0 := Sub3(ArcPoint(D[I].C, D[I].R, D[I].A0, D[I].Plane, D[I].Nm), D[I].C);
+          P0 := Sub3(ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm), D.EntRef(I)^.C);
           A0 := ArcTan2(Dot3(P0, AV), Dot3(P0, AU));
           { A plain circle is one line: center, radius, and facing only when not up.
             Anything more (start, its own sides, an ink) makes it a block. }
-          if FullCircle(D[I].Sweep) and (Abs(A0) <= 1E-9) and
-             (D[I].Sides = HECK_SIDES) and (D[I].Ink = DefInk) and
-             (Abs(D[I].Weight - DefWidth) <= 1E-3) then
+          if FullCircle(D.EntRef(I)^.Sweep) and (Abs(A0) <= 1E-9) and
+             (D.EntRef(I)^.Sides = HECK_SIDES) and (D.EntRef(I)^.Ink = DefInk) and
+             (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) then
           begin
             if Abs(Nm.Z - 1) < 1E-9 then
-              Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D[I].C, U, False) +
-                '; ' + Len2(D[I].R, U) + Tl, I)
+              Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D.EntRef(I)^.C, U, False) +
+                '; ' + Len2(D.EntRef(I)^.R, U) + Tl, I)
             else
-              Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D[I].C, U, False) +
-                '; ' + Len2(D[I].R, U) + '; ' + Facing2(Nm) + Tl, I);
+              Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D.EntRef(I)^.C, U, False) +
+                '; ' + Len2(D.EntRef(I)^.R, U) + '; ' + Facing2(Nm) + Tl, I);
             Exit;
           end;
-          if FullCircle(D[I].Sweep) then Put(Depth, 'circle ' + CircleName(I) + Tl, I)
-          else Put(Depth, 'arc' + NameWord(D[I].Name) + Tl, I);
-          Put(Depth + 1, 'center = ' + Place2(D[I].C, U, False), I);
-          Put(Depth + 1, 'radius = ' + Len2(D[I].R, U), I);
+          if FullCircle(D.EntRef(I)^.Sweep) then Put(Depth, 'circle ' + CircleName(I) + Tl, I)
+          else Put(Depth, 'arc' + NameWord(D.EntRef(I)^.Name) + Tl, I);
+          Put(Depth + 1, 'center = ' + Place2(D.EntRef(I)^.C, U, False), I);
+          Put(Depth + 1, 'radius = ' + Len2(D.EntRef(I)^.R, U), I);
           Put(Depth + 1, 'facing = ' + Facing2(Nm), I);
           if Abs(A0) > 1E-9 then Put(Depth + 1, 'starts = ' + Deg2(A0), I);
-          if not FullCircle(D[I].Sweep) then
-            Put(Depth + 1, 'sweep = ' + Deg2(D[I].Sweep), I);
+          if not FullCircle(D.EntRef(I)^.Sweep) then
+            Put(Depth + 1, 'sweep = ' + Deg2(D.EntRef(I)^.Sweep), I);
           { the ring's sides for the faces it implies, written whenever they differ
             from what a one-line circle reads back with }
           if ArcSteps(D[I]) <> HECK_SIDES then Put(Depth + 1, 'sides = ' + IntToStr(ArcSteps(D[I])), I);
@@ -1423,36 +1423,36 @@ var
         end;
       ekDim:
         begin
-          Put(Depth, 'dim' + NameWord(D[I].Name) + Tl, I);
-          Put(Depth + 1, 'from = ' + Place2(D[I].A, U, False), I);
-          Put(Depth + 1, 'to = ' + Place2(D[I].B, U, False), I);
-          Put(Depth + 1, 'off = ' + Place2(D[I].C, U, True), I);
-          if D[I].Txt <> '' then Put(Depth + 1, 'label = ' + QuotedStr(D[I].Txt), I);
+          Put(Depth, 'dim' + NameWord(D.EntRef(I)^.Name) + Tl, I);
+          Put(Depth + 1, 'from = ' + Place2(D.EntRef(I)^.A, U, False), I);
+          Put(Depth + 1, 'to = ' + Place2(D.EntRef(I)^.B, U, False), I);
+          Put(Depth + 1, 'off = ' + Place2(D.EntRef(I)^.C, U, True), I);
+          if D.EntRef(I)^.Txt <> '' then Put(Depth + 1, 'label = ' + QuotedStr(D.EntRef(I)^.Txt), I);
           PutInk(Depth + 1, I);
           Put(Depth, 'end', I);
         end;
       ekGuide:
-        if SameP(D[I].A, D[I].B) then
-          Put(Depth, 'guide' + NameWord(D[I].Name) + ' = ' + Place2(D[I].A, U, False) + Tl, I)
+        if SameP(D.EntRef(I)^.A, D.EntRef(I)^.B) then
+          Put(Depth, 'guide' + NameWord(D.EntRef(I)^.Name) + ' = ' + Place2(D.EntRef(I)^.A, U, False) + Tl, I)
         else
-          Put(Depth, 'guide' + NameWord(D[I].Name) + ' = ' + Place2(D[I].A, U, False) + ' to ' +
-            Place2(D[I].B, U, False) + Tl, I);
+          Put(Depth, 'guide' + NameWord(D.EntRef(I)^.Name) + ' = ' + Place2(D.EntRef(I)^.A, U, False) + ' to ' +
+            Place2(D.EntRef(I)^.B, U, False) + Tl, I);
       ekText:
         begin
-          Put(Depth, 'note' + NameWord(D[I].Name) + Tl, I);
-          Put(Depth + 1, 'at = ' + Place2(D[I].A, U, False), I);
-          if not SameP(D[I].A, D[I].B) then
-            Put(Depth + 1, 'to = ' + Place2(D[I].B, U, False), I);
+          Put(Depth, 'note' + NameWord(D.EntRef(I)^.Name) + Tl, I);
+          Put(Depth + 1, 'at = ' + Place2(D.EntRef(I)^.A, U, False), I);
+          if not SameP(D.EntRef(I)^.A, D.EntRef(I)^.B) then
+            Put(Depth + 1, 'to = ' + Place2(D.EntRef(I)^.B, U, False), I);
           Parts := TStringList.Create;
           try
-            Parts.Text := D[I].Txt;
+            Parts.Text := D.EntRef(I)^.Txt;
             for K := 0 to Parts.Count - 1 do
               Put(Depth + 1, 'text = ' + QuotedStr(Parts[K]), I);
           finally
             Parts.Free;
           end;
-          if (D[I].Size > 0) and (Abs(D[I].Size - 1) > 1E-6) then
-            Put(Depth + 1, 'size = ' + FloatToStrF(D[I].Size, ffGeneral, 4, 0, DotFS), I);
+          if (D.EntRef(I)^.Size > 0) and (Abs(D.EntRef(I)^.Size - 1) > 1E-6) then
+            Put(Depth + 1, 'size = ' + FloatToStrF(D.EntRef(I)^.Size, ffGeneral, 4, 0, DotFS), I);
           PutInk(Depth + 1, I);
           Put(Depth, 'end', I);
         end;
@@ -1471,9 +1471,9 @@ var
   begin
     Result := False;
     if InPass1 or (I >= Length(ImpliedGeom)) or not ImpliedGeom[I] then Exit;
-    if D[I].Ink <> DefInk then Exit;
-    if D[I].MatSet and not (HasMat and (D[I].Mat = SMat)) then Exit;
-    if (not D[I].MatSet) and HasMat then Exit;
+    if D.EntRef(I)^.Ink <> DefInk then Exit;
+    if D.EntRef(I)^.MatSet and not (HasMat and (D.EntRef(I)^.Mat = SMat)) then Exit;
+    if (not D.EntRef(I)^.MatSet) and HasMat then Exit;
     Result := True;
   end;
 
@@ -1509,10 +1509,10 @@ var
     K, N: Integer;
   begin
     Result := False;
-    N := Length(D[F].Poly);
+    N := Length(D.EntRef(F)^.Poly);
     for K := 0 to N - 1 do
-      if (SameP(D[F].Poly[K], A) and SameP(D[F].Poly[(K + 1) mod N], B)) or
-         (SameP(D[F].Poly[K], B) and SameP(D[F].Poly[(K + 1) mod N], A)) then Exit(True);
+      if (SameP(D.EntRef(F)^.Poly[K], A) and SameP(D.EntRef(F)^.Poly[(K + 1) mod N], B)) or
+         (SameP(D.EntRef(F)^.Poly[K], B) and SameP(D.EntRef(F)^.Poly[(K + 1) mod N], A)) then Exit(True);
   end;
 
   function IsRect(Part_, I: Integer; out Lines: TIntArrayW; out Face: Integer;
@@ -1525,9 +1525,9 @@ var
 
     function Plain(L: Integer): Boolean;
     begin
-      Result := (D[L].Kind = ekLine) and (D[L].Part = Part_) and (D[L].Grp = 0) and
-        (not D[L].Soft) and (not D[L].Dim) and (D[L].Ink = D[I].Ink) and
-        (Abs(D[L].Weight - D[I].Weight) <= 1E-3) and (AxesUsed(Sub3(D[L].B, D[L].A)) = 1);
+      Result := (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Part = Part_) and (D.EntRef(L)^.Grp = 0) and
+        (not D.EntRef(L)^.Soft) and (not D.EntRef(L)^.Dim) and (D.EntRef(L)^.Ink = D.EntRef(I)^.Ink) and
+        (Abs(D.EntRef(L)^.Weight - D.EntRef(I)^.Weight) <= 1E-3) and (AxesUsed(Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A)) = 1);
     end;
 
     { Walk around, trying every plain line that leaves the corner and turns;
@@ -1545,8 +1545,8 @@ var
       begin
         if (J = Lines[0]) or not Plain(J) then Continue;
         if (K > 1) and ((J = Lines[1]) or ((K > 2) and (J = Lines[2]))) then Continue;
-        if SameP(D[J].A, Cur) then Nxt := D[J].B
-        else if SameP(D[J].B, Cur) then Nxt := D[J].A
+        if SameP(D.EntRef(J)^.A, Cur) then Nxt := D.EntRef(J)^.B
+        else if SameP(D.EntRef(J)^.B, Cur) then Nxt := D.EntRef(J)^.A
         else Continue;
         if SameP(Nxt, Pts[K - 1]) then Continue;            { back the way we came }
         { a corner: the next edge runs along a different axis }
@@ -1563,13 +1563,13 @@ var
     HasPaint := False;
     Paint := 0;
     SetLength(Lines, 0);
-    if (D[I].Kind <> ekLine) or not Plain(I) then Exit;
-    Ink := D[I].Ink;
-    Wd := D[I].Weight;
+    if (D.EntRef(I)^.Kind <> ekLine) or not Plain(I) then Exit;
+    Ink := D.EntRef(I)^.Ink;
+    Wd := D.EntRef(I)^.Weight;
     SetLength(Lines, 4);
     Lines[0] := I;
-    Pts[0] := D[I].A;
-    if not Walk(1, D[I].B) then Exit;
+    Pts[0] := D.EntRef(I)^.A;
+    if not Walk(1, D.EntRef(I)^.B) then Exit;
     for K := 0 to 3 do
       for J := K + 1 to 3 do
         if (Lines[K] = Lines[J]) or SameP(Pts[K], Pts[J]) then Exit;
@@ -1586,8 +1586,8 @@ var
     SetLength(Loop, 4);
     for K := 0 to 3 do Loop[K] := Pts[K];
     for F := 0 to D.Live - 1 do
-      if (D[F].Kind = ekFace) and (D[F].Part = Part_) and (D[F].Grp = 0) and
-         (Length(D[F].Holes) = 0) and (D[F].Ink = DefInk) and SameLoop(D[F].Poly, Loop) then
+      if (D.EntRef(F)^.Kind = ekFace) and (D.EntRef(F)^.Part = Part_) and (D.EntRef(F)^.Grp = 0) and
+         (Length(D.EntRef(F)^.Holes) = 0) and (D.EntRef(F)^.Ink = DefInk) and SameLoop(D.EntRef(F)^.Poly, Loop) then
       begin
         Face := F;
         Break;
@@ -1598,11 +1598,11 @@ var
       if each rect made its own. }
     for K := 0 to 3 do
       for F := 0 to D.Live - 1 do
-        if (D[F].Kind = ekFace) and (F <> Face) and EdgeOf(F, D[Lines[K]].A, D[Lines[K]].B) then Exit;
-    if D[Face].MatSet then
+        if (D.EntRef(F)^.Kind = ekFace) and (F <> Face) and EdgeOf(F, D.EntRef(Lines[K])^.A, D.EntRef(Lines[K])^.B) then Exit;
+    if D.EntRef(Face)^.MatSet then
     begin
       HasPaint := True;
-      Paint := D[Face].Mat;
+      Paint := D.EntRef(Face)^.Mat;
       { turned the way the reader turns one it paints: OrientFace's way }
       if Dot3(D.FaceNormal(Face), P3(Ord(Abs(Size.X) < 1E-9), Ord((Abs(Size.X) >= 1E-9) and (Abs(Size.Y) < 1E-9)),
            Ord((Abs(Size.X) >= 1E-9) and (Abs(Size.Y) >= 1E-9)))) <= 0 then Exit;
@@ -1616,8 +1616,8 @@ var
     again from the circle. }
   function IsDisk(I, Part_: Integer): Boolean;
   begin
-    Result := (D[I].Kind = ekFace) and (Length(D[I].Poly) >= 8) and
-      (Length(D[I].Holes) = 0) and (CircleNamed(D[I].Poly, Part_) <> '');
+    Result := (D.EntRef(I)^.Kind = ekFace) and (Length(D.EntRef(I)^.Poly) >= 8) and
+      (Length(D.EntRef(I)^.Holes) = 0) and (CircleNamed(D.EntRef(I)^.Poly, Part_) <> '');
   end;
 
   { One pen over all of a fold's lines, any ink or width as long as they all
@@ -1631,10 +1631,10 @@ var
     Ink := DefInk;
     Wd := DefWidth;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekLine) and (D[I].Grp = G) and (D[I].Part = Part_) then
+      if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
       begin
-        if N = 0 then begin Ink := D[I].Ink; Wd := D[I].Weight; end
-        else if (D[I].Ink <> Ink) or (Abs(D[I].Weight - Wd) > 1E-3) then Exit;
+        if N = 0 then begin Ink := D.EntRef(I)^.Ink; Wd := D.EntRef(I)^.Weight; end
+        else if (D.EntRef(I)^.Ink <> Ink) or (Abs(D.EntRef(I)^.Weight - Wd) > 1E-3) then Exit;
         Inc(N);
       end;
     Result := N > 0;
@@ -1652,12 +1652,12 @@ var
       T, Len2: Double;
       Q: TP3;
     begin
-      Q := Sub3(D[L].B, D[L].A);
+      Q := Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A);
       Len2 := Dot3(Q, Q);
       if Len2 < 1E-18 then Exit(False);
-      T := Dot3(Sub3(P, D[L].A), Q) / Len2;
+      T := Dot3(Sub3(P, D.EntRef(L)^.A), Q) / Len2;
       if (T < -1E-9) or (T > 1 + 1E-9) then Exit(False);
-      Result := Dist(P, Add3(D[L].A, Mul3(Q, T))) < 1E-6;
+      Result := Dist(P, Add3(D.EntRef(L)^.A, Mul3(Q, T))) < 1E-6;
     end;
 
   begin
@@ -1666,7 +1666,7 @@ var
     begin
       Found := False;
       for L := 0 to D.Live - 1 do
-        if (D[L].Kind = ekLine) and (D[L].Grp = 0) and (D[L].Part = Part_) and
+        if (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Grp = 0) and (D.EntRef(L)^.Part = Part_) and
            OnLine(Lp[K], L) and OnLine(Lp[(K + 1) mod Length(Lp)], L) then
         begin
           Found := True;
@@ -1700,37 +1700,37 @@ var
     if not OnePen(Part_, G, Ink, Wd) then Exit;
     for I := 0 to D.Live - 1 do
     begin
-      if (D[I].Grp <> G) or (D[I].Part <> Part_) then Continue;
+      if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part_) then Continue;
       if IsDisk(I, Part_) then Continue;
-      case D[I].Kind of
+      case D.EntRef(I)^.Kind of
         ekFace:
           begin
             Inc(NF);
-            if (Length(D[I].Poly) <> 4) or (D[I].Ink <> DefInk) then Exit;
+            if (Length(D.EntRef(I)^.Poly) <> 4) or (D.EntRef(I)^.Ink <> DefInk) then Exit;
             { a hole is allowed when it is a circle drawn on the face: the box is
               still a box, and the circle is written on its own }
-            for K := 0 to High(D[I].Holes) do
-              if (CircleNamed(D[I].Holes[K], Part_) = '') and not LooseLoop(D[I].Holes[K], Part_) then Exit;
+            for K := 0 to High(D.EntRef(I)^.Holes) do
+              if (CircleNamed(D.EntRef(I)^.Holes[K], Part_) = '') and not LooseLoop(D.EntRef(I)^.Holes[K], Part_) then Exit;
             W := FacingWord(D.FaceNormal(I));
             Side := High(FACINGS);
             while (Side >= 0) and (FACINGS[Side] <> W) do Dec(Side);
             if (Side < 0) or (Have and (1 shl Side) <> 0) then Exit;
             Have := Have or (1 shl Side);
             Sides[Side] := I;
-            if D[I].MatSet then
+            if D.EntRef(I)^.MatSet then
             begin
-              if (NPaint > 0) and (D[I].Mat <> Paint) then Exit;
-              Paint := D[I].Mat;
+              if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
+              Paint := D.EntRef(I)^.Mat;
               Inc(NPaint);
             end;
           end;
         ekLine:
           begin
             Inc(NL);
-            if D[I].Soft or D[I].Dim then Exit;
-            if AxesUsed(Sub3(D[I].B, D[I].A)) <> 1 then Exit;
-            AddPt(Pts, D[I].A);
-            AddPt(Pts, D[I].B);
+            if D.EntRef(I)^.Soft or D.EntRef(I)^.Dim then Exit;
+            if AxesUsed(Sub3(D.EntRef(I)^.B, D.EntRef(I)^.A)) <> 1 then Exit;
+            AddPt(Pts, D.EntRef(I)^.A);
+            AddPt(Pts, D.EntRef(I)^.B);
           end;
         ekBore: Exit;
       end;
@@ -1761,13 +1761,13 @@ var
       for K := 0 to 3 do
       begin
         case Side of
-          0: OnSide := Abs(D[Sides[Side]].Poly[K].Z - Lo.Z) < 1E-9;
-          1: OnSide := Abs(D[Sides[Side]].Poly[K].Z - Hi.Z) < 1E-9;
-          2: OnSide := Abs(D[Sides[Side]].Poly[K].Y - Lo.Y) < 1E-9;
-          3: OnSide := Abs(D[Sides[Side]].Poly[K].X - Hi.X) < 1E-9;
-          4: OnSide := Abs(D[Sides[Side]].Poly[K].Y - Hi.Y) < 1E-9;
+          0: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].Z - Lo.Z) < 1E-9;
+          1: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].Z - Hi.Z) < 1E-9;
+          2: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].Y - Lo.Y) < 1E-9;
+          3: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].X - Hi.X) < 1E-9;
+          4: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].Y - Hi.Y) < 1E-9;
         else
-          OnSide := Abs(D[Sides[Side]].Poly[K].X - Lo.X) < 1E-9;
+          OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].X - Lo.X) < 1E-9;
         end;
         if not OnSide then Exit;
       end;
@@ -1830,7 +1830,7 @@ var
     { every face and edge maps to this statement, so picking on the sheet
       lights up the box }
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind in [ekFace, ekLine]) and
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) and
          not IsDisk(I, Part_) then
       begin
         First[I] := Header;
@@ -1840,7 +1840,7 @@ var
       beside the box already gives them }
     SetLength(NoPts, 0);
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and IsDisk(I, Part_) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and IsDisk(I, Part_) then
         if FaceImplied(I, HasPaint, Paint) then
         begin
           First[I] := Header;
@@ -1891,27 +1891,27 @@ var
     if not OnePen(Part_, G, Ink, Wd) then Exit;
     for I := 0 to D.Live - 1 do
     begin
-      if (D[I].Grp <> G) or (D[I].Part <> Part_) then Continue;
-      case D[I].Kind of
+      if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part_) then Continue;
+      case D.EntRef(I)^.Kind of
         ekFace:
           begin
-            if D[I].Ink <> DefInk then Exit;
+            if D.EntRef(I)^.Ink <> DefInk then Exit;
             { a circle drawn on an end (a motor on a housing) is written on
               its own and cuts the end again when read, as on a box }
-            for K := 0 to High(D[I].Holes) do
-              if CircleNamed(D[I].Holes[K], Part_) = '' then Exit;
+            for K := 0 to High(D.EntRef(I)^.Holes) do
+              if CircleNamed(D.EntRef(I)^.Holes[K], Part_) = '' then Exit;
             SetLength(Faces, Length(Faces) + 1);
             Faces[High(Faces)] := I;
-            if D[I].MatSet then
+            if D.EntRef(I)^.MatSet then
             begin
-              if (NPaint > 0) and (D[I].Mat <> Paint) then Exit;
-              Paint := D[I].Mat;
+              if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
+              Paint := D.EntRef(I)^.Mat;
               Inc(NPaint);
             end;
           end;
         ekBore: Exit;
         ekLine:
-          if D[I].Dim then Exit;
+          if D.EntRef(I)^.Dim then Exit;
       end;
     end;
     NF := Length(Faces);
@@ -1922,31 +1922,31 @@ var
       apart; the bottom is the one the step goes away from }
     Best := 0;
     for I := 0 to NF - 1 do
-      if Length(D[Faces[I]].Poly) > Best then Best := Length(D[Faces[I]].Poly);
+      if Length(D.EntRef(Faces[I])^.Poly) > Best then Best := Length(D.EntRef(Faces[I])^.Poly);
     N := Best;
     if N + 2 <> NF then Exit;
     Top := -1;
     for I := 0 to NF - 1 do
     begin
-      if Length(D[Faces[I]].Poly) <> N then Continue;
+      if Length(D.EntRef(Faces[I])^.Poly) <> N then Continue;
       for J := 0 to NF - 1 do
       begin
-        if (J = I) or (Length(D[Faces[J]].Poly) <> N) then Continue;
+        if (J = I) or (Length(D.EntRef(Faces[J])^.Poly) <> N) then Continue;
         { The step: from the first bottom corner to its twin on top.  The top
           need not start where the bottom does. }
         for C := 0 to N - 1 do
         begin
-          V := Sub3(D[Faces[J]].Poly[C], D[Faces[I]].Poly[0]);
+          V := Sub3(D.EntRef(Faces[J])^.Poly[C], D.EntRef(Faces[I])^.Poly[0]);
           Ok_ := AxesUsed(V) > 0;
           for K := 0 to N - 1 do
-            if Ok_ and (CornerAt(Add3(D[Faces[I]].Poly[K], V), D[Faces[J]].Poly) < 0) then Ok_ := False;
+            if Ok_ and (CornerAt(Add3(D.EntRef(Faces[I])^.Poly[K], V), D.EntRef(Faces[J])^.Poly) < 0) then Ok_ := False;
           if Ok_ and (Dot3(D.FaceNormal(Faces[I]), V) < 0) and (Dot3(D.FaceNormal(Faces[J]), V) > 0) then
           begin
             { Either end could be the bottom.  Prefer the circle (the tool pulled the
               disk up from it), else the one the step goes up, north or east from, so
               the same solid is always written the same way. }
-            if (Top < 0) or (CircleNamed(D[Faces[I]].Poly, Part_) <> '') or
-               ((CircleNamed(D[Bottom].Poly, Part_) = '') and
+            if (Top < 0) or (CircleNamed(D.EntRef(Faces[I])^.Poly, Part_) <> '') or
+               ((CircleNamed(D.EntRef(Bottom)^.Poly, Part_) = '') and
                 (V.Z + V.Y * 1E-3 + V.X * 1E-6 > By.Z + By.Y * 1E-3 + By.X * 1E-6)) then
             begin
               Bottom := Faces[I];
@@ -1966,13 +1966,13 @@ var
     for K := 0 to N - 1 do
     begin
       SetLength(Q, 4);
-      Q[0] := D[Bottom].Poly[K];
-      Q[1] := D[Bottom].Poly[(K + 1) mod N];
+      Q[0] := D.EntRef(Bottom)^.Poly[K];
+      Q[1] := D.EntRef(Bottom)^.Poly[(K + 1) mod N];
       Q[2] := Add3(Q[1], By);
       Q[3] := Add3(Q[0], By);
       Hit := False;
       for I := 0 to NF - 1 do
-        if not Used[I] and (Length(D[Faces[I]].Poly) = 4) and SameLoop(D[Faces[I]].Poly, Q) then
+        if not Used[I] and (Length(D.EntRef(Faces[I])^.Poly) = 4) and SameLoop(D.EntRef(Faces[I])^.Poly, Q) then
         begin
           Used[I] := True;
           Hit := True;
@@ -1981,45 +1981,45 @@ var
       if not Hit then Exit;
     end;
     { round: the bottom is a named circle, and the uprights are soft }
-    Round_ := CircleNamed(D[Bottom].Poly, Part_) <> '';
+    Round_ := CircleNamed(D.EntRef(Bottom)^.Poly, Part_) <> '';
     { Every line must be a bottom, top or upright edge and every such edge a
       line of this solid, since the reader makes them all.  So a solid sharing
       its bottom edges with the one it stands on is not a pull. }
     NBottom := 0; NTop := 0; NUp := 0; NArc := 0;
     for I := 0 to D.Live - 1 do
     begin
-      if (D[I].Grp <> G) or (D[I].Part <> Part_) then Continue;
-      if D[I].Kind = ekArc then
+      if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part_) then Continue;
+      if D.EntRef(I)^.Kind = ekArc then
       begin
         if not Round_ or (CircleName(I) = '') then Exit;
         Inc(NArc);
         Continue;
       end;
-      if D[I].Kind <> ekLine then Continue;
-      J := CornerAt(D[I].A, D[Bottom].Poly);
-      K := CornerAt(D[I].B, D[Bottom].Poly);
+      if D.EntRef(I)^.Kind <> ekLine then Continue;
+      J := CornerAt(D.EntRef(I)^.A, D.EntRef(Bottom)^.Poly);
+      K := CornerAt(D.EntRef(I)^.B, D.EntRef(Bottom)^.Poly);
       if (J >= 0) and (K >= 0) then
       begin
         if Round_ or (Abs(J - K) <> 1) and (Abs(J - K) <> N - 1) then Exit;   { a bottom edge, not for a circle }
-        if D[I].Soft then Exit;
+        if D.EntRef(I)^.Soft then Exit;
         Inc(NBottom);
         Continue;
       end;
       Ok_ := False;
-      if (J >= 0) and (CornerAt(D[I].B, D[Top].Poly) >= 0) then
-        Ok_ := SameP(D[I].B, Add3(D[I].A, By))
-      else if (K >= 0) and (CornerAt(D[I].A, D[Top].Poly) >= 0) then
-        Ok_ := SameP(D[I].A, Add3(D[I].B, By));
+      if (J >= 0) and (CornerAt(D.EntRef(I)^.B, D.EntRef(Top)^.Poly) >= 0) then
+        Ok_ := SameP(D.EntRef(I)^.B, Add3(D.EntRef(I)^.A, By))
+      else if (K >= 0) and (CornerAt(D.EntRef(I)^.A, D.EntRef(Top)^.Poly) >= 0) then
+        Ok_ := SameP(D.EntRef(I)^.A, Add3(D.EntRef(I)^.B, By));
       if Ok_ then
       begin
-        if D[I].Soft <> Round_ then Exit;      { an upright }
+        if D.EntRef(I)^.Soft <> Round_ then Exit;      { an upright }
         Inc(NUp);
         Continue;
       end;
-      J := CornerAt(D[I].A, D[Top].Poly);
-      K := CornerAt(D[I].B, D[Top].Poly);
+      J := CornerAt(D.EntRef(I)^.A, D.EntRef(Top)^.Poly);
+      K := CornerAt(D.EntRef(I)^.B, D.EntRef(Top)^.Poly);
       if (J < 0) or (K < 0) or ((Abs(J - K) <> 1) and (Abs(J - K) <> N - 1)) then Exit;
-      if D[I].Soft then Exit;                  { a top edge }
+      if D.EntRef(I)^.Soft then Exit;                  { a top edge }
       Inc(NTop);
     end;
     if (NTop <> N) or (NUp <> N) then Exit;
@@ -2032,8 +2032,8 @@ var
     SetLength(Segs, 3 * N);
     for K := 0 to N - 1 do
     begin
-      Segs[3 * K].A := D[Bottom].Poly[K];
-      Segs[3 * K].B := D[Bottom].Poly[(K + 1) mod N];
+      Segs[3 * K].A := D.EntRef(Bottom)^.Poly[K];
+      Segs[3 * K].B := D.EntRef(Bottom)^.Poly[(K + 1) mod N];
       Segs[3 * K + 1].A := P3(Segs[3 * K].A.X + By.X, Segs[3 * K].A.Y + By.Y, Segs[3 * K].A.Z + By.Z);
       Segs[3 * K + 1].B := P3(Segs[3 * K].B.X + By.X, Segs[3 * K].B.Y + By.Y, Segs[3 * K].B.Z + By.Z);
       Segs[3 * K + 2].A := Segs[3 * K].A;
@@ -2042,7 +2042,7 @@ var
     Mid := ScopeMid(Segs);
     for I := 0 to NF - 1 do
     begin
-      R.Outer := Copy(D[Faces[I]].Poly);
+      R.Outer := Copy(D.EntRef(Faces[I])^.Poly);
       SetLength(R.Holes, 0);
       R.Normal := D.FaceNormal(Faces[I]);
       ImpliedLoop(R, True, Mid, Outer, Holes);
@@ -2066,20 +2066,20 @@ var
     SetLength(NoPts, 0);
     { Start from the corner nearest the origin, going the way the face goes,
       so the same solid is always written the same way. }
-    Poly := Copy(D[Bottom].Poly);
+    Poly := Copy(D.EntRef(Bottom)^.Poly);
     Best := 0;
     for I := 1 to High(Poly) do
       if (Poly[I].X < Poly[Best].X - 1E-9) or
          ((Abs(Poly[I].X - Poly[Best].X) <= 1E-9) and (Poly[I].Y < Poly[Best].Y - 1E-9)) or
          ((Abs(Poly[I].X - Poly[Best].X) <= 1E-9) and (Abs(Poly[I].Y - Poly[Best].Y) <= 1E-9) and
           (Poly[I].Z < Poly[Best].Z - 1E-9)) then Best := I;
-    for I := 0 to High(Poly) do Poly[I] := D[Bottom].Poly[(Best + I) mod Length(Poly)];
+    for I := 0 to High(Poly) do Poly[I] := D.EntRef(Bottom)^.Poly[(Best + I) mod Length(Poly)];
     { a named circle whichever way the bottom faces: a pull's outline has no
       facing of its own }
     if Round_ then
     begin
       SetLength(It, 1);
-      It[0] := CircleNamed(D[Bottom].Poly, Part_);
+      It[0] := CircleNamed(D.EntRef(Bottom)^.Poly, Part_);
     end
     else
       It := Outline(NoPts, Poly, Part_);
@@ -2098,7 +2098,7 @@ var
       Put(Depth, 'end', -1);
     end;
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind in [ekFace, ekLine]) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) then
       begin
         First[I] := Header;
         Last[I] := NLine - 1;
@@ -2127,26 +2127,26 @@ var
     NPaint := 0;
     NF := 0;
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind <> ekPart) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind <> ekPart) then
       begin
-        if D[I].Made = '' then Exit;
+        if D.EntRef(I)^.Made = '' then Exit;
         { a face that joined the loft is written beside it }
-        if D[I].Made[1] = #4 then
+        if D.EntRef(I)^.Made[1] = #4 then
         begin
-          if D[I].Kind <> ekFace then Exit;
+          if D.EntRef(I)^.Kind <> ekFace then Exit;
           SetLength(Extras, Length(Extras) + 1);
           Extras[High(Extras)] := I;
           Continue;
         end;
-        if Made = '' then Made := D[I].Made
-        else if D[I].Made <> Made then Exit;
-        if D[I].Kind = ekFace then
+        if Made = '' then Made := D.EntRef(I)^.Made
+        else if D.EntRef(I)^.Made <> Made then Exit;
+        if D.EntRef(I)^.Kind = ekFace then
         begin
           Inc(NF);
-          if D[I].MatSet then
+          if D.EntRef(I)^.MatSet then
           begin
-            if (NPaint > 0) and (D[I].Mat <> Paint) then Exit;
-            Paint := D[I].Mat;
+            if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
+            Paint := D.EntRef(I)^.Mat;
             Inc(NPaint);
           end;
         end;
@@ -2161,7 +2161,7 @@ var
     Fp := Copy(Made, K + 1, MaxInt);
     if SolidPrint(D, G, Part_) <> Fp then Exit;
     for I := 0 to High(Extras) do
-      if D[Extras[I]].Made <> #4 + Fp then Exit;
+      if D.EntRef(Extras[I])^.Made <> #4 + Fp then Exit;
     K := Pos(#3, Stmt);
     if K > 0 then
     begin
@@ -2265,8 +2265,8 @@ var
       Put(Depth, 'end', -1);
     end;
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = G) and (D[I].Part = Part_) and (D[I].Kind in [ekFace, ekLine]) and
-         (D[I].Made[1] <> #4) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) and
+         (D.EntRef(I)^.Made[1] <> #4) then
       begin
         First[I] := Header;
         Last[I] := NLine - 1;
@@ -2295,33 +2295,33 @@ var
     SetLength(Pts, 0);
     N := 0;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekFace) and (D[I].Grp = G) and (D[I].Part = Part_) then
+      if (D.EntRef(I)^.Kind = ekFace) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
       begin
         Inc(N);
         { a loop that is a named circle ("face = c1", "hole = c1") has no corners
           to list }
-        if CircleNamed(D[I].Poly, Part_) = '' then
-          for K := 0 to High(D[I].Poly) do
+        if CircleNamed(D.EntRef(I)^.Poly, Part_) = '' then
+          for K := 0 to High(D.EntRef(I)^.Poly) do
           begin
-            AddPt(Pts, D[I].Poly[K]);
-            Pts[FindPt(Pts, D[I].Poly[K])].InHole := False;
+            AddPt(Pts, D.EntRef(I)^.Poly[K]);
+            Pts[FindPt(Pts, D.EntRef(I)^.Poly[K])].InHole := False;
           end;
-        for J := 0 to High(D[I].Holes) do
-          if CircleNamed(D[I].Holes[J], Part_) = '' then
-            for K := 0 to High(D[I].Holes[J]) do AddPt(Pts, D[I].Holes[J][K]);
+        for J := 0 to High(D.EntRef(I)^.Holes) do
+          if CircleNamed(D.EntRef(I)^.Holes[J], Part_) = '' then
+            for K := 0 to High(D.EntRef(I)^.Holes[J]) do AddPt(Pts, D.EntRef(I)^.Holes[J][K]);
       end;
     { what most of its faces are made of is given once, for the solid }
     HasMat := False;
     SMat := 0;
     Best := 0;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekFace) and (D[I].Grp = G) and (D[I].Part = Part_) and D[I].MatSet then
+      if (D.EntRef(I)^.Kind = ekFace) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and D.EntRef(I)^.MatSet then
       begin
         K := 0;
         for J := 0 to D.Live - 1 do
-          if (D[J].Kind = ekFace) and (D[J].Grp = G) and (D[J].Part = Part_) and
-             D[J].MatSet and (D[J].Mat = D[I].Mat) then Inc(K);
-        if K > Best then begin Best := K; SMat := D[I].Mat; end;
+          if (D.EntRef(J)^.Kind = ekFace) and (D.EntRef(J)^.Grp = G) and (D.EntRef(J)^.Part = Part_) and
+             D.EntRef(J)^.MatSet and (D.EntRef(J)^.Mat = D.EntRef(I)^.Mat) then Inc(K);
+        if K > Best then begin Best := K; SMat := D.EntRef(I)^.Mat; end;
         if Best * 2 > N then Break;
       end;
     HasMat := (Best >= 2) and (Best * 2 > N);
@@ -2330,15 +2330,15 @@ var
     SetLength(Rings, 0);
     for I := 0 to High(Pts) do Pts[I].Ring := -1;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekFace) and (D[I].Grp = G) and (D[I].Part = Part_) then
-        for J := -1 to High(D[I].Holes) do
+      if (D.EntRef(I)^.Kind = ekFace) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
+        for J := -1 to High(D.EntRef(I)^.Holes) do
         begin
-          if J < 0 then Best := Ord(RingOf(D[I].Poly, Rg))
-          else Best := Ord(RingOf(D[I].Holes[J], Rg));
+          if J < 0 then Best := Ord(RingOf(D.EntRef(I)^.Poly, Rg))
+          else Best := Ord(RingOf(D.EntRef(I)^.Holes[J], Rg));
           if Best = 0 then Continue;
-          if J < 0 then begin if CircleNamed(D[I].Poly, Part_) <> '' then Continue; end
-          else if CircleNamed(D[I].Holes[J], Part_) <> '' then Continue;
-          if J < 0 then K := FindPt(Pts, D[I].Poly[0]) else K := FindPt(Pts, D[I].Holes[J][0]);
+          if J < 0 then begin if CircleNamed(D.EntRef(I)^.Poly, Part_) <> '' then Continue; end
+          else if CircleNamed(D.EntRef(I)^.Holes[J], Part_) <> '' then Continue;
+          if J < 0 then K := FindPt(Pts, D.EntRef(I)^.Poly[0]) else K := FindPt(Pts, D.EntRef(I)^.Holes[J][0]);
           if (K < 0) or (Pts[K].Ring >= 0) then Continue;   { that ring is known }
           Rg.Name := 'r' + Chr(Ord('a') + Length(Rings) mod 26);
           if Length(Rings) >= 26 then Rg.Name := Rg.Name + IntToStr(Length(Rings) div 26);
@@ -2346,7 +2346,7 @@ var
           Rings[High(Rings)] := Rg;
           for Best := 0 to Rg.N - 1 do
           begin
-            if J < 0 then K := FindPt(Pts, D[I].Poly[Best]) else K := FindPt(Pts, D[I].Holes[J][Best]);
+            if J < 0 then K := FindPt(Pts, D.EntRef(I)^.Poly[Best]) else K := FindPt(Pts, D.EntRef(I)^.Holes[J][Best]);
             if (K >= 0) and (Pts[K].Ring < 0) then
             begin
               Pts[K].Ring := High(Rings);
@@ -2362,7 +2362,7 @@ var
     if HasMat then Put(Depth + 1, 'paint = ' + Color2(SMat), -1);
     PutPoints(Depth + 1, Pts, Rings);
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekFace) and (D[I].Grp = G) and (D[I].Part = Part_) then
+      if (D.EntRef(I)^.Kind = ekFace) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
       begin
         Implied[I] := FaceImplied(I, HasMat, SMat);
         if not Implied[I] then PutFace(Depth + 1, I, Pts, HasMat, SMat);
@@ -2370,20 +2370,20 @@ var
     PutNoFaces(Depth + 1, Pts, Part_, G);
     LinesFrom := NLine;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekLine) and (D[I].Grp = G) and (D[I].Part = Part_) then
+      if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
       begin
         PutLine(Depth + 1, I, Pts);
       end
-      else if (D[I].Kind = ekBore) and (D[I].Grp = G) and (D[I].Part = Part_) then
+      else if (D.EntRef(I)^.Kind = ekBore) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
       begin
         Put(Depth + 1, 'bore', I);
-        PutList(Depth + 2, 'points', Items(Pts, D[I].Poly), I);
-        Put(Depth + 2, 'goes = ' + Place2(Sub3(D[I].B, D[I].Poly[0]), U, True), I);
+        PutList(Depth + 2, 'points', Items(Pts, D.EntRef(I)^.Poly), I);
+        Put(Depth + 2, 'goes = ' + Place2(Sub3(D.EntRef(I)^.B, D.EntRef(I)^.Poly[0]), U, True), I);
         Put(Depth + 1, 'end', I);
       end;
     { an unwritten face maps to its edges, so picking it lights up the lines }
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekFace) and (D[I].Grp = G) and (D[I].Part = Part_) and Implied[I] then
+      if (D.EntRef(I)^.Kind = ekFace) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and Implied[I] then
       begin
         First[I] := LinesFrom;
         Last[I] := NLine - 1;
@@ -2418,18 +2418,18 @@ var
       SetLength(Chain, 1);
       Chain[0] := I;
       SetLength(ChainPoly, 2);
-      ChainPoly[0] := D[I].A;
-      ChainPoly[1] := D[I].B;
-      Tip := D[I].B;
+      ChainPoly[0] := D.EntRef(I)^.A;
+      ChainPoly[1] := D.EntRef(I)^.B;
+      Tip := D.EntRef(I)^.B;
       repeat
         More := False;
         for K := I + 1 to D.Live - 1 do
-          if (D[K].Kind = ekLine) and not ChainDone[K] and not RectDone[K] and (D[K].Part = Part_) and
-             (D[K].Grp = 0) and (D[K].Name = D[I].Name) and (D[K].Ink = D[I].Ink) and
-             (Abs(D[K].Weight - D[I].Weight) <= 1E-3) and (D[K].Soft = D[I].Soft) and
-             (D[K].Dim = D[I].Dim) and (SameP(D[K].A, Tip) or SameP(D[K].B, Tip)) then
+          if (D.EntRef(K)^.Kind = ekLine) and not ChainDone[K] and not RectDone[K] and (D.EntRef(K)^.Part = Part_) and
+             (D.EntRef(K)^.Grp = 0) and (D.EntRef(K)^.Name = D.EntRef(I)^.Name) and (D.EntRef(K)^.Ink = D.EntRef(I)^.Ink) and
+             (Abs(D.EntRef(K)^.Weight - D.EntRef(I)^.Weight) <= 1E-3) and (D.EntRef(K)^.Soft = D.EntRef(I)^.Soft) and
+             (D.EntRef(K)^.Dim = D.EntRef(I)^.Dim) and (SameP(D.EntRef(K)^.A, Tip) or SameP(D.EntRef(K)^.B, Tip)) then
           begin
-            if SameP(D[K].A, Tip) then Tip := D[K].B else Tip := D[K].A;
+            if SameP(D.EntRef(K)^.A, Tip) then Tip := D.EntRef(K)^.B else Tip := D.EntRef(K)^.A;
             ChainDone[K] := True;
             SetLength(Chain, Length(Chain) + 1);
             Chain[High(Chain)] := K;
@@ -2454,7 +2454,7 @@ var
     SetLength(RectAt, D.Live);
     for I := 0 to D.Live - 1 do RectAt[I] := False;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekLine) and (D[I].Part = Part_) and (D[I].Grp = 0) and not RectDone[I] and
+      if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Grp = 0) and not RectDone[I] and
          IsRect(Part_, I, RLines, RFace, RLo, RSize, BPaintOn, BPaint, PInk, PWd) then
       begin
         for J := 0 to 3 do RectDone[RLines[J]] := True;
@@ -2467,14 +2467,14 @@ var
       of the next (a cylinder standing on a box's hole).  The reader gives a
       pulled circle to its pull. }
     for I := 0 to D.Live - 1 do
-      if (D[I].Part = Part_) and (CircleName(I) <> '') then PutOther(Depth, I);
+      if (D.EntRef(I)^.Part = Part_) and (CircleName(I) <> '') then PutOther(Depth, I);
     for I := 0 to D.Live - 1 do
     begin
-      if D[I].Part <> Part_ then Continue;
-      if D[I].Kind = ekPart then Continue;
+      if D.EntRef(I)^.Part <> Part_ then Continue;
+      if D.EntRef(I)^.Kind = ekPart then Continue;
       if CircleName(I) <> '' then Continue;
-      G := D[I].Grp;
-      if (G <> 0) and (D[I].Kind in [ekFace, ekLine, ekBore]) then
+      G := D.EntRef(I)^.Grp;
+      if (G <> 0) and (D.EntRef(I)^.Kind in [ekFace, ekLine, ekBore]) then
       begin
         Seen := False;
         for J := 0 to High(Done) do
@@ -2494,7 +2494,7 @@ var
       end;
       if RectDone[I] and not RectAt[I] then Continue;
       if ChainDone[I] then Continue;
-      case D[I].Kind of
+      case D.EntRef(I)^.Kind of
         ekFace:
           begin
             Implied[I] := FaceImplied(I, False, 0);
@@ -2504,10 +2504,10 @@ var
           if RectAt[I] and IsRect(Part_, I, RLines, RFace, RLo, RSize, BPaintOn, BPaint, PInk, PWd) then
           begin
             Header := NLine;
-            PutNote(Depth, D[RLines[0]].Note, -1);
+            PutNote(Depth, D.EntRef(RLines[0])^.Note, -1);
             if BPaintOn or not PlainPen(PInk, PWd) then
             begin
-              Put(Depth, 'rect' + NameWord(D[RLines[0]].Name) + TailNote(D[RLines[0]].Note), -1);
+              Put(Depth, 'rect' + NameWord(D.EntRef(RLines[0])^.Name) + TailNote(D.EntRef(RLines[0])^.Note), -1);
               Put(Depth + 1, 'at   = ' + Place2(RLo, U, False), -1);
               Put(Depth + 1, 'size = ' + Place2(RSize, U, True), -1);
               if BPaintOn then Put(Depth + 1, 'paint = ' + Color2(BPaint), -1);
@@ -2515,8 +2515,8 @@ var
               Put(Depth, 'end', -1);
             end
             else
-              Put(Depth, 'rect' + NameWord(D[RLines[0]].Name) + ' = ' + Place2(RLo, U, False) + '; ' +
-                Place2(RSize, U, True) + TailNote(D[RLines[0]].Note), -1);
+              Put(Depth, 'rect' + NameWord(D.EntRef(RLines[0])^.Name) + ' = ' + Place2(RLo, U, False) + '; ' +
+                Place2(RSize, U, True) + TailNote(D.EntRef(RLines[0])^.Note), -1);
             for J := 0 to 3 do
             begin
               RectDone[RLines[J]] := True;
@@ -2530,7 +2530,7 @@ var
           else
           begin
             if LinesFrom < 0 then LinesFrom := NLine;
-            if D[I].Name <> '' then FindChain(I) else SetLength(Chain, 1);
+            if D.EntRef(I)^.Name <> '' then FindChain(I) else SetLength(Chain, 1);
             if Length(Chain) > 1 then PutChain(Depth, Chain, ChainPoly)
             else PutLine(Depth, I, None);
           end;
@@ -2540,21 +2540,21 @@ var
     end;
     PutNoFaces(Depth, None, Part_, 0);
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekFace) and (D[I].Part = Part_) and (D[I].Grp = 0) and Implied[I] then
+      if (D.EntRef(I)^.Kind = ekFace) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Grp = 0) and Implied[I] then
       begin
         if LinesFrom >= 0 then First[I] := LinesFrom;
         Last[I] := NLine - 1;
       end;
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekPart) and (D[I].Part = Part_) then
+      if (D.EntRef(I)^.Kind = ekPart) and (D.EntRef(I)^.Part = Part_) then
       begin
-        PutNote(Depth, D[I].Note, I);
-        Put(Depth, 'group ' + QuotedStr(D[I].Txt) + TailNote(D[I].Note), I);
-        if D[I].Solid then Put(Depth + 1, 'locked = true', I);
-        if D[I].Hidden then Put(Depth + 1, 'hidden = true', I);
-        if D[I].Jig <> '' then Put(Depth + 1, 'jig = ' + D[I].Jig, I);
-        if D[I].Data <> '' then PutData(Depth + 1, D[I].Data, I);
-        PutLevel(Depth + 1, D[I].Grp);
+        PutNote(Depth, D.EntRef(I)^.Note, I);
+        Put(Depth, 'group ' + QuotedStr(D.EntRef(I)^.Txt) + TailNote(D.EntRef(I)^.Note), I);
+        if D.EntRef(I)^.Solid then Put(Depth + 1, 'locked = true', I);
+        if D.EntRef(I)^.Hidden then Put(Depth + 1, 'hidden = true', I);
+        if D.EntRef(I)^.Jig <> '' then Put(Depth + 1, 'jig = ' + D.EntRef(I)^.Jig, I);
+        if D.EntRef(I)^.Data <> '' then PutData(Depth + 1, D.EntRef(I)^.Data, I);
+        PutLevel(Depth + 1, D.EntRef(I)^.Grp);
         Put(Depth, 'end', I);
       end;
   end;
@@ -2592,14 +2592,14 @@ var
       C, I, Want: Integer;
     begin
       Result := -1;
-      Want := GrpOfE(E[F].Grp);
-      Cands := DFaces.Near(E[F].Poly);
+      Want := GrpOfE(E.EntRef(F)^.Grp);
+      Cands := DFaces.Near(E.EntRef(F)^.Poly);
       for C := 0 to High(Cands) do
       begin
         I := Cands[C];
-        if Taken[I] or (D[I].Grp <> Want) then Continue;
-        if (Length(D[I].Holes) = Length(E[F].Holes)) and
-           SameLoopTol(D[I].Poly, E[F].Poly, 1E-4) then
+        if Taken[I] or (D.EntRef(I)^.Grp <> Want) then Continue;
+        if (Length(D.EntRef(I)^.Holes) = Length(E.EntRef(F)^.Holes)) and
+           SameLoopTol(D.EntRef(I)^.Poly, E.EntRef(F)^.Poly, 1E-4) then
           Exit(I);
       end;
     end;
@@ -2615,27 +2615,27 @@ var
       SetLength(Seg, 2);
       for F := 0 to E.Live - 1 do
       begin
-        if (E[F].Kind <> ekLine) or (E[F].Grp = 0) then Continue;
+        if (E.EntRef(F)^.Kind <> ekLine) or (E.EntRef(F)^.Grp = 0) then Continue;
         Known := False;
         for K := 0 to High(GrpMap) do
-          if GrpMap[K].E = E[F].Grp then begin Known := True; Break; end;
+          if GrpMap[K].E = E.EntRef(F)^.Grp then begin Known := True; Break; end;
         if Known then Continue;
-        Seg[0] := E[F].A; Seg[1] := E[F].B;
+        Seg[0] := E.EntRef(F)^.A; Seg[1] := E.EntRef(F)^.B;
         Cands := DLines.Near(Seg);
         for C := 0 to High(Cands) do
         begin
           I := Cands[C];
-          if D[I].Grp = 0 then Continue;
-          if ((SamePt(D[I].A, E[F].A, 1E-4) and SamePt(D[I].B, E[F].B, 1E-4)) or
-              (SamePt(D[I].A, E[F].B, 1E-4) and SamePt(D[I].B, E[F].A, 1E-4))) then
+          if D.EntRef(I)^.Grp = 0 then Continue;
+          if ((SamePt(D.EntRef(I)^.A, E.EntRef(F)^.A, 1E-4) and SamePt(D.EntRef(I)^.B, E.EntRef(F)^.B, 1E-4)) or
+              (SamePt(D.EntRef(I)^.A, E.EntRef(F)^.B, 1E-4) and SamePt(D.EntRef(I)^.B, E.EntRef(F)^.A, 1E-4))) then
           begin
             Used := False;
             for K := 0 to High(GrpMap) do
-              if GrpMap[K].D = D[I].Grp then begin Used := True; Break; end;
+              if GrpMap[K].D = D.EntRef(I)^.Grp then begin Used := True; Break; end;
             if Used then Continue;
             SetLength(GrpMap, Length(GrpMap) + 1);
-            GrpMap[High(GrpMap)].E := E[F].Grp;
-            GrpMap[High(GrpMap)].D := D[I].Grp;
+            GrpMap[High(GrpMap)].E := E.EntRef(F)^.Grp;
+            GrpMap[High(GrpMap)].D := D.EntRef(I)^.Grp;
             Break;
           end;
         end;
@@ -2644,23 +2644,23 @@ var
         it) is matched by a face instead }
       for F := 0 to E.Live - 1 do
       begin
-        if (E[F].Kind <> ekFace) or (E[F].Grp = 0) then Continue;
+        if (E.EntRef(F)^.Kind <> ekFace) or (E.EntRef(F)^.Grp = 0) then Continue;
         Known := False;
         for K := 0 to High(GrpMap) do
-          if GrpMap[K].E = E[F].Grp then begin Known := True; Break; end;
+          if GrpMap[K].E = E.EntRef(F)^.Grp then begin Known := True; Break; end;
         if Known then Continue;
-        Cands := DFaces.Near(E[F].Poly);
+        Cands := DFaces.Near(E.EntRef(F)^.Poly);
         for C := 0 to High(Cands) do
         begin
           I := Cands[C];
-          if (D[I].Grp = 0) or not SameLoopTol(D[I].Poly, E[F].Poly, 1E-4) then Continue;
+          if (D.EntRef(I)^.Grp = 0) or not SameLoopTol(D.EntRef(I)^.Poly, E.EntRef(F)^.Poly, 1E-4) then Continue;
           Used := False;
           for K := 0 to High(GrpMap) do
-            if GrpMap[K].D = D[I].Grp then begin Used := True; Break; end;
+            if GrpMap[K].D = D.EntRef(I)^.Grp then begin Used := True; Break; end;
           if Used then Continue;
           SetLength(GrpMap, Length(GrpMap) + 1);
-          GrpMap[High(GrpMap)].E := E[F].Grp;
-          GrpMap[High(GrpMap)].D := D[I].Grp;
+          GrpMap[High(GrpMap)].E := E.EntRef(F)^.Grp;
+          GrpMap[High(GrpMap)].D := D.EntRef(I)^.Grp;
           Break;
         end;
       end;
@@ -2672,13 +2672,13 @@ var
     A, N: Integer;
   begin
     Result := False;
-    N := Length(D[F].Poly);
+    N := Length(D.EntRef(F)^.Poly);
     if N < 8 then Exit;
     for A := 0 to D.Live - 1 do
-      if (D[A].Kind = ekArc) and FullCircle(D[A].Sweep) and (D[A].Part = D[F].Part) and
-         (Abs(Dist(D[A].C, D[F].Poly[0]) - D[A].R) < 1E-5) and
-         (Abs(Dist(D[A].C, D[F].Poly[N div 2]) - D[A].R) < 1E-5) and
-         (Abs(Dist(D[A].C, D[F].Poly[N div 4]) - D[A].R) < 1E-5) then Exit(True);
+      if (D.EntRef(A)^.Kind = ekArc) and FullCircle(D.EntRef(A)^.Sweep) and (D.EntRef(A)^.Part = D.EntRef(F)^.Part) and
+         (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[0]) - D.EntRef(A)^.R) < 1E-5) and
+         (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[N div 2]) - D.EntRef(A)^.R) < 1E-5) and
+         (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[N div 4]) - D.EntRef(A)^.R) < 1E-5) then Exit(True);
   end;
 
   begin
@@ -2695,10 +2695,10 @@ var
       for I := 0 to D.Live - 1 do
       begin
         Taken[I] := False;
-        if D[I].Kind = ekFace then DFaces.Add(D[I].Poly, I)
-        else if D[I].Kind = ekLine then
+        if D.EntRef(I)^.Kind = ekFace then DFaces.Add(D.EntRef(I)^.Poly, I)
+        else if D.EntRef(I)^.Kind = ekLine then
         begin
-          Seg[0] := D[I].A; Seg[1] := D[I].B;
+          Seg[0] := D.EntRef(I)^.A; Seg[1] := D.EntRef(I)^.B;
           DLines.Add(Seg, I);
         end;
       end;
@@ -2709,7 +2709,7 @@ var
       for F := 0 to E.Live - 1 do
       begin
         Match[F] := -1;
-        if E[F].Kind <> ekFace then Continue;
+        if E.EntRef(F)^.Kind <> ekFace then Continue;
         Match[F] := MatchOf(F);
         if Match[F] >= 0 then Taken[Match[F]] := True;
       end;
@@ -2722,32 +2722,32 @@ var
       { Faces of E with no match in D are loops the reader closed on its own and
         must be told not to.  They go in the scope of D their edges are in. }
       for F := 0 to E.Live - 1 do
-        if (E[F].Kind = ekFace) and (Match[F] < 0) then
+        if (E.EntRef(F)^.Kind = ekFace) and (Match[F] < 0) then
         begin
           { The D scope it belongs in: the one whose lines closed it.  A loose one
             is placed by a D line along it, or the D arc it is the ring of. }
           Grp := 0;
           Prt := -1;
-          if (E[F].Grp <> 0) and (GrpOfE(E[F].Grp) > 0) then
+          if (E.EntRef(F)^.Grp <> 0) and (GrpOfE(E.EntRef(F)^.Grp) > 0) then
           begin
-            Grp := GrpOfE(E[F].Grp);
-            Prt := E[F].Part;
+            Grp := GrpOfE(E.EntRef(F)^.Grp);
+            Prt := E.EntRef(F)^.Part;
             for I := 0 to D.Live - 1 do
-              if (D[I].Kind = ekLine) and (D[I].Grp = Grp) then begin Prt := D[I].Part; Break; end;
+              if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp = Grp) then begin Prt := D.EntRef(I)^.Part; Break; end;
           end
           else
-          for S := 0 to High(E[F].Poly) do
+          for S := 0 to High(E.EntRef(F)^.Poly) do
           begin
-            Seg[0] := E[F].Poly[S]; Seg[1] := E[F].Poly[(S + 1) mod Length(E[F].Poly)];
+            Seg[0] := E.EntRef(F)^.Poly[S]; Seg[1] := E.EntRef(F)^.Poly[(S + 1) mod Length(E.EntRef(F)^.Poly)];
             Cands := DLines.Near(Seg);
             for C := 0 to High(Cands) do
             begin
               I := Cands[C];
-              if (SamePt(D[I].A, Seg[0], 1E-4) and SamePt(D[I].B, Seg[1], 1E-4)) or
-                 (SamePt(D[I].A, Seg[1], 1E-4) and SamePt(D[I].B, Seg[0], 1E-4)) then
+              if (SamePt(D.EntRef(I)^.A, Seg[0], 1E-4) and SamePt(D.EntRef(I)^.B, Seg[1], 1E-4)) or
+                 (SamePt(D.EntRef(I)^.A, Seg[1], 1E-4) and SamePt(D.EntRef(I)^.B, Seg[0], 1E-4)) then
               begin
-                Grp := D[I].Grp;
-                Prt := D[I].Part;
+                Grp := D.EntRef(I)^.Grp;
+                Prt := D.EntRef(I)^.Part;
                 Break;
               end;
             end;
@@ -2755,12 +2755,12 @@ var
           end;
           if Prt < 0 then
             for I := 0 to D.Live - 1 do
-              if (D[I].Kind = ekArc) and
-                 (Abs(Dist(D[I].C, E[F].Poly[0]) - D[I].R) < 1E-4) and
-                 (Abs(Dist(D[I].C, E[F].Poly[Length(E[F].Poly) div 2]) - D[I].R) < 1E-4) then
+              if (D.EntRef(I)^.Kind = ekArc) and
+                 (Abs(Dist(D.EntRef(I)^.C, E.EntRef(F)^.Poly[0]) - D.EntRef(I)^.R) < 1E-4) and
+                 (Abs(Dist(D.EntRef(I)^.C, E.EntRef(F)^.Poly[Length(E.EntRef(F)^.Poly) div 2]) - D.EntRef(I)^.R) < 1E-4) then
               begin
-                Grp := D[I].Grp;
-                Prt := D[I].Part;
+                Grp := D.EntRef(I)^.Grp;
+                Prt := D.EntRef(I)^.Part;
                 Break;
               end;
           if Prt < 0 then Prt := 0;
@@ -2769,10 +2769,10 @@ var
           Found := False;
           for R := 0 to High(NoFaceLoops) do
             if (NoFaceScope[R] = Grp) and (NoFacePart[R] = Prt) and
-               SameLoopTol(NoFaceLoops[R], E[F].Poly, 1E-4) then begin Found := True; Break; end;
+               SameLoopTol(NoFaceLoops[R], E.EntRef(F)^.Poly, 1E-4) then begin Found := True; Break; end;
           if Found then Continue;
           SetLength(NoFaceLoops, Length(NoFaceLoops) + 1);
-          NoFaceLoops[High(NoFaceLoops)] := Copy(E[F].Poly);
+          NoFaceLoops[High(NoFaceLoops)] := Copy(E.EntRef(F)^.Poly);
           SetLength(NoFaceScope, Length(NoFaceScope) + 1);
           NoFaceScope[High(NoFaceScope)] := Grp;
           SetLength(NoFacePart, Length(NoFacePart) + 1);
@@ -2783,7 +2783,7 @@ var
       for I := 0 to D.Live - 1 do
         if ImpliedGeom[I] then
           for R := 0 to High(NoFaceLoops) do
-            if SameLoopTol(NoFaceLoops[R], D[I].Poly, 1E-4) then
+            if SameLoopTol(NoFaceLoops[R], D.EntRef(I)^.Poly, 1E-4) then
             begin
               ImpliedGeom[I] := False;
               Break;
@@ -2795,18 +2795,18 @@ var
       DHoles := TLoopIndex.Create;
       try
         for I := 0 to D.Live - 1 do
-          if D[I].Kind = ekFace then
-            for K := 0 to High(D[I].Holes) do DHoles.Add(D[I].Holes[K], I);
+          if D.EntRef(I)^.Kind = ekFace then
+            for K := 0 to High(D.EntRef(I)^.Holes) do DHoles.Add(D.EntRef(I)^.Holes[K], I);
         for I := 0 to D.Live - 1 do
           if ImpliedGeom[I] and not RingOfCircle(I) then
           begin
-            Cands := DHoles.Near(D[I].Poly);
+            Cands := DHoles.Near(D.EntRef(I)^.Poly);
             for C := 0 to High(Cands) do
             begin
               F := Cands[C];
-              if (F = I) or (D[F].Part <> D[I].Part) then Continue;
-              for K := 0 to High(D[F].Holes) do
-                if SameLoopTol(D[F].Holes[K], D[I].Poly, 1E-4) then ImpliedGeom[I] := False;
+              if (F = I) or (D.EntRef(F)^.Part <> D.EntRef(I)^.Part) then Continue;
+              for K := 0 to High(D.EntRef(F)^.Holes) do
+                if SameLoopTol(D.EntRef(F)^.Holes[K], D.EntRef(I)^.Poly, 1E-4) then ImpliedGeom[I] := False;
               if not ImpliedGeom[I] then Break;
             end;
           end;
@@ -2868,7 +2868,7 @@ begin
   FindDefaults;
   SetLength(Circles, 0);
   for I := 0 to D.Live - 1 do
-    if (D[I].Kind = ekArc) and FullCircle(D[I].Sweep) then
+    if (D.EntRef(I)^.Kind = ekArc) and FullCircle(D.EntRef(I)^.Sweep) then
     begin
       SetLength(Circles, Length(Circles) + 1);
       Circles[High(Circles)] := I;

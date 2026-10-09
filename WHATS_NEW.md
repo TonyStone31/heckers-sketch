@@ -14,6 +14,13 @@
 
 ### Fixed
 
+- Opening or leaving a group with the source window open stalled for a
+  second or two on a big drawing, and could lose your place in the text;
+  the text no longer gets rewritten for it.
+- Saving, and the source window catching up after an edit, are several
+  times faster on big drawings (a barn of 1,500 lines: from over a second
+  to about a seventh of one).
+
 - A loft with something painted on it - a cannon with a black bore on its
   muzzle - was saved as hundreds of lines of faces.  It stays a loft, with
   the painted face written beside it.

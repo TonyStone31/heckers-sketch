@@ -2285,14 +2285,14 @@ begin
     Part := -1;
     { a group's record keeps its own number in Grp; it is no solid's }
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = Lofts[L].G) and (D[I].Kind <> ekPart) then begin Part := D[I].Part; Break; end;
+      if (D.EntRef(I)^.Grp = Lofts[L].G) and (D.EntRef(I)^.Kind <> ekPart) then begin Part := D.EntRef(I)^.Part; Break; end;
     if Part < 0 then Continue;
     Fp := SolidPrint(D, Lofts[L].G, Part);
     { its own rings and what it made carry the statement; a face that joined
       it is marked #4, to be written on its own beside it }
     for I := 0 to D.Live - 1 do
-      if (D[I].Grp = Lofts[L].G) and (D[I].Part = Part) and (D[I].Kind <> ekPart) then
-        if (D[I].Made = #5) or (D[I].Kind = ekArc) then D.SetMade(I, Lofts[L].Said + #2 + Fp)
+      if (D.EntRef(I)^.Grp = Lofts[L].G) and (D.EntRef(I)^.Part = Part) and (D.EntRef(I)^.Kind <> ekPart) then
+        if (D.EntRef(I)^.Made = #5) or (D.EntRef(I)^.Kind = ekArc) then D.SetMade(I, Lofts[L].Said + #2 + Fp)
         else D.SetMade(I, #4 + Fp);
   end;
 end;
@@ -2537,52 +2537,52 @@ var
 begin
   for I := FirstNew to D.Live - 1 do
   begin
-    if (D[I].Kind <> ekArc) or not FullCircle(D[I].Sweep) then Continue;
-    N := D[I].Sides;
+    if (D.EntRef(I)^.Kind <> ekArc) or not FullCircle(D.EntRef(I)^.Sweep) then Continue;
+    N := D.EntRef(I)^.Sides;
     if N < 3 then N := DefSides;
     SetLength(Lp, N);
     for K := 0 to N - 1 do
-      Lp[K] := ArcPoint(D[I].C, D[I].R, D[I].A0 + K * 2 * Pi / N, D[I].Plane, D[I].Nm);
+      Lp[K] := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0 + K * 2 * Pi / N, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
     for F := FirstNew to D.Live - 1 do
     begin
-      if D[F].Kind <> ekFace then Continue;
+      if D.EntRef(F)^.Kind <> ekFace then Continue;
       { a circle in one group does not cut a face in another: groups keep
         to themselves }
-      if D[F].Part <> D[I].Part then Continue;
+      if D.EntRef(F)^.Part <> D.EntRef(I)^.Part then Continue;
       { A written-out face gives its own holes; only faces the reader made (a
         box's top, a pull's, one the lines closed) are cut. }
       Known := False;
       for J := 0 to High(Explicit) do
         if Explicit[J] = F then begin Known := True; Break; end;
       if Known then Continue;
-      if Length(D[F].Poly) = N then
+      if Length(D.EntRef(F)^.Poly) = N then
       begin
         { the disk itself, or a face that is this ring: not cut }
         Inside := True;
         for K := 0 to N - 1 do
-          if not SamePt(D[F].Poly[K], Lp[0], 1E-6) then Continue else begin Inside := False; Break; end;
+          if not SamePt(D.EntRef(F)^.Poly[K], Lp[0], 1E-6) then Continue else begin Inside := False; Break; end;
         if not Inside then Continue;
       end;
       Nm := D.FaceNormal(F);
-      P0 := D[F].Poly[0];
+      P0 := D.EntRef(F)^.Poly[0];
       Inside := True;
       for K := 0 to N - 1 do
       begin
         Q := Sub3(Lp[K], P0);
         if Abs(Dot3(Q, Nm)) > 1E-6 then begin Inside := False; Break; end;
-        if not PointInLoop(Lp[K], D[F].Poly, Nm) then begin Inside := False; Break; end;
+        if not PointInLoop(Lp[K], D.EntRef(F)^.Poly, Nm) then begin Inside := False; Break; end;
       end;
       if not Inside then Continue;
       { already a hole of it? }
       Known := False;
-      for J := 0 to High(D[F].Holes) do
-        if (Length(D[F].Holes[J]) = N) then
+      for J := 0 to High(D.EntRef(F)^.Holes) do
+        if (Length(D.EntRef(F)^.Holes[J]) = N) then
           for K := 0 to N - 1 do
-            if SamePt(D[F].Holes[J][K], Lp[0], 1E-6) then begin Known := True; Break; end;
+            if SamePt(D.EntRef(F)^.Holes[J][K], Lp[0], 1E-6) then begin Known := True; Break; end;
       if Known then Continue;
       { a hole goes round the other way from its face }
-      SetLength(Holes, Length(D[F].Holes) + 1);
-      for J := 0 to High(D[F].Holes) do Holes[J] := D[F].Holes[J];
+      SetLength(Holes, Length(D.EntRef(F)^.Holes) + 1);
+      for J := 0 to High(D.EntRef(F)^.Holes) do Holes[J] := D.EntRef(F)^.Holes[J];
       Holes[High(Holes)] := Copy(Lp);
       E1 := Sub3(Lp[1], Lp[0]);
       E2 := Sub3(Lp[2], Lp[1]);
@@ -2633,8 +2633,8 @@ var
     J: Integer;
   begin
     for J := 0 to High(Rounds) do
-      if (Abs(Dist(D[Rounds[J]].C, A) - D[Rounds[J]].R) < 1E-6) and
-         (Abs(Dist(D[Rounds[J]].C, B) - D[Rounds[J]].R) < 1E-6) then
+      if (Abs(Dist(D.EntRef(Rounds[J])^.C, A) - D.EntRef(Rounds[J])^.R) < 1E-6) and
+         (Abs(Dist(D.EntRef(Rounds[J])^.C, B) - D.EntRef(Rounds[J])^.R) < 1E-6) then
         Exit(True);
     Result := False;
   end;
@@ -2645,12 +2645,12 @@ var
     T, Len2: Double;
     Q: TP3;
   begin
-    Q := Sub3(D[L].B, D[L].A);
+    Q := Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A);
     Len2 := Dot3(Q, Q);
     if Len2 < 1E-18 then Exit(False);
-    T := Dot3(Sub3(P, D[L].A), Q) / Len2;
+    T := Dot3(Sub3(P, D.EntRef(L)^.A), Q) / Len2;
     if (T < -1E-9) or (T > 1 + 1E-9) then Exit(False);
-    Result := Dist(P, Add3(D[L].A, Mul3(Q, T))) < 1E-6;
+    Result := Dist(P, Add3(D.EntRef(L)^.A, Mul3(Q, T))) < 1E-6;
   end;
 
   { a side that is part of a longer line: a corner where another line meets it }
@@ -2661,7 +2661,7 @@ var
     { the face's own solid's lines, or loose ones in its group: a rectangle
       drawn on a solid's face is the hole's edges }
     for L := 0 to D.Live - 1 do
-      if (D[L].Kind = ekLine) and ((D[L].Grp = D[F].Grp) or (D[L].Grp = 0)) and (D[L].Part = D[F].Part) and
+      if (D.EntRef(L)^.Kind = ekLine) and ((D.EntRef(L)^.Grp = D.EntRef(F)^.Grp) or (D.EntRef(L)^.Grp = 0)) and (D.EntRef(L)^.Part = D.EntRef(F)^.Part) and
          OnLine(A, L) and OnLine(B, L) then Exit(True);
     Result := False;
   end;
@@ -2669,15 +2669,15 @@ var
   procedure Edge(const A, B: TP3; F: Integer);
   begin
     if SamePt(A, B, 1E-9) then Exit;
-    if Have.FindIndexOf(KeyOf(A, B, D[F].Grp, D[F].Part)) >= 0 then Exit;
-    if Have.FindIndexOf(KeyOf(A, B, 0, D[F].Part)) >= 0 then Exit;
+    if Have.FindIndexOf(KeyOf(A, B, D.EntRef(F)^.Grp, D.EntRef(F)^.Part)) >= 0 then Exit;
+    if Have.FindIndexOf(KeyOf(A, B, 0, D.EntRef(F)^.Part)) >= 0 then Exit;
     if OnCircle(A, B) then Exit;
     if AlongLine(A, B, F) then Exit;
     Added := True;
     D.AddLine(A, B, DefInk, DefWidth, False);
-    if D[F].Grp <> 0 then D.SetLineGroup(D.Live - 1, D[F].Grp);
-    D.SetPart(D.Live - 1, D[F].Part);
-    Have.Add(KeyOf(A, B, D[F].Grp, D[F].Part), Pointer(1));
+    if D.EntRef(F)^.Grp <> 0 then D.SetLineGroup(D.Live - 1, D.EntRef(F)^.Grp);
+    D.SetPart(D.Live - 1, D.EntRef(F)^.Part);
+    Have.Add(KeyOf(A, B, D.EntRef(F)^.Grp, D.EntRef(F)^.Part), Pointer(1));
   end;
 
 begin
@@ -2686,11 +2686,11 @@ begin
   try
     SetLength(Rounds, 0);
     for I := 0 to D.Live - 1 do
-      if (D[I].Kind = ekLine) and (D[I].Grp <> 0) and (Lined.FindIndexOf(IntToStr(D[I].Grp)) < 0) then
-        Lined.Add(IntToStr(D[I].Grp), Pointer(1));
+      if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp <> 0) and (Lined.FindIndexOf(IntToStr(D.EntRef(I)^.Grp)) < 0) then
+        Lined.Add(IntToStr(D.EntRef(I)^.Grp), Pointer(1));
     for I := 0 to D.Live - 1 do
-      if D[I].Kind = ekLine then Have.Add(KeyOf(D[I].A, D[I].B, D[I].Grp, D[I].Part), Pointer(1))
-      else if D[I].Kind = ekArc then
+      if D.EntRef(I)^.Kind = ekLine then Have.Add(KeyOf(D.EntRef(I)^.A, D.EntRef(I)^.B, D.EntRef(I)^.Grp, D.EntRef(I)^.Part), Pointer(1))
+      else if D.EntRef(I)^.Kind = ekArc then
       begin
         SetLength(Rounds, Length(Rounds) + 1);
         Rounds[High(Rounds)] := I;
@@ -2698,21 +2698,21 @@ begin
     N := D.Live;
     for I := FirstNew to N - 1 do
     begin
-      if D[I].Kind <> ekFace then Continue;
-      for H := -1 to High(D[I].Holes) do
+      if D.EntRef(I)^.Kind <> ekFace then Continue;
+      for H := -1 to High(D.EntRef(I)^.Holes) do
       begin
-        if H < 0 then Lp := D[I].Poly else Lp := D[I].Holes[H];
+        if H < 0 then Lp := D.EntRef(I)^.Poly else Lp := D.EntRef(I)^.Holes[H];
         Added := False;
         for K := 0 to High(Lp) do Edge(Lp[K], Lp[(K + 1) mod Length(Lp)], I);
         if Added then
         begin
           if Length(Edged) < D.Live then SetLength(Edged, D.Live);
           Edged[I] := True;
-          if (D[I].Grp <> 0) and (Lined.FindIndexOf(IntToStr(D[I].Grp)) < 0) and
-             ((Length(FacesGiven) = 0) or (FacesGiven[High(FacesGiven)] <> D[I].Grp)) then
+          if (D.EntRef(I)^.Grp <> 0) and (Lined.FindIndexOf(IntToStr(D.EntRef(I)^.Grp)) < 0) and
+             ((Length(FacesGiven) = 0) or (FacesGiven[High(FacesGiven)] <> D.EntRef(I)^.Grp)) then
           begin
             SetLength(FacesGiven, Length(FacesGiven) + 1);
-            FacesGiven[High(FacesGiven)] := D[I].Grp;
+            FacesGiven[High(FacesGiven)] := D.EntRef(I)^.Grp;
           end;
         end;
         { a hole typed without its lines is an opening, not a face to fill }
@@ -2721,7 +2721,7 @@ begin
           SetLength(NoFaces, Length(NoFaces) + 1);
           NoFaces[High(NoFaces)] := Copy(Lp);
           SetLength(NoFaceGrp, Length(NoFaceGrp) + 1);
-          NoFaceGrp[High(NoFaceGrp)] := D[I].Grp;
+          NoFaceGrp[High(NoFaceGrp)] := D.EntRef(I)^.Grp;
         end;
       end;
     end;
@@ -2770,19 +2770,19 @@ var
   begin
     for F := FirstNew to D.Live - 1 do
     begin
-      if (D[F].Kind <> ekFace) or (D[F].Grp = 0) or (D[F].Part <> Part) then Continue;
-      if SameLoopTol(D[F].Poly, Lp, 1E-4) then Continue;
+      if (D.EntRef(F)^.Kind <> ekFace) or (D.EntRef(F)^.Grp = 0) or (D.EntRef(F)^.Part <> Part) then Continue;
+      if SameLoopTol(D.EntRef(F)^.Poly, Lp, 1E-4) then Continue;
       Nm := D.FaceNormal(F);
       Inside := True;
       for J := 0 to High(Lp) do
-        if (Abs(Dot3(Sub3(Lp[J], D[F].Poly[0]), Nm)) > 1E-6) or not PointInLoop(Lp[J], D[F].Poly, Nm) then
+        if (Abs(Dot3(Sub3(Lp[J], D.EntRef(F)^.Poly[0]), Nm)) > 1E-6) or not PointInLoop(Lp[J], D.EntRef(F)^.Poly, Nm) then
         begin
           Inside := False;
           Break;
         end;
       if not Inside then Continue;
-      for H := 0 to High(D[F].Holes) do
-        if SameLoopTol(D[F].Holes[H], Lp, 1E-4) then Inside := False;
+      for H := 0 to High(D.EntRef(F)^.Holes) do
+        if SameLoopTol(D.EntRef(F)^.Holes[H], Lp, 1E-4) then Inside := False;
       if not Inside then Continue;
       Hole := Copy(Lp);
       if Dot3(LoopNormal(Hole), Nm) > 0 then
@@ -2792,8 +2792,8 @@ var
           Hole[J] := Hole[High(Hole) - J];
           Hole[High(Hole) - J] := T;
         end;
-      SetLength(Holes, Length(D[F].Holes) + 1);
-      for H := 0 to High(D[F].Holes) do Holes[H] := D[F].Holes[H];
+      SetLength(Holes, Length(D.EntRef(F)^.Holes) + 1);
+      for H := 0 to High(D.EntRef(F)^.Holes) do Holes[H] := D.EntRef(F)^.Holes[H];
       Holes[High(Holes)] := Hole;
       D.SetFaceHoles(F, Holes);
     end;
@@ -2806,18 +2806,18 @@ begin
   for F := 0 to D.Live - 1 do Closes[F] := False;
   Faces := TLoopIndex.Create;
   for F := FirstNew to D.Live - 1 do
-    if D[F].Kind = ekFace then Faces.Add(D[F].Poly, F);
+    if D.EntRef(F)^.Kind = ekFace then Faces.Add(D.EntRef(F)^.Poly, F);
   SetLength(Keys, 0);
   for I := FirstNew to D.Live - 1 do
-    if D[I].Kind in [ekLine, ekArc] then
+    if D.EntRef(I)^.Kind in [ekLine, ekArc] then
     begin
       Known := False;
       for K := 0 to High(Keys) do
-        if (Keys[K].Part = D[I].Part) and (Keys[K].Grp = D[I].Grp) then begin Known := True; Break; end;
+        if (Keys[K].Part = D.EntRef(I)^.Part) and (Keys[K].Grp = D.EntRef(I)^.Grp) then begin Known := True; Break; end;
       if Known then Continue;
       SetLength(Keys, Length(Keys) + 1);
-      Keys[High(Keys)].Part := D[I].Part;
-      Keys[High(Keys)].Grp := D[I].Grp;
+      Keys[High(Keys)].Part := D.EntRef(I)^.Part;
+      Keys[High(Keys)].Grp := D.EntRef(I)^.Grp;
     end;
   for K := 0 to High(Keys) do
   begin
@@ -2843,8 +2843,8 @@ begin
       for C := 0 to High(Cands) do
       begin
         F := Cands[C];
-        if ((D[F].Grp = Keys[K].Grp) or (Keys[K].Grp = 0)) and
-           SameLoopTol(D[F].Poly, Regs[I].Outer, 1E-4) then
+        if ((D.EntRef(F)^.Grp = Keys[K].Grp) or (Keys[K].Grp = 0)) and
+           SameLoopTol(D.EntRef(F)^.Poly, Regs[I].Outer, 1E-4) then
         begin
           Known := True;
           if RegionIsFace(Regs[I], D, F) then
@@ -2923,9 +2923,9 @@ var
     K, L: Integer;
   begin
     for L := 0 to D.Live - 1 do
-      if (D[L].Kind = ekLine) and (D[L].Grp <> 0) and (D[L].Grp <> G) then
-        for K := 0 to High(D[Face].Poly) do
-          if SamePt(D[L].A, D[Face].Poly[K], 1E-6) or SamePt(D[L].B, D[Face].Poly[K], 1E-6) then
+      if (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Grp <> 0) and (D.EntRef(L)^.Grp <> G) then
+        for K := 0 to High(D.EntRef(Face)^.Poly) do
+          if SamePt(D.EntRef(L)^.A, D.EntRef(Face)^.Poly[K], 1E-6) or SamePt(D.EntRef(L)^.B, D.EntRef(Face)^.Poly[K], 1E-6) then
             Exit(True);
     Result := False;
   end;
@@ -2934,30 +2934,30 @@ begin
   Holes := TLoopIndex.Create;
   try
     for S := FirstNew to D.Live - 1 do
-      if (D[S].Kind = ekFace) and (D[S].Grp <> 0) then
-        for J := 0 to High(D[S].Holes) do Holes.Add(D[S].Holes[J], S);
+      if (D.EntRef(S)^.Kind = ekFace) and (D.EntRef(S)^.Grp <> 0) then
+        for J := 0 to High(D.EntRef(S)^.Holes) do Holes.Add(D.EntRef(S)^.Holes[J], S);
     for F := FirstNew to D.Live - 1 do
     begin
-      if (D[F].Kind <> ekFace) or (D[F].Grp <> 0) then Continue;
-      Cands := Holes.Near(D[F].Poly);
+      if (D.EntRef(F)^.Kind <> ekFace) or (D.EntRef(F)^.Grp <> 0) then Continue;
+      Cands := Holes.Near(D.EntRef(F)^.Poly);
       for C := 0 to High(Cands) do
       begin
         S := Cands[C];
         if S = F then Continue;
-        for J := 0 to High(D[S].Holes) do
-          if SameLoopTol(D[S].Holes[J], D[F].Poly, 1E-4) then
+        for J := 0 to High(D.EntRef(S)^.Holes) do
+          if SameLoopTol(D.EntRef(S)^.Holes[J], D.EntRef(F)^.Poly, 1E-4) then
           begin
-            D.SetFaceGroup(F, D[S].Grp);
+            D.SetFaceGroup(F, D.EntRef(S)^.Grp);
             { a disk the reader made faces out of the solid with the face it
               fills, not east, north or up as a loose face would; one written
               out keeps the way it was written }
-            if Shared(F, D[S].Grp) then
+            if Shared(F, D.EntRef(S)^.Grp) then
               { as it was }
             else if not WrittenOut(F) then
             begin
               if Dot3(D.FaceNormal(F), D.FaceNormal(S)) < 0 then D.FlipFace(F);
               { and is made of what that face is, as the tool leaves it }
-              if not D[F].MatSet and D[S].MatSet then D.SetMaterial(F, D[S].Mat);
+              if not D.EntRef(F)^.MatSet and D.EntRef(S)^.MatSet then D.SetMaterial(F, D.EntRef(S)^.Mat);
             end
             { written out, it is what the reader would have made when it faces
               the way that face does }
@@ -2965,7 +2965,7 @@ begin
               Implied[F] := Dot3(D.FaceNormal(F), D.FaceNormal(S)) > 0;
             Break;
           end;
-        if D[F].Grp <> 0 then Break;
+        if D.EntRef(F)^.Grp <> 0 then Break;
       end;
     end;
   finally
