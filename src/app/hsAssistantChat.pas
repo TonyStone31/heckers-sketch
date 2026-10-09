@@ -41,6 +41,7 @@ type
     FProblem: string;
     FOnPiece, FOnThink: TChatPiece;
     function PieceOf(const Json: string; Streamed: Boolean; const Field: string = 'content'): string;
+    function ErrorOf(const Json: string): string;
     procedure TakeAnthropic(const Json: string);
     procedure TakeLine(const L: string);
   public
@@ -135,6 +136,9 @@ begin
   end;
   if ProviderOf(S) = PROV_ANTHROPIC then Exit;
   while (Result <> '') and (Result[Length(Result)] = '/') do SetLength(Result, Length(Result) - 1);
+  { a bare server, http://localhost:1234, answers under /v1 }
+  if (Pos('://', Result) > 0) and (Pos('/', Copy(Result, Pos('://', Result) + 3, MaxInt)) = 0) then
+    Result := Result + '/v1';
   if LowerCase(Copy(Result, Length(Result) - 16, 17)) <> '/chat/completions' then
     Result := Result + '/chat/completions';
 end;
@@ -318,6 +322,32 @@ begin
   end;
 end;
 
+{ a reply that is an error: {"error": "..."} or {"error": {"message": ...}},
+  which some servers send with a 200; '' if it is not one }
+function TChatStream.ErrorOf(const Json: string): string;
+var
+  D, E: TJSONData;
+begin
+  Result := '';
+  if Pos('"error"', Json) = 0 then Exit;
+  try
+    D := GetJSON(Json);
+  except
+    Exit;
+  end;
+  try
+    if not (D is TJSONObject) then Exit;
+    E := TJSONObject(D).Find('error');
+    if E = nil then Exit;
+    if E.JSONType = jtString then Result := E.AsString
+    else if (E is TJSONObject) and (TJSONObject(E).Find('message') <> nil) then
+      Result := TJSONObject(E).Get('message', '')
+    else Result := E.AsJSON;
+  finally
+    D.Free;
+  end;
+end;
+
 { one of Anthropic's events: text and thinking as they come, a refusal or
   an error kept for the end }
 procedure TChatStream.TakeAnthropic(const Json: string);
@@ -379,6 +409,12 @@ begin
     TakeAnthropic(P);
     Exit;
   end;
+  T := ErrorOf(P);
+  if T <> '' then
+  begin
+    FProblem := T;
+    Exit;
+  end;
   if Assigned(FOnThink) then
   begin
     T := PieceOf(P, True, 'reasoning_content');
@@ -424,6 +460,8 @@ begin
   if FLine <> '' then TakeLine(TrimRight(FLine));
   FLine := '';
   if FStreamed or Anthropic then Exit('');
+  FProblem := ErrorOf(Trim(FAll));
+  if FProblem <> '' then Exit('');
   Result := PieceOf(FAll, False);
 end;
 

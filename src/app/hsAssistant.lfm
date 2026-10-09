@@ -138,7 +138,7 @@ object AssistantForm: TAssistantForm
       Width = 536
       Anchors = [akTop, akLeft, akRight, akBottom]
       TabOrder = 0
-      TextHint = 'Ask about the sheet, or for a change to it.  Ctrl+Enter sends.'
+      TextHint = 'Ask about the sheet, or for a change to it.  Enter sends; Ctrl+Enter starts a new line.'
       WantReturns = True
       WantTabs = False
     end

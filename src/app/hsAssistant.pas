@@ -121,8 +121,8 @@ end;
 
 procedure TAssistantForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  { Ctrl+Enter sends; Enter alone is a new line in the question }
-  if (Key = VK_RETURN) and (ssCtrl in Shift) then
+  { Enter sends; Ctrl+Enter or Shift+Enter is a new line in the question }
+  if (Key = VK_RETURN) and (Shift * [ssCtrl, ssShift, ssAlt] = []) and memAsk.Focused then
   begin
     btnSendClick(nil);
     Key := 0;
@@ -338,7 +338,15 @@ begin
     memChat.ReplaceLast('*(no answer)*');
   if not OK then
     if Err = 'stopped' then Say('', 'Stopped.', PixToColor(DlgTheme.TextDim))
-    else Say('', 'It went wrong: ' + Err, ToneColor(False));
+    else
+    begin
+      Say('', 'It went wrong: ' + Err, ToneColor(False));
+      { the commonest one with a model on this machine }
+      if (Pos('context', LowerCase(Err)) > 0) and (Pos('exceed', LowerCase(Err)) > 0) then
+        Say('', 'The manual and this sheet do not fit in what the model was loaded ' +
+          'with.  Load it with a longer context (32768 or more), or untick the manual or ' +
+          'the sheet above.', PixToColor(DlgTheme.TextDim));
+    end;
 end;
 
 procedure TAssistantForm.btnClearClick(Sender: TObject);
@@ -358,7 +366,7 @@ end;
 
 procedure TAssistantForm.chkOnTopChange(Sender: TObject);
 begin
-  if chkOnTop.Checked then FormStyle := fsStayOnTop else FormStyle := fsNormal;
+  hsDialogSkin.SetOnTop(Self, chkOnTop.Checked);
 end;
 
 end.
