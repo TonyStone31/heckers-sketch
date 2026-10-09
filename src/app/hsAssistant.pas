@@ -61,7 +61,7 @@ type
     procedure Say(const Who, Txt: string; C: TColor);
     function SheetText(out Lines: Integer; out Picked: string; out NPicked: Integer): string;
     function GivenText: string;
-    function SystemText: string;
+    function SystemParts: TChatSystem;
   public
     { the same questions the source window asks the sheet }
     OnAskSource: TSourceAskSource;
@@ -138,9 +138,10 @@ procedure TAssistantForm.ShowWho;
 var
   S: string;
 begin
-  S := TextSpan(FSettings.Provider, True, False);
-  if FSettings.Model <> '' then S := S + DimSpan(', ' + FSettings.Model, False);
-  if LoadAssistantKey = '' then S := S + InkSpan(' - no key yet', ToneColor(False), False, False);
+  S := TextSpan(PROVIDERS[ProviderOf(FSettings)], True, False);
+  if ChatModel(FSettings) <> '' then S := S + DimSpan(', ' + ChatModel(FSettings), False);
+  if (ProviderOf(FSettings) <> PROV_OWN) and (LoadAssistantKey = '') then
+    S := S + InkSpan(' - no key yet', ToneColor(False), False, False);
   lblWho.Caption := S;
 end;
 
@@ -251,7 +252,7 @@ begin
 end;
 
 { what goes ahead of the conversation, as the boxes are ticked }
-function TAssistantForm.SystemText: string;
+function TAssistantForm.SystemParts: TChatSystem;
 var
   Manual, Missing, Sheet, Picked: string;
   N, NP: Integer;
@@ -261,7 +262,7 @@ begin
   Sheet := SheetText(N, Picked, NP);
   if not chkSheet.Checked then Sheet := '';
   if not chkPicked.Checked or (NP = 0) then Picked := '';
-  Result := ChatSystemText(Manual, Sheet, Picked);
+  Result := ChatSystem(Manual, Sheet, Picked);
 end;
 
 procedure TAssistantForm.Busy(On: Boolean);
@@ -275,7 +276,6 @@ procedure TAssistantForm.btnSendClick(Sender: TObject);
 var
   Q, Why, Key: string;
   Msgs: TChatMsgs;
-  I: Integer;
 begin
   { Send stops an answer still coming }
   if FChat <> nil then
@@ -298,15 +298,12 @@ begin
   FHistory[High(FHistory)].Role := 'user';
   FHistory[High(FHistory)].Text := Q;
   { the manual and the sheet as they are now, then the conversation }
-  SetLength(Msgs, Length(FHistory) + 1);
-  Msgs[0].Role := 'system';
-  Msgs[0].Text := SystemText;
-  for I := 0 to High(FHistory) do Msgs[I + 1] := FHistory[I];
+  Msgs := Copy(FHistory);
   FAnswer := '';
   FThought := 0;
   memChat.AppendBlock('...', itfMarkdown);
   Busy(True);
-  FChat := TChatThread.Create(FSettings, Key, Msgs, @ChatPiece, @ChatDone, @ChatThink);
+  FChat := TChatThread.Create(FSettings, Key, SystemParts, Msgs, @ChatPiece, @ChatDone, @ChatThink);
   ShowGiven;
 end;
 

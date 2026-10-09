@@ -1,8 +1,9 @@
 unit hsAssistantChat;
 
-{ One question to a chat server and its answer, a piece at a time.  Spoken
-  in the chat-completions form most servers take, a model on this machine
-  included.  No windows here, so the tests can run it. }
+{ One question to an AI service and its answer, a piece at a time.  Two
+  ways of asking: Anthropic's Messages API, and the chat-completions form
+  OpenAI and most servers take, a model on this machine included.  No
+  windows here, so the tests can run it. }
 
 {$mode objfpc}{$H+}
 
@@ -13,27 +14,39 @@ uses
 
 type
   TChatMsg = record
-    Role: string;    { 'system', 'user' or 'assistant' }
+    Role: string;    { 'user' or 'assistant' }
     Text: string;
   end;
   TChatMsgs = array of TChatMsg;
+
+  { What goes ahead of the conversation: Fixed (what the assistant is for,
+    and the manual) changes seldom and is cached where the service caches;
+    Sheet (the drawing, what is picked) changes as the drawing does. }
+  TChatSystem = record
+    Fixed, Sheet: string;
+  end;
 
   TChatPiece = procedure(Sender: TObject; const Piece: string) of object;
   TChatDone = procedure(Sender: TObject; OK: Boolean; const Err: string) of object;
 
   { Reads a streamed answer as it is written into it: "data: {...}" lines,
-    each holding the next piece.  A server that ignores streaming answers in
-    one body, which Finish reads.  Raises EAbort from Write once Stopped. }
+    each holding the next piece, in either service's shape.  A server that
+    ignores streaming answers in one body, which Finish reads.  Raises
+    EAbort from Write once Stopped. }
   TChatStream = class(TStream)
   private
     FLine: string;
     FAll: string;
     FStreamed: Boolean;
+    FProblem: string;
     FOnPiece, FOnThink: TChatPiece;
     function PieceOf(const Json: string; Streamed: Boolean; const Field: string = 'content'): string;
+    procedure TakeAnthropic(const Json: string);
     procedure TakeLine(const L: string);
   public
     Stopped: Boolean;
+    { Anthropic's events rather than chat-completions chunks }
+    Anthropic: Boolean;
     function Write(const Buffer; Count: LongInt): LongInt; override;
     function Read(var Buffer; Count: LongInt): LongInt; override;
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
@@ -41,8 +54,10 @@ type
     function Finish: string;
     { the reply as it came, for an error message }
     property All: string read FAll;
+    { an error or a refusal the service sent in the stream; '' if none }
+    property Problem: string read FProblem;
     property OnPiece: TChatPiece read FOnPiece write FOnPiece;
-    { the model's reasoning before it answers, where a server sends it }
+    { the model's reasoning before it answers, where a service sends it }
     property OnThink: TChatPiece read FOnThink write FOnThink;
   end;
 
@@ -50,7 +65,7 @@ type
     thread.  Frees itself. }
   TChatThread = class(TThread)
   private
-    FURL, FKey, FBody: string;
+    FURL, FHeaders, FBody: string;
     FStream: TChatStream;
     FPiece, FErr: string;
     FOK: Boolean;
@@ -65,28 +80,37 @@ type
     procedure Execute; override;
   public
     constructor Create(const S: TAssistantSettings; const Key: string;
-      const Msgs: TChatMsgs; AOnPiece: TChatPiece; AOnDone: TChatDone;
-      AOnThink: TChatPiece = nil);
+      const Sys: TChatSystem; const Msgs: TChatMsgs; AOnPiece: TChatPiece;
+      AOnDone: TChatDone; AOnThink: TChatPiece = nil);
     procedure Stop;
     { stops it and drops its events, for a window going away }
     procedure Detach;
   end;
 
-{ Where the question goes: the address as given, with /chat/completions
-  added unless it is there; a server of one's own defaults to this
-  machine. }
+const
+  { asked when Settings leaves the model blank }
+  ANTHROPIC_MODEL = 'claude-opus-5-5';
+
+{ Where the question goes: the service's own address unless one is given;
+  a chat-completions address gets /chat/completions added. }
 function ChatURL(const S: TAssistantSettings): string;
 
-{ The request: the model, the messages, streamed. }
-function ChatBody(const S: TAssistantSettings; const Msgs: TChatMsgs): string;
+{ The model asked for: as set, else the service's usual; '' lets a server
+  of one's own use what it has loaded. }
+function ChatModel(const S: TAssistantSettings): string;
+
+{ The request, in the service's shape, streamed. }
+function ChatBody(const S: TAssistantSettings; const Sys: TChatSystem; const Msgs: TChatMsgs): string;
+
+{ The headers besides Content-Type: the key, and Anthropic's version. }
+procedure ChatHeaders(const S: TAssistantSettings; const Key: string; H: TStrings);
 
 { '' when a question may go; else why not.  A key goes only over https or
-  to this machine. }
+  to this machine, and a service that needs a key or a model says so. }
 function ChatRefusal(const S: TAssistantSettings; const Key: string): string;
 
-{ What the assistant is told before the conversation: what it is for, and
-  the manual and the sheet when they go. }
-function ChatSystemText(const Manual, Sheet, Picked: string): string;
+{ What the assistant is told before the conversation, in its two parts. }
+function ChatSystem(const Manual, Sheet, Picked: string): TChatSystem;
 
 implementation
 
@@ -95,30 +119,66 @@ uses
 
 const
   OWN_SERVER = 'http://localhost:1234/v1';
+  OPENAI_SERVER = 'https://api.openai.com/v1';
+  ANTHROPIC_SERVER = 'https://api.anthropic.com/v1/messages';
 
 function ChatURL(const S: TAssistantSettings): string;
 begin
   Result := Trim(S.Endpoint);
-  if (Result = '') and (S.Provider = PROVIDERS[1]) then Result := OWN_SERVER;
-  if Result = '' then Exit;
+  case ProviderOf(S) of
+    PROV_ANTHROPIC:
+      if Result = '' then Result := ANTHROPIC_SERVER;
+    PROV_OPENAI:
+      if Result = '' then Result := OPENAI_SERVER;
+  else
+    if Result = '' then Result := OWN_SERVER;
+  end;
+  if ProviderOf(S) = PROV_ANTHROPIC then Exit;
   while (Result <> '') and (Result[Length(Result)] = '/') do SetLength(Result, Length(Result) - 1);
   if LowerCase(Copy(Result, Length(Result) - 16, 17)) <> '/chat/completions' then
     Result := Result + '/chat/completions';
 end;
 
-function ChatBody(const S: TAssistantSettings; const Msgs: TChatMsgs): string;
+function ChatModel(const S: TAssistantSettings): string;
+begin
+  Result := Trim(S.Model);
+  if (Result = '') and (ProviderOf(S) = PROV_ANTHROPIC) then Result := ANTHROPIC_MODEL;
+end;
+
+function AnthropicBody(const S: TAssistantSettings; const Sys: TChatSystem;
+  const Msgs: TChatMsgs): string;
 var
-  O, M: TJSONObject;
-  A: TJSONArray;
+  O, M, B, OC: TJSONObject;
+  A, SysA: TJSONArray;
   I: Integer;
 begin
   O := TJSONObject.Create;
   try
-    if S.Model <> '' then O.Add('model', S.Model);
+    O.Add('model', ChatModel(S));
+    O.Add('max_tokens', 64000);
     O.Add('stream', True);
-    { a reasoning model answers at once; a server that does not know it
-      lets it pass }
-    if not S.Think then O.Add('reasoning_effort', 'none');
+    { the instructions and the manual, cached: they come again with every
+      question; the sheet after them, as it is now }
+    SysA := TJSONArray.Create;
+    B := TJSONObject.Create;
+    B.Add('type', 'text');
+    B.Add('text', Sys.Fixed);
+    B.Add('cache_control', TJSONObject.Create(['type', 'ephemeral']));
+    SysA.Add(B);
+    if Sys.Sheet <> '' then
+      SysA.Add(TJSONObject.Create(['type', 'text', 'text', Sys.Sheet]));
+    O.Add('system', SysA);
+    { and the conversation so far, cached up to its end }
+    O.Add('cache_control', TJSONObject.Create(['type', 'ephemeral']));
+    { the model always reasons; summaries of it show progress, and effort
+      says how hard }
+    O.Add('thinking', TJSONObject.Create(['type', 'adaptive', 'display', 'summarized']));
+    OC := TJSONObject.Create;
+    if S.Think then OC.Add('effort', 'high') else OC.Add('effort', 'low');
+    O.Add('output_config', OC);
+    { a request a safety check declines goes on to another model, chosen
+      by the service }
+    O.Add('fallbacks', 'default');
     A := TJSONArray.Create;
     for I := 0 to High(Msgs) do
     begin
@@ -134,14 +194,71 @@ begin
   end;
 end;
 
+function CompletionsBody(const S: TAssistantSettings; const Sys: TChatSystem;
+  const Msgs: TChatMsgs): string;
+var
+  O, M: TJSONObject;
+  A: TJSONArray;
+  I: Integer;
+  T: string;
+begin
+  O := TJSONObject.Create;
+  try
+    if ChatModel(S) <> '' then O.Add('model', ChatModel(S));
+    O.Add('stream', True);
+    { a model that reasons answers sooner when told; OpenAI's least is low,
+      a local server takes none; one that does not know it lets it pass }
+    if not S.Think then
+      if ProviderOf(S) = PROV_OPENAI then O.Add('reasoning_effort', 'low')
+      else O.Add('reasoning_effort', 'none');
+    A := TJSONArray.Create;
+    T := Sys.Fixed;
+    if Sys.Sheet <> '' then T := T + LineEnding + LineEnding + Sys.Sheet;
+    A.Add(TJSONObject.Create(['role', 'system', 'content', T]));
+    for I := 0 to High(Msgs) do
+    begin
+      M := TJSONObject.Create;
+      M.Add('role', Msgs[I].Role);
+      M.Add('content', Msgs[I].Text);
+      A.Add(M);
+    end;
+    O.Add('messages', A);
+    Result := O.AsJSON;
+  finally
+    O.Free;
+  end;
+end;
+
+function ChatBody(const S: TAssistantSettings; const Sys: TChatSystem; const Msgs: TChatMsgs): string;
+begin
+  if ProviderOf(S) = PROV_ANTHROPIC then Result := AnthropicBody(S, Sys, Msgs)
+  else Result := CompletionsBody(S, Sys, Msgs);
+end;
+
+procedure ChatHeaders(const S: TAssistantSettings; const Key: string; H: TStrings);
+begin
+  if ProviderOf(S) = PROV_ANTHROPIC then
+  begin
+    H.Add('x-api-key: ' + Key);
+    H.Add('anthropic-version: 2023-06-01');
+    H.Add('anthropic-beta: server-side-fallback-2026-07-01');
+  end
+  else if Key <> '' then
+    H.Add('Authorization: Bearer ' + Key);
+  H.Add('Accept: text/event-stream');
+end;
+
 function ChatRefusal(const S: TAssistantSettings; const Key: string): string;
 var
   U, Host: string;
   K: Integer;
 begin
   Result := '';
+  if (ProviderOf(S) <> PROV_OWN) and (Key = '') then
+    Exit(PROVIDERS[ProviderOf(S)] + ' wants a key - Settings takes one.');
+  if (ProviderOf(S) = PROV_OPENAI) and (Trim(S.Model) = '') then
+    Exit('OpenAI wants a model named in Settings.');
   U := LowerCase(ChatURL(S));
-  if U = '' then Exit('No address yet - Settings says where the questions go.');
   if Copy(U, 1, 8) = 'https://' then Exit;
   if Copy(U, 1, 7) <> 'http://' then Exit('The address wants to start http:// or https://.');
   if Key = '' then Exit;
@@ -154,9 +271,9 @@ begin
     Result := 'A key goes only over https, or to this machine.';
 end;
 
-function ChatSystemText(const Manual, Sheet, Picked: string): string;
+function ChatSystem(const Manual, Sheet, Picked: string): TChatSystem;
 begin
-  Result :=
+  Result.Fixed :=
     'You help someone draw in Heckers Sketch, a 3D sketching program.  ' +
     'Drawings are written in Heck, a plain-text language; the manual below ' +
     'is all of it.  Answer plainly and briefly.  When you change the ' +
@@ -164,12 +281,15 @@ begin
     'keeping every name and comment that is there; it is looked over ' +
     'before it is used.';
   if Manual <> '' then
-    Result := Result + LineEnding + LineEnding + '# The manual' + LineEnding + LineEnding + Manual;
+    Result.Fixed := Result.Fixed + LineEnding + LineEnding + '# The manual' +
+      LineEnding + LineEnding + Manual;
+  Result.Sheet := '';
   if Sheet <> '' then
-    Result := Result + LineEnding + LineEnding + '# The sheet as it stands' + LineEnding +
-      LineEnding + '```heck' + LineEnding + Sheet + '```';
+    Result.Sheet := '# The sheet as it stands' + LineEnding + LineEnding + '```heck' +
+      LineEnding + Sheet + '```';
   if Picked <> '' then
-    Result := Result + LineEnding + LineEnding + 'Picked on the sheet: lines ' + Picked + '.';
+    Result.Sheet := Result.Sheet + LineEnding + LineEnding + 'Picked on the sheet: lines ' +
+      Picked + '.';
 end;
 
 { TChatStream }
@@ -198,6 +318,54 @@ begin
   end;
 end;
 
+{ one of Anthropic's events: text and thinking as they come, a refusal or
+  an error kept for the end }
+procedure TChatStream.TakeAnthropic(const Json: string);
+var
+  D, E: TJSONData;
+  Kind, Delta: string;
+begin
+  try
+    D := GetJSON(Json);
+  except
+    Exit;
+  end;
+  try
+    if not (D is TJSONObject) then Exit;
+    Kind := TJSONObject(D).Get('type', '');
+    if Kind = 'content_block_delta' then
+    begin
+      E := TJSONObject(D).FindPath('delta.type');
+      if E = nil then Exit;
+      Delta := E.AsString;
+      if Delta = 'text_delta' then
+      begin
+        E := TJSONObject(D).FindPath('delta.text');
+        if (E <> nil) and Assigned(FOnPiece) then FOnPiece(Self, E.AsString);
+      end
+      else if Delta = 'thinking_delta' then
+      begin
+        E := TJSONObject(D).FindPath('delta.thinking');
+        if (E <> nil) and Assigned(FOnThink) then FOnThink(Self, E.AsString);
+      end;
+    end
+    else if Kind = 'message_delta' then
+    begin
+      E := TJSONObject(D).FindPath('delta.stop_reason');
+      if (E <> nil) and (E.JSONType = jtString) then
+        if E.AsString = 'refusal' then FProblem := 'the service declined to answer'
+        else if E.AsString = 'max_tokens' then FProblem := 'the answer was cut off at its length limit';
+    end
+    else if Kind = 'error' then
+    begin
+      E := TJSONObject(D).FindPath('error.message');
+      if E <> nil then FProblem := E.AsString else FProblem := 'the service sent an error';
+    end;
+  finally
+    D.Free;
+  end;
+end;
+
 procedure TChatStream.TakeLine(const L: string);
 var
   P, T: string;
@@ -206,6 +374,11 @@ begin
   FStreamed := True;
   P := Trim(Copy(L, 6, MaxInt));
   if (P = '') or (P = '[DONE]') then Exit;
+  if Anthropic then
+  begin
+    TakeAnthropic(P);
+    Exit;
+  end;
   if Assigned(FOnThink) then
   begin
     T := PieceOf(P, True, 'reasoning_content');
@@ -250,22 +423,32 @@ function TChatStream.Finish: string;
 begin
   if FLine <> '' then TakeLine(TrimRight(FLine));
   FLine := '';
-  if FStreamed then Exit('');
+  if FStreamed or Anthropic then Exit('');
   Result := PieceOf(FAll, False);
 end;
 
 { TChatThread }
 
 constructor TChatThread.Create(const S: TAssistantSettings; const Key: string;
-  const Msgs: TChatMsgs; AOnPiece: TChatPiece; AOnDone: TChatDone; AOnThink: TChatPiece);
+  const Sys: TChatSystem; const Msgs: TChatMsgs; AOnPiece: TChatPiece;
+  AOnDone: TChatDone; AOnThink: TChatPiece);
+var
+  H: TStringList;
 begin
   FURL := ChatURL(S);
-  FKey := Key;
-  FBody := ChatBody(S, Msgs);
+  FBody := ChatBody(S, Sys, Msgs);
+  H := TStringList.Create;
+  try
+    ChatHeaders(S, Key, H);
+    FHeaders := H.Text;
+  finally
+    H.Free;
+  end;
   FOnPiece := AOnPiece;
   FOnThink := AOnThink;
   FOnDone := AOnDone;
   FStream := TChatStream.Create;
+  FStream.Anthropic := ProviderOf(S) = PROV_ANTHROPIC;
   FStream.OnPiece := @GotPiece;
   if Assigned(AOnThink) then FStream.OnThink := @GotThink;
   FreeOnTerminate := True;
@@ -323,15 +506,19 @@ begin
   H := TStringList.Create;
   Body := TStringStream.Create(FBody);
   try
-    H.Add('Content-Type: application/json');
-    H.Add('Accept: text/event-stream');
-    if FKey <> '' then H.Add('Authorization: Bearer ' + FKey);
+    H.Text := FHeaders;
+    H.Insert(0, 'Content-Type: application/json');
     FOK := NetPostStream(FURL, H, Body, FStream, Status, FErr);
     One := FStream.Finish;
     if FOK and (One <> '') then GotPiece(Self, One);
-    if not FOK and (FErr <> 'stopped') then
+    if FOK and (FStream.Problem <> '') then
     begin
-      { the server's own words say most, cut short }
+      FOK := False;
+      FErr := FStream.Problem;
+    end
+    else if not FOK and (FErr <> 'stopped') then
+    begin
+      { the service's own words say most, cut short }
       Why := Trim(FStream.All);
       if Why <> '' then FErr := FErr + ': ' + Copy(Why, 1, 300);
     end;

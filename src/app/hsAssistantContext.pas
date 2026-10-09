@@ -23,13 +23,18 @@ type
   end;
 
 const
-  { which services to name is not settled yet }
-  PROVIDERS: array[0..1] of string = ('A hosted service', 'A server of my own');
+  PROVIDERS: array[0..2] of string = ('Anthropic', 'OpenAI', 'A server of my own');
+  PROV_ANTHROPIC = 0;
+  PROV_OPENAI = 1;
+  PROV_OWN = 2;
 
   { the pages the assistant reads, in order, from the help folder }
   MANUAL_PAGES: array[0..1] of string = ('writing-heck.html', 'heck.html');
 
 function DefaultAssistantSettings: TAssistantSettings;
+{ which of PROVIDERS; a name from an older settings file asks the
+  chat-completions way it did }
+function ProviderOf(const S: TAssistantSettings): Integer;
 function LoadAssistantSettings: TAssistantSettings;
 procedure SaveAssistantSettings(const S: TAssistantSettings);
 
@@ -64,6 +69,15 @@ begin
   Result.SendSheet := True;
   Result.SendPicked := True;
   Result.Think := True;
+end;
+
+function ProviderOf(const S: TAssistantSettings): Integer;
+var
+  I: Integer;
+begin
+  for I := 0 to High(PROVIDERS) do
+    if SameText(S.Provider, PROVIDERS[I]) then Exit(I);
+  Result := PROV_OPENAI;
 end;
 
 function LoadAssistantSettings: TAssistantSettings;
