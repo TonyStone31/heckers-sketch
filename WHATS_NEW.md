@@ -21,7 +21,7 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
-## Next release
+## v2026.10.09
 
 ### Fixed
 
