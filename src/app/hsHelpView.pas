@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, StdCtrls, ComCtrls, ExtCtrls,
-  LCLType, LCLIntf, BCPanel, BCButton, InkCSS, InkPage, BGRAFlashProgressBar;
+  LCLType, LCLIntf, BCPanel, BCButton, InkPage, BGRAFlashProgressBar;
 
 type
   { The page theme switch, same three as the website.  Auto follows the
