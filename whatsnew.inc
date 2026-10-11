@@ -24,6 +24,23 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Double-click a drawing in your file manager and it opens here.**' + LineEnding +
+    '  SETTINGS > File Associations > Set Up on This Computer tells Windows or' + LineEnding +
+    '  Linux that `.hsk` and `.heck` files belong to this program, with a' + LineEnding +
+    '  document icon of their own.  Which program is the default stays your' + LineEnding +
+    '  choice; Remove takes it all back out.' + LineEnding +
+    '- **Running from a USB stick?**  Repair at Start-up, on the same menu,' + LineEnding +
+    '  quietly mends the registration whenever the stick lands on a different' + LineEnding +
+    '  drive letter or a different machine.' + LineEnding +
+    '- **A drawing opened while the program is already running** now lands in' + LineEnding +
+    '  the running window as a tab of its own, instead of a box telling you the' + LineEnding +
+    '  program is already open.  Launching the program a second time just' + LineEnding +
+    '  brings the window to the front.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.11' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +

@@ -27,7 +27,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
-            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -67,7 +67,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
-            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -98,7 +98,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
-            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-fast"/>
           </SearchPaths>
           <CodeGeneration>
@@ -429,7 +429,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);."/>
-      <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
+      <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

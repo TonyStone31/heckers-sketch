@@ -47,9 +47,10 @@ begin
     Tmp := ChangeFileExt(Note, '.tmp');
     try
       L.SaveToFile(Tmp);
-      if FileExists(Note) then DeleteFile(Note);
-      if RenameFile(Tmp, Note) then Result := Note
-      else DeleteFile(Tmp);
+      { qualified: the Windows unit is in scope here and shadows these }
+      if FileExists(Note) then SysUtils.DeleteFile(Note);
+      if SysUtils.RenameFile(Tmp, Note) then Result := Note
+      else SysUtils.DeleteFile(Tmp);
     except
       { a read-only folder: the old message will have to do }
     end;

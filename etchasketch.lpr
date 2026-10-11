@@ -169,7 +169,7 @@ begin
     begin
       OnlyCopy := BecomeTheOnlyCopy(0);
       if not OnlyCopy then Halt(0);
-      DeleteFile(ReqFile);
+      SysUtils.DeleteFile(ReqFile);
     end;
   end;
   if not OnlyCopy then

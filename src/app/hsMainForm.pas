@@ -35,7 +35,7 @@ uses
   hsSurface, hsSkin, hsViewCube, hsDialogSkin, hsFilm, hsRecorder, hsExport, hsExToy, hsExamples, hsDrawing, hsSplash, hsSysInfo, hsTouch, hsFaceFinder, hsUpdater, hsUpdateForm, hsWhatsNew, hsPaths,
   hsBugReport, hsNet, hsUnfold, hsFlatView, hsTunnels, hsSendReport, hsSourceWindow, hsAssistant, hsPostcard, hsHeckWriter, hsHeckReader, hsJigRun, hsJigFiles, hsFittings, hsTransitionWizard, hsSpoolWizard, hsPipe,
   hsStairs, hsStairWizard, hsStringerSheet, hsHeckFile, hsRadiantData, hsRadiant, hsRadiantWizard, hsRadiantSubmittal, hsRadiantJob,
-  hsCommandText, InkPage, InkDraw;
+  hsCommandText, InkPage, InkDraw, FileAssMan, FATypes;
 
 type
   { What the cursor may infer; Alt cycles through these, as SketchUp's line
@@ -172,6 +172,7 @@ type
     dlgSave: TSaveDialog;
     dlgSubmittal: TSaveDialog;
     dlgStringers: TSaveDialog;
+    FileAss: TFileAssMan;
     pbCmd: TPaintBox;
     pbTabs: TPaintBox;
     pbSlice: TPaintBox;
@@ -828,6 +829,8 @@ type
     FRecoverToOffer: Boolean;
     { when to next look for a second copy's open-request notes }
     FReqPollAt: QWord;
+    { mend the file associations at start-up (SETTINGS > File Associations) }
+    FAssocRepair: Boolean;
     FGuide: Boolean;             // an alignment guide is active
     FGuideFrom: TP3;
 
@@ -1311,6 +1314,11 @@ type
     procedure FollowScreenSize;
     procedure SaveSettings;
     procedure ShowAbout;
+    { file associations: the FileAss component, SETTINGS > File Associations }
+    function AssocSuffix: string;
+    procedure TellAssocTrouble(const R: TFileAssResult);
+    procedure AssociationsPick(What: Integer);
+    procedure RepairAssociations;
     procedure ShowFacts(const Title, AText: string);
     procedure ShowLongText(const Title, AText: string);
   end;

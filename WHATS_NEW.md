@@ -21,6 +21,23 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **Double-click a drawing in your file manager and it opens here.**
+  SETTINGS > File Associations > Set Up on This Computer tells Windows or
+  Linux that `.hsk` and `.heck` files belong to this program, with a
+  document icon of their own.  Which program is the default stays your
+  choice; Remove takes it all back out.
+- **Running from a USB stick?**  Repair at Start-up, on the same menu,
+  quietly mends the registration whenever the stick lands on a different
+  drive letter or a different machine.
+- **A drawing opened while the program is already running** now lands in
+  the running window as a tab of its own, instead of a box telling you the
+  program is already open.  Launching the program a second time just
+  brings the window to the front.
+
 ## v2026.10.11
 
 ### Fixed

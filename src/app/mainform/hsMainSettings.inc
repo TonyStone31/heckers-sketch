@@ -506,6 +506,7 @@ begin
       FEdgeW := EnsureRange(DrawingInt(Ini, 'linew', 1), MIN_PEN, MAX_PEN);
       FInkColor := TColor(Ini.ReadInteger('pen', 'ink', PALETTE[0]));
       FInkAuto := Ini.ReadBool('pen', 'inkauto', True);
+      FAssocRepair := Ini.ReadBool('files', 'fixassociations', False);
       { tool names on by default, for first-timers }
       FToolsWide := Ini.ReadBool('drawing', 'toolnames',
         Ini.ReadBool('pro', 'toolnames', True));
@@ -590,6 +591,7 @@ begin
       Ini.WriteInteger('drawing', 'linew', FEdgeW);
       Ini.WriteInteger('pen', 'ink', FInkColor);
       Ini.WriteBool('pen', 'inkauto', FInkAuto);
+      Ini.WriteBool('files', 'fixassociations', FAssocRepair);
       Ini.WriteBool('drawing', 'toolnames', FToolsWide);
       Ini.WriteInteger('drawing', 'scale', FD.ScaleIdx);
       { camera moves used lately, so the list offers them first }
@@ -653,5 +655,87 @@ begin
   ShowAboutBox(Self);
 end;
 
+{ ---- file associations: the FileAss component on the form ---- }
+
+{ A word on their state for the SETTINGS menu caption. }
+function TMainForm.AssocSuffix: string;
+begin
+  case FileAss.GetRegistrationStatus of
+    fasFullyRegistered:     Result := '  -  set up';
+    fasPartiallyRegistered: Result := '  -  needs repair';
+    fasNotRegistered:       Result := '  -  not set up';
+  else                      Result := '';
+  end;
+end;
+
+procedure TMainForm.TellAssocTrouble(const R: TFileAssResult);
+begin
+  hsDialogSkin.UseTheme(Themes[FThemeIdx]);
+  MessageDlg('File associations', R.Message, mtWarning, [mbOK], 0);
+end;
+
+{ The submenu: set up, remove, keep repaired.  Registering offers this
+  program for .hsk and .heck files; which program is the default stays
+  the user's choice, made in the system's own dialog. }
+procedure TMainForm.AssociationsPick(What: Integer);
+var
+  R: TFileAssResult;
+begin
+  case What of
+    0:
+      begin
+        R := FileAss.RegisterAll;
+        if R.Succeeded then
+          FCmdMsg := '.hsk and .heck files now open with this program.  If ' +
+            'another program holds them, pick this one under Open With.'
+        else
+          TellAssocTrouble(R);
+      end;
+    1:
+      begin
+        R := FileAss.UnregisterAll;
+        if R.Succeeded then
+        begin
+          FAssocRepair := False;
+          FCmdMsg := 'File associations removed from this computer.';
+        end
+        else
+          TellAssocTrouble(R);
+      end;
+    2:
+      begin
+        FAssocRepair := not FAssocRepair;
+        if FAssocRepair then
+        begin
+          R := FileAss.RegisterAll;
+          if R.Succeeded then
+            FCmdMsg := 'File associations get repaired at start-up - for a ' +
+              'portable copy whose path moves around.'
+          else
+            TellAssocTrouble(R);
+        end
+        else
+          FCmdMsg := 'File associations are left alone at start-up.';
+      end;
+  end;
+  SaveSettings;
+end;
+
+{ Start-up, after the window has settled.  A portable copy moves between
+  machines and mount points; when the person asked for repairs, stale or
+  missing registrations are written again, quietly. }
+procedure TMainForm.RepairAssociations;
+var
+  R: TFileAssResult;
+begin
+  if not FAssocRepair then Exit;
+  if not (FileAss.GetRegistrationStatus in
+    [fasNotRegistered, fasPartiallyRegistered]) then Exit;
+  R := FileAss.RegisterAll;
+  Trail('association repair: ' + R.Message);
+end;
+
 initialization
   OnGetApplicationName := @SketchAppName;
+  { the form reader needs the class by name for the component on the form }
+  RegisterClass(TFileAssMan);

@@ -475,7 +475,13 @@ begin
       end;
     end;
     if FUpTime > 4.0 then
+    begin
       FStartupDone := True;
+      { a portable copy carries its settings with it, so on a new machine -
+        or an old one where the USB stick got a new drive letter - the
+        associations point at nothing until this quietly mends them }
+      RepairAssociations;
+    end;
   end;
 
   { The stick under strain: held still it winds up; moved, it goes slack

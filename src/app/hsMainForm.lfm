@@ -178,6 +178,30 @@ object MainForm: TMainForm
     Left = 420
     Top = 16
   end
+  object FileAss: TFileAssMan
+    ApplicationID = 'com.tonystone.heckerssketch'
+    ApplicationName = 'Heckers Sketch'
+    ApplicationDescription = 'A simple 3D sketching program'
+    FileTypes = <
+      item
+        Extension = '.hsk'
+        Description = 'Heckers Sketch drawing'
+        MimeType = 'application/x-heckers-sketch'
+        TypeIdentifier = 'com.tonystone.heckerssketch.hsk'
+        WindowsIcon = 'icons/hsk.ico'
+        LinuxIcon = 'icons/hsk.png'
+      end
+      item
+        Extension = '.heck'
+        Description = 'Heck geometry'
+        MimeType = 'application/x-heck'
+        TypeIdentifier = 'com.tonystone.heckerssketch.heck'
+        WindowsIcon = 'icons/hsk.ico'
+        LinuxIcon = 'icons/hsk.png'
+      end>
+    Left = 564
+    Top = 16
+  end
   object pmView: TPopupMenu
     Left = 8
     Top = 8

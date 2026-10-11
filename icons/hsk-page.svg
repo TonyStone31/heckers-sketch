@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<path d="M44,18 H172 L218,64 V238 H44 Z" fill="#fdfdfb" stroke="#4a4a4a" stroke-width="5" stroke-linejoin="round"/>
+<path d="M172,18 L218,64 H172 Z" fill="#e4e4dd" stroke="#4a4a4a" stroke-width="5" stroke-linejoin="round"/>
+<line x1="90.0" y1="176.0" x2="46.9" y2="163.9" stroke="#e8b0ab" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="6,6"/>
+<line x1="90.0" y1="176.0" x2="53.7" y2="196.6" stroke="#b3d8b4" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="6,6"/>
+<line x1="90.0" y1="176.0" x2="90.0" y2="208.5" stroke="#b9c6ea" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="6,6"/>
+<line x1="90.0" y1="176.0" x2="171.7" y2="198.9" stroke="#d84a3f" stroke-width="5.0" stroke-linecap="round"/>
+<line x1="90.0" y1="176.0" x2="180.3" y2="124.8" stroke="#3f9b43" stroke-width="5.0" stroke-linecap="round"/>
+<line x1="90.0" y1="176.0" x2="90.0" y2="88.0" stroke="#4a6fd8" stroke-width="5.0" stroke-linecap="round"/>
+<polygon points="132.2,158.4 173.8,170.0 173.8,125.2 132.2,113.6" fill="#f1f1ec" stroke="#1d1d1d" stroke-width="3.0" stroke-linejoin="round"/>
+<polygon points="173.8,170.0 212.8,147.9 212.8,103.1 173.8,125.2" fill="#d8d8d2" stroke="#1d1d1d" stroke-width="3.0" stroke-linejoin="round"/>
+<polygon points="132.2,113.6 173.8,125.2 212.8,103.1 171.2,91.5" fill="#fafaf7" stroke="#1d1d1d" stroke-width="3.0" stroke-linejoin="round"/>
+<path d="M151.7,108.3 v-27.2 a20.8,10.4 0 0 1 41.6,0 v27.2 a20.8,10.4 0 0 1 -41.6,0 Z" fill="#e6e6e1" stroke="#1d1d1d" stroke-width="3.0" stroke-linejoin="round"/>
+<ellipse cx="172.5" cy="81.1" rx="20.8" ry="10.4" fill="#fafaf7" stroke="#1d1d1d" stroke-width="3.0"/>
+</svg>

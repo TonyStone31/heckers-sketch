@@ -586,6 +586,11 @@ begin
   for I := 0 to THEME_COUNT - 1 do
     Add(Root, Themes[I].Name, 7000 + I, FThemeIdx = I);
 
+  Root := Sub('File Associations' + AssocSuffix);
+  Add(Root, 'Set Up on This Computer', 8000, False);
+  Add(Root, 'Remove from This Computer', 8001, False);
+  Add(Root, 'Repair at Start-up', 8002, FAssocRepair);
+
   P := BarMenuPoint(BAR_SETTINGS);
   pmSettings.PopUp(P.X, P.Y);
 end;
@@ -609,6 +614,7 @@ begin
     5: SetLenPrecision(PREC_DENOMS[EnsureRange(I, 0, High(PREC_DENOMS))]);
     6: SetUnits(TUnitSystem(EnsureRange(I, 0, 1)));
     7: if I <> FThemeIdx then CycleTheme(I - FThemeIdx);
+    8: AssociationsPick(I);
   end;
   pbCmd.Invalidate;
 end;

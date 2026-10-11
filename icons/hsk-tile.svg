@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<rect x="14" y="14" width="228" height="228" rx="44" fill="#282b32"/>
+<rect x="34" y="42" width="188" height="178" rx="16" fill="#f3cdc2"/>
+<rect x="50" y="58" width="156" height="118" rx="6" fill="#fbfbf8" stroke="#caa49a" stroke-width="2"/>
+<circle cx="68" cy="198" r="13" fill="#f6efe7" stroke="#caa49a" stroke-width="2"/>
+<circle cx="188" cy="198" r="13" fill="#f6efe7" stroke="#caa49a" stroke-width="2"/>
+<line x1="94.0" y1="150.0" x2="63.9" y2="141.6" stroke="#e8b0ab" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="6,6"/>
+<line x1="94.0" y1="150.0" x2="68.6" y2="164.4" stroke="#b3d8b4" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="6,6"/>
+<line x1="94.0" y1="150.0" x2="94.0" y2="172.7" stroke="#b9c6ea" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="6,6"/>
+<line x1="94.0" y1="150.0" x2="151.2" y2="166.0" stroke="#d84a3f" stroke-width="4.0" stroke-linecap="round"/>
+<line x1="94.0" y1="150.0" x2="157.2" y2="114.2" stroke="#3f9b43" stroke-width="4.0" stroke-linecap="round"/>
+<line x1="94.0" y1="150.0" x2="94.0" y2="88.4" stroke="#4a6fd8" stroke-width="4.0" stroke-linecap="round"/>
+<polygon points="123.6,137.7 152.7,145.8 152.7,114.4 123.6,106.3" fill="#f1f1ec" stroke="#1d1d1d" stroke-width="2.4" stroke-linejoin="round"/>
+<polygon points="152.7,145.8 179.9,130.3 179.9,99.0 152.7,114.4" fill="#d8d8d2" stroke="#1d1d1d" stroke-width="2.4" stroke-linejoin="round"/>
+<polygon points="123.6,106.3 152.7,114.4 179.9,99.0 150.8,90.8" fill="#fafaf7" stroke="#1d1d1d" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M137.2,102.6 v-19.0 a14.6,7.3 0 0 1 29.1,0 v19.0 a14.6,7.3 0 0 1 -29.1,0 Z" fill="#e6e6e1" stroke="#1d1d1d" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="151.7" cy="83.6" rx="14.6" ry="7.3" fill="#fafaf7" stroke="#1d1d1d" stroke-width="2.4"/>
+</svg>
