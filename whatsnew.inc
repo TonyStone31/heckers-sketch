@@ -24,7 +24,7 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
-    '## Next release' + LineEnding +
+    '## v2026.10.11.1' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +
     '' + LineEnding +
@@ -40,6 +40,10 @@ const
     '  the running window as a tab of its own, instead of a box telling you the' + LineEnding +
     '  program is already open.  Launching the program a second time just' + LineEnding +
     '  brings the window to the front.' + LineEnding +
+    '- **A new icon.**  The program and its documents now wear the start view:' + LineEnding +
+    '  the red, green and blue axes, with a cube and a circle pushed out of its' + LineEnding +
+    '  top.  The old icon also showed up as colored noise in some Linux file' + LineEnding +
+    '  managers - that is fixed with it.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.11' + LineEnding +
     '' + LineEnding +
