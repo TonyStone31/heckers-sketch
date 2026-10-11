@@ -37,6 +37,10 @@
   the running window as a tab of its own, instead of a box telling you the
   program is already open.  Launching the program a second time just
   brings the window to the front.
+- **A new icon.**  The program and its documents now wear the start view:
+  the red, green and blue axes, with a cube and a circle pushed out of its
+  top.  The old icon also showed up as colored noise in some Linux file
+  managers - that is fixed with it.
 
 ## v2026.10.11
 

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs><linearGradient id="g0" gradientUnits="userSpaceOnUse" x1="44.0" y1="18.0" x2="44.0" y2="238.0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f2f4f6"/></linearGradient><linearGradient id="g1" gradientUnits="userSpaceOnUse" x1="128.2" y1="111.6" x2="169.8" y2="168.0"><stop offset="0" stop-color="#f6f8fa"/><stop offset="1" stop-color="#e2e6eb"/></linearGradient><linearGradient id="g2" gradientUnits="userSpaceOnUse" x1="169.8" y1="123.2" x2="208.8" y2="145.9"><stop offset="0" stop-color="#d6dbe2"/><stop offset="1" stop-color="#bfc6d0"/></linearGradient><linearGradient id="g3" gradientUnits="userSpaceOnUse" x1="167.2" y1="89.5" x2="169.8" y2="123.2"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9edf1"/></linearGradient><linearGradient id="g4" gradientUnits="userSpaceOnUse" x1="147.7" y1="0.0" x2="189.3" y2="0.0"><stop offset="0" stop-color="#f3f5f8"/><stop offset="0.55" stop-color="#c3cad4"/><stop offset="0.82" stop-color="#e6eaef"/><stop offset="1" stop-color="#cfd5dc"/></linearGradient><linearGradient id="g5" gradientUnits="userSpaceOnUse" x1="147.7" y1="0.0" x2="189.3" y2="0.0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef1f5"/></linearGradient></defs>
+<polygon points="44.0,18.0 172.0,18.0 218.0,64.0 218.0,238.0 44.0,238.0" fill="url(#g0)" stroke="#2a2f36" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M172,18 L218,64 H172 Z" fill="#e3e6ea" stroke="#2a2f36" stroke-width="4.5" stroke-linejoin="round"/>
+<ellipse cx="173.3" cy="156.7" rx="52.8" ry="10.4" fill="#000000" fill-opacity="0.11"/>
+<line x1="86.0" y1="174.0" x2="42.9" y2="161.9" stroke="#eba9a2" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="4.0,4.8"/>
+<line x1="86.0" y1="174.0" x2="49.7" y2="194.6" stroke="#a9d8b1" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="4.0,4.8"/>
+<line x1="86.0" y1="174.0" x2="86.0" y2="206.5" stroke="#aebfe8" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="4.0,4.8"/>
+<line x1="86.0" y1="174.0" x2="167.7" y2="196.9" stroke="#e5483b" stroke-width="5.0" stroke-linecap="round"/>
+<line x1="86.0" y1="174.0" x2="176.3" y2="122.8" stroke="#2fa84f" stroke-width="5.0" stroke-linecap="round"/>
+<line x1="86.0" y1="174.0" x2="86.0" y2="86.0" stroke="#3e6ff0" stroke-width="5.0" stroke-linecap="round"/>
+<polygon points="128.2,156.4 169.8,168.0 169.8,123.2 128.2,111.6" fill="url(#g1)" stroke="#2a2f36" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="169.8,168.0 208.8,145.9 208.8,101.1 169.8,123.2" fill="url(#g2)" stroke="#2a2f36" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="128.2,111.6 169.8,123.2 208.8,101.1 167.2,89.5" fill="url(#g3)" stroke="#2a2f36" stroke-width="2.6" stroke-linejoin="round"/>
+<path d="M147.7,106.3 v-28.8 a20.8,10.4 0 0 1 41.6,0 v28.8 a20.8,10.4 0 0 1 -41.6,0 Z" fill="url(#g4)" stroke="#2a2f36" stroke-width="2.6" stroke-linejoin="round"/>
+<ellipse cx="168.5" cy="77.5" rx="20.8" ry="10.4" fill="url(#g5)" stroke="#2a2f36" stroke-width="2.6"/>
+</svg>
