@@ -34,6 +34,11 @@ const
     '- **Line Color shows its colors.**  Each row on the SETTINGS menu''s color' + LineEnding +
     '  list has its swatch beside the name, and the color in use wears a ring.' + LineEnding +
     '- The menu words take the ordinary arrow cursor, like every other button.' + LineEnding +
+    '- **Every picture in the manual is retaken on the new look** - the old' + LineEnding +
+    '  ones still showed the settings deck and the button-row chrome from two' + LineEnding +
+    '  redesigns back.  New pictures show the menus themselves, the color list' + LineEnding +
+    '  with its swatches, and the hint line that names the keys for the tool in' + LineEnding +
+    '  hand.' + LineEnding +
     '' + LineEnding +
     '## v2026.10.10' + LineEnding +
     '' + LineEnding +
@@ -573,7 +578,7 @@ const
     '- **Radiant: a search set never to give up doesn''t.**  It stopped at' + LineEnding +
     '  20,000 layouts whatever the give-up setting said; it now goes on until' + LineEnding +
     '  the goals are met, the give-up time runs out, or Stop.' + LineEnding +
-    '- **Radiant: the manifold slides along the whole of its wall.**  A line' + LineEnding +
+    '- **Radiant: the manifold slides along its whole wall.**  A line' + LineEnding +
     '  drawn across the floor left a point in the wall that the search took' + LineEnding +
     '  for a corner, and the manifold could slide no further than it - on one' + LineEnding +
     '  floor a foot one way and fifty-seven the other.  A manifold standing' + LineEnding +
@@ -940,7 +945,7 @@ const
     '  manifold in an acute corner cannot feed the rows above it and the' + LineEnding +
     '  ticket says how much is bare - move the manifold to the middle of a' + LineEnding +
     '  wall.' + LineEnding +
-    '- The whole of a home row''s near part is taken on the way home round' + LineEnding +
+    '- All of a home row''s near part is taken on the way home around' + LineEnding +
     '  an obstacle, so no row beside it is left bare for parity''s sake.' + LineEnding +
     '' + LineEnding +
     '## v2026.09.24.1' + LineEnding +
@@ -1169,7 +1174,7 @@ const
     '' + LineEnding +
     '- **A mannequin, from a jig.**  A seventh example: a woman six foot tall' + LineEnding +
     '  and a hundred and fifty pounds, standing on the floor, arms at her' + LineEnding +
-    '  sides, there to be dressed.  The whole of her is one group made by the' + LineEnding +
+    '  sides, there to be dressed.  All of her is one group made by the' + LineEnding +
     '  new `body` jig from those two numbers - right-click her, change' + LineEnding +
     '  `Height`, `Weight`, or give `Bust`, `Waist` and `Hip` outright, and run' + LineEnding +
     '  the jig again for another body.  Every edge of her is soft, so what' + LineEnding +
@@ -2467,7 +2472,7 @@ const
     '  circle on the corner of a rectangle so it just touches both sides, then rub' + LineEnding +
     '  out three quarters of the circle and the short piece of each side, and the' + LineEnding +
     '  corner is rounded.  Before this the side was still one line from corner to' + LineEnding +
-    '  corner and there was nothing to rub out but the whole of it.  Solids,' + LineEnding +
+    '  corner and there was nothing to erase but all of it.  Solids,' + LineEnding +
     '  guides and dimensions take no part - only loose drawing is cut.' + LineEnding +
     '' + LineEnding +
     '- **A move shows what is coming with it.**  Move one side of a rectangle and' + LineEnding +
@@ -2893,7 +2898,7 @@ const
     '' + LineEnding +
     '- **An export says how far along it is.**  A twelve second film is three' + LineEnding +
     '  hundred drawings of the model, and the window used to stop answering for' + LineEnding +
-    '  the whole of it.  There is a bar now, frame by frame, and an hourglass.' + LineEnding +
+    '  all of it.  There is a bar now, frame by frame, and an hourglass.' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +
     '' + LineEnding +

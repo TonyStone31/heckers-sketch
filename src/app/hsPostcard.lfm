@@ -42,7 +42,7 @@ object HelloForm: THelloForm
     Width = 592
     Anchors = [akTop, akLeft, akRight]
     AutoSize = False
-    Caption = 'This is the whole of what would be sent - nothing else:'
+    Caption = 'This is everything that would be sent - nothing else:'
     Font.Style = [fsBold]
     ParentFont = False
   end

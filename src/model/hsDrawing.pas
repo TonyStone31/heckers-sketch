@@ -5697,7 +5697,7 @@ var
     Result := False;
     if Dist(P, FarP) < TOL then
     begin
-      { the fillet takes the whole of this line }
+      { the fillet takes all of this line }
       FEnts[K].A := F.Corner;
       FEnts[K].B := P;
       Exit(True);

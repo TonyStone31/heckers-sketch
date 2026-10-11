@@ -267,7 +267,7 @@ begin
   LayoutTabs;
   FreshScreen;
 
-  { a file on the command line opens straight away; scan for it so a switch
+  { a file on the command line opens right away; scan for it so a switch
     in front of it does not hide it }
   Opened := False;
   for I := 1 to ParamCount do

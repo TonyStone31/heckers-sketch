@@ -1779,7 +1779,7 @@ begin
     scratch with it, and the rename must be on the same volume to be atomic }
   Tmp := AppDataDir + 'heckers-sketch-' + Info.Tag + '.download';
   { written before the update runs, since the update starts the new copy and
-    it reads this straight away }
+    it reads this right away }
   WriteHandoff;
   hsDialogSkin.UseTheme(Themes[FThemeIdx]);
   UpdateForm := TUpdateForm.Create(Self);

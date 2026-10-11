@@ -31,6 +31,11 @@
 - **Line Color shows its colors.**  Each row on the SETTINGS menu's color
   list has its swatch beside the name, and the color in use wears a ring.
 - The menu words take the ordinary arrow cursor, like every other button.
+- **Every picture in the manual is retaken on the new look** - the old
+  ones still showed the settings deck and the button-row chrome from two
+  redesigns back.  New pictures show the menus themselves, the color list
+  with its swatches, and the hint line that names the keys for the tool in
+  hand.
 
 ## v2026.10.10
 
@@ -570,7 +575,7 @@
 - **Radiant: a search set never to give up doesn't.**  It stopped at
   20,000 layouts whatever the give-up setting said; it now goes on until
   the goals are met, the give-up time runs out, or Stop.
-- **Radiant: the manifold slides along the whole of its wall.**  A line
+- **Radiant: the manifold slides along its whole wall.**  A line
   drawn across the floor left a point in the wall that the search took
   for a corner, and the manifold could slide no further than it - on one
   floor a foot one way and fifty-seven the other.  A manifold standing
@@ -937,7 +942,7 @@
   manifold in an acute corner cannot feed the rows above it and the
   ticket says how much is bare - move the manifold to the middle of a
   wall.
-- The whole of a home row's near part is taken on the way home round
+- All of a home row's near part is taken on the way home around
   an obstacle, so no row beside it is left bare for parity's sake.
 
 ## v2026.09.24.1
@@ -1166,7 +1171,7 @@
 
 - **A mannequin, from a jig.**  A seventh example: a woman six foot tall
   and a hundred and fifty pounds, standing on the floor, arms at her
-  sides, there to be dressed.  The whole of her is one group made by the
+  sides, there to be dressed.  All of her is one group made by the
   new `body` jig from those two numbers - right-click her, change
   `Height`, `Weight`, or give `Bust`, `Waist` and `Hip` outright, and run
   the jig again for another body.  Every edge of her is soft, so what
@@ -2464,7 +2469,7 @@
   circle on the corner of a rectangle so it just touches both sides, then rub
   out three quarters of the circle and the short piece of each side, and the
   corner is rounded.  Before this the side was still one line from corner to
-  corner and there was nothing to rub out but the whole of it.  Solids,
+  corner and there was nothing to erase but all of it.  Solids,
   guides and dimensions take no part - only loose drawing is cut.
 
 - **A move shows what is coming with it.**  Move one side of a rectangle and
@@ -2890,7 +2895,7 @@
 
 - **An export says how far along it is.**  A twelve second film is three
   hundred drawings of the model, and the window used to stop answering for
-  the whole of it.  There is a bar now, frame by frame, and an hourglass.
+  all of it.  There is a bar now, frame by frame, and an hourglass.
 
 ### Fixed
 

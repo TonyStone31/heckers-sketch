@@ -45,7 +45,7 @@ with a window in it.
 lines only to begin with, on the reasoning that a real etch-a-sketch drawing
 is lines - and it meant you could not push one, because a drawing read from a
 file never has its faces worked out.  So each piece of the robot is a face now,
-plugged into a hole in the screen, and the whole of it lifts: click the head,
+plugged into a hole in the screen, and all of it lifts: click the head,
 push it, and it stands off the screen with walls round it.
 
 The eyes are cut into the **head**, not into the screen, which is the thing to

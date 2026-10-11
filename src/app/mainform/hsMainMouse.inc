@@ -844,7 +844,7 @@ begin
       '  ' + ExtractFileName(Path) + '.hsk   - the drawing it happened to' +
       LineEnding + LineEnding +
       'Both together say exactly where this went wrong.  The drawing is ' +
-      'your own work, so have a look before sending it anywhere.',
+      'your own work, so take a look before sending it anywhere.',
       mtError, [mbOK], 0);
 end;
 
@@ -2354,7 +2354,7 @@ var
 begin
   SelectOnly(I);
   if I < 0 then Exit;
-  if FD.Doc.TopPartIn(I) > 0 then Exit;    { a group is the whole of itself }
+  if FD.Doc.TopPartIn(I) > 0 then Exit;    { a group is all of itself }
   { a guide is not part of the drawing, so nothing is attached to it }
   if FD.Doc[I].Kind = ekGuide then Exit;
   if FD.Doc[I].Kind = ekFace then
