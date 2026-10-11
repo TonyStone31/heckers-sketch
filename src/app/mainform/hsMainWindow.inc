@@ -418,6 +418,8 @@ begin
     FCrashToOffer := False;
     OfferCrashReport(True);
   end;
+  { a second copy may have left a note: open its files, come to the front }
+  CheckOpenRequests;
   TouchTick;
 
   FollowScreenSize;

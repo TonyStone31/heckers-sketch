@@ -293,6 +293,7 @@ begin
     is at least as new, so it goes. }
   if not Opened and (FUpdatedFrom <> '') then Opened := RestoreHandoff;
   if FileExists(HandoffFile) then DeleteFile(HandoffFile);
+  DropStaleOpenRequests;
   if Opened and (FUpdatedFrom <> '') then DropDraft;
   { A draft means the last run did not close properly.  It is offered on the
     tick once the window is up, not loaded, and no dialog may appear here

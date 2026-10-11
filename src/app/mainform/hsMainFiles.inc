@@ -54,6 +54,71 @@ begin
   Result := True;
 end;
 
+{ A second copy that found this one running leaves a note and goes (see
+  hsSingleCopy.LeaveOpenRequest).  Looked for four times a second on the
+  tick; an empty note just asks for the window. }
+procedure TMainForm.CheckOpenRequests;
+var
+  Rec: TSearchRec;
+  Notes, L: TStringList;
+  I, K: Integer;
+begin
+  if (FPopup <> POP_NONE) or FLoading then Exit;
+  if GetTickCount64 < FReqPollAt then Exit;
+  FReqPollAt := GetTickCount64 + 250;
+  Notes := TStringList.Create;
+  try
+    if FindFirst(OpenRequestMask, 0, Rec) = 0 then
+    begin
+      repeat
+        Notes.Add(AppDataDir + Rec.Name);
+      until FindNext(Rec) <> 0;
+      FindClose(Rec);
+    end;
+    if Notes.Count = 0 then Exit;
+    Notes.Sort;
+    L := TStringList.Create;
+    try
+      for I := 0 to Notes.Count - 1 do
+      begin
+        try
+          L.LoadFromFile(Notes[I]);
+        except
+          Continue;   { unreadable this tick; the next one tries again }
+        end;
+        DeleteFile(Notes[I]);
+        for K := 0 to L.Count - 1 do
+          if FileExists(L[K]) then OpenFile(L[K]);
+      end;
+    finally
+      L.Free;
+    end;
+    { asked for even with nothing to open: the person launched the program
+      again, and this window is the answer }
+    if WindowState = wsMinimized then Application.Restore;
+    ShowOnTop;
+  finally
+    Notes.Free;
+  end;
+end;
+
+{ At start-up: a note older than a minute was left for a copy that is gone
+  and is dropped.  A fresh one is kept - a second file double-clicked while
+  this copy was still starting - and the tick opens it. }
+procedure TMainForm.DropStaleOpenRequests;
+var
+  Rec: TSearchRec;
+begin
+  if FindFirst(OpenRequestMask, 0, Rec) = 0 then
+  begin
+    repeat
+      if Now - FileDateToDateTime(Rec.Time) > 1 / MinsPerDay then
+        DeleteFile(AppDataDir + Rec.Name);
+    until FindNext(Rec) <> 0;
+    FindClose(Rec);
+  end;
+end;
+
 { A file's sheets added after the existing tabs; First is the first new one.
   Session: a draft or handoff carrying every open file, with a comment before
   each sheet naming its document, file and saved state.  Otherwise the file

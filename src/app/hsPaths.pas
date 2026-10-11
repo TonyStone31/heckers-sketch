@@ -19,6 +19,10 @@ function DraftFile: string;
 { What a program being updated leaves for its replacement: every sheet,
   its file name and any unsaved work. }
 function HandoffFile: string;
+{ Notes a second copy leaves for the running one: files to open, or an
+  empty note meaning "come to the front".  Read and deleted on the tick. }
+function OpenRequestMask: string;
+function NewOpenRequestName: string;
 { Where the example drawings are put. }
 function ExamplesDir: string;
 
@@ -94,6 +98,16 @@ end;
 function HandoffFile: string;
 begin
   Result := AppDataDir + 'heckers-sketch-handoff.hsk';
+end;
+
+function OpenRequestMask: string;
+begin
+  Result := AppDataDir + 'heckers-sketch-open-*.req';
+end;
+
+function NewOpenRequestName: string;
+begin
+  Result := AppDataDir + 'heckers-sketch-open-' + IntToStr(GetProcessID) + '.req';
 end;
 
 function ExamplesDir: string;

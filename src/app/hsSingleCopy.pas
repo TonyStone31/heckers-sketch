@@ -15,12 +15,48 @@ interface
 function BecomeTheOnlyCopy(WaitSecs: Integer = 0): Boolean;
 procedure DropInheritedUpdateLock;
 
+{ Another copy has the lock: leave it a note instead of a complaint.  The
+  note lists the files named on our command line - none means "come to the
+  front" - and the running copy reads it on its tick.  Returns the note's
+  path, or '' when it could not be written and the caller should fall back
+  to saying a copy is already running. }
+function LeaveOpenRequest: string;
+
 implementation
 
 uses
   SysUtils, Classes, hsPaths
   {$IFDEF UNIX}, BaseUnix, Unix{$ENDIF}
   {$IFDEF WINDOWS}, Windows{$ENDIF};
+
+{ Written whole: to a temporary name first, renamed once complete, so the
+  reader never sees half a note. }
+function LeaveOpenRequest: string;
+var
+  L: TStringList;
+  I: Integer;
+  Note, Tmp: string;
+begin
+  Result := '';
+  L := TStringList.Create;
+  try
+    for I := 1 to ParamCount do
+      if (Copy(ParamStr(I), 1, 1) <> '-') and FileExists(ParamStr(I)) then
+        L.Add(ExpandFileName(ParamStr(I)));
+    Note := NewOpenRequestName;
+    Tmp := ChangeFileExt(Note, '.tmp');
+    try
+      L.SaveToFile(Tmp);
+      if FileExists(Note) then DeleteFile(Note);
+      if RenameFile(Tmp, Note) then Result := Note
+      else DeleteFile(Tmp);
+    except
+      { a read-only folder: the old message will have to do }
+    end;
+  finally
+    L.Free;
+  end;
+end;
 
 {$IFDEF UNIX}
 const

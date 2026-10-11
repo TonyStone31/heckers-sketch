@@ -101,7 +101,8 @@ begin
     WriteLn('  --help             this');
     WriteLn;
     WriteLn('Without a switch the window comes back the size and the place it');
-    WriteLn('was left.  A drawing named on the line is opened.');
+    WriteLn('was left.  A drawing named on the line is opened - in the running');
+    WriteLn('window, when there is one already.');
     Flush(Output);
   except
     { no console; nothing to be done about it }
@@ -140,6 +141,7 @@ end;
 var
   UpdateWait, I: Integer;
   OnlyCopy: Boolean;
+  ReqFile: string;
 
 begin
   if AskedForHelp then Halt(0);
@@ -156,6 +158,20 @@ begin
   OnlyCopy := WantsAnother or BecomeTheOnlyCopy(UpdateWait);
   while not OnlyCopy and (UpdateWait > 0) and KeepWaitingForOldCopy do
     OnlyCopy := BecomeTheOnlyCopy(UpdateWait);
+  { A copy is already running: hand it our files (or just ask it forward)
+    and go, rather than complaining.  If it let go of the lock while the
+    note was being written nobody would ever read it, so try the lock once
+    more; holding it now means the job is ours after all. }
+  if not OnlyCopy then
+  begin
+    ReqFile := LeaveOpenRequest;
+    if ReqFile <> '' then
+    begin
+      OnlyCopy := BecomeTheOnlyCopy(0);
+      if not OnlyCopy then Halt(0);
+      DeleteFile(ReqFile);
+    end;
+  end;
   if not OnlyCopy then
   begin
     ShowAlreadyRunning;

@@ -826,6 +826,8 @@ type
     { a draft from a run that did not close properly, offered once the window
       is up (see RestoreDraft) }
     FRecoverToOffer: Boolean;
+    { when to next look for a second copy's open-request notes }
+    FReqPollAt: QWord;
     FGuide: Boolean;             // an alignment guide is active
     FGuideFrom: TP3;
 
@@ -1207,6 +1209,8 @@ type
     procedure DoSaveAll;
     { a file opened as a document of its own, in tabs after the others }
     function OpenFile(const FileName: string): Boolean;
+    procedure CheckOpenRequests;
+    procedure DropStaleOpenRequests;
     { a file's sheets added after the existing tabs (see the body) }
     function ReadSheets(const FileName: string; Session: Boolean; out First: Integer): Boolean;
     { show tab First, framed when its file did not store a camera }
