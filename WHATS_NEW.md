@@ -21,6 +21,17 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- **The menus behave like a menu bar now.**  With one open, sliding along
+  the top opens each menu as you pass its word - no clicking twice - and
+  clicking the open menu's own word closes it.
+- **Line Color shows its colors.**  Each row on the SETTINGS menu's color
+  list has its swatch beside the name, and the color in use wears a ring.
+- The menu words take the ordinary arrow cursor, like every other button.
+
 ## v2026.10.10
 
 ### New

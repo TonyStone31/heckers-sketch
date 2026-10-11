@@ -73,6 +73,8 @@ begin
   FGrpSig := -1;
   FQuickSkin := TArtSurface.Create(16, 16);
   FHotQuick := -1;
+  FBarMenu := -1;
+  FBarSwitch := -1;
   FHotTool := -1;
   FToolsWide := True;
   FHotSlice := -1;
@@ -109,7 +111,6 @@ FPushFace := -1;
   SetInk(FInkColor, FInkAuto);
 
   pbScreen.Cursor := crCross;
-  pbQuick.Cursor := crHandPoint;
 
   tmrTick.Interval := TICK_MS;
   tmrTick.Enabled := True;

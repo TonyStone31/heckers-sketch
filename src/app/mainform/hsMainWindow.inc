@@ -374,6 +374,9 @@ begin
     the stock dialogs too.  Everything here catches up on the next tick. }
   if Application.ModalLevel > 0 then Exit;
 
+  { while a bar menu is open, hovering another word switches to it }
+  TrackBarMenu;
+
   { The entity and groups panels are rebuilt on the tick when what they read
     has changed (including the sheet and open group), not at every place the
     selection changes; some of those are bulk loops over huge selections. }

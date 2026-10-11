@@ -24,6 +24,17 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- **The menus behave like a menu bar now.**  With one open, sliding along' + LineEnding +
+    '  the top opens each menu as you pass its word - no clicking twice - and' + LineEnding +
+    '  clicking the open menu''s own word closes it.' + LineEnding +
+    '- **Line Color shows its colors.**  Each row on the SETTINGS menu''s color' + LineEnding +
+    '  list has its swatch beside the name, and the color in use wears a ring.' + LineEnding +
+    '- The menu words take the ordinary arrow cursor, like every other button.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.10' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

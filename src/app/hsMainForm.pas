@@ -247,6 +247,9 @@ type
     function QuickWidth: Integer;
     { the menus those buttons open; each is filled fresh as it opens }
     procedure OpenBarMenu(Index: Integer);
+    function BarPopup(Index: Integer): TPopupMenu;
+    procedure CloseBarMenu;
+    procedure TrackBarMenu;
     function BarMenuPoint(Index: Integer): TPoint;
     procedure ShowEditMenu;
     procedure EditMenuClick(Sender: TObject);
@@ -801,6 +804,8 @@ type
     FQuick: array of TDeckItem;   // the menu bar across the title
     FQuickSkin: TArtSurface;
     FHotQuick: Integer;
+    FBarMenu: Integer;          { the bar menu that is open, or -1 }
+    FBarSwitch: Integer;        { the word to go on to when it closes }
     { Names beside the icons, or icons alone.  Saved in settings; starts True
       on purpose (see pbToolsPaint). }
     FToolsWide: Boolean;
@@ -1312,6 +1317,7 @@ var
 implementation
 
 uses
+  {$IFDEF LCLGTK3} LazGtk3, gtk3widgets, {$ENDIF}
   FileUtil, Clipbrd, LazUTF8, hsHelpDocs, hsHelpView, hsReportDialog, hsLongText, hsAbout,
   hsFacts, hsText, hsImpliedFaces;
 

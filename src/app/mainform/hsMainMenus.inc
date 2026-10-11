@@ -130,15 +130,83 @@ begin
   Result := pbQuick.ClientToScreen(Result);
 end;
 
-procedure TMainForm.OpenBarMenu(Index: Integer);
+function TMainForm.BarPopup(Index: Integer): TPopupMenu;
 begin
   case Index of
-    BAR_FILE: ShowFileMenu;
-    BAR_EDIT: ShowEditMenu;
-    BAR_VIEW: ShowViewMenu;
-    BAR_SETTINGS: ShowSettingsMenu;
-    BAR_HELP: ShowHelpMenu;
+    BAR_FILE: Result := pmFile;
+    BAR_EDIT: Result := pmEdit;
+    BAR_VIEW: Result := pmView;
+    BAR_SETTINGS: Result := pmSettings;
+  else
+    Result := pmHelp;
   end;
+end;
+
+{ TPopupMenu.Close only resets LCL bookkeeping; the native menu must be
+  popped down itself, which is what ends PopUp's wait. }
+procedure TMainForm.CloseBarMenu;
+begin
+  if FBarMenu < 0 then Exit;
+  {$IFDEF LCLGTK3}
+  if BarPopup(FBarMenu).HandleAllocated then
+    gtk_menu_popdown(PGtkMenu(TGtk3Menu(BarPopup(FBarMenu).Handle).Widget));
+  {$ENDIF}
+end;
+
+{ An open menu grabs the mouse, so the bar never hears the click that
+  dismisses it - a second menu took two clicks.  While one of our menus is
+  up the tick watches the cursor instead: resting on another word closes
+  this menu, and OpenBarMenu carries straight on to that one, the sweep a
+  real menu bar gives. }
+procedure TMainForm.TrackBarMenu;
+var
+  P: TPoint;
+  H: Integer;
+begin
+  if FBarMenu < 0 then Exit;
+  P := pbQuick.ScreenToClient(Mouse.CursorPos);
+  H := QuickHit(P.X, P.Y);
+  if (H >= 0) and (H <> FBarMenu) then
+  begin
+    FBarSwitch := H;
+    CloseBarMenu;
+  end;
+end;
+
+procedure TMainForm.OpenBarMenu(Index: Integer);
+var
+  P: TPoint;
+  H: Integer;
+begin
+  while (Index >= 0) and (Index <= High(FQuick)) do
+  begin
+    FBarMenu := Index;
+    FBarSwitch := -1;
+    FHotQuick := Index;
+    pbQuick.Invalidate;
+    case Index of
+      BAR_FILE: ShowFileMenu;
+      BAR_EDIT: ShowEditMenu;
+      BAR_VIEW: ShowViewMenu;
+      BAR_SETTINGS: ShowSettingsMenu;
+      BAR_HELP: ShowHelpMenu;
+    end;                        { PopUp waits here until the menu closes }
+    FBarMenu := -1;
+    if FBarSwitch < 0 then
+    begin
+      { a press on another word can land before the tick saw the hover;
+        the menu ate that press, so honor it here }
+      P := pbQuick.ScreenToClient(Mouse.CursorPos);
+      H := QuickHit(P.X, P.Y);
+      if (H >= 0) and (H <> Index) and
+        ((GetKeyState(VK_LBUTTON) and $8000) <> 0) then
+        FBarSwitch := H;
+    end;
+    Index := FBarSwitch;
+  end;
+  P := pbQuick.ScreenToClient(Mouse.CursorPos);
+  FHotQuick := QuickHit(P.X, P.Y);
+  pbQuick.Invalidate;
 end;
 
 { ---- the File menu ----
@@ -435,6 +503,7 @@ procedure TMainForm.ShowSettingsMenu;
 var
   Root: TMenuItem;
   I, Sz: Integer;
+  Sw: TArtSurface;
   P: TPoint;
 
   function Sub(const Caption: string): TMenuItem;
@@ -476,16 +545,25 @@ begin
       I = FD.SnapIdx);
 
   Root := Sub('Line Color');
-  Sz := Round(12 * FUIScale);
-  for I := 0 to High(PALETTE) do
-    with Add(Root, PALETTE_NAMES[I], 3000 + I, PALETTE[I] = FInkColor) do
-    begin
-      { a swatch beside the name, where the widgetset will show one }
-      Bitmap.SetSize(Sz, Sz);
-      Bitmap.Canvas.Brush.Color := PALETTE[I];
-      Bitmap.Canvas.Pen.Color := clGray;
-      Bitmap.Canvas.Rectangle(0, 0, Sz, Sz);
-    end;
+  Sz := Round(14 * FUIScale);
+  Sw := TArtSurface.Create(Sz, Sz);
+  try
+    for I := 0 to High(PALETTE) do
+      with Add(Root, PALETTE_NAMES[I], 3000 + I, PALETTE[I] = FInkColor) do
+      begin
+        { the swatch is rasterized by our own surface; one drawn with the
+          LCL canvas comes out blank under GTK3 }
+        Sw.ClearTransparent;
+        Sw.RoundRect(Rect(0, 0, Sz, Sz), Sz * 0.22, ColorToPix(PALETTE[I]));
+        Sw.RoundFrame(Rect(0, 0, Sz, Sz), Sz * 0.22, 1.0, Pix(128, 128, 128));
+        if PALETTE[I] = FInkColor then
+          Sw.RoundFrame(Rect(2, 2, Sz - 2, Sz - 2), Sz * 0.15, 2.0,
+            OnPix(ColorToPix(PALETTE[I])));
+        Bitmap.Assign(Sw.AsBitmap);
+      end;
+  finally
+    Sw.Free;
+  end;
   Add(Root, 'Another Color...', 3000 + Length(PALETTE), False);
 
   Root := Sub(Format('Line Width  -  %d px', [FEdgeW]));
