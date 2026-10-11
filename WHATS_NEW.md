@@ -36,6 +36,7 @@
   redesigns back.  New pictures show the menus themselves, the color list
   with its swatches, and the hint line that names the keys for the tool in
   hand.
+- The built-in help window picks up this month's LazInk renderer work.
 
 ## v2026.10.10
 
