@@ -68,9 +68,6 @@ begin
   end;
   FD.View := vkOrbit;
   FViewPreset := -1;
-  RebuildDeck;
-  pbDeck.Invalidate;
-  pbView.Invalidate;
   RepaintPaper;
   RenderInk;
   RecomposeAll;
@@ -109,7 +106,6 @@ begin
   else pbScreen.Cursor := crCross;
   FTool := T;
   ResetTool;
-  pbDeck.Invalidate;
   pbCmd.Invalidate;
   Invalidate;
 end;
@@ -1714,7 +1710,6 @@ begin
   end;
   pbScreen.Invalidate;
   pbCmd.Invalidate;
-  pbDeck.Invalidate;
   FLastStatus := 0;
   InvalidateStatus;
 end;
@@ -2051,7 +2046,6 @@ begin
     FShowGrid := not FShowGrid;
     RepaintPaper;
     RecomposeAll;
-    pbDeck.Invalidate;
   end
   else if W = 'regions' then ReportRegions
   else if W = 'forget' then

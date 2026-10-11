@@ -88,16 +88,6 @@ object MainForm: TMainForm
     OnMouseWheel = pbSliceMouseWheel
     OnPaint = pbSlicePaint
   end
-  object pbView: TPaintBox
-    Left = 1030
-    Height = 30
-    Top = 84
-    Width = 228
-    OnMouseDown = pbViewMouseDown
-    OnMouseLeave = pbViewMouseLeave
-    OnMouseMove = pbViewMouseMove
-    OnPaint = pbViewPaint
-  end
   object pbTabs: TPaintBox
     Left = 22
     Height = 30
@@ -117,16 +107,6 @@ object MainForm: TMainForm
     OnMouseLeave = pbCmdMouseLeave
     OnMouseMove = pbCmdMouseMove
     OnPaint = pbCmdPaint
-  end
-  object pbDeck: TPaintBox
-    Left = 180
-    Height = 172
-    Top = 692
-    Width = 920
-    OnMouseDown = pbDeckMouseDown
-    OnMouseLeave = pbDeckMouseLeave
-    OnMouseMove = pbDeckMouseMove
-    OnPaint = pbDeckPaint
   end
   object tmrTick: TTimer
     Enabled = False
@@ -200,6 +180,18 @@ object MainForm: TMainForm
   end
   object pmView: TPopupMenu
     Left = 8
+    Top = 8
+  end
+  object pmEdit: TPopupMenu
+    Left = 216
+    Top = 8
+  end
+  object pmSettings: TPopupMenu
+    Left = 256
+    Top = 8
+  end
+  object pmHelp: TPopupMenu
+    Left = 296
     Top = 8
   end
   object pmCanvas: TPopupMenu

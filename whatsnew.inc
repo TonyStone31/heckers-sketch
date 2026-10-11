@@ -24,6 +24,21 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Real menus along the top: FILE, EDIT, VIEW, SETTINGS, HELP.**  The' + LineEnding +
+    '  settings panel that sat across the foot of the window is gone - print' + LineEnding +
+    '  scale, snap, line color and width, rounding, units and the light or dark' + LineEnding +
+    '  chrome all live under SETTINGS now, each list showing its current value -' + LineEnding +
+    '  and that whole strip of screen belongs to the drawing.  The view list' + LineEnding +
+    '  moved from its own button into VIEW, with Fit, the grid, the view cube' + LineEnding +
+    '  and the two panels beside it; Undo, Redo and the clipboard are under' + LineEnding +
+    '  EDIT.  Every key works as before.' + LineEnding +
+    '- The readings (X, Y, Z, lengths, the working plane) moved from the top' + LineEnding +
+    '  right down onto the command bar, beside what you are typing.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.09' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +

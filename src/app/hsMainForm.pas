@@ -174,7 +174,6 @@ type
     dlgStringers: TSaveDialog;
     pbCmd: TPaintBox;
     pbTabs: TPaintBox;
-    pbView: TPaintBox;
     pbSlice: TPaintBox;
     pbTools: TPaintBox;
     pbInfo: TPaintBox;
@@ -183,9 +182,11 @@ type
     pmView: TPopupMenu;
     pmCanvas: TPopupMenu;
     pmFile: TPopupMenu;
+    pmEdit: TPopupMenu;
+    pmSettings: TPopupMenu;
+    pmHelp: TPopupMenu;
     pmGroups: TPopupMenu;
     pmCmd: TPopupMenu;
-    pbDeck: TPaintBox;
     pbScreen: TPaintBox;
     tmrTick: TTimer;
     function ExportDirFor(const Ext: string): string;
@@ -244,6 +245,16 @@ type
     procedure RebuildQuick;
     function QuickHit(X, Y: Integer): Integer;
     function QuickWidth: Integer;
+    { the menus those buttons open; each is filled fresh as it opens }
+    procedure OpenBarMenu(Index: Integer);
+    function BarMenuPoint(Index: Integer): TPoint;
+    procedure ShowEditMenu;
+    procedure EditMenuClick(Sender: TObject);
+    procedure ShowViewMenu;
+    procedure ShowSettingsMenu;
+    procedure SettingsMenuClick(Sender: TObject);
+    procedure ShowHelpMenu;
+    procedure HelpMenuClick(Sender: TObject);
     procedure pbToolsPaint(Sender: TObject);
     function InfoPanelWidth: Integer;
     function GroupsPanelOn: Boolean;
@@ -314,19 +325,7 @@ type
     function SliceZoneAt(X, Y: Integer): Integer;
     function SliceFieldRect(Which: Integer): TRect;
     procedure CommitSliceEdit;
-    procedure pbViewMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure pbViewMouseLeave(Sender: TObject);
-    procedure pbViewMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure pbViewPaint(Sender: TObject);
-    function ViewButtonName: string;
     procedure ViewMenuClick(Sender: TObject);
-    procedure FillViewMenu;
-    procedure pbDeckMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure pbDeckMouseLeave(Sender: TObject);
-    procedure pbDeckMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure pbDeckPaint(Sender: TObject);
     procedure pbScreenMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure pbScreenMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -351,7 +350,6 @@ type
     FInkHalf: TArtSurface;       // half its size, for a frame while the camera moves
     FArt: TArtSurface;           // paper + active ink; what you see and save
     FShell: TArtSurface;
-    FDeckSkin: TArtSurface;
     FCmdSkin: TArtSurface;
     { the message rows' last content, so they are set only on change, and
       row one's layout kept between caret blinks }
@@ -426,10 +424,6 @@ type
     { from the command line: keep filling the screen if it changes size }
     FFill: (flNone, flMaximized, flFull);
     FScrW, FScrH: Integer;
-
-    { the two gaps between tool groups, where the deck draws dividers }
-    FGrpDivX: array[0..1] of Integer;
-    FGrpDivY0, FGrpDivY1: Integer;
 
     { every corner the current move will carry, gathered once at the grab
       so the drag stays cheap }
@@ -551,9 +545,6 @@ type
     FShotCount: Integer;
     FShotFlash: Boolean;
     FShotBusy: Boolean;
-    { the guide count the settings row was built for, so the guide buttons
-      follow it however it changed }
-    FDeckGuides: Integer;
     { the note being dragged by its box }
     FNoteDrag: Integer;
     { whether the note being carried has actually gone anywhere yet }
@@ -752,7 +743,6 @@ type
     { the paper's fill, made once per theme and size - see RepaintPaper }
     FPaperBase: TArtSurface;
     FPaperBaseKey: string;
-    FHotView: Integer;
 
     { The view cube.  Off by default: a first drawing is a rectangle in plan
       and does not need it. }
@@ -808,7 +798,7 @@ type
     { the divider positions on the tool strip, and where the shop door sits }
     FToolRules: array of Integer;
     FShopTop: Integer;
-    FQuick: array of TDeckItem;   // the file buttons in the title bar
+    FQuick: array of TDeckItem;   // the menu bar across the title
     FQuickSkin: TArtSurface;
     FHotQuick: Integer;
     { Names beside the icons, or icons alone.  Saved in settings; starts True
@@ -816,7 +806,6 @@ type
     FToolsWide: Boolean;
     FSliceSkin: TArtSurface;
     FSliceEdit: Integer;        // 0 none, 1 typing the bottom, 2 the top
-    FViewSkin: TArtSurface;
     FGlyph: TArtSurface;    // the tool badge beside the cursor
     FHoverEnt: Integer;          // what the eraser is about to delete
     { The one edge the dimension tool would take, as its two ends.  An index
@@ -851,10 +840,8 @@ type
     FDwellSX, FDwellSY: Integer;
     FDwellSince: QWord;
 
-    { --- deck ----------------------------------------------------------- }
-    FDeck: array of TDeckItem;
-    FHotItem: Integer;
-    { The open settings list, drawn on the canvas so it needs no extra
+    { --- the lists drawn on the canvas ----------------------------------- }
+    { The open list, drawn on the canvas so it needs no extra
       control and cannot fall behind anything. }
     FPopup: Integer;
     FPopupR: TRect;
@@ -923,12 +910,8 @@ type
     function SliceText: string;
     function ApplyDimResize(NewLen: Double; MoveB: Boolean): Boolean;
     procedure CommitDimNote;
-    function DeckRowH: Integer;
-    function DeckRows: Integer;
-    function DeckHeight: Integer;
     function ChromeMargin: Integer;
     procedure RebuildShell;
-    procedure RebuildDeck;
     procedure RefreshChrome;
     procedure NoteFrame(PaintMs: QWord);
     procedure ResizeSurfaces(AW, AH: Integer);
@@ -1261,13 +1244,6 @@ type
     procedure EnterFreeCamera(AtCorner: Boolean = False);
     procedure CycleViewPreset(Step: Integer);
 
-    { deck }
-    function DeckHit(X, Y: Integer): Integer;
-    procedure DeckActivate(Index: Integer);
-    procedure DoAction(A: Integer);
-    function IconLit(Value: Integer): Boolean;
-    function IconEnabled(Value: Integer): Boolean;
-
     { is the cursor on something a dimension may be anchored to? }
     function DimAnchored: Boolean;
     function ZoomReading: string;
@@ -1369,26 +1345,16 @@ const
   { so a crash report says which build it came from }
   BUILD_STAMP = {$I %DATE%} + ' ' + {$I %TIME%};
 
-  { deck groups }
-  GRP_ICON  = 3;
-  GRP_SCALE = 5;
-  GRP_SNAP  = 6;
+  { tool strip groups: a tool button, or a button that opens a list }
   GRP_TOOL  = 7;
-  GRP_POPUP = 8;   { a button that opens a list rather than setting a value }
+  GRP_POPUP = 8;
 
-  { the lists those buttons open }
+  { The lists drawn on the canvas.  The settings that used to open lists from
+    the deck live on the SETTINGS menu now; these are what is left. }
   POP_NONE  = -1;
-  POP_SCALE = 0;
-  POP_SNAP  = 1;
-  POP_COLOR = 2;
-  POP_WIDTH  = 3;
-  { The help button opens a list: the web page, manual, downloads, bug
-    reporting and the update check. }
-  POP_HELP   = 4;
   { The shop tools: making the thing rather than drawing it (unfold, the
     fitting builders). }
   POP_SHOP   = 5;
-  POP_PREC   = 6;
   { the rest of the tools, behind one door; see MAIN_TOOLS }
   POP_MORE   = 7;
   { Every typed command with a word about each: the arrow beside the prompt.
@@ -1548,27 +1514,10 @@ const
   PEN_STEPS = 6;
   PEN_SIZES: array[0..PEN_STEPS - 1] of Integer = (1, 2, 4, 6, 10, 16);
 
-  { icon actions }
-  ACT_UNDO    = 0;
-  ACT_REDO    = 1;
-  ACT_SAVE    = 3;
-  ACT_PRINT   = 4;
-  ACT_THEME   = 6;
-  ACT_GRID    = 7;
-  ACT_HELP    = 8;
-  ACT_UNITS   = 11;
-  ACT_ORIGIN  = 13;
-  ACT_FIT     = 14;
-  ACT_OPEN    = 15;
-  ACT_EXPORT  = 16;
   { Past this many picked, the selection overlay skips the depth test and
     just outlines the edges; at that size tracing is the cost on every
     orbit frame. }
   SEL_TRACE_MAX = 3000;
-
-  ACT_GUIDES  = 17;
-  ACT_NOGUIDE = 18;
-  ACT_MENU    = 19;
 
   UNDO_LEVELS     = 16;
   { where the cube can sit, in the words the command takes }
@@ -1621,9 +1570,8 @@ type
 
 const
   ISO_EL = 35.264 * Pi / 180;   // the true isometric tilt
-  { the first two presets are the paper modes; the button cycles from here }
+  { the first two presets are the paper modes; the V key cycles from here }
   FIRST_CAMERA_PRESET = 2;
-  VIEW_ARROW_W = 30;    // the drop-down arrow's share of the view button
 
   { The views one key steps through: the four corners first, since that is
     what you draw from, then elevations and top for reading dimensions. }
@@ -1714,8 +1662,9 @@ const
 {$I mainform/hsMainLifecycle.inc}
 {$I mainform/hsMainLayout.inc}
 {$I mainform/hsMainView.inc}
+{$I mainform/hsMainMenus.inc}
 {$I mainform/hsMainTabs.inc}
-{$I mainform/hsMainDeck.inc}
+{$I mainform/hsMainPanels.inc}
 {$I mainform/hsMainScreen.inc}
 {$I mainform/hsMainTools.inc}
 {$I mainform/hsMainMouse.inc}

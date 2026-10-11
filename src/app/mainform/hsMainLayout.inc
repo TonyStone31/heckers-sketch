@@ -4,8 +4,8 @@
 { layout                                                                    }
 { ======================================================================== }
 
-{ A drawing board keeps its chrome small.  Relayout, RebuildShell,
-  pbDeckPaint and FormPaint all use these, so they must come from here. }
+{ A drawing board keeps its chrome small.  Relayout, RebuildShell and
+  FormPaint all use these, so they must come from here. }
 function TMainForm.TitleHeight: Integer;
 begin
   Result := Round(34 * FUIScale);
@@ -16,65 +16,42 @@ begin
   Result := Round(8 * FUIScale);
 end;
 
-function TMainForm.DeckRowH: Integer;
-begin
-  { 20 was too tight: longer tool names clipped }
-  Result := Round(24 * FUIScale);
-end;
-
-function TMainForm.DeckRows: Integer;
-begin
-  { one row: settings left and six named buttons right }
-  Result := 1;
-end;
-
-function TMainForm.DeckHeight: Integer;
-begin
-  Result := DeckRows * DeckRowH + (DeckRows - 1) * Round(4 * FUIScale) +
-    Round(10 * FUIScale);
-end;
-
 procedure TMainForm.Relayout;
 var
-  M, TitleH, DeckH, Bezel, Gap, CmdH, TabsH: Integer;
+  M, TitleH, Bezel, CmdH, TabsH: Integer;
   ToolW: Integer;
-  BezelR, DeckR: TRect;
+  BezelR: TRect;
   InfoW, ColH, GrpH: Integer;
 begin
   if not FBooted then Exit;
 
   M := ChromeMargin;
   TitleH := TitleHeight;
-  DeckH := DeckHeight;
   Bezel := Round(16 * FUIScale);
   CmdH := CmdBarHeight;
   TabsH := Round(22 * FUIScale);
-  Gap := Round(6 * FUIScale);
 
-  { the file buttons, after the name and the version }
+  { the menu bar, top left; the version goes beside it (see FormPaint) }
   pbQuick.SetBounds(M + Round(2 * FUIScale), Round(4 * FUIScale),
     QuickWidth, Round(24 * FUIScale));
 
-  DeckR := Rect(M, ClientHeight - M - DeckH, ClientWidth - M, ClientHeight - M);
   ToolW := ToolStripWidth;
   pbTools.Visible := ToolW > 0;
 
-  { The cut only means something in plan, so it only shows there, beside
-    the view button since it is a property of the view. }
+  { The cut only means something in plan, so it only shows there, at the
+    top right, since it is a property of the view. }
   pbSlice.Visible := (FD <> nil) and (FD.View = vkPlan);
-  pbView.SetBounds(ClientWidth - M - Round(228 * FUIScale), TitleH,
-    Round(228 * FUIScale), TabsH);
   if pbSlice.Visible then
   begin
-    pbSlice.SetBounds(pbView.Left - Round(6 * FUIScale) - Round(250 * FUIScale),
-      TitleH, Round(250 * FUIScale), TabsH);
+    pbSlice.SetBounds(ClientWidth - M - Round(250 * FUIScale), TitleH,
+      Round(250 * FUIScale), TabsH);
     pbTabs.SetBounds(M, TitleH,
       Max(120, pbSlice.Left - M - Round(16 * FUIScale)), TabsH);
   end
   else
-    pbTabs.SetBounds(M, TitleH,
-      Max(120, pbView.Left - M - Round(16 * FUIScale)), TabsH);
-  pbCmd.SetBounds(M, DeckR.Top - Gap - CmdH, ClientWidth - 2 * M, CmdH);
+    pbTabs.SetBounds(M, TitleH, Max(120, ClientWidth - 2 * M), TabsH);
+  { the command bar sits on the window's floor; the drawing has the rest }
+  pbCmd.SetBounds(M, ClientHeight - M - CmdH, ClientWidth - 2 * M, CmdH);
   BezelR := Rect(M, TitleH + TabsH + Round(4 * FUIScale), ClientWidth - M,
     pbCmd.Top - Round(10 * FUIScale));
   PlaceCmdMsg;
@@ -111,8 +88,6 @@ begin
       pbGroups.SetBounds(BezelR.Right + Round(6 * FUIScale), BezelR.Top, InfoW, ColH);
   end;
 
-  pbDeck.SetBounds(DeckR.Left, DeckR.Top, Max(120, DeckR.Right - DeckR.Left), DeckH);
-
   pbScreen.SetBounds(BezelR.Left + Bezel, BezelR.Top + Bezel,
     Max(32, (BezelR.Right - BezelR.Left) - 2 * Bezel),
     Max(32, (BezelR.Bottom - BezelR.Top) - 2 * Bezel));
@@ -122,11 +97,7 @@ begin
   FShell.SetSize(Max(1, ClientWidth), Max(1, ClientHeight));
   RebuildShell;
 
-  FDeckSkin.SetSize(pbDeck.Width, pbDeck.Height);
-  RebuildDeck;
-
   FCmdSkin.SetSize(Max(1, pbCmd.Width), Max(1, pbCmd.Height));
-  FViewSkin.SetSize(Max(1, pbView.Width), Max(1, pbView.Height));
   FSliceSkin.SetSize(Max(1, pbSlice.Width), Max(1, pbSlice.Height));
   FToolSkin.SetSize(Max(1, pbTools.Width), Max(1, pbTools.Height));
   RebuildTools;
@@ -139,19 +110,17 @@ end;
 
 procedure TMainForm.RebuildShell;
 var
-  M, TitleH, DeckH, Bezel, Gap, CmdH, TabsH: Integer;
+  M, TitleH, Bezel, CmdH, TabsH: Integer;
   BezelR: TRect;
 begin
   M := ChromeMargin;
   TitleH := TitleHeight;
-  DeckH := DeckHeight;
   Bezel := Round(16 * FUIScale);
-  Gap := Round(6 * FUIScale);
   CmdH := CmdBarHeight;
   TabsH := Round(22 * FUIScale);
 
   BezelR := Rect(M, TitleH + TabsH + Round(4 * FUIScale), ClientWidth - M,
-    ClientHeight - M - DeckH - Gap - CmdH - Round(10 * FUIScale));
+    ClientHeight - M - CmdH - Round(10 * FUIScale));
   { the same shift Relayout makes, or the frame is drawn in the wrong place }
   if ToolStripWidth > 0 then
     BezelR.Left := BezelR.Left + ToolStripWidth + Round(6 * FUIScale);
@@ -1946,23 +1915,19 @@ end;
 procedure TMainForm.RefreshChrome;
 begin
   RebuildShell;
-  RebuildDeck;
   Invalidate;
-  pbDeck.Invalidate;
   pbCmd.Invalidate;
 end;
 
+{ The readings live on the command bar, and the mouse never stops moving;
+  this coalesces their repaints. }
 procedure TMainForm.InvalidateStatus;
 var
-  R: TRect;
   Now64: QWord;
 begin
   Now64 := GetTickCount64;
   if Now64 - FLastStatus < 60 then Exit;
   FLastStatus := Now64;
-  { the whole title strip, however high it is }
-  R := Rect(ClientWidth div 3, 0, ClientWidth, TitleHeight + Round(2 * FUIScale));
-  LCLIntf.InvalidateRect(Handle, @R, False);
   pbCmd.Invalidate;
 end;
 

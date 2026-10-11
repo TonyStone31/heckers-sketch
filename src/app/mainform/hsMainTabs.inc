@@ -114,8 +114,6 @@ begin
   RepaintPaper;
   RenderInk;
   RecomposeAll;
-  RebuildDeck;
-  pbDeck.Invalidate;
   pbTabs.Invalidate;
   Invalidate;
 end;

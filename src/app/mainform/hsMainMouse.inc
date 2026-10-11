@@ -1272,21 +1272,14 @@ begin
   if not Grabbable(Result) then Result := P3(0, 0, 0);
 end;
 
-{ --- the settings lists ---
-  Scale, snap and the pen each have a button showing their value and a list
-  that opens above it, as long as it needs to be. }
+{ --- the lists drawn on the canvas ---
+  The shop, the tools behind MORE, and the command list.  Each hangs off the
+  button or prompt that opened it. }
 
 function TMainForm.PopupCount(Which: Integer): Integer;
 begin
   case Which of
-    POP_SCALE: Result := SCALE_COUNT;
-    POP_SNAP: Result := SNAP_COUNT;
-    { one row past the palette, for any other color }
-    POP_COLOR: Result := Length(PALETTE) + 1;
-    POP_WIDTH: Result := PEN_STEPS;
-    POP_HELP: Result := 7;
     POP_SHOP: Result := 5;
-    POP_PREC: Result := Length(PREC_DENOMS);
     POP_MORE: Result := Length(MORE_TOOLS);
     POP_CMDS: Result := Length(CMD_LIST);
   else
@@ -1297,12 +1290,6 @@ end;
 function TMainForm.PopupCaption(Which, I: Integer): string;
 begin
   case Which of
-    POP_SCALE: Result := ScaleTable(FD.Units, I).Name +
-      IfThen(FD.Units = usImperial, '  =  1''-0"', '');
-    POP_SNAP: Result := IfThen(I = 0, 'No snapping', SnapName(FD.Units, I));
-    POP_COLOR:
-      if I = Length(PALETTE) then Result := 'Another color...' else Result := '';
-    POP_WIDTH: Result := Format('%d px', [PEN_SIZES[I]]);
     POP_SHOP:
       case I of
         0: Result := 'Lay a selection out flat(incomplete)';
@@ -1313,9 +1300,6 @@ begin
       else
         Result := '';
       end;
-    POP_PREC:
-      if PREC_DENOMS[I] = 100 then Result := 'hundredths of an inch'
-      else Result := Format('1/%d"', [PREC_DENOMS[I]]);
     POP_MORE:
       if (I >= 0) and (I <= High(MORE_TOOLS)) then
         Result := TOOL_NAMES[MORE_TOOLS[I]]
@@ -1326,17 +1310,6 @@ begin
         Result := '/' + CMD_LIST[FCmdOrder[I]].Name
       else
         Result := '';
-    POP_HELP:
-      case I of
-        0: Result := 'About  (F1)';
-        1: Result := 'Check for updates';
-        2: Result := 'What''s new';
-        3: Result := 'Downloads';
-        4: Result := 'The manual';
-        5: Result := 'Report a problem';
-      else
-        Result := 'Project page';
-      end;
   else
     Result := '';
   end;
@@ -1345,16 +1318,6 @@ end;
 procedure TMainForm.PopupChoose(Which, I: Integer);
 begin
   case Which of
-    POP_SCALE: SetScaleIdx(I);
-    POP_SNAP:
-      begin
-        FD.SnapIdx := EnsureRange(I, 0, SNAP_COUNT - 1);
-        FCmdMsg := 'Snap: ' + SnapName(FD.Units, FD.SnapIdx);
-      end;
-    POP_COLOR:
-      if I = Length(PALETTE) then PickAnyColor
-      else SetInk(PALETTE[I], False);
-    POP_WIDTH: SetEdgeWidth(PEN_SIZES[I]);
     POP_SHOP:
       case I of
         0: StartUnfold;
@@ -1363,7 +1326,6 @@ begin
         3: BuildRadiantWizard;
         4: BuildStairWizard;
       end;
-    POP_PREC: SetLenPrecision(PREC_DENOMS[EnsureRange(I, 0, High(PREC_DENOMS))]);
     POP_MORE:
       if (I >= 0) and (I <= High(MORE_TOOLS)) then SetTool(MORE_TOOLS[I]);
     POP_CMDS:
@@ -1384,20 +1346,7 @@ begin
         end;
         pbCmd.Invalidate;
       end;
-    POP_HELP:
-      case I of
-        0: ShowAbout;
-        1: begin CheckForUpdate(True); DoUpdate; end;
-        2: ShowWhatsNew;
-        3: OpenURL('https://github.com/' + UPDATE_REPO + '/releases/latest');
-        4: OpenManual;
-        5: ReportBug;
-      else
-        OpenURL('https://github.com/' + UPDATE_REPO);
-      end;
   end;
-  RebuildDeck;
-  pbDeck.Invalidate;
 end;
 
 { How tall a list may get.  The command list is capped at half the window so
@@ -1442,35 +1391,15 @@ begin
   begin
     LeftX := Round(14 * FUIScale);
     TopY := -1;
-  end
-  else
-  if TopY < 0 then
-    for I := 0 to High(FDeck) do
-      if ((FDeck[I].Group = GRP_POPUP) and (FDeck[I].Value = Which)) or
-         ((Which = POP_HELP) and (FDeck[I].Group = GRP_ICON) and
-          (FDeck[I].Value = ACT_HELP)) then
-      begin
-        B := FDeck[I].Bounds;
-        LeftX := pbDeck.Left + B.Left - pbScreen.Left;
-        Break;
-      end;
+  end;
 
   RowH := Round(22 * FUIScale);
   W := Round(190 * FUIScale);
-  if Which = POP_COLOR then W := Round(150 * FUIScale);
-  if Which = POP_HELP then W := Round(210 * FUIScale);
   { wide, because each row carries what the command does }
   if Which = POP_CMDS then W := Round(430 * FUIScale);
   H := Min(N * RowH + Round(12 * FUIScale), PopupMaxHeight(Which));
   Bottom := pbScreen.Height - Round(6 * FUIScale);
-  { How far right a list may go: the deck's right edge, not the drawing's,
-    or with the entity panel open the HELP list lands a panel's width from
-    its button.  The part past the drawing is painted onto the panel (see
-    PaintPopup and pbInfoPaint). }
   RightMost := pbScreen.Width;
-  if pbInfo.Visible or pbGroups.Visible then
-    RightMost := Max(RightMost,
-      pbDeck.Left + pbDeck.Width - pbScreen.Left - Round(2 * FUIScale));
   LeftX := EnsureRange(LeftX, 4, Max(4, RightMost - W - 4));
   if TopY >= 0 then
   begin
@@ -1578,12 +1507,7 @@ begin
   C.Pen.Width := Max(1, Round(FUIScale));
   C.Rectangle(PR);
 
-  case FPopup of
-    POP_SCALE: Cur := FD.ScaleIdx;
-    POP_SNAP: Cur := FD.SnapIdx;
-  else
-    Cur := -1;
-  end;
+  Cur := -1;
 
   for I := FPopupTop to FPopupN - 1 do
   begin
@@ -1592,11 +1516,7 @@ begin
     R := Rect(PR.Left + Round(4 * FUIScale), Y,
       PR.Right - Round(4 * FUIScale), Y + RowH - 1);
     { the current choice is lit }
-    Sel := (I = Cur) or
-      ((FPopup = POP_COLOR) and (I < Length(PALETTE)) and
-       (PALETTE[I] = FInkColor)) or
-      ((FPopup = POP_WIDTH) and
-       (PEN_SIZES[I] = FEdgeW));
+    Sel := I = Cur;
     if Sel then
     begin
       C.Brush.Color := PixToColor(ShadePix(Theme.Accent, 0.95));
@@ -1606,21 +1526,6 @@ begin
     begin
       C.Brush.Color := PixToColor(MixPix(Theme.Panel, Pix(255, 255, 255), 0.12));
       C.FillRect(R);
-    end;
-
-    if (FPopup = POP_COLOR) and (I < Length(PALETTE)) then
-    begin
-      C.Brush.Color := PALETTE[I];
-      if Sel then
-        C.Pen.Color := PixToColor(Pix(255, 255, 255))
-      else
-        C.Pen.Color := PixToColor(MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.4));
-      C.Pen.Width := IfThen(Sel, Max(2, Round(2 * FUIScale)), 1);
-      C.Rectangle(R.Left + Round(6 * FUIScale), R.Top + Round(3 * FUIScale),
-        R.Right - Round(6 * FUIScale), R.Bottom - Round(3 * FUIScale));
-      C.Pen.Width := 1;
-      C.Brush.Style := bsSolid;
-      Continue;
     end;
 
     S := PopupCaption(FPopup, I);

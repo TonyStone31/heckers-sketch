@@ -118,30 +118,17 @@ end;
 
 procedure TMainForm.FormPaint(Sender: TObject);
 var
-  VerX: Integer;
-  M, Y, TW, RightEdge: Integer;
+  VerX, Y: Integer;
   S: string;
 begin
   if not FBooted then Exit;
   FShell.DrawTo(Canvas, 0, 0);
 
-  M := ChromeMargin;
-
-  { One line.  The file buttons have the left; the reading is right-aligned
-    and grows leftward; the version sits between. }
   Y := Round(5 * FUIScale);
 
-  { the reading goes hard against ClientWidth - M, where the VIEW button
-    below ends, so the right edges line up }
-  RightEdge := ClientWidth - M;
-  UIFont(Canvas, 11, True, Theme.Text, True);
-  S := StatusLine;
-  TW := Canvas.TextWidth(S);
-  Canvas.TextOut(RightEdge - TW, Round(6 * FUIScale), S);
-
-  { No program name here: the reading grows leftward into the middle.  The
-    version stays (it is the first thing quoted in a bug report), with any
-    newer-build notice, against the buttons. }
+  { No program name here: the menus have the left, and the readings live on
+    the command bar now.  The version stays (it is the first thing quoted in
+    a bug report), with any newer-build notice, against the menus. }
   VerX := pbQuick.Left + pbQuick.Width + Round(16 * FUIScale);
   UIFont(Canvas, 9, False, Theme.TextDim);
   Canvas.TextOut(VerX, Y + Round(4 * FUIScale), CurrentVersion);
@@ -151,7 +138,7 @@ begin
   begin
     UIFont(Canvas, 9, True, Pix(90, 190, 255));
     S := '* ' + FUpdateTag + ' available - /update';
-    if VerX + Canvas.TextWidth(S) < RightEdge - TW - Round(16 * FUIScale) then
+    if VerX + Canvas.TextWidth(S) < ClientWidth - ChromeMargin then
       Canvas.TextOut(VerX, Y + Round(4 * FUIScale), S);
   end;
 end;
@@ -165,7 +152,6 @@ begin
   FInkColor := C;
   FInkAuto := Auto;
   dlgColor.Color := C;
-  pbDeck.Invalidate;
 end;
 
 { How finely lengths are written and read.  One setting for both, so a typed
@@ -180,8 +166,6 @@ begin
   else
     FCmdMsg := Format('Lengths to the nearest 1/%d of an inch.', [FLenDenom]);
   SaveSettings;
-  RebuildDeck;
-  pbDeck.Invalidate;
   RenderInk;
   RecomposeAll;
   InvalidateStatus;
@@ -195,7 +179,6 @@ begin
   FEdgeW := V;
   RenderInk;
   RecomposeAll;
-  pbDeck.Invalidate;
   pbScreen.Invalidate;
 end;
 
@@ -205,8 +188,7 @@ begin
   FD.Units := U;
   RenderInk;
   RecomposeAll;
-  RebuildDeck;
-  pbDeck.Invalidate;
+  pbSlice.Invalidate;
   pbCmd.Invalidate;
   Invalidate;
 end;
@@ -235,7 +217,6 @@ begin
   FD.Undo[FD.UndoTop] := FD.Doc.Snapshot;
   Inc(FD.UndoTop);
   FD.RedoTop := 0;
-  pbDeck.Invalidate;
 end;
 
 function TMainForm.CanUndo: Boolean;
@@ -266,7 +247,6 @@ begin
   ResetTool;
   RenderInk;
   RecomposeAll;
-  pbDeck.Invalidate;
 end;
 
 procedure TMainForm.DoRedo;
@@ -287,7 +267,6 @@ begin
   ResetTool;
   RenderInk;
   RecomposeAll;
-  pbDeck.Invalidate;
 end;
 
 { ======================================================================== }
@@ -319,7 +298,6 @@ begin
     ResetTool;
     RecomposeAll;
     Invalidate;
-    pbDeck.Invalidate;
     Exit;
   end;
 
@@ -452,15 +430,6 @@ begin
   ServiceMotion;
   ServiceHover;
   StepGlide(Dt);
-
-  { the guide buttons follow the guide count, watched here since many places
-    change it }
-  if (FD.Doc.GuideCount <> FDeckGuides) then
-  begin
-    FDeckGuides := FD.Doc.GuideCount;
-    RebuildDeck;
-    pbDeck.Invalidate;
-  end;
 
   { Four seconds up counts as a successful start, so a restored draft that
     crashes is not restored again. }

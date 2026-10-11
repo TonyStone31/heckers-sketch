@@ -77,8 +77,6 @@ begin
   RepaintPaper;
   RenderInk;
   RecomposeAll;
-  RebuildDeck;
-  pbDeck.Invalidate;
   Invalidate;
 end;
 
@@ -194,4 +192,92 @@ begin
   RenderInk;
   RecomposeAll;
   Invalidate;
+end;
+
+{ ======================================================================== }
+{ the named views                                                           }
+{ ======================================================================== }
+
+{ Park on a named camera.  Free orbiting sets FViewPreset to -1, so the next
+  press starts again at the corner view. }
+procedure TMainForm.ApplyViewPreset(I: Integer);
+var
+  N: Integer;
+  Turn: Boolean;
+  FitZ, FitX, FitY: Double;
+begin
+  N := Length(VIEW_PRESETS);
+  Turn := (FD <> nil) and (FD.View = vkOrbit) and
+          (VIEW_PRESETS[((I mod N) + N) mod N].View = vkOrbit) and FBooted;
+  FViewPreset := ((I mod N) + N) mod N;
+  FD.View := VIEW_PRESETS[FViewPreset].View;
+  { One 3D view to another glides; a change of view kind (into or out of
+    the paper modes) snaps, since one projection cannot turn into another. }
+  if Turn then
+  begin
+    { a preset reframes, so the glide aims at the final framing instead of
+      popping into it on arrival }
+    if FitTarget(Length(FSel) > 0, VIEW_PRESETS[FViewPreset].Az,
+         VIEW_PRESETS[FViewPreset].El, FitZ, FitX, FitY) then
+      GlideCamera(VIEW_PRESETS[FViewPreset].Az, VIEW_PRESETS[FViewPreset].El,
+        FitZ, FitX, FitY)
+    else
+      GlideTo(VIEW_PRESETS[FViewPreset].Az, VIEW_PRESETS[FViewPreset].El);
+  end
+  else
+  begin
+    FD.Az := VIEW_PRESETS[FViewPreset].Az;
+    FD.El := VIEW_PRESETS[FViewPreset].El;
+  end;
+  if FD.View <> vkOrbit then FD.Plane := plXY;
+  { this can reach PLAN, so the cut strip must come and go and the top row
+    be laid out again }
+  ApplySlice;
+  Relayout;
+  FCmdMsg := VIEW_PRESETS[FViewPreset].Name + ' view.';
+  if FD.View = vkPlan then
+    FCmdMsg := FCmdMsg + '  CUT, top right, slices it - Ctrl+wheel travels ' +
+      'up and down.';
+  { the glide carries the framing; a change of view kind still snaps to fit }
+  if FGlideT = 0 then FitView(False);
+  pbSlice.Invalidate;
+  pbCmd.Invalidate;
+end;
+
+procedure TMainForm.CycleViewPreset(Step: Integer);
+var
+  N, I: Integer;
+begin
+  { Off the presets (a paper mode or orbited free), either direction goes to
+    the first corner; on them, step round the camera presets. }
+  N := High(VIEW_PRESETS) - FIRST_CAMERA_PRESET + 1;
+  if (FViewPreset < FIRST_CAMERA_PRESET) or (FD.View <> vkOrbit) then
+    I := FIRST_CAMERA_PRESET
+  else
+    I := FIRST_CAMERA_PRESET + (((FViewPreset - FIRST_CAMERA_PRESET + Step) mod N) + N) mod N;
+  ApplyViewPreset(I);
+end;
+
+procedure TMainForm.SetView(V: TViewKind);
+begin
+  FViewPreset := -1;
+  if V = FD.View then Exit;
+  Trail('view ' + VIEW_NAMES[V]);
+  Act('view ' + VIEW_NAMES[V]);
+  FD.View := V;
+  if V <> vkOrbit then FD.Plane := plXY;
+  { the slice is plan only, so entering or leaving plan turns it on or off }
+  ApplySlice;
+  { the cut strip comes and goes with the view, so lay out the top row again }
+  Relayout;
+  { the projection changed, so there is nothing to glide between }
+  FitView(False);
+  pbSlice.Invalidate;
+  case V of
+    vkPlan: FCmdMsg := 'Plan view.';
+    vkIso: FCmdMsg := 'Isometric view.';
+  else
+    FCmdMsg := '3D view - middle-drag to orbit.';
+  end;
+  pbCmd.Invalidate;
 end;

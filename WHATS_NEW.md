@@ -21,6 +21,21 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **Real menus along the top: FILE, EDIT, VIEW, SETTINGS, HELP.**  The
+  settings panel that sat across the foot of the window is gone - print
+  scale, snap, line color and width, rounding, units and the light or dark
+  chrome all live under SETTINGS now, each list showing its current value -
+  and that whole strip of screen belongs to the drawing.  The view list
+  moved from its own button into VIEW, with Fit, the grid, the view cube
+  and the two panels beside it; Undo, Redo and the clipboard are under
+  EDIT.  Every key works as before.
+- The readings (X, Y, Z, lengths, the working plane) moved from the top
+  right down onto the command bar, beside what you are typing.
+
 ## v2026.10.09
 
 ### Fixed

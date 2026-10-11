@@ -34,9 +34,6 @@ begin
     if Pos('--updated-from=', LowerCase(A)) = 1 then
       FUpdatedFrom := Copy(A, Length('--updated-from=') + 1, MaxInt);
   end;
-  FillViewMenu;
-  { real hover tooltips on the deck, not just the hint line }
-  pbDeck.ShowHint := True;
   Application.ShowHint := True;
   Application.HintPause := 450;
   Application.HintHidePause := 6000;
@@ -67,9 +64,7 @@ begin
   FInkHalf := TArtSurface.Create(16, 16);
   FInk.PreserveAlpha := True;
   FShell := TArtSurface.Create(16, 16);
-  FDeckSkin := TArtSurface.Create(16, 16);
   FCmdSkin := TArtSurface.Create(16, 16);
-  FViewSkin := TArtSurface.Create(16, 16);
   FSliceSkin := TArtSurface.Create(16, 16);
   FToolSkin := TArtSurface.Create(16, 16);
   FInfoSkin := TArtSurface.Create(16, 16);
@@ -101,8 +96,6 @@ begin
   FThemeIdx := THEME_DARK;
   FEdgeW := 1;
   FMeasEdge := -1;
-  FHotItem := -1;
-  FHotView := -1;
   FHoverEnt := -1;
   FTool := ptSelect;
   FDirLock := -1;
@@ -116,7 +109,7 @@ FPushFace := -1;
   SetInk(FInkColor, FInkAuto);
 
   pbScreen.Cursor := crCross;
-  pbDeck.Cursor := crHandPoint;
+  pbQuick.Cursor := crHandPoint;
 
   tmrTick.Interval := TICK_MS;
   tmrTick.Enabled := True;
@@ -243,7 +236,6 @@ begin
   FOverlay.Free;
   FPaperBase.Free;
   FSelShot.Free;
-  FViewSkin.Free;
   FSliceSkin.Free;
   FToolSkin.Free;
   FInfoSkin.Free;
@@ -252,7 +244,6 @@ begin
   FGlyph.Free;
   FCmdSkin.Free;
   FCubeSkin.Free;
-  FDeckSkin.Free;
   FShell.Free;
   FInk.Free;
   FInkHalf.Free;
