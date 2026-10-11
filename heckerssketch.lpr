@@ -1,4 +1,4 @@
-program etchasketch;
+program heckerssketch;
 
 {$mode objfpc}{$H+}
 

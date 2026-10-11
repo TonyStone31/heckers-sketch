@@ -161,8 +161,8 @@ Needs Lazarus, plus these packages:
 * `Printer4Lazarus` ships with Lazarus.
 
 ```sh
-lazbuild etchasketch.lpi
-./bin/etchasketch
+lazbuild heckerssketch.lpi
+./bin/heckers-sketch
 ```
 
 The program is built into `bin/`, and run from there it keeps its settings,

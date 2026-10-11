@@ -204,7 +204,7 @@ type
 
 var
   { Whether the search may use threads.  Set by the program that links a
-    thread driver (etchasketch.lpr, beside cthreads), never guessed: without
+    thread driver (heckerssketch.lpr, beside cthreads), never guessed: without
     one the RTL's no-thread stubs fail silently (nil events, waits that
     return at once) and the search would weigh layouts nobody laid.  The
     layouts are the same either way. }

@@ -82,7 +82,7 @@ var
 begin
   Result := '';
   Up := ExpandFileName(AppDataDir + '..' + PathDelim);
-  if FileExists(Up + 'etchasketch.lpi') then Result := IncludeTrailingPathDelimiter(Up);
+  if FileExists(Up + 'heckerssketch.lpi') then Result := IncludeTrailingPathDelimiter(Up);
 end;
 
 function ConfigFile: string;

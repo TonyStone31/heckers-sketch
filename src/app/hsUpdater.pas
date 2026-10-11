@@ -350,7 +350,7 @@ begin
   Dir := ExtractFilePath(ExpandFileName(ParamStr(0)));
   { never update a copy running from its source tree; it would overwrite
     what was just built }
-  if FileExists(Dir + 'etchasketch.lpi') or FileExists(Dir + 'hsMainForm.pas') then
+  if FileExists(Dir + 'heckerssketch.lpi') or FileExists(Dir + 'hsMainForm.pas') then
     Exit('this copy runs from its own source folder, where an update would ' +
          'overwrite what you just built');
   if not DirectoryExists(Dir) then

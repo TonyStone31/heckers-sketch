@@ -34,7 +34,7 @@ Not vendored - referenced as sibling clones, the same arrangement as
   relationship: pulled in, never called from here.
 
 Clone all three next to this folder - `../CryptoLib4Pascal`,
-`../HashLib4Pascal`, `../SimpleBaseLib4Pascal`.  `etchasketch.lpi` uses
+`../HashLib4Pascal`, `../SimpleBaseLib4Pascal`.  `heckerssketch.lpi` uses
 their own Lazarus packages from there, and lazbuild compiles them with the
 program.  Nothing extra is shipped: they end up inside the one executable.  A user's copy of the program is
 exactly as small as it always was.

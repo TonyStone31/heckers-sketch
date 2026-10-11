@@ -23,7 +23,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="bin/etchasketch"/>
+            <Filename Value="bin/heckers-sketch"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
@@ -63,7 +63,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="bin/etchasketch"/>
+            <Filename Value="bin/heckers-sketch"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
@@ -94,7 +94,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="bin/etchasketch-release"/>
+            <Filename Value="bin/heckers-sketch-release"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
@@ -167,7 +167,7 @@
     </RequiredPackages>
     <Units>
       <Unit>
-        <Filename Value="etchasketch.lpr"/>
+        <Filename Value="heckerssketch.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
@@ -425,7 +425,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="bin/etchasketch"/>
+      <Filename Value="bin/heckers-sketch"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);."/>
