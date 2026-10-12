@@ -22,6 +22,7 @@ var
   A: string;
 begin
   Application.OnException := @ReportCrash;
+  PrepareDocIcons;
   FDimArc := -1;
   FExportDirs := TStringList.Create;
   Randomize;

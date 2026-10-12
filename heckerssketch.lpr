@@ -15,6 +15,7 @@ uses
   hsSurface, hsTriangulate, hsSkin, hsFilm, hsDialogSkin, hsRecorder, hsExport, hsExToy, hsDrawing, hsPaths, hsSingleCopy, hsSplash, hsNet, hsRadiant, hsMainForm;
 
 {$R *.res}
+{$R hsdocicons.res}
 
 { --help is answered before any of the LCL starts up, so it prints and leaves
   rather than printing and then opening a window.  A GUI build on Windows has

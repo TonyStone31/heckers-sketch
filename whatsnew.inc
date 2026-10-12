@@ -24,6 +24,16 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- **The help window''s find box writes in ink you can see.**  It was' + LineEnding +
+    '  borrowing the page''s text color - nearly white in the dark theme - and' + LineEnding +
+    '  writing it on a white box, so typing looked like it did nothing.  The' + LineEnding +
+    '  keys were arriving all along; now the letters and the blinking caret' + LineEnding +
+    '  show in black.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.12' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +

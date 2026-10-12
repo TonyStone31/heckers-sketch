@@ -721,6 +721,42 @@ begin
   SaveSettings;
 end;
 
+{ The updater ships only the program file, so the document icon rides inside
+  it (hsdocicons.res).  Windows points DefaultIcon at the exe's own icon
+  resource; Linux refreshes icons/hsk.png beside the program when it went
+  stale, for the next registration or repair to install. }
+procedure TMainForm.PrepareDocIcons;
+{$ifdef windows}
+var
+  I: Integer;
+begin
+  for I := 0 to FileAss.FileTypes.Count - 1 do
+    FileAss.FileTypes[I].WindowsIcon := '"' + ExpandFileName(ParamStr(0)) + '",-2';
+end;
+{$else}
+var
+  R: TResourceStream;
+  M: TMemoryStream;
+  P: string;
+begin
+  P := ExtractFilePath(ExpandFileName(ParamStr(0))) + 'icons' + PathDelim + 'hsk.png';
+  try
+    R := TResourceStream.Create(HInstance, 'HSKPNG', RT_RCDATA);
+    try
+      M := TMemoryStream.Create;
+      try
+        if FileExists(P) then M.LoadFromFile(P);
+        if (M.Size = R.Size) and CompareMem(M.Memory, R.Memory, M.Size) then Exit;
+        ForceDirectories(ExtractFilePath(P));
+        R.SaveToFile(P);
+      finally M.Free; end;
+    finally R.Free; end;
+  except
+    { a read-only install keeps the icons it shipped with }
+  end;
+end;
+{$endif}
+
 { Start-up, after the window has settled.  A portable copy moves between
   machines and mount points; when the person asked for repairs, stale or
   missing registrations are written again, quietly. }

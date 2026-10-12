@@ -25,6 +25,13 @@
 
 ### Fixed
 
+- **Updating the program now updates the document icons with it.**  The
+  built-in updater replaces just the program file, which used to leave
+  yesterday's icon files sitting beside it - so the icon fix never arrived
+  on machines that updated in-app.  The document icon now lives inside the
+  program itself, Windows is pointed straight at it, and Linux refreshes
+  the icon file beside the program on start.  With Repair at Start-up on,
+  everything corrects itself the first time the new version runs.
 - **The help window's find box writes in ink you can see.**  It was
   borrowing the page's text color - nearly white in the dark theme - and
   writing it on a white box, so typing looked like it did nothing.  The

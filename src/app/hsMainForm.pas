@@ -1319,6 +1319,7 @@ type
     procedure TellAssocTrouble(const R: TFileAssResult);
     procedure AssociationsPick(What: Integer);
     procedure RepairAssociations;
+    procedure PrepareDocIcons;
     procedure ShowFacts(const Title, AText: string);
     procedure ShowLongText(const Title, AText: string);
   end;
