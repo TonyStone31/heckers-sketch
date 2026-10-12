@@ -24,6 +24,16 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- **Document icons now show properly on Windows.**  The icon files for' + LineEnding +
+    '  `.hsk` and `.heck` promised a transparency mask they never carried, so' + LineEnding +
+    '  Windows read leftover pixels as the mask and drew a mess.  Every size' + LineEnding +
+    '  now carries its real mask, and the icons were checked against both the' + LineEnding +
+    '  Windows and Linux icon readers.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.11.1' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

@@ -21,6 +21,16 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- **Document icons now show properly on Windows.**  The icon files for
+  `.hsk` and `.heck` promised a transparency mask they never carried, so
+  Windows read leftover pixels as the mask and drew a mess.  Every size
+  now carries its real mask, and the icons were checked against both the
+  Windows and Linux icon readers.
+
 ## v2026.10.11.1
 
 ### New
