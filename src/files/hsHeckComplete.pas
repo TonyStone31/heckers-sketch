@@ -25,31 +25,29 @@ type
     FTimer: TTimer;
     FDeclined: string;         { the word the list was dismissed on }
     FInserts: TStringList;     { what each item puts in, matching ItemList }
-    FDark: Boolean;
-    FAuto: Boolean;
+    FDark: boolean;
+    FAuto: boolean;
     procedure EditorChange(Sender: TObject);
-    procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EditorKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure TimerTick(Sender: TObject);
     procedure BoxExecute(Sender: TObject);
     procedure BoxCancel(Sender: TObject);
-    procedure BoxCodeCompletion(var Value: string; SourceValue: string;
-      var SourceStart, SourceEnd: TPoint; KeyChar: TUTF8Char; Shift: TShiftState);
-    function BoxPaintItem(const AKey: string; ACanvas: TCanvas; X, Y: integer;
-      Selected: boolean; Index: integer): boolean;
+    procedure BoxCodeCompletion(var Value: string; SourceValue: string; var SourceStart, SourceEnd: TPoint; KeyChar: TUTF8Char; Shift: TShiftState);
+    function BoxPaintItem(const AKey: string; ACanvas: TCanvas; X, Y: integer; Selected: boolean; Index: integer): boolean;
     procedure BoxSearchPosition(var APosition: integer);
-    function WordBeforeCaret(out StartX: Integer): string;
+    function WordBeforeCaret(out StartX: integer): string;
     procedure Gather(const Prefix: string);
     procedure Offer(const Show, Insert, Hint: string);
   public
     constructor Create(Ed: TSynEdit);
     destructor Destroy; override;
-    procedure UseDark(Dark: Boolean; Back, Fore: TColor);
+    procedure UseDark(Dark: boolean; Back, Fore: TColor);
     { Open now on the word at the caret (Ctrl+Space). }
     procedure Open;
     property Box: TSynCompletion read FBox;
     { Open by itself after a pause in typing.  The test harness turns this
       off, since the list would take its typed Return as a choice. }
-    property Auto: Boolean read FAuto write FAuto;
+    property Auto: boolean read FAuto write FAuto;
   end;
 
 implementation
@@ -140,7 +138,7 @@ begin
   inherited Destroy;
 end;
 
-procedure THeckCompleter.UseDark(Dark: Boolean; Back, Fore: TColor);
+procedure THeckCompleter.UseDark(Dark: boolean; Back, Fore: TColor);
 begin
   FDark := Dark;
   FBox.TheForm.Color := Back;
@@ -161,10 +159,10 @@ begin
 end;
 
 { The word being typed, up to the caret. }
-function THeckCompleter.WordBeforeCaret(out StartX: Integer): string;
+function THeckCompleter.WordBeforeCaret(out StartX: integer): string;
 var
   L: string;
-  X: Integer;
+  X: integer;
 begin
   Result := '';
   StartX := FEd.CaretX;
@@ -179,7 +177,7 @@ end;
 procedure THeckCompleter.EditorChange(Sender: TObject);
 var
   W: string;
-  SX: Integer;
+  SX: integer;
 begin
   if FEd.ReadOnly then Exit;
   W := WordBeforeCaret(SX);
@@ -197,7 +195,7 @@ begin
   FTimer.Enabled := True;
 end;
 
-procedure THeckCompleter.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure THeckCompleter.EditorKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   { Navigation keys cancel a pending open. }
   if Key in [VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN, VK_HOME, VK_END, VK_PRIOR, VK_NEXT, VK_ESCAPE] then
@@ -217,7 +215,7 @@ end;
 procedure THeckCompleter.Open;
 var
   W: string;
-  SX: Integer;
+  SX: integer;
   P: TPoint;
 begin
   W := WordBeforeCaret(SX);
@@ -235,15 +233,14 @@ end;
 
 procedure THeckCompleter.BoxCancel(Sender: TObject);
 var
-  SX: Integer;
+  SX: integer;
 begin
   FDeclined := WordBeforeCaret(SX);
 end;
 
-procedure THeckCompleter.BoxCodeCompletion(var Value: string; SourceValue: string;
-  var SourceStart, SourceEnd: TPoint; KeyChar: TUTF8Char; Shift: TShiftState);
+procedure THeckCompleter.BoxCodeCompletion(var Value: string; SourceValue: string; var SourceStart, SourceEnd: TPoint; KeyChar: TUTF8Char; Shift: TShiftState);
 var
-  I: Integer;
+  I: integer;
 begin
   I := FBox.Position;
   if (I >= 0) and (I < FInserts.Count) then Value := FInserts[I];
@@ -251,10 +248,9 @@ begin
 end;
 
 { The word in bold, its hint after it, dimmed. }
-function THeckCompleter.BoxPaintItem(const AKey: string; ACanvas: TCanvas; X, Y: integer;
-  Selected: boolean; Index: integer): boolean;
+function THeckCompleter.BoxPaintItem(const AKey: string; ACanvas: TCanvas; X, Y: integer; Selected: boolean; Index: integer): boolean;
 var
-  P: Integer;
+  P: integer;
   W, H: string;
 begin
   P := Pos('|', AKey);
@@ -273,7 +269,9 @@ begin
   if H <> '' then
   begin
     ACanvas.Font.Style := [];
-    if FDark then ACanvas.Font.Color := TColor($A0A0A0) else ACanvas.Font.Color := TColor($707070);
+    if FDark then ACanvas.Font.Color := TColor($A0A0A0)
+    else
+      ACanvas.Font.Color := TColor($707070);
     ACanvas.TextOut(X + 2 + ACanvas.TextWidth(W + '  '), Y, H);
   end;
   Result := True;
@@ -282,7 +280,7 @@ end;
 { The first item that starts with what has been typed. }
 procedure THeckCompleter.BoxSearchPosition(var APosition: integer);
 var
-  I: Integer;
+  I: integer;
   W: string;
 begin
   W := LowerCase(FBox.CurrentString);
@@ -298,7 +296,8 @@ end;
 procedure THeckCompleter.Offer(const Show, Insert, Hint: string);
 begin
   if Hint <> '' then FBox.ItemList.Add(Show + '|' + Hint)
-  else FBox.ItemList.Add(Show);
+  else
+    FBox.ItemList.Add(Show);
   FInserts.Add(Insert);
 end;
 
@@ -306,15 +305,14 @@ end;
   walking back to the nearest unclosed opening line. }
 procedure THeckCompleter.Gather(const Prefix: string);
 var
-  Y, I, K, Depth, P, N: Integer;
+  Y, I, K, Depth, P, N: integer;
   L, T, Before, Key, Block, W, Stem: string;
   Names, Rings: TStringList;
   Pfx: string;
 
-  function Opens(const S: string): Boolean;
+  function Opens(const S: string): boolean;
   begin
-    Result := (S <> '') and (Pos('=', S) = 0) and (S <> 'end') and (S <> 'begin') and
-              (S[Length(S)] <> ')');
+    Result := (S <> '') and (Pos('=', S) = 0) and (S <> 'end') and (S <> 'begin') and (S[Length(S)] <> ')');
   end;
 
   procedure OfferJigs(const Pfx: string);
@@ -334,8 +332,8 @@ var
           Nm := ChangeFileExt(R.Name, '');
           Ext := LowerCase(ExtractFileExt(R.Name));
           if (Nm = '') or (Nm[1] = '.') then Continue;
-          if not ((Ext = '.sh') or (Ext = '.py') or (Ext = '.pl') or (Ext = '.pas') or
-                  (Ext = '.ps1') or (Ext = '.bat') or (Ext = '.cmd') or (Ext = '.exe') or (Ext = '')) then Continue;
+          if not ((Ext = '.sh') or (Ext = '.py') or (Ext = '.pl') or (Ext = '.pas') or (Ext = '.ps1') or (Ext = '.bat') or
+            (Ext = '.cmd') or (Ext = '.exe') or (Ext = '')) then Continue;
           if Seen.IndexOf(Nm) >= 0 then Continue;
           Seen.Add(Nm);
           if (Pfx = '') or (Pos(LowerCase(Pfx), LowerCase(Nm)) = 1) then
@@ -350,7 +348,7 @@ var
 
   procedure Props(const A: array of string);
   var
-    J, Q: Integer;
+    J, Q: integer;
   begin
     for J := 0 to High(A) do
     begin
@@ -416,10 +414,9 @@ begin
         if P > 0 then
         begin
           Key := Trim(Copy(W, 1, P - 1));
-          if (Key <> '') and (Pos(' ', Key) = 0) and (Key[1] in ['a'..'z', 'A'..'Z']) and
-             (Pos(' east', W) + Pos(' north', W) + Pos(' up', W) + Pos(' west', W) +
-              Pos(' south', W) + Pos(' down', W) + Pos(' x ', W) > 0) and
-             (Pos('=', Copy(W, P + 1, MaxInt)) = 0) and (Pos(' to ', W) = 0) then
+          if (Key <> '') and (Pos(' ', Key) = 0) and (Key[1] in ['a'..'z', 'A'..'Z']) and (Pos(' east', W) + Pos(' north', W) +
+            Pos(' up', W) + Pos(' west', W) + Pos(' south', W) + Pos(' down', W) + Pos(' x ', W) > 0) and (Pos('=', Copy(W, P + 1, MaxInt)) = 0) and
+            (Pos(' to ', W) = 0) then
             Names.Add(Key);
         end;
       end;
@@ -451,9 +448,8 @@ begin
         Word_('ring', 'corners round a circle: ring ra ... end');
         Word_('end', 'closes the block');
       end
-      else if (Block <> 'face') and (Block <> 'line') and (Block <> 'circle') and (Block <> 'arc') and
-              (Block <> 'ring') and (Block <> 'dim') and (Block <> 'note') and (Block <> 'bore') and
-              (Block <> 'box') and (Block <> 'rect') and (Block <> 'pull') then
+      else if (Block <> 'face') and (Block <> 'line') and (Block <> 'circle') and (Block <> 'arc') and (Block <> 'ring') and
+        (Block <> 'dim') and (Block <> 'note') and (Block <> 'bore') and (Block <> 'box') and (Block <> 'rect') and (Block <> 'pull') then
       begin
         N := 0;
         for K := 1 to Length(THINGS) + 1 do
@@ -475,7 +471,8 @@ begin
                   else if W = 'guide' then Offer(W, 'guide = <from> to <to>', THING_HINTS[N])
                   else if (W = 'box') or (W = 'rect') then Offer(W, W + ' = <corner>; <size>', THING_HINTS[N])
                   else if W = 'pull' then Offer(W, 'pull = <outline>; <by>', THING_HINTS[N])
-                  else Offer(W, W + ' = ', THING_HINTS[N]);
+                  else
+                    Offer(W, W + ' = ', THING_HINTS[N]);
                 end;
               end
               else if W = 'circle' then
@@ -501,7 +498,7 @@ begin
       for I := 0 to Rings.Count - 1 do Word_(Rings[I] + '1', 'first corner of ring ' + Rings[I]);
       if T[Length(T)] = '=' then
         for I := 0 to High(VALUES) do Word_(VALUES[I], '');
-        for I := 0 to High(HECK_COLOR_NAMES) do Word_(HECK_COLOR_NAMES[I], '');
+      for I := 0 to High(HECK_COLOR_NAMES) do Word_(HECK_COLOR_NAMES[I], '');
     end
     else
     begin

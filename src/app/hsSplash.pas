@@ -19,14 +19,14 @@ const
 procedure SplashShow;
 { Frac is 0..1, or below 0 when progress is unknown.  Skippable shows the
   skip button. }
-procedure SplashStatus(const Msg: string; Frac: Double; Skippable: Boolean);
+procedure SplashStatus(const Msg: string; Frac: double; Skippable: boolean);
 { loading is done; shows Msg and removes the skip button }
 procedure SplashLoaded(const Msg: string);
 { skip was pressed and not yet reset }
-function SplashSkipAsked: Boolean;
+function SplashSkipAsked: boolean;
 procedure SplashSkipReset;
-function SplashUp: Boolean;
-function SplashFinished: Boolean;
+function SplashUp: boolean;
+function SplashFinished: boolean;
 { milliseconds since it went up }
 function SplashAge: QWord;
 procedure SplashHide;
@@ -42,15 +42,14 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SplashPaint(Sender: TObject);
-    procedure SplashMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure SplashMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
   private
     FSkin: TArtSurface;
     FTheme: TTheme;
-    FScale: Single;
+    FScale: single;
     FMsg: string;
-    FFrac: Double;
-    FSkippable, FSkip, FLoaded: Boolean;
+    FFrac: double;
+    FSkippable, FSkip, FLoaded: boolean;
     FShownAt, FPaintedAt: QWord;
     FSkipRect: TRect;
   end;
@@ -81,15 +80,15 @@ end;
 
 procedure TSplashForm.SplashPaint(Sender: TObject);
 var
-  Pad, Y, W, H, BarY, BarH, BarW, X0, K: Integer;
+  Pad, Y, W, H, BarY, BarH, BarW, X0, K: integer;
   S: string;
-  Ph: Double;
-  Cx, Cy, R: Single;
+  Ph: double;
+  Cx, Cy, R: single;
 
-  { a small wire cube in the corner }
-  procedure Cube(CX, CY, Sz: Single);
+{ a small wire cube in the corner }
+  procedure Cube(CX, CY, Sz: single);
   var
-    Dx, Dy: Single;
+    Dx, Dy: single;
   begin
     Dx := Sz * 0.866;
     Dy := Sz * 0.5;
@@ -154,15 +153,20 @@ begin
   FSkipRect := Rect(0, 0, 0, 0);
   if FSkippable and not FLoaded then
   begin
-    FSkipRect := Rect(W - Pad - Round(170 * FScale), H - Round(52 * FScale),
-                      W - Pad, H - Round(22 * FScale));
+    FSkipRect := Rect(W - Pad - Round(170 * FScale), H - Round(52 * FScale), W - Pad, H - Round(22 * FScale));
     FSkin.RoundRect(FSkipRect, (FSkipRect.Bottom - FSkipRect.Top) / 2, FTheme.Panel, 1.0);
     FSkin.RoundFrame(FSkipRect, (FSkipRect.Bottom - FSkipRect.Top) / 2, 1.2, FTheme.Accent, 0.8);
   end;
   FSkin.DrawTo(Canvas, 0, 0);
 
   Canvas.Brush.Style := bsClear;
-  Canvas.Font.Name := {$IFDEF WINDOWS}'Segoe UI'{$ELSE}'Sans'{$ENDIF};
+  Canvas.Font.Name :=
+  {$IFDEF WINDOWS}
+'Segoe UI'
+    {$ELSE}
+    'Sans'
+  {$ENDIF}
+  ;
 
   Canvas.Font.Height := -Round(30 * FScale);
   Canvas.Font.Style := [fsBold];
@@ -202,8 +206,7 @@ begin
   FPaintedAt := GetTickCount64;
 end;
 
-procedure TSplashForm.SplashMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TSplashForm.SplashMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if (FSkipRect.Right > FSkipRect.Left) and PtInRect(FSkipRect, Point(X, Y)) then
   begin
@@ -226,9 +229,9 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure SplashStatus(const Msg: string; Frac: Double; Skippable: Boolean);
+procedure SplashStatus(const Msg: string; Frac: double; Skippable: boolean);
 var
-  Changed: Boolean;
+  Changed: boolean;
 begin
   if Splash = nil then Exit;
   Changed := (Msg <> Splash.FMsg) or (Skippable <> Splash.FSkippable);
@@ -256,7 +259,7 @@ begin
   Application.ProcessMessages;
 end;
 
-function SplashSkipAsked: Boolean;
+function SplashSkipAsked: boolean;
 begin
   Result := (Splash <> nil) and Splash.FSkip;
 end;
@@ -266,12 +269,12 @@ begin
   if Splash <> nil then Splash.FSkip := False;
 end;
 
-function SplashUp: Boolean;
+function SplashUp: boolean;
 begin
   Result := Splash <> nil;
 end;
 
-function SplashFinished: Boolean;
+function SplashFinished: boolean;
 begin
   Result := (Splash <> nil) and Splash.FLoaded;
 end;
@@ -279,7 +282,8 @@ end;
 function SplashAge: QWord;
 begin
   if Splash = nil then Result := High(QWord)
-  else Result := GetTickCount64 - Splash.FShownAt;
+  else
+    Result := GetTickCount64 - Splash.FShownAt;
 end;
 
 procedure SplashHide;

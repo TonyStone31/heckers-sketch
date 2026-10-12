@@ -17,7 +17,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure PageLinkClick(Sender: TObject; const URL: string);
   public
     procedure ShowPicture(const URL, Title: string);
@@ -51,10 +51,8 @@ begin
   Page.ImageFit := iifWindow;
   { for looking only, no copy menu }
   Page.CopyMenu := False;
-  Dark := Format('#%.2x%.2x%.2x', [DlgTheme.Shell1.R, DlgTheme.Shell1.G,
-    DlgTheme.Shell1.B]);
-  Page.StyleSheet.Text := 'body { background: ' + Dark +
-    '; margin: 0; padding: 0 } html { scrollbar-width: none }';
+  Dark := Format('#%.2x%.2x%.2x', [DlgTheme.Shell1.R, DlgTheme.Shell1.G, DlgTheme.Shell1.B]);
+  Page.StyleSheet.Text := 'body { background: ' + Dark + '; margin: 0; padding: 0 } html { scrollbar-width: none }';
   Page.Color := PixToColor(DlgTheme.Shell1);
 end;
 
@@ -63,14 +61,12 @@ begin
   if HelpImageForm = Self then HelpImageForm := nil;
 end;
 
-procedure THelpImageForm.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
+procedure THelpImageForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   CloseAction := caHide;
 end;
 
-procedure THelpImageForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure THelpImageForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
@@ -96,13 +92,12 @@ begin
     Height := (R.Bottom - R.Top) * 85 div 100;
   end;
   if Title <> '' then Caption := 'Heckers Sketch - ' + Title
-  else Caption := 'Heckers Sketch - Picture';
+  else
+    Caption := 'Heckers Sketch - Picture';
   { Wrap the picture in a page of our own.  LoadFromURL only does that for
     formats it knows, and it shows .webp as raw text. }
-  Page.LoadHTML('<html><head></head><body style="margin:0">' +
-    '<img src="' + StringReplace(URL, '"', '&quot;', [rfReplaceAll]) +
-    '" alt="' + StringReplace(Title, '"', '&quot;', [rfReplaceAll]) +
-    '"></body></html>', URL);
+  Page.LoadHTML('<html><head></head><body style="margin:0">' + '<img src="' + StringReplace(URL, '"', '&quot;', [rfReplaceAll]) +
+    '" alt="' + StringReplace(Title, '"', '&quot;', [rfReplaceAll]) + '"></body></html>', URL);
   Page.ClearHistory;
   Show;
   BringToFront;

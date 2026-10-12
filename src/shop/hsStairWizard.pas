@@ -27,9 +27,9 @@ type
     Frame: TStairFrame;          { the sizes; and where, for smPlaced }
     Spec: TStairSpec;
     Use: TStairUse;
-    HaveSpec: Boolean;           { Spec and Use as they were, to be shown again }
-    FromUpper: Boolean;          { on lines: the upper one sets the width }
-    Editing: Boolean;            { a flight already built, changed in place }
+    HaveSpec: boolean;           { Spec and Use as they were, to be shown again }
+    FromUpper: boolean;          { on lines: the upper one sets the width }
+    Editing: boolean;            { a flight already built, changed in place }
     Note: string;                { for the hint: how the points came }
   end;
 
@@ -77,7 +77,7 @@ type
     procedure CancelClick(Sender: TObject);
     procedure Changed(Sender: TObject);
     procedure CheckLabelClick(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure PaintSide(Sender: TObject);
     procedure PickClick(Sender: TObject);
     procedure SourceClick(Sender: TObject);
@@ -87,11 +87,11 @@ type
     FFrame: TStairFrame;
     FSpec: TStairSpec;
     FUnits: TUnitSystem;
-    FReady: Boolean;
+    FReady: boolean;
     FJob: TStairJob;
     procedure Dress;
-    function ReadFrame(out Why: string): Boolean;
-    function ReadSpec(out Why: string): Boolean;
+    function ReadFrame(out Why: string): boolean;
+    function ReadSpec(out Why: string): boolean;
   public
     { saBuild: Job holds what to build.  saPick: Job holds what was typed,
       to reopen with once the points are picked. }
@@ -112,17 +112,29 @@ begin
 end;
 
 { the frame from the lines (the chosen one sets the width) or the typed sizes }
-function TStairForm.ReadFrame(out Why: string): Boolean;
+function TStairForm.ReadFrame(out Why: string): boolean;
 var
-  Rise, Run, Wide: Double;
+  Rise, Run, Wide: double;
 begin
   Why := '';
   if FJob.Mode = smLines then
     Exit(StairFrame(FJob.LA, FJob.LB, FJob.HA, FJob.HB, FFrame, Why, cbFrom.ItemIndex = 1));
   Result := False;
-  if not ParseLen(edRise.Text, FUnits, Rise) or (Rise <= 0) then begin Why := 'Type the total rise - floor to landing.'; Exit; end;
-  if not ParseLen(edRun.Text, FUnits, Run) or (Run <= 0) then begin Why := 'Type the total run - first riser to the landing edge.'; Exit; end;
-  if not ParseLen(edWidth.Text, FUnits, Wide) or (Wide <= 0) then begin Why := 'Type the width.'; Exit; end;
+  if not ParseLen(edRise.Text, FUnits, Rise) or (Rise <= 0) then
+  begin
+    Why := 'Type the total rise - floor to landing.';
+    Exit;
+  end;
+  if not ParseLen(edRun.Text, FUnits, Run) or (Run <= 0) then
+  begin
+    Why := 'Type the total run - first riser to the landing edge.';
+    Exit;
+  end;
+  if not ParseLen(edWidth.Text, FUnits, Wide) or (Wide <= 0) then
+  begin
+    Why := 'Type the width.';
+    Exit;
+  end;
   FFrame := StairFrameFree(Rise, Run, Wide);
   { at a known spot the sizes are typed; position and heading are kept }
   if FJob.Mode = smPlaced then
@@ -134,7 +146,7 @@ begin
   Result := True;
 end;
 
-function TStairForm.ReadSpec(out Why: string): Boolean;
+function TStairForm.ReadSpec(out Why: string): boolean;
 begin
   Result := ReadFrame(Why);
   if not Result then Exit;
@@ -142,9 +154,15 @@ begin
   FSpec.ClosedRisers := cbClosed.Checked;
   FSpec.Bullnose := cbRound.Checked;
   if not ParseLen(edThickness.Text, FUnits, FSpec.Thickness) then
-    begin Why := 'Type the board thickness.'; Exit(False); end;
+  begin
+    Why := 'Type the board thickness.';
+    Exit(False);
+  end;
   if not ParseLen(edNosing.Text, FUnits, FSpec.Nosing) then
-    begin Why := 'Type the nosing - 0 for none.'; Exit(False); end;
+  begin
+    Why := 'Type the nosing - 0 for none.';
+    Exit(False);
+  end;
   Result := StairCheck(FFrame, FSpec, Why);
 end;
 
@@ -152,7 +170,7 @@ procedure TStairForm.Changed(Sender: TObject);
 var
   Why: string;
   A: TStairAdvice;
-  R, G: Double;
+  R, G: double;
 begin
   if not FReady then Exit;
   { with lines, the sizes come from them: shown, not typed }
@@ -173,10 +191,8 @@ begin
   begin
     R := FFrame.Rise / FSpec.Risers;
     G := FFrame.Run / (FSpec.Risers - 1);
-    lblSummary.Caption := Format('%d risers of %s, %d treads of %s' + LineEnding +
-      'Each tread %s deep with its nosing - %.1f degrees',
-      [FSpec.Risers, StairMeasure(R, FUnits), FSpec.Risers - 1, StairMeasure(G, FUnits),
-       StairLen(G + FSpec.Nosing, FUnits), RadToDeg(ArcTan2(R, G))]);
+    lblSummary.Caption := Format('%d risers of %s, %d treads of %s' + LineEnding + 'Each tread %s deep with its nosing - %.1f degrees',
+      [FSpec.Risers, StairMeasure(R, FUnits), FSpec.Risers - 1, StairMeasure(G, FUnits), StairLen(G + FSpec.Nosing, FUnits), RadToDeg(ArcTan2(R, G))]);
     A := RecommendStairs(FFrame, FUnits, TStairUse(Max(0, cbUse.ItemIndex)), FSpec);
     memAdvice.Lines.Text := InkReport(A.Summary);
     { whether it meets the chosen use, with each miss in red }
@@ -200,9 +216,8 @@ begin
       lblStatus.Caption := 'Does not fit between your ' + IfThen(FJob.Mode = smLines, 'lines', 'points');
       lblStatus.Font.Color := $004040E8;
       if A.IdealRun > FFrame.Run then
-        lblProblems.Caption := lblProblems.Caption + LineEnding +
-          Format('%d risers want %s of run - %s more than you have.', [A.IdealRisers,
-            StairLen(A.IdealRun, FUnits), StairLen(A.IdealRun - FFrame.Run, FUnits)])
+        lblProblems.Caption := lblProblems.Caption + LineEnding + Format('%d risers want %s of run - %s more than you have.',
+          [A.IdealRisers, StairLen(A.IdealRun, FUnits), StairLen(A.IdealRun - FFrame.Run, FUnits)])
       else
         lblProblems.Caption := lblProblems.Caption + LineEnding + 'No count of risers fits this rise and run.';
     end;
@@ -269,20 +284,28 @@ begin
     suResidential: OpenURL('https://codes.iccsafe.org/content/IRC2021P2/chapter-3-building-planning');
     suService: OpenURL('https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.25');
     suGeneral, suEgress: OpenURL('https://codes.iccsafe.org/content/IBC2024V2.0/chapter-10-means-of-egress');
-  else OpenURL('https://www.access-board.gov/ada/guides/chapter-5-stairways/');
+    else
+      OpenURL('https://www.access-board.gov/ada/guides/chapter-5-stairways/');
   end;
 end;
 
 procedure TStairForm.PaintSide(Sender: TObject);
 var
   C: TCanvas;
-  K, R, G, X, Z, Radius, A: Double;
-  I, J: Integer;
+  K, R, G, X, Z, Radius, A: double;
+  I, J: integer;
   Why: string;
   P: array[0..10] of TPoint;
 
-  function SX(V: Double): Integer; begin Result := 24 + Round((V + FSpec.Nosing) * K); end;
-  function SY(V: Double): Integer; begin Result := pbSide.Height - 22 - Round(V * K); end;
+  function SX(V: double): integer;
+  begin
+    Result := 24 + Round((V + FSpec.Nosing) * K);
+  end;
+
+  function SY(V: double): integer;
+  begin
+    Result := pbSide.Height - 22 - Round(V * K);
+  end;
 
 begin
   C := pbSide.Canvas;
@@ -296,7 +319,8 @@ begin
   C.Brush.Color := PixToColor(DlgTheme.Accent);
   for I := 0 to FSpec.Risers - 2 do
   begin
-    X := I * G; Z := (I + 1) * R;
+    X := I * G;
+    Z := (I + 1) * R;
     if not FSpec.Bullnose then
       C.Rectangle(SX(X - FSpec.Nosing), SY(Z), SX(X + G), SY(Z - FSpec.Thickness))
     else
@@ -321,8 +345,10 @@ begin
     end;
   { the floor and the landing }
   C.Pen.Width := 2;
-  C.MoveTo(SX(FFrame.Run), SY(FFrame.Rise)); C.LineTo(pbSide.Width - 4, SY(FFrame.Rise));
-  C.MoveTo(4, SY(0)); C.LineTo(SX(0), SY(0));
+  C.MoveTo(SX(FFrame.Run), SY(FFrame.Rise));
+  C.LineTo(pbSide.Width - 4, SY(FFrame.Rise));
+  C.MoveTo(4, SY(0));
+  C.LineTo(SX(0), SY(0));
   C.Pen.Width := 1;
   C.Brush.Style := bsClear;
   C.Font.Color := PixToColor(DlgTheme.TextDim);
@@ -354,7 +380,7 @@ begin
     with TBGRAThemeCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
 end;
 
-procedure TStairForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TStairForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
@@ -373,13 +399,15 @@ procedure TStairForm.BuildClick(Sender: TObject);
 var
   Why: string;
 begin
-  if ReadSpec(Why) then ModalResult := mrOK else Changed(nil);
+  if ReadSpec(Why) then ModalResult := mrOk
+  else
+    Changed(nil);
 end;
 
 class function TStairForm.Ask(U: TUnitSystem; var Job: TStairJob): TStairAnswer;
 var
   F: TStairForm;
-  Inch: Double;
+  Inch: double;
   Why: string;
   A: TStairAdvice;
   R: TModalResult;
@@ -390,7 +418,9 @@ begin
     F.FUnits := U;
     F.FJob := Job;
     F.Dress;
-    if U = usImperial then Inch := 1 / 12 else Inch := 0.0254;
+    if U = usImperial then Inch := 1 / 12
+    else
+      Inch := 0.0254;
     if Job.Editing then
     begin
       F.Caption := 'Stairs - changing a flight';
@@ -399,51 +429,54 @@ begin
     end;
     case Job.Mode of
       smLines:
+      begin
+        { which line sets the width, each with its length }
+        F.cbFrom.Items.Clear;
+        if (Job.LA.Z + Job.LB.Z) <= (Job.HA.Z + Job.HB.Z) then
         begin
-          { which line sets the width, each with its length }
-          F.cbFrom.Items.Clear;
-          if (Job.LA.Z + Job.LB.Z) <= (Job.HA.Z + Job.HB.Z) then
-          begin
-            F.cbFrom.Items.Add('The lower line - ' + FormatLen(Dist(Job.LA, Job.LB), U));
-            F.cbFrom.Items.Add('The upper line - ' + FormatLen(Dist(Job.HA, Job.HB), U));
-          end
-          else
-          begin
-            F.cbFrom.Items.Add('The lower line - ' + FormatLen(Dist(Job.HA, Job.HB), U));
-            F.cbFrom.Items.Add('The upper line - ' + FormatLen(Dist(Job.LA, Job.LB), U));
-          end;
-          F.cbFrom.ItemIndex := Ord(Job.FromUpper);
-          F.lblHint.Caption := 'On the two lines picked: the lower where the first riser stands, the upper at the ' +
-            'landing''s edge.  Up from the lower line, or down from the upper.';
-          F.edRise.Enabled := False; F.edRun.Enabled := False; F.edWidth.Enabled := False;
-          if not F.ReadFrame(Why) then F.FFrame := StairFrameFree(8, 10, 3);
+          F.cbFrom.Items.Add('The lower line - ' + FormatLen(Dist(Job.LA, Job.LB), U));
+          F.cbFrom.Items.Add('The upper line - ' + FormatLen(Dist(Job.HA, Job.HB), U));
+        end
+        else
+        begin
+          F.cbFrom.Items.Add('The lower line - ' + FormatLen(Dist(Job.HA, Job.HB), U));
+          F.cbFrom.Items.Add('The upper line - ' + FormatLen(Dist(Job.LA, Job.LB), U));
         end;
+        F.cbFrom.ItemIndex := Ord(Job.FromUpper);
+        F.lblHint.Caption := 'On the two lines picked: the lower where the first riser stands, the upper at the ' +
+          'landing''s edge.  Up from the lower line, or down from the upper.';
+        F.edRise.Enabled := False;
+        F.edRun.Enabled := False;
+        F.edWidth.Enabled := False;
+        if not F.ReadFrame(Why) then F.FFrame := StairFrameFree(8, 10, 3);
+      end;
       smFree, smPlaced:
+      begin
+        F.cbFrom.Visible := False;
+        F.lblFrom.Visible := False;
+        if Job.Mode = smPlaced then
+          F.lblHint.Caption := IfThen(Job.Note <> '', Job.Note + '  ', '') + 'Built where it stands.  Suggest keeps your points and picks the steps that fit them.'
+        else
+          F.lblHint.Caption := 'Type how high it climbs and how wide it is; Suggest works out the steps and the run.  ' +
+            'It is placed on the drawing after, where you click - or Pick on the drawing first.';
+        if Job.HaveSpec or (Job.Mode = smPlaced) then
         begin
-          F.cbFrom.Visible := False; F.lblFrom.Visible := False;
-          if Job.Mode = smPlaced then
-            F.lblHint.Caption := IfThen(Job.Note <> '', Job.Note + '  ', '') +
-              'Built where it stands.  Suggest keeps your points and picks the steps that fit them.'
-          else
-            F.lblHint.Caption := 'Type how high it climbs and how wide it is; Suggest works out the steps and the run.  ' +
-              'It is placed on the drawing after, where you click - or Pick on the drawing first.';
-          if Job.HaveSpec or (Job.Mode = smPlaced) then
-          begin
-            F.edRise.Text := FormatLen(Job.Frame.Rise, U);
-            F.edWidth.Text := FormatLen(Job.Frame.Width, U);
-            F.edRun.Text := FormatLen(Job.Frame.Run, U);
-          end
-          else
-          begin
-            F.edRise.Text := FormatLen(96 * Inch, U);
-            F.edWidth.Text := FormatLen(36 * Inch, U);
-            F.edRun.Text := FormatLen(126 * Inch, U);
-          end;
-          F.ReadFrame(Why);
+          F.edRise.Text := FormatLen(Job.Frame.Rise, U);
+          F.edWidth.Text := FormatLen(Job.Frame.Width, U);
+          F.edRun.Text := FormatLen(Job.Frame.Run, U);
+        end
+        else
+        begin
+          F.edRise.Text := FormatLen(96 * Inch, U);
+          F.edWidth.Text := FormatLen(36 * Inch, U);
+          F.edRun.Text := FormatLen(126 * Inch, U);
         end;
+        F.ReadFrame(Why);
+      end;
     end;
     if Job.HaveSpec then F.FSpec := Job.Spec
-    else F.FSpec := StairDefaults(F.FFrame, U);
+    else
+      F.FSpec := StairDefaults(F.FFrame, U);
     if Job.HaveSpec then F.cbUse.ItemIndex := Ord(Job.Use);
     F.edCount.Value := F.FSpec.Risers;
     F.edThickness.Text := FormatLen(F.FSpec.Thickness, U);
@@ -465,7 +498,7 @@ begin
     { hand back the state as it was left }
     Job := F.FJob;
     if R = mrRetry then Exit(saPick);
-    if R <> mrOK then Exit;
+    if R <> mrOk then Exit;
     Job.Frame := F.FFrame;
     Job.Spec := F.FSpec;
     Job.Use := TStairUse(Max(0, F.cbUse.ItemIndex));

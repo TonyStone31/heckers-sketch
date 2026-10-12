@@ -33,32 +33,32 @@ type
     procedure btnSaveClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure memNoteChange(Sender: TObject);
   private
     FVersion: string;
-    FSent, FBusy, FAnswered: Boolean;
+    FSent, FBusy, FAnswered: boolean;
     procedure Refresh_;
     procedure Stage(const S: string);
   public
     Version: string;
     { true once a postcard was sent from this window }
-    property Sent: Boolean read FSent;
+    property Sent: boolean read FSent;
   end;
 
 { Counts a start, for deciding when to ask. }
 procedure CountLaunch;
 
 { Second start or later, never answered, and not --offline. }
-function PostcardDue: Boolean;
+function PostcardDue: boolean;
 
 { The exact text that would be sent. }
 function PostcardText(const Version, Note: string): string;
 
 { Records the answer either way so it is not asked again.  Forced is
   /postcard, which asks regardless. }
-procedure OfferPostcard(AOwner: TComponent; const Version: string; Forced: Boolean);
+procedure OfferPostcard(AOwner: TComponent; const Version: string; Forced: boolean);
 
 implementation
 
@@ -75,7 +75,7 @@ const
 procedure CountLaunch;
 var
   Ini: TIniFile;
-  N: Integer;
+  N: integer;
 begin
   try
     Ini := TIniFile.Create(ConfigFile);
@@ -90,7 +90,7 @@ begin
   end;
 end;
 
-function PostcardDue: Boolean;
+function PostcardDue: boolean;
 var
   Ini: TIniFile;
 begin
@@ -99,8 +99,7 @@ begin
   try
     Ini := TIniFile.Create(ConfigFile);
     try
-      Result := (Ini.ReadInteger(SECTION, 'launches', 0) >= ASK_ON_LAUNCH) and
-                (Ini.ReadString(SECTION, 'answer', '') = '');
+      Result := (Ini.ReadInteger(SECTION, 'launches', 0) >= ASK_ON_LAUNCH) and (Ini.ReadString(SECTION, 'answer', '') = '');
     finally
       Ini.Free;
     end;
@@ -132,10 +131,7 @@ begin
   { The collector keys on the first line.  The rest is the machine facts a
     bug report carries, and the day only.  Nothing about the person (see
     hsSysInfo). }
-  Result := 'Heckers Sketch hello' + LineEnding +
-    'version: ' + Version + LineEnding +
-    'sent: ' + FormatDateTime('yyyy-mm-dd', Now) + LineEnding +
-    SystemFacts;
+  Result := 'Heckers Sketch hello' + LineEnding + 'version: ' + Version + LineEnding + 'sent: ' + FormatDateTime('yyyy-mm-dd', Now) + LineEnding + SystemFacts;
   N := Trim(Note);
   if N = '' then
     Result := Result + 'they said: nothing' + LineEnding
@@ -143,7 +139,7 @@ begin
     Result := Result + 'they said:' + LineEnding + N + LineEnding;
 end;
 
-procedure OfferPostcard(AOwner: TComponent; const Version: string; Forced: Boolean);
+procedure OfferPostcard(AOwner: TComponent; const Version: string; Forced: boolean);
 var
   F: THelloForm;
 begin
@@ -165,20 +161,14 @@ begin
   { No and Send are both plain on purpose: neither is the one to press }
   hsDialogSkin.ThemeForm(Self);
   lblWhy.Caption :=
-    'Two people are making this, and we cannot tell whether anyone is ' +
-    'trying it: GitHub counts downloads, and most of those are our own ' +
-    'machines.  So the program asks, once, whether it may send us one ' +
-    'note saying what sort of computer it is running on.  That is all it ' +
+    'Two people are making this, and we cannot tell whether anyone is ' + 'trying it: GitHub counts downloads, and most of those are our own ' +
+    'machines.  So the program asks, once, whether it may send us one ' + 'note saying what sort of computer it is running on.  That is all it ' +
     'is - a postcard, not a subscription.';
   lblHonest.Caption :=
-    'Plainly: nothing in it names you.  No user name, no machine name, no ' +
-    'network address, no files, no drawing, and no number that would let ' +
-    'two postcards be matched up.  It is encrypted before it leaves, to a ' +
-    'key only we hold, and goes to a public postbox that throws files away ' +
-    'after a few days - we never see where it came from, though the postbox ' +
-    'does, briefly, as any website would.  It is sent once, now, and never ' +
-    'again.  Whichever button you press you will not be asked again; ' +
-    '/postcard in the command bar brings this back if you change your mind, ' +
+    'Plainly: nothing in it names you.  No user name, no machine name, no ' + 'network address, no files, no drawing, and no number that would let ' +
+    'two postcards be matched up.  It is encrypted before it leaves, to a ' + 'key only we hold, and goes to a public postbox that throws files away ' +
+    'after a few days - we never see where it came from, though the postbox ' + 'does, briefly, as any website would.  It is sent once, now, and never ' +
+    'again.  Whichever button you press you will not be asked again; ' + '/postcard in the command bar brings this back if you change your mind, ' +
     'and starting with --offline means it never asks at all.';
   Stage('');
   Refresh_;
@@ -187,7 +177,7 @@ end;
 
 procedure THelloForm.Refresh_;
 var
-  Top_: Integer;
+  Top_: integer;
 begin
   Top_ := memText.ScrollY;
   memText.Lines.Text := PostcardText(FVersion, memNote.Lines.Text);
@@ -207,8 +197,7 @@ begin
 end;
 
 { Esc is No, as the stock Cancel button made it }
-procedure THelloForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure THelloForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (Key = VK_ESCAPE) and btnNo.Enabled then
   begin

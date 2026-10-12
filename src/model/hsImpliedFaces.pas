@@ -16,7 +16,7 @@ uses
 
 { every line, and every arc in pieces, of the things from First on that
   have this Part and this Grp }
-function ScopeSegments(D: TWorkDoc; First, Part, Grp: Integer): TSegArray;
+function ScopeSegments(D: TWorkDoc; First, Part, Grp: integer): TSegArray;
 
 { the middle of a scope, for turning a solid's faces outward: the mean of
   its segments' middles }
@@ -24,20 +24,19 @@ function ScopeMid(const Segs: TSegArray): TP3;
 
 { Is this region exactly this face - the same corners round the outside,
   whichever way round and wherever it starts, and the same holes? }
-function RegionIsFace(const R: TRegion; D: TWorkDoc; F: Integer): Boolean;
+function RegionIsFace(const R: TRegion; D: TWorkDoc; F: integer): boolean;
 
 { Is this loop the region's outline, as RegionIsFace would see it? }
-function SameLoop(const A, B: TP3Array): Boolean;
+function SameLoop(const A, B: TP3Array): boolean;
 { the same, to a tolerance of one's own: the rounding of the text }
-function SameLoopTol(const A, B: TP3Array; Tol: Double): Boolean;
+function SameLoopTol(const A, B: TP3Array; Tol: double): boolean;
 
 { the loop's normal, unnormalized - Newell's }
 function LoopNormal(const L: TP3Array): TP3;
 
 { The outline as an implied face would carry it, turned the way the tool
   would turn it.  Holes come back turned with it. }
-procedure ImpliedLoop(const R: TRegion; InSolid: Boolean; const Mid: TP3;
-  out Outer: TP3Array; out Holes: TLoopArray);
+procedure ImpliedLoop(const R: TRegion; InSolid: boolean; const Mid: TP3; out Outer: TP3Array; out Holes: TLoopArray);
 
 type
   { Finds faces by outline without walking every face, which matters on big
@@ -47,11 +46,11 @@ type
   private
     FKeys: TStringList;
     FBins: array of TIntArrayW;
-    function KeyOf(const L: TP3Array; DX, DY, DZ: Integer): string;
+    function KeyOf(const L: TP3Array; DX, DY, DZ: integer): string;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(const L: TP3Array; Id: Integer);
+    procedure Add(const L: TP3Array; Id: integer);
     { the ids filed near this loop - candidates, to be checked }
     function Near(const L: TP3Array): TIntArrayW;
   end;
@@ -72,22 +71,21 @@ begin
   inherited Destroy;
 end;
 
-function TLoopIndex.KeyOf(const L: TP3Array; DX, DY, DZ: Integer): string;
+function TLoopIndex.KeyOf(const L: TP3Array; DX, DY, DZ: integer): string;
 var
   C: TP3;
-  K: Integer;
+  K: integer;
 begin
   C := P3(0, 0, 0);
   for K := 0 to High(L) do C := Add3(C, L[K]);
   K := Length(L);
   if K = 0 then Exit('-');
-  Result := Format('%d %d %d %d', [Round(C.X / K * 100) + DX, Round(C.Y / K * 100) + DY,
-    Round(C.Z / K * 100) + DZ, K]);
+  Result := Format('%d %d %d %d', [Round(C.X / K * 100) + DX, Round(C.Y / K * 100) + DY, Round(C.Z / K * 100) + DZ, K]);
 end;
 
-procedure TLoopIndex.Add(const L: TP3Array; Id: Integer);
+procedure TLoopIndex.Add(const L: TP3Array; Id: integer);
 var
-  B: Integer;
+  B: integer;
   Key: string;
 begin
   Key := KeyOf(L, 0, 0, 0);
@@ -98,14 +96,15 @@ begin
     FKeys.AddObject(Key, TObject(PtrInt(High(FBins))));
     B := High(FBins);
   end
-  else B := PtrInt(FKeys.Objects[B]);
+  else
+    B := PtrInt(FKeys.Objects[B]);
   SetLength(FBins[B], Length(FBins[B]) + 1);
   FBins[B][High(FBins[B])] := Id;
 end;
 
-function TLoopIndex.Near(const L: TP3Array): TIntArrayW;
+function TLoopIndex. Near(const L: TP3Array): TIntArrayW;
 var
-  DX, DY, DZ, B, K, N: Integer;
+  DX, DY, DZ, B, K, N: integer;
 begin
   N := 0;
   SetLength(Result, 0);
@@ -125,9 +124,9 @@ begin
       end;
 end;
 
-function ScopeSegments(D: TWorkDoc; First, Part, Grp: Integer): TSegArray;
+function ScopeSegments(D: TWorkDoc; First, Part, Grp: integer): TSegArray;
 var
-  I, K, N, Steps: Integer;
+  I, K, N, Steps: integer;
   A: TP3;
 begin
   N := 0;
@@ -137,26 +136,25 @@ begin
     if (D.EntRef(I)^.Part <> Part) or (D.EntRef(I)^.Grp <> Grp) then Continue;
     case D.EntRef(I)^.Kind of
       ekLine:
+      begin
+        if N >= Length(Result) then SetLength(Result, N * 2);
+        Result[N].A := D.EntRef(I)^.A;
+        Result[N].B := D.EntRef(I)^.B;
+        Inc(N);
+      end;
+      ekArc:
+      begin
+        A := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
+        Steps := ArcSteps(D[I]);
+        for K := 1 to Steps do
         begin
           if N >= Length(Result) then SetLength(Result, N * 2);
-          Result[N].A := D.EntRef(I)^.A;
-          Result[N].B := D.EntRef(I)^.B;
+          Result[N].A := A;
+          A := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0 + D.EntRef(I)^.Sweep * K / Steps, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
+          Result[N].B := A;
           Inc(N);
         end;
-      ekArc:
-        begin
-          A := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
-          Steps := ArcSteps(D[I]);
-          for K := 1 to Steps do
-          begin
-            if N >= Length(Result) then SetLength(Result, N * 2);
-            Result[N].A := A;
-            A := ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0 + D.EntRef(I)^.Sweep * K / Steps,
-              D.EntRef(I)^.Plane, D.EntRef(I)^.Nm);
-            Result[N].B := A;
-            Inc(N);
-          end;
-        end;
+      end;
     end;
   end;
   SetLength(Result, N);
@@ -164,21 +162,20 @@ end;
 
 function ScopeMid(const Segs: TSegArray): TP3;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := P3(0, 0, 0);
   if Length(Segs) = 0 then Exit;
   for I := 0 to High(Segs) do
-    Result := P3(Result.X + (Segs[I].A.X + Segs[I].B.X) / 2,
-                 Result.Y + (Segs[I].A.Y + Segs[I].B.Y) / 2,
-                 Result.Z + (Segs[I].A.Z + Segs[I].B.Z) / 2);
+    Result := P3(Result.X + (Segs[I].A.X + Segs[I].B.X) / 2, Result.Y + (Segs[I].A.Y + Segs[I].B.Y) / 2, Result.Z +
+      (Segs[I].A.Z + Segs[I].B.Z) / 2);
   Result := P3(Result.X / Length(Segs), Result.Y / Length(Segs), Result.Z / Length(Segs));
 end;
 
-function SameLoopTol(const A, B: TP3Array; Tol: Double): Boolean;
+function SameLoopTol(const A, B: TP3Array; Tol: double): boolean;
 var
-  I, J: Integer;
-  Hit: Boolean;
+  I, J: integer;
+  Hit: boolean;
 begin
   Result := False;
   if Length(A) <> Length(B) then Exit;
@@ -186,21 +183,25 @@ begin
   begin
     Hit := False;
     for J := 0 to High(B) do
-      if SamePt(A[I], B[J], Tol) then begin Hit := True; Break; end;
+      if SamePt(A[I], B[J], Tol) then
+      begin
+        Hit := True;
+        Break;
+      end;
     if not Hit then Exit;
   end;
   Result := True;
 end;
 
-function SameLoop(const A, B: TP3Array): Boolean;
+function SameLoop(const A, B: TP3Array): boolean;
 begin
   Result := SameLoopTol(A, B, 1E-6);
 end;
 
-function RegionIsFace(const R: TRegion; D: TWorkDoc; F: Integer): Boolean;
+function RegionIsFace(const R: TRegion; D: TWorkDoc; F: integer): boolean;
 var
-  H, K: Integer;
-  Hit: Boolean;
+  H, K: integer;
+  Hit: boolean;
 begin
   Result := False;
   if D.EntRef(F)^.Kind <> ekFace then Exit;
@@ -210,7 +211,11 @@ begin
   begin
     Hit := False;
     for K := 0 to High(D.EntRef(F)^.Holes) do
-      if SameLoop(R.Holes[H], D.EntRef(F)^.Holes[K]) then begin Hit := True; Break; end;
+      if SameLoop(R.Holes[H], D.EntRef(F)^.Holes[K]) then
+      begin
+        Hit := True;
+        Break;
+      end;
     if not Hit then Exit;
   end;
   Result := True;
@@ -218,7 +223,7 @@ end;
 
 procedure Reverse(var L: TP3Array);
 var
-  I, N: Integer;
+  I, N: integer;
   T: TP3;
 begin
   N := Length(L);
@@ -232,7 +237,7 @@ end;
 
 function LoopNormal(const L: TP3Array): TP3;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
 begin
   Result := P3(0, 0, 0);
   N := Length(L);
@@ -245,12 +250,11 @@ begin
   end;
 end;
 
-procedure ImpliedLoop(const R: TRegion; InSolid: Boolean; const Mid: TP3;
-  out Outer: TP3Array; out Holes: TLoopArray);
+procedure ImpliedLoop(const R: TRegion; InSolid: boolean; const Mid: TP3; out Outer: TP3Array; out Holes: TLoopArray);
 var
-  I: Integer;
+  I: integer;
   Nm, Inner: TP3;
-  Flip: Boolean;
+  Flip: boolean;
 begin
   Outer := Copy(R.Outer);
   SetLength(Holes, Length(R.Holes));
@@ -266,7 +270,8 @@ begin
     { OrientFace's rule: the biggest component of the normal is positive }
     if (Abs(Nm.Z) >= Abs(Nm.X)) and (Abs(Nm.Z) >= Abs(Nm.Y)) then Flip := Nm.Z < 0
     else if Abs(Nm.Y) >= Abs(Nm.X) then Flip := Nm.Y < 0
-    else Flip := Nm.X < 0;
+    else
+      Flip := Nm.X < 0;
   end;
   if Flip then
   begin

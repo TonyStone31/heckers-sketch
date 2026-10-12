@@ -21,7 +21,7 @@ uses
   {$IFDEF WINDOWS}, Windows, Registry{$ENDIF}
   {$IFDEF UNIX}, BaseUnix{$ENDIF};
 
-function MB(Bytes: Int64): string;
+function MB(Bytes: int64): string;
 begin
   if Bytes >= 10 * 1024 * 1024 * 1024 then
     Result := Format('%.0f GB', [Bytes / 1024 / 1024 / 1024])
@@ -54,7 +54,7 @@ end;
 function FieldOf(const Text, Key: string): string;
 var
   L: TStringList;
-  I, P: Integer;
+  I, P: integer;
   S: string;
 begin
   Result := '';
@@ -64,8 +64,7 @@ begin
     for I := 0 to L.Count - 1 do
     begin
       S := L[I];
-      if (Copy(S, 1, Length(Key)) = Key) and (Length(S) > Length(Key)) and
-         (S[Length(Key) + 1] in [':', '=', ' ', #9]) then
+      if (Copy(S, 1, Length(Key)) = Key) and (Length(S) > Length(Key)) and (S[Length(Key) + 1] in [':', '=', ' ', #9]) then
       begin
         P := Length(Key) + 1;
         while (P <= Length(S)) and (S[P] in [':', '=', ' ', #9]) do Inc(P);
@@ -81,7 +80,7 @@ begin
 end;
 
 { "16384 kB" -> bytes }
-function KBOf(const S: string): Int64;
+function KBOf(const S: string): int64;
 var
   T: string;
 begin
@@ -334,12 +333,35 @@ end;
 {$ENDIF}
 
 {$IF NOT DEFINED(UNIX) AND NOT DEFINED(WINDOWS)}
-function OSLine: string; begin Result := {$I %FPCTARGETOS%}; end;
-function MachineLine: string; begin Result := ''; end;
-function CPULine: string; begin Result := 'unknown processor'; end;
-function RAMLine: string; begin Result := 'unknown'; end;
-function GraphicsLine: string; begin Result := 'unknown'; end;
-function ResidentLine: string; begin Result := 'unknown'; end;
+function OSLine: string;
+begin
+  Result := {$I %FPCTARGETOS%};
+end;
+
+function MachineLine: string;
+begin
+  Result := '';
+end;
+
+function CPULine: string;
+begin
+  Result := 'unknown processor';
+end;
+
+function RAMLine: string;
+begin
+  Result := 'unknown';
+end;
+
+function GraphicsLine: string;
+begin
+  Result := 'unknown';
+end;
+
+function ResidentLine: string;
+begin
+  Result := 'unknown';
+end;
 {$ENDIF}
 
 type
@@ -362,8 +384,7 @@ end;
 
 function ToolkitLine: string;
 begin
-  Result := GetLCLWidgetTypeName + ', LCL ' + lcl_version +
-    ', FPC ' + {$I %FPCVERSION%} + ', ' + {$I %FPCTARGETCPU%} + '-' + {$I %FPCTARGETOS%};
+  Result := GetLCLWidgetTypeName + ', LCL ' + lcl_version + ', FPC ' + {$I %FPCVERSION%} + ', ' + {$I %FPCTARGETCPU%} + '-' + {$I %FPCTARGETOS%};
 end;
 
 function LocaleLine: string;
@@ -382,13 +403,9 @@ begin
   Result := 'os: ' + Safely(@OSLine) + LineEnding;
   M := Safely(@MachineLine);
   if M <> '' then Result := Result + 'machine: ' + M + LineEnding;
-  Result := Result +
-    'cpu: ' + Safely(@CPULine) + Format(' (%d cores)', [TThread.ProcessorCount]) + LineEnding +
-    'ram: ' + Safely(@RAMLine) + LineEnding +
-    'graphics: ' + Safely(@GraphicsLine) + LineEnding +
-    'display: ' + Safely(@DisplayLine) + LineEnding +
-    'toolkit: ' + Safely(@ToolkitLine) + LineEnding +
-    'locale: ' + Safely(@LocaleLine) + LineEnding;
+  Result := Result + 'cpu: ' + Safely(@CPULine) + Format(' (%d cores)', [TThread.ProcessorCount]) + LineEnding + 'ram: ' +
+    Safely(@RAMLine) + LineEnding + 'graphics: ' + Safely(@GraphicsLine) + LineEnding + 'display: ' + Safely(@DisplayLine) + LineEnding +
+    'toolkit: ' + Safely(@ToolkitLine) + LineEnding + 'locale: ' + Safely(@LocaleLine) + LineEnding;
 end;
 
 function ProgramMemory: string;

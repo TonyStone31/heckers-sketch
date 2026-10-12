@@ -14,21 +14,18 @@ uses
 
 { A GET, with the body written into Dest.  Status is the HTTP code when the
   exchange got far enough to have one.  Accept may be empty. }
-function NetGet(const URL, Accept: string; Dest: TStream;
-  out Status: Integer; out Err: string): Boolean;
+function NetGet(const URL, Accept: string; Dest: TStream; out Status: integer; out Err: string): boolean;
 
 { The same, returning the body as a string. }
-function NetGetText(const URL, Accept: string; out Body, Err: string): Boolean;
+function NetGetText(const URL, Accept: string; out Body, Err: string): boolean;
 
 { A POST of Data.  The reply body is dropped; only the status matters. }
-function NetPost(const URL: string; Data: TStream; const ContentType: string;
-  out Status: Integer; out Err: string): Boolean;
+function NetPost(const URL: string; Data: TStream; const ContentType: string; out Status: integer; out Err: string): boolean;
 
 { A POST whose reply is written into Dest as it arrives, for an answer that
   streams.  Headers are "Name: value" lines.  Dest may raise EAbort from its
   Write to stop early. }
-function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream;
-  out Status: Integer; out Err: string): Boolean;
+function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream; out Status: integer; out Err: string): boolean;
 
 { 'openssl' or 'winhttp', for reports. }
 function NetBackend: string;
@@ -41,7 +38,7 @@ var
     need it; they start the program many times an hour in fresh folders and
     would otherwise use up GitHub's 60-an-hour API limit for the whole
     network. }
-  NetOffline: Boolean = False;
+  NetOffline: boolean = False;
 
 { A failure message for people.  A 403 or 429 from GitHub is almost always
   the per-network rate limit, which clears within the hour. }
@@ -57,30 +54,28 @@ uses
   {$ENDIF};
 
 { --offline keeps everything on this machine; a server on it is allowed }
-function OnThisMachine(const URL: string): Boolean;
+function OnThisMachine(const URL: string): boolean;
 var
   U: string;
 begin
   U := LowerCase(URL);
-  Result := (Copy(U, 1, 17) = 'http://localhost:') or (Copy(U, 1, 17) = 'http://localhost/') or
-    (Copy(U, 1, 17) = 'http://127.0.0.1:') or (Copy(U, 1, 17) = 'http://127.0.0.1/');
+  Result := (Copy(U, 1, 17) = 'http://localhost:') or (Copy(U, 1, 17) = 'http://localhost/') or (Copy(U, 1, 17) = 'http://127.0.0.1:') or
+    (Copy(U, 1, 17) = 'http://127.0.0.1/');
 end;
 
 function NetFriendlyError(const Err: string): string;
 begin
   if (Pos('403', Err) > 0) or (Pos('429', Err) > 0) then
-    Result := 'GitHub is limiting requests from this network for the moment ' +
-      '- try again within the hour'
+    Result := 'GitHub is limiting requests from this network for the moment ' + '- try again within the hour'
   else
     Result := Err;
 end;
 
 { Splits a URL by hand; simpler than filling WinHttpCrackUrl's struct. }
-function SplitURL(const URL: string; out Secure: Boolean; out Host: string;
-  out Port: Word; out Path: string): Boolean;
+function SplitURL(const URL: string; out Secure: boolean; out Host: string; out Port: word; out Path: string): boolean;
 var
   S: string;
-  I: Integer;
+  I: integer;
 begin
   Result := False;
   Secure := True;
@@ -115,7 +110,9 @@ begin
   Host := S;
   if Port = 0 then
   begin
-    if Secure then Port := 443 else Port := 80;
+    if Secure then Port := 443
+    else
+      Port := 80;
   end;
   Result := Host <> '';
 end;
@@ -373,11 +370,10 @@ end;
 
 {$ELSE}
 
-function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream;
-  out Status: Integer; out Err: string): Boolean;
+function NetPostStream(const URL: string; Headers: TStrings; Body, Dest: TStream; out Status: integer; out Err: string): boolean;
 var
   C: TFPHTTPClient;
-  K: Integer;
+  K: integer;
 begin
   Result := False;
   Status := 0;
@@ -426,8 +422,7 @@ begin
   Result := 'openssl';
 end;
 
-function NetGet(const URL, Accept: string; Dest: TStream;
-  out Status: Integer; out Err: string): Boolean;
+function NetGet(const URL, Accept: string; Dest: TStream; out Status: integer; out Err: string): boolean;
 var
   C: TFPHTTPClient;
 begin
@@ -463,8 +458,7 @@ begin
   end;
 end;
 
-function NetPost(const URL: string; Data: TStream; const ContentType: string;
-  out Status: Integer; out Err: string): Boolean;
+function NetPost(const URL: string; Data: TStream; const ContentType: string; out Status: integer; out Err: string): boolean;
 var
   C: TFPHTTPClient;
   Sink: TStringStream;
@@ -507,10 +501,10 @@ end;
 
 {$ENDIF}
 
-function NetGetText(const URL, Accept: string; out Body, Err: string): Boolean;
+function NetGetText(const URL, Accept: string; out Body, Err: string): boolean;
 var
   S: TStringStream;
-  Status: Integer;
+  Status: integer;
 begin
   Body := '';
   S := TStringStream.Create('');

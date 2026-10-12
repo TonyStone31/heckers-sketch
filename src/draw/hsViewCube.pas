@@ -26,21 +26,20 @@ type
   end;
 
 { How wide the cube wants to be, in pixels, at a given interface scale. }
-function CubeSize(UIScale: Single): Integer;
+function CubeSize(UIScale: single): integer;
 
 { The target under a screen point, if any.  CX, CY and Half (pixels) are the
   same numbers PaintCube is given. }
-function CubeAt(const V: TProjector; CX, CY, Half, SX, SY: Double;
-  out T: TCubeTarget): Boolean;
+function CubeAt(const V: TProjector; CX, CY, Half, SX, SY: double; out T: TCubeTarget): boolean;
 
 { Azimuth and elevation for a target.  Az is in and out: straight up or down
   gives no azimuth, so the current one is kept. }
-procedure CubeAzEl(const Dir: TP3; var Az: Double; out El: Double);
+procedure CubeAzEl(const Dir: TP3; var Az: double; out El: double);
 
 { The target nearest the camera.  Look is the direction the camera stands
   in, same sense as Dir.  Near_ is the dot product of the two unit vectors:
   1 is dead on, 0 a right angle away, so a caller can snap only when close. }
-function CubeNearest(const Look: TP3; out Near_: Double): TCubeTarget;
+function CubeNearest(const Look: TP3; out Near_: double): TCubeTarget;
 
 { One keyboard step between targets.  Left/Right go round the sides (face,
   edge, next face); Up/Down tip over the top or under the bottom.  Az says
@@ -49,31 +48,29 @@ function CubeNearest(const Look: TP3; out Near_: Double): TCubeTarget;
 type
   TCubeStep = (csLeft, csRight, csUp, csDown);
 
-function CubeStep(const Dir: TP3; Az: Double; Step: TCubeStep): TP3;
+function CubeStep(const Dir: TP3; Az: double; Step: TCubeStep): TP3;
 
 { Draw the cube centered in its own square surface, at least 2 * Half plus a
   few pixels across.  Hot is the target under the pointer.  Labels need a
   font, so the caller writes them using CubeLabels. }
-procedure PaintCube(S: TArtSurface; const V: TProjector; Half: Double;
-  const Th: TTheme; HaveHot: Boolean; const HotDir: TP3);
+procedure PaintCube(S: TArtSurface; const V: TProjector; Half: double; const Th: TTheme; HaveHot: boolean; const HotDir: TP3);
 
 { The visible faces, their names, and where the middle of each one is in the
   surface PaintCube just drew.  Up to three come back. }
 type
   TCubeLabel = record
     Name: string;
-    X, Y: Double;
-    Facing: Double;     { how square-on it is, 0 to 1 - dim the steep ones }
+    X, Y: double;
+    Facing: double;     { how square-on it is, 0 to 1 - dim the steep ones }
   end;
   TCubeLabels = array of TCubeLabel;
 
-function CubeLabels(const V: TProjector; Half: Double): TCubeLabels;
+function CubeLabels(const V: TProjector; Half: double): TCubeLabels;
 
 { Where a target's middle is drawn on screen.  Edges and corners belong to
   several faces; the one most square-on to the camera is used.  False when
   the target is round the back. }
-function CubeTargetAt(const V: TProjector; const Dir: TP3;
-  CX, CY, Half: Double; out P: TPointF): Boolean;
+function CubeTargetAt(const V: TProjector; const Dir: TP3; CX, CY, Half: double; out P: TPointF): boolean;
 
 implementation
 
@@ -89,14 +86,14 @@ type
 
 const
   FACES: array[0..5] of TFaceDef = (
-    (N: (X: 1; Y: 0; Z: 0);  A: (X: 0; Y: 1; Z: 0);  B: (X: 0; Y: 0; Z: 1)),
+    (N: (X: 1; Y: 0; Z: 0); A: (X: 0; Y: 1; Z: 0); B: (X: 0; Y: 0; Z: 1)),
     (N: (X: -1; Y: 0; Z: 0); A: (X: 0; Y: -1; Z: 0); B: (X: 0; Y: 0; Z: 1)),
-    (N: (X: 0; Y: 1; Z: 0);  A: (X: -1; Y: 0; Z: 0); B: (X: 0; Y: 0; Z: 1)),
-    (N: (X: 0; Y: -1; Z: 0); A: (X: 1; Y: 0; Z: 0);  B: (X: 0; Y: 0; Z: 1)),
-    (N: (X: 0; Y: 0; Z: 1);  A: (X: 1; Y: 0; Z: 0);  B: (X: 0; Y: 1; Z: 0)),
-    (N: (X: 0; Y: 0; Z: -1); A: (X: 1; Y: 0; Z: 0);  B: (X: 0; Y: -1; Z: 0)));
+    (N: (X: 0; Y: 1; Z: 0); A: (X: -1; Y: 0; Z: 0); B: (X: 0; Y: 0; Z: 1)),
+    (N: (X: 0; Y: -1; Z: 0); A: (X: 1; Y: 0; Z: 0); B: (X: 0; Y: 0; Z: 1)),
+    (N: (X: 0; Y: 0; Z: 1); A: (X: 1; Y: 0; Z: 0); B: (X: 0; Y: 1; Z: 0)),
+    (N: (X: 0; Y: 0; Z: -1); A: (X: 1; Y: 0; Z: 0); B: (X: 0; Y: -1; Z: 0)));
 
-function CubeSize(UIScale: Single): Integer;
+function CubeSize(UIScale: single): integer;
 begin
   Result := Round(104 * UIScale);
 end;
@@ -121,12 +118,14 @@ const
     (X: 1; Y: 0), (X: 1; Y: 1), (X: 0; Y: 1), (X: -1; Y: 1),
     (X: -1; Y: 0), (X: -1; Y: -1), (X: 0; Y: -1), (X: 1; Y: -1));
 
-function CubeStep(const Dir: TP3; Az: Double; Step: TCubeStep): TP3;
+function CubeStep(const Dir: TP3; Az: double; Step: TCubeStep): TP3;
 var
-  X, Y, Z, K, Best: Integer;
-  D, BestD: Double;
+  X, Y, Z, K, Best: integer;
+  D, BestD: double;
 begin
-  X := Round(Dir.X); Y := Round(Dir.Y); Z := Round(Dir.Z);
+  X := Round(Dir.X);
+  Y := Round(Dir.Y);
+  Z := Round(Dir.Z);
   Result := P3(X, Y, Z);
   if (X = 0) and (Y = 0) then
   begin
@@ -136,8 +135,7 @@ begin
     BestD := -2;
     for K := 0 to 7 do
     begin
-      D := (RING[K].X * Cos(Az) + RING[K].Y * Sin(Az)) /
-           Sqrt(Sqr(RING[K].X) + Sqr(RING[K].Y));
+      D := (RING[K].X * Cos(Az) + RING[K].Y * Sin(Az)) / Sqrt(Sqr(RING[K].X) + Sqr(RING[K].Y));
       if D > BestD then
       begin
         BestD := D;
@@ -146,7 +144,7 @@ begin
     end;
     case Step of
       csDown: if Z > 0 then Result := P3(RING[Best].X, RING[Best].Y, 1);
-      csUp:   if Z < 0 then Result := P3(RING[Best].X, RING[Best].Y, -1);
+      csUp: if Z < 0 then Result := P3(RING[Best].X, RING[Best].Y, -1);
     end;
     Exit;
   end;
@@ -154,17 +152,21 @@ begin
   while (K < 7) and ((RING[K].X <> X) or (RING[K].Y <> Y)) do Inc(K);
   case Step of
     csRight: Result := P3(RING[(K + 1) mod 8].X, RING[(K + 1) mod 8].Y, Z);
-    csLeft:  Result := P3(RING[(K + 7) mod 8].X, RING[(K + 7) mod 8].Y, Z);
-    csUp:    if Z < 1 then Result := P3(X, Y, Z + 1) else Result := P3(0, 0, 1);
-    csDown:  if Z > -1 then Result := P3(X, Y, Z - 1) else Result := P3(0, 0, -1);
+    csLeft: Result := P3(RING[(K + 7) mod 8].X, RING[(K + 7) mod 8].Y, Z);
+    csUp: if Z < 1 then Result := P3(X, Y, Z + 1)
+      else
+        Result := P3(0, 0, 1);
+    csDown: if Z > -1 then Result := P3(X, Y, Z - 1)
+      else
+        Result := P3(0, 0, -1);
   end;
 end;
 
-function CubeNearest(const Look: TP3; out Near_: Double): TCubeTarget;
+function CubeNearest(const Look: TP3; out Near_: double): TCubeTarget;
 var
-  IX, IY, IZ: Integer;
+  IX, IY, IZ: integer;
   D, L: TP3;
-  Len, Dot, Best: Double;
+  Len, Dot, Best: double;
 begin
   Result.Dir := P3(0, 0, 1);
   Result.Name := DirName(Result.Dir);
@@ -195,8 +197,7 @@ end;
 
 { A point of the cube, in the surface's pixels.  The cube is one unit from
   the middle to each face, so a coordinate runs -1 to 1. }
-function OnScreen(const V: TProjector; const P: TP3;
-  CX, CY, Half: Double): TPointF;
+function OnScreen(const V: TProjector; const P: TP3; CX, CY, Half: double): TPointF;
 var
   R, U: TP3;
 begin
@@ -206,9 +207,9 @@ begin
   Result.Y := CY - Dot3(P, U) * Half;
 end;
 
-procedure CubeAzEl(const Dir: TP3; var Az: Double; out El: Double);
+procedure CubeAzEl(const Dir: TP3; var Az: double; out El: double);
 var
-  Flat: Double;
+  Flat: double;
 begin
   Flat := Sqrt(Dir.X * Dir.X + Dir.Y * Dir.Y);
   { straight up or straight down says nothing about which way round to be,
@@ -220,15 +221,14 @@ begin
   if El > 1.45 then El := 1.45;
 end;
 
-function CubeAt(const V: TProjector; CX, CY, Half, SX, SY: Double;
-  out T: TCubeTarget): Boolean;
+function CubeAt(const V: TProjector; CX, CY, Half, SX, SY: double; out T: TCubeTarget): boolean;
 var
   R, U, D, O, Dir, P: TP3;
-  A, B, TMin, TMax, T1, T2, Tmp: Double;
-  K: Integer;
+  A, B, TMin, TMax, T1, T2, Tmp: double;
+  K: integer;
 
-  { one axis of the slab test }
-  function Slab(Oi, Di: Double): Boolean;
+{ one axis of the slab test }
+  function Slab(Oi, Di: double): boolean;
   begin
     Result := True;
     if Abs(Di) < 1E-12 then
@@ -242,7 +242,9 @@ var
     T2 := (1 - Oi) / Di;
     if T1 > T2 then
     begin
-      Tmp := T1; T1 := T2; T2 := Tmp;
+      Tmp := T1;
+      T1 := T2;
+      T2 := Tmp;
     end;
     if T1 > TMin then TMin := T1;
     if T2 < TMax then TMax := T2;
@@ -279,9 +281,12 @@ begin
   { and which of the twenty-six that is: every coordinate out past the band
     counts towards the direction, the rest do not }
   T.Dir := P3(0, 0, 0);
-  if P.X > BAND then T.Dir.X := 1 else if P.X < -BAND then T.Dir.X := -1;
-  if P.Y > BAND then T.Dir.Y := 1 else if P.Y < -BAND then T.Dir.Y := -1;
-  if P.Z > BAND then T.Dir.Z := 1 else if P.Z < -BAND then T.Dir.Z := -1;
+  if P.X > BAND then T.Dir.X := 1
+  else if P.X < -BAND then T.Dir.X := -1;
+  if P.Y > BAND then T.Dir.Y := 1
+  else if P.Y < -BAND then T.Dir.Y := -1;
+  if P.Z > BAND then T.Dir.Z := 1
+  else if P.Z < -BAND then T.Dir.Z := -1;
 
   { A point on the cube is on at least one face; this only catches rounding
     putting it a hair inside. }
@@ -293,7 +298,8 @@ begin
     case K of
       0: T.Dir.X := Sign(P.X);
       1: T.Dir.Y := Sign(P.Y);
-    else T.Dir.Z := Sign(P.Z);
+      else
+        T.Dir.Z := Sign(P.Z);
     end;
   end;
 
@@ -301,12 +307,12 @@ begin
   Result := True;
 end;
 
-function CubeLabels(const V: TProjector; Half: Double): TCubeLabels;
+function CubeLabels(const V: TProjector; Half: double): TCubeLabels;
 var
-  F: Integer;
+  F: integer;
   D: TP3;
   Face: TFaceDef;
-  Lit: Double;
+  Lit: double;
   P: TPointF;
 begin
   SetLength(Result, 0);
@@ -327,12 +333,11 @@ begin
   end;
 end;
 
-function CubeTargetAt(const V: TProjector; const Dir: TP3;
-  CX, CY, Half: Double; out P: TPointF): Boolean;
+function CubeTargetAt(const V: TProjector; const Dir: TP3; CX, CY, Half: double; out P: TPointF): boolean;
 var
-  F, Best: Integer;
+  F, Best: integer;
   D, Pt: TP3;
-  Lit, BestLit, Mid, U, W: Double;
+  Lit, BestLit, Mid, U, W: double;
 begin
   Result := False;
   P := PointF(CX, CY);
@@ -357,46 +362,45 @@ begin
   Mid := (BAND + 1) / 2;
   U := Dot3(Dir, FACES[Best].A) * Mid;
   W := Dot3(Dir, FACES[Best].B) * Mid;
-  Pt := P3(FACES[Best].N.X + U * FACES[Best].A.X + W * FACES[Best].B.X,
-           FACES[Best].N.Y + U * FACES[Best].A.Y + W * FACES[Best].B.Y,
-           FACES[Best].N.Z + U * FACES[Best].A.Z + W * FACES[Best].B.Z);
+  Pt := P3(FACES[Best].N.X + U * FACES[Best].A.X + W * FACES[Best].B.X, FACES[Best].N.Y + U * FACES[Best].A.Y + W * FACES[Best].B.Y,
+    FACES[Best].N.Z + U * FACES[Best].A.Z + W * FACES[Best].B.Z);
   P := OnScreen(V, Pt, CX, CY, Half);
   Result := True;
 end;
 
-procedure PaintCube(S: TArtSurface; const V: TProjector; Half: Double;
-  const Th: TTheme; HaveHot: Boolean; const HotDir: TP3);
+procedure PaintCube(S: TArtSurface; const V: TProjector; Half: double; const Th: TTheme; HaveHot: boolean; const HotDir: TP3);
 var
-  F, I, J: Integer;
+  F, I, J: integer;
   Face: TFaceDef;
   D, N, Cell: TP3;
-  Lit, Up: Double;
-  CX, CY: Double;
+  Lit, Up: double;
+  CX, CY: double;
   Q: array[0..3] of TPointF;
   G0, G1: TPointF;
   Fill, Line: TPix;
-  Hot: Boolean;
+  Hot: boolean;
 
-  { the corners of cell I,J of a face, in cube space }
-  function Corner(const AFace: TFaceDef; UI, WI: Integer): TP3;
+{ the corners of cell I,J of a face, in cube space }
+  function Corner(const AFace: TFaceDef; UI, WI: integer): TP3;
   var
-    Ub, Wb: Double;
+    Ub, Wb: double;
   begin
     case UI of
       0: Ub := -1;
       1: Ub := -BAND;
       2: Ub := BAND;
-    else Ub := 1;
+      else
+        Ub := 1;
     end;
     case WI of
       0: Wb := -1;
       1: Wb := -BAND;
       2: Wb := BAND;
-    else Wb := 1;
+      else
+        Wb := 1;
     end;
-    Result := P3(AFace.N.X + Ub * AFace.A.X + Wb * AFace.B.X,
-                 AFace.N.Y + Ub * AFace.A.Y + Wb * AFace.B.Y,
-                 AFace.N.Z + Ub * AFace.A.Z + Wb * AFace.B.Z);
+    Result := P3(AFace.N.X + Ub * AFace.A.X + Wb * AFace.B.X, AFace.N.Y + Ub * AFace.A.Y + Wb * AFace.B.Y, AFace.N.Z +
+      Ub * AFace.A.Z + Wb * AFace.B.Z);
   end;
 
 begin
@@ -426,8 +430,7 @@ begin
         if J = 0 then Cell := Sub3(Cell, Face.B)
         else if J = 2 then Cell := Add3(Cell, Face.B);
 
-        Hot := HaveHot and (Abs(Cell.X - HotDir.X) < 0.01) and
-               (Abs(Cell.Y - HotDir.Y) < 0.01) and (Abs(Cell.Z - HotDir.Z) < 0.01);
+        Hot := HaveHot and (Abs(Cell.X - HotDir.X) < 0.01) and (Abs(Cell.Y - HotDir.Y) < 0.01) and (Abs(Cell.Z - HotDir.Z) < 0.01);
 
         Q[0] := OnScreen(V, Corner(Face, I, J), CX, CY, Half);
         Q[1] := OnScreen(V, Corner(Face, I + 1, J), CX, CY, Half);
@@ -440,8 +443,7 @@ begin
         if Hot then
           Fill := ShadePix(Th.Accent, 0.85 + 0.35 * Lit)
         else
-          Fill := MixPix(Th.Panel, Pix(255, 255, 255),
-                         0.10 + 0.20 * Lit + 0.14 * Max(0, N.Z));
+          Fill := MixPix(Th.Panel, Pix(255, 255, 255), 0.10 + 0.20 * Lit + 0.14 * Max(0, N.Z));
 
         S.Triangle(Q[0], Q[1], Q[2], Fill, 1.0);
         S.Triangle(Q[0], Q[2], Q[3], Fill, 1.0);

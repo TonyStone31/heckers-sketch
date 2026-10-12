@@ -29,26 +29,25 @@ type
     Tag: string;
     AssetURL: string;
     SumsURL: string;
-    Size: Int64;
+    Size: int64;
   end;
 
-  TDownloadProgress = procedure(BytesReceived, TotalBytes: Int64) of object;
+  TDownloadProgress = procedure(BytesReceived, TotalBytes: int64) of object;
 
 function CurrentVersion: string;
 { Tags like v2026.09.03.13 are compared piece by piece as numbers, so 13
   sorts after 9. }
-function NewerThan(const A, B: string): Boolean;
+function NewerThan(const A, B: string): boolean;
 { The latest release from the Atom feed; FetchLatest's fallback when the API
   refuses.  Public so it can be tested. }
-function FetchFromFeed(out Info: TUpdateInfo; out Err: string): Boolean;
-function FetchLatest(out Info: TUpdateInfo; out Err: string): Boolean;
-function Download(const URL, Path: string; TotalBytes: Int64;
-  OnProgress: TDownloadProgress; out Err: string): Boolean;
+function FetchFromFeed(out Info: TUpdateInfo; out Err: string): boolean;
+function FetchLatest(out Info: TUpdateInfo; out Err: string): boolean;
+function Download(const URL, Path: string; TotalBytes: int64; OnProgress: TDownloadProgress; out Err: string): boolean;
 function Sha256Of(const Path: string): string;
 function ExpectedSum(const SumsURL, AName: string): string;
 { Why the program must not replace itself here, or '' if it may. }
 function WhyNotUpdate: string;
-function SwapInAndRestart(const NewFile: string; out Err: string): Boolean;
+function SwapInAndRestart(const NewFile: string; out Err: string): boolean;
 procedure ForgetPreviousBuild;
 
 implementation
@@ -60,10 +59,10 @@ begin
   Result := APP_VERSION;
 end;
 
-function NewerThan(const A, B: string): Boolean;
+function NewerThan(const A, B: string): boolean;
 var
   SA, SB: TStringList;
-  I, NA, NB: Integer;
+  I, NA, NB: integer;
 
   procedure Split(const S: string; L: TStringList);
   var
@@ -85,8 +84,12 @@ begin
     Split(B, SB);
     for I := 0 to 7 do
     begin
-      if I < SA.Count then NA := StrToIntDef(SA[I], 0) else NA := 0;
-      if I < SB.Count then NB := StrToIntDef(SB[I], 0) else NB := 0;
+      if I < SA.Count then NA := StrToIntDef(SA[I], 0)
+      else
+        NA := 0;
+      if I < SB.Count then NB := StrToIntDef(SB[I], 0)
+      else
+        NB := 0;
       if NA > NB then Exit(True);
       if NA < NB then Exit(False);
     end;
@@ -96,7 +99,7 @@ begin
   end;
 end;
 
-function GetText(const URL: string; out Body: string; out Err: string): Boolean;
+function GetText(const URL: string; out Body: string; out Err: string): boolean;
 begin
   Result := NetGetText(URL, 'application/vnd.github+json', Body, Err);
 end;
@@ -105,16 +108,15 @@ end;
   an hour per network address, shared by every machine behind the router;
   the feed is not.  Release files are always at /releases/download/<tag>/,
   so the tag is enough.  The size is unknown this way. }
-function FetchFromFeed(out Info: TUpdateInfo; out Err: string): Boolean;
+function FetchFromFeed(out Info: TUpdateInfo; out Err: string): boolean;
 const
   MARK = '/releases/tag/';
 var
   Body, Tag: string;
-  P, Q: Integer;
+  P, Q: integer;
 begin
   Result := False;
-  if not NetGetText('https://github.com/' + UPDATE_REPO + '/releases.atom',
-       'application/atom+xml', Body, Err) then Exit;
+  if not NetGetText('https://github.com/' + UPDATE_REPO + '/releases.atom', 'application/atom+xml', Body, Err) then Exit;
   { the first entry's link; the feed's own links come before it }
   P := Pos('<entry>', Body);
   if P = 0 then
@@ -138,21 +140,19 @@ begin
     Exit;
   end;
   Info.Tag := Tag;
-  Info.AssetURL := 'https://github.com/' + UPDATE_REPO + '/releases/download/' +
-    Tag + '/' + ASSET_NAME;
-  Info.SumsURL := 'https://github.com/' + UPDATE_REPO + '/releases/download/' +
-    Tag + '/SHA256SUMS';
+  Info.AssetURL := 'https://github.com/' + UPDATE_REPO + '/releases/download/' + Tag + '/' + ASSET_NAME;
+  Info.SumsURL := 'https://github.com/' + UPDATE_REPO + '/releases/download/' + Tag + '/SHA256SUMS';
   Info.Size := 0;
   Result := True;
 end;
 
-function FetchLatest(out Info: TUpdateInfo; out Err: string): Boolean;
+function FetchLatest(out Info: TUpdateInfo; out Err: string): boolean;
 var
   Body, N, ApiErr: string;
   J, A: TJSONData;
   Arr: TJSONArray;
   O: TJSONObject;
-  I: Integer;
+  I: integer;
 begin
   Result := False;
   Info.Tag := '';
@@ -160,8 +160,7 @@ begin
   Info.SumsURL := '';
   Info.Size := 0;
 
-  if not GetText('https://api.github.com/repos/' + UPDATE_REPO +
-       '/releases/latest', Body, Err) then
+  if not GetText('https://api.github.com/repos/' + UPDATE_REPO + '/releases/latest', Body, Err) then
   begin
     { probably the rate limit; try the feed, and report only if both fail }
     ApiErr := Err;
@@ -207,7 +206,7 @@ begin
         if N = ASSET_NAME then
         begin
           Info.AssetURL := TJSONObject(Arr.Items[I]).Get('browser_download_url', '');
-          Info.Size := TJSONObject(Arr.Items[I]).Get('size', Int64(0));
+          Info.Size := TJSONObject(Arr.Items[I]).Get('size', int64(0));
         end
         else if N = 'SHA256SUMS' then
           Info.SumsURL := TJSONObject(Arr.Items[I]).Get('browser_download_url', '');
@@ -227,18 +226,16 @@ type
   TProgressStream = class(TStream)
   private
     FDest: TStream;
-    FTotal: Int64;
+    FTotal: int64;
     FOnProgress: TDownloadProgress;
   public
-    constructor Create(ADest: TStream; ATotal: Int64;
-      AOnProgress: TDownloadProgress);
-    function Read(var Buffer; Count: Longint): Longint; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
-    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
+    constructor Create(ADest: TStream; ATotal: int64; AOnProgress: TDownloadProgress);
+    function Read(var Buffer; Count: longint): longint; override;
+    function Write(const Buffer; Count: longint): longint; override;
+    function Seek(const Offset: int64; Origin: TSeekOrigin): int64; override;
   end;
 
-constructor TProgressStream.Create(ADest: TStream; ATotal: Int64;
-  AOnProgress: TDownloadProgress);
+constructor TProgressStream.Create(ADest: TStream; ATotal: int64; AOnProgress: TDownloadProgress);
 begin
   inherited Create;
   FDest := ADest;
@@ -246,28 +243,27 @@ begin
   FOnProgress := AOnProgress;
 end;
 
-function TProgressStream.Read(var Buffer; Count: Longint): Longint;
+function TProgressStream.Read(var Buffer; Count: longint): longint;
 begin
   Result := FDest.Read(Buffer, Count);
 end;
 
-function TProgressStream.Write(const Buffer; Count: Longint): Longint;
+function TProgressStream.Write(const Buffer; Count: longint): longint;
 begin
   Result := FDest.Write(Buffer, Count);
   if Assigned(FOnProgress) then FOnProgress(FDest.Position, FTotal);
 end;
 
-function TProgressStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
+function TProgressStream.Seek(const Offset: int64; Origin: TSeekOrigin): int64;
 begin
   Result := FDest.Seek(Offset, Origin);
 end;
 
-function Download(const URL, Path: string; TotalBytes: Int64;
-  OnProgress: TDownloadProgress; out Err: string): Boolean;
+function Download(const URL, Path: string; TotalBytes: int64; OnProgress: TDownloadProgress; out Err: string): boolean;
 var
   F: TFileStream;
   Progress: TProgressStream;
-  Status: Integer;
+  Status: integer;
 begin
   Result := False;
   Err := '';
@@ -297,7 +293,7 @@ function Sha256Of(const Path: string): string;
 var
   F: TFileStream;
   D: TSHA256Digest;
-  I: Integer;
+  I: integer;
 begin
   Result := '';
   try
@@ -318,7 +314,7 @@ function ExpectedSum(const SumsURL, AName: string): string;
 var
   Body, Err, Line, Nm: string;
   L: TStringList;
-  I, P: Integer;
+  I, P: integer;
 begin
   Result := '';
   if SumsURL = '' then Exit;
@@ -351,8 +347,7 @@ begin
   { never update a copy running from its source tree; it would overwrite
     what was just built }
   if FileExists(Dir + 'heckerssketch.lpi') or FileExists(Dir + 'hsMainForm.pas') then
-    Exit('this copy runs from its own source folder, where an update would ' +
-         'overwrite what you just built');
+    Exit('this copy runs from its own source folder, where an update would ' + 'overwrite what you just built');
   if not DirectoryExists(Dir) then
     Exit('cannot tell where this program lives');
   try
@@ -364,7 +359,7 @@ begin
   end;
 end;
 
-function SwapInAndRestart(const NewFile: string; out Err: string): Boolean;
+function SwapInAndRestart(const NewFile: string; out Err: string): boolean;
 var
   Me: string;
   {$IFDEF WINDOWS}

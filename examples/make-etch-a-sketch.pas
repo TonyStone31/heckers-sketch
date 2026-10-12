@@ -15,21 +15,35 @@ program makeetchasketch;
 {$mode objfpc}{$H+}
 
 uses
-  SysUtils, Classes, Math, Types, Graphics, hsSurface, hsDrawing, exwrite;
+  SysUtils,
+  Classes,
+  Math,
+  Types,
+  Graphics,
+  hsSurface,
+  hsDrawing,
+  exwrite;
 
 const
   { the toy, in inches }
-  BW = 12.0;      BH = 9.0;      BT = 1.25;     { body: wide, high, thick }
+  BW = 12.0;
+  BH = 9.0;
+  BT = 1.25;     { body: wide, high, thick }
   { how far the logo stands off the body, so it reads as molded, not printed }
   EMBOSS = 0.0625;
-  SX0 = 1.5;      SX1 = 10.5;                   { the screen opening }
-  SY0 = 2.25;     SY1 = 7.75;
+  SX0 = 1.5;
+  SX1 = 10.5;                   { the screen opening }
+  SY0 = 2.25;
+  SY1 = 7.75;
   RECESS = 0.12;                                { how far the screen sits in }
-  BR = 0.70;      SR = 0.30;                    { the rounding on each }
+  BR = 0.70;
+  SR = 0.30;                    { the rounding on each }
   ROUND_STEPS = 7;                              { pieces per quarter turn }
-  KNOB_R = 0.625; KNOB_H = 0.42;                { the knobs }
+  KNOB_R = 0.625;
+  KNOB_H = 0.42;                { the knobs }
   KNOB_Y = 1.125;
-  KNOB_X0 = 2.25; KNOB_X1 = 9.75;
+  KNOB_X0 = 2.25;
+  KNOB_X1 = 9.75;
   KNOB_SIDES = 20;
   { the body's group; the knobs take the numbers after it, so name this
     rather than trust the counter }
@@ -39,109 +53,125 @@ const
   ART_H = 720;
 
   { TColor is $00BBGGRR }
-  RED   = $002030C8;    { the toy's red }
-  GRAY  = $00B8B4AE;    { the screen }
+  RED = $002030C8;    { the toy's red }
+  GRAY = $00B8B4AE;    { the screen }
   WHITE = $00E8ECEE;    { the knobs }
-  INK   = $00201C1A;    { the stylus line }
+  INK = $00201C1A;    { the stylus line }
 
 var
   D: TWorkDoc;
   L: TStringList;
-  Grp: Integer;
+  Grp: integer;
   { every closed loop drawn on a flat face, in the order it was drawn }
   Drawn: array of TP3Array;
 
-{ inches to the drawing's unit }
-function I_(V: Double): Double;
-begin
-  Result := V / 12;
-end;
+  { inches to the drawing's unit }
+  function I_(V: double): double;
+  begin
+    Result := V / 12;
+  end;
 
 { Inches to a point.  The near bottom left corner sits on the origin, so the
   toy lies where all three axes are solid and every measurement is positive. }
-function P(X, Y, Z: Double): TP3;
-begin
-  Result := P3(I_(X), I_(Y), I_(Z));
-end;
-
-{ A rounded rectangle, anticlockwise seen from above, at height Z. }
-function RoundRect(X0, Y0, X1, Y1, R, Z: Double): TP3Array;
-var
-  C, I, N: Integer;
-  A, CX, CY, A0: Double;
-begin
-  R := Min(R, Min((X1 - X0) / 2, (Y1 - Y0) / 2));
-  N := 0;
-  SetLength(Result, 4 * (ROUND_STEPS + 1));
-  for C := 0 to 3 do
+  function P(X, Y, Z: double): TP3;
   begin
-    { anticlockwise from the bottom right, so the whole ring is anticlockwise }
-    case C of
-      0: begin CX := X1 - R; CY := Y0 + R; A0 := -Pi / 2; end;
-      1: begin CX := X1 - R; CY := Y1 - R; A0 := 0;       end;
-      2: begin CX := X0 + R; CY := Y1 - R; A0 := Pi / 2;  end;
-    else begin CX := X0 + R; CY := Y0 + R; A0 := Pi;      end;
-    end;
-    for I := 0 to ROUND_STEPS do
-    begin
-      A := A0 + (Pi / 2) * I / ROUND_STEPS;
-      Result[N] := P(CX + R * Cos(A), CY + R * Sin(A), Z);
-      Inc(N);
-    end;
+    Result := P3(I_(X), I_(Y), I_(Z));
   end;
-  SetLength(Result, N);
-end;
 
-{ The same ring the other way round, for a hole or an underside. }
-function Reversed(const Pts: TP3Array): TP3Array;
-var
-  I: Integer;
-begin
-  SetLength(Result, Length(Pts));
-  for I := 0 to High(Pts) do Result[I] := Pts[High(Pts) - I];
-end;
+  { A rounded rectangle, anticlockwise seen from above, at height Z. }
+  function RoundRect(X0, Y0, X1, Y1, R, Z: double): TP3Array;
+  var
+    C, I, N: integer;
+    A, CX, CY, A0: double;
+  begin
+    R := Min(R, Min((X1 - X0) / 2, (Y1 - Y0) / 2));
+    N := 0;
+    SetLength(Result, 4 * (ROUND_STEPS + 1));
+    for C := 0 to 3 do
+    begin
+      { anticlockwise from the bottom right, so the whole ring is anticlockwise }
+      case C of
+        0: begin
+          CX := X1 - R;
+          CY := Y0 + R;
+          A0 := -Pi / 2;
+        end;
+        1: begin
+          CX := X1 - R;
+          CY := Y1 - R;
+          A0 := 0;
+        end;
+        2: begin
+          CX := X0 + R;
+          CY := Y1 - R;
+          A0 := Pi / 2;
+        end;
+        else
+        begin
+          CX := X0 + R;
+          CY := Y0 + R;
+          A0 := Pi;
+        end;
+      end;
+      for I := 0 to ROUND_STEPS do
+      begin
+        A := A0 + (Pi / 2) * I / ROUND_STEPS;
+        Result[N] := P(CX + R * Cos(A), CY + R * Sin(A), Z);
+        Inc(N);
+      end;
+    end;
+    SetLength(Result, N);
+  end;
 
-{ A face, wound as given, belonging to this solid. }
-procedure Face(const Pts: array of TP3; Ink: TColor);
-begin
-  D.AddFaceRaw(Pts, Ink, True);
-  D.SetFaceGroup(D.Live - 1, Grp);
-end;
+  { The same ring the other way round, for a hole or an underside. }
+  function Reversed(const Pts: TP3Array): TP3Array;
+  var
+    I: integer;
+  begin
+    SetLength(Result, Length(Pts));
+    for I := 0 to High(Pts) do Result[I] := Pts[High(Pts) - I];
+  end;
+
+  { A face, wound as given, belonging to this solid. }
+  procedure Face(const Pts: array of TP3; Ink: TColor);
+  begin
+    D.AddFaceRaw(Pts, Ink, True);
+    D.SetFaceGroup(D.Live - 1, Grp);
+  end;
 
 { A flat rectangle at height Z, seen from above.  Up says which way its
   normal points, so the same call makes a lid or a floor. }
-procedure Flat(X0, Y0, X1, Y1, Z: Double; Ink: TColor; Up: Boolean);
-begin
-  if Up then
-    Face([P(X0, Y0, Z), P(X1, Y0, Z), P(X1, Y1, Z), P(X0, Y1, Z)], Ink)
-  else
-    Face([P(X0, Y0, Z), P(X0, Y1, Z), P(X1, Y1, Z), P(X1, Y0, Z)], Ink);
-end;
+  procedure Flat(X0, Y0, X1, Y1, Z: double; Ink: TColor; Up: boolean);
+  begin
+    if Up then
+      Face([P(X0, Y0, Z), P(X1, Y0, Z), P(X1, Y1, Z), P(X0, Y1, Z)], Ink)
+    else
+      Face([P(X0, Y0, Z), P(X0, Y1, Z), P(X1, Y1, Z), P(X1, Y0, Z)], Ink);
+  end;
 
 { A wall all the way round a ring, from Z0 up to Z1.  The normal is to the
   right of the way round: an anticlockwise ring walls outwards (a body), a
   clockwise one inwards (a pocket). }
-procedure Skirt(const Ring: TP3Array; Z0, Z1: Double; Ink: TColor);
-var
-  I, N: Integer;
-  A, B: TP3;
-begin
-  N := Length(Ring);
-  for I := 0 to N - 1 do
+  procedure Skirt(const Ring: TP3Array; Z0, Z1: double; Ink: TColor);
+  var
+    I, N: integer;
+    A, B: TP3;
   begin
-    A := Ring[I];
-    B := Ring[(I + 1) mod N];
-    Face([P3(A.X, A.Y, I_(Z0)), P3(B.X, B.Y, I_(Z0)),
-          P3(B.X, B.Y, I_(Z1)), P3(A.X, A.Y, I_(Z1))], Ink);
+    N := Length(Ring);
+    for I := 0 to N - 1 do
+    begin
+      A := Ring[I];
+      B := Ring[(I + 1) mod N];
+      Face([P3(A.X, A.Y, I_(Z0)), P3(B.X, B.Y, I_(Z0)), P3(B.X, B.Y, I_(Z1)), P3(A.X, A.Y, I_(Z1))], Ink);
+    end;
   end;
-end;
 
 { An upright wall between two points, from Z0 up to Z1, its normal to the
   left of the direction of travel. }
-procedure Wall(X0, Y0, X1, Y1, Z0, Z1: Double; Ink: TColor);
-begin
-  Face([P(X0, Y0, Z0), P(X1, Y1, Z0), P(X1, Y1, Z1), P(X0, Y0, Z1)], Ink);
-end;
+  procedure Wall(X0, Y0, X1, Y1, Z0, Z1: double; Ink: TColor);
+  begin
+    Face([P(X0, Y0, Z0), P(X1, Y1, Z0), P(X1, Y1, Z1), P(X0, Y0, Z1)], Ink);
+  end;
 
 { --- block capitals, drawn in lines -------------------------------------
   Only H E C K R S T are needed for HECKERS SKETCH, each in a box six wide
@@ -149,191 +179,191 @@ end;
 
 { One closed loop of lines, x,y,x,y..., with its bottom left corner at OX,OY
   and scaled by S. }
-procedure Loop(const XY: array of Double; OX, OY, S, Z: Double);
-var
-  I, N: Integer;
-  Pts: TP3Array;
-begin
-  N := Length(XY) div 2;
-  SetLength(Pts, N);
-  for I := 0 to N - 1 do
-    Pts[I] := P(OX + XY[I * 2] * S, OY + XY[I * 2 + 1] * S, Z);
-  for I := 0 to N - 1 do
-    D.AddLine(Pts[I], Pts[(I + 1) mod N], INK, 1.0, False);
-  { kept so it can be given a face later; see the faces at the bottom }
-  SetLength(Drawn, Length(Drawn) + 1);
-  Drawn[High(Drawn)] := Pts;
-end;
+  procedure Loop(const XY: array of double; OX, OY, S, Z: double);
+  var
+    I, N: integer;
+    Pts: TP3Array;
+  begin
+    N := Length(XY) div 2;
+    SetLength(Pts, N);
+    for I := 0 to N - 1 do
+      Pts[I] := P(OX + XY[I * 2] * S, OY + XY[I * 2 + 1] * S, Z);
+    for I := 0 to N - 1 do
+      D.AddLine(Pts[I], Pts[(I + 1) mod N], INK, 1.0, False);
+    { kept so it can be given a face later; see the faces at the bottom }
+    SetLength(Drawn, Length(Drawn) + 1);
+    Drawn[High(Drawn)] := Pts;
+  end;
 
 { One letter; returns its width so the caller can walk along.  Each letter is
   one outline, so it is one face that pushes up whole with no seams.  R has a
   second loop for the hole in its bowl. }
-function Letter(C: Char; OX, OY, S, Z: Double): Double;
-begin
-  Result := 6 * S;
-  case C of
-    'H': Loop([0,0, 2,0, 2,4, 4,4, 4,0, 6,0,
-               6,10, 4,10, 4,6, 2,6, 2,10, 0,10], OX, OY, S, Z);
-    'E': Loop([0,0, 6,0, 6,2, 2,2, 2,4, 5,4,
-               5,6, 2,6, 2,8, 6,8, 6,10, 0,10], OX, OY, S, Z);
-    'C': Loop([0,0, 6,0, 6,2, 2,2, 2,8, 6,8, 6,10, 0,10], OX, OY, S, Z);
-    'T': Loop([2,0, 4,0, 4,8, 6,8, 6,10, 0,10, 0,8, 2,8], OX, OY, S, Z);
-    'S': Loop([0,0, 6,0, 6,6, 2,6, 2,8, 6,8,
-               6,10, 0,10, 0,4, 4,4, 4,2, 0,2], OX, OY, S, Z);
-    'K': Loop([0,0, 2,0, 2,3.5, 4,0, 6,0, 3,5,
-               6,10, 4,10, 2,6.5, 2,10, 0,10], OX, OY, S, Z);
-    'R': begin
-           { the leg leans, or it is a P with a heavy side }
-           Loop([0,0, 2,0, 2,4, 3.6,4, 4,0, 6,0, 5.6,4, 6,4,
-                 6,10, 0,10], OX, OY, S, Z);
-           { the counter, which becomes a hole }
-           Loop([2,6, 2,8, 4,8, 4,6], OX, OY, S, Z);
-         end;
-    ' ': Result := 3 * S;
+  function Letter(C: char; OX, OY, S, Z: double): double;
+  begin
+    Result := 6 * S;
+    case C of
+      'H': Loop([0, 0, 2, 0, 2, 4, 4, 4, 4, 0, 6, 0, 6, 10, 4, 10, 4, 6, 2, 6, 2, 10, 0, 10], OX, OY, S, Z);
+      'E': Loop([0, 0, 6, 0, 6, 2, 2, 2, 2, 4, 5, 4, 5, 6, 2, 6, 2, 8, 6, 8, 6, 10, 0, 10], OX, OY, S, Z);
+      'C': Loop([0, 0, 6, 0, 6, 2, 2, 2, 2, 8, 6, 8, 6, 10, 0, 10], OX, OY, S, Z);
+      'T': Loop([2, 0, 4, 0, 4, 8, 6, 8, 6, 10, 0, 10, 0, 8, 2, 8], OX, OY, S, Z);
+      'S': Loop([0, 0, 6, 0, 6, 6, 2, 6, 2, 8, 6, 8, 6, 10, 0, 10, 0, 4, 4, 4, 4, 2, 0, 2], OX, OY, S, Z);
+      'K': Loop([0, 0, 2, 0, 2, 3.5, 4, 0, 6, 0, 3, 5, 6, 10, 4, 10, 2, 6.5, 2, 10, 0, 10], OX, OY, S, Z);
+      'R': begin
+        { the leg leans, or it is a P with a heavy side }
+        Loop([0, 0, 2, 0, 2, 4, 3.6, 4, 4, 0, 6, 0, 5.6, 4, 6, 4, 6, 10, 0, 10], OX, OY, S, Z);
+        { the counter, which becomes a hole }
+        Loop([2, 6, 2, 8, 4, 8, 4, 6], OX, OY, S, Z);
+      end;
+      ' ': Result := 3 * S;
+    end;
   end;
-end;
 
 { Is this loop the counter of the letter before it?  Only R has one, and it
   always comes straight after R's outline, so containment by the loop before
   is the whole test. }
-function IsCounter(const All: array of TP3Array; I: Integer): Boolean;
-var
-  Lo, Hi, PLo, PHi: TP3;
-
-  procedure Span(const Pts: TP3Array; out A, B: TP3);
+  function IsCounter(const All: array of TP3Array; I: integer): boolean;
   var
-    K: Integer;
-  begin
-    A := Pts[0]; B := Pts[0];
-    for K := 1 to High(Pts) do
-    begin
-      A.X := Min(A.X, Pts[K].X); A.Y := Min(A.Y, Pts[K].Y);
-      B.X := Max(B.X, Pts[K].X); B.Y := Max(B.Y, Pts[K].Y);
-    end;
-  end;
+    Lo, Hi, PLo, PHi: TP3;
 
-begin
-  Result := False;
-  if I = 0 then Exit;
-  Span(All[I], Lo, Hi);
-  Span(All[I - 1], PLo, PHi);
-  Result := (Lo.X > PLo.X - 1E-9) and (Hi.X < PHi.X + 1E-9) and
-            (Lo.Y > PLo.Y - 1E-9) and (Hi.Y < PHi.Y + 1E-9) and
-            ((Hi.X - Lo.X) < (PHi.X - PLo.X) - 1E-9);
-end;
+    procedure Span(const Pts: TP3Array; out A, B: TP3);
+    var
+      K: integer;
+    begin
+      A := Pts[0];
+      B := Pts[0];
+      for K := 1 to High(Pts) do
+      begin
+        A.X := Min(A.X, Pts[K].X);
+        A.Y := Min(A.Y, Pts[K].Y);
+        B.X := Max(B.X, Pts[K].X);
+        B.Y := Max(B.Y, Pts[K].Y);
+      end;
+    end;
+
+  begin
+    Result := False;
+    if I = 0 then Exit;
+    Span(All[I], Lo, Hi);
+    Span(All[I - 1], PLo, PHi);
+    Result := (Lo.X > PLo.X - 1E-9) and (Hi.X < PHi.X + 1E-9) and (Lo.Y > PLo.Y - 1E-9) and (Hi.Y < PHi.Y + 1E-9) and ((Hi.X - Lo.X) < (PHi.X - PLo.X) - 1E-9);
+  end;
 
 { Which loop this one sits directly inside (the smallest container), or -1.
   An eye's hole must be cut from the head, not the screen, or two faces
   overlap and the solid stops being closed when either is pushed. }
-function ParentOf(const All: array of TP3Array; I: Integer): Integer;
-var
-  J: Integer;
-  Lo, Hi, QLo, QHi, BestLo, BestHi: TP3;
-
-  procedure Span(const Pts: TP3Array; out A, B: TP3);
+  function ParentOf(const All: array of TP3Array; I: integer): integer;
   var
-    K: Integer;
-  begin
-    A := Pts[0]; B := Pts[0];
-    for K := 1 to High(Pts) do
+    J: integer;
+    Lo, Hi, QLo, QHi, BestLo, BestHi: TP3;
+
+    procedure Span(const Pts: TP3Array; out A, B: TP3);
+    var
+      K: integer;
     begin
-      A.X := Min(A.X, Pts[K].X); A.Y := Min(A.Y, Pts[K].Y);
-      B.X := Max(B.X, Pts[K].X); B.Y := Max(B.Y, Pts[K].Y);
+      A := Pts[0];
+      B := Pts[0];
+      for K := 1 to High(Pts) do
+      begin
+        A.X := Min(A.X, Pts[K].X);
+        A.Y := Min(A.Y, Pts[K].Y);
+        B.X := Max(B.X, Pts[K].X);
+        B.Y := Max(B.Y, Pts[K].Y);
+      end;
+    end;
+
+  begin
+    Result := -1;
+    Span(All[I], Lo, Hi);
+    BestLo := P3(0, 0, 0);
+    BestHi := P3(0, 0, 0);
+    for J := 0 to High(All) do
+    begin
+      if J = I then Continue;
+      Span(All[J], QLo, QHi);
+      if (Lo.X < QLo.X - 1E-9) or (Hi.X > QHi.X + 1E-9) or (Lo.Y < QLo.Y - 1E-9) or (Hi.Y > QHi.Y + 1E-9) then Continue;
+      { the same size is not inside }
+      if ((QHi.X - QLo.X) - (Hi.X - Lo.X) < 1E-9) and ((QHi.Y - QLo.Y) - (Hi.Y - Lo.Y) < 1E-9) then Continue;
+      if (Result < 0) or ((QHi.X - QLo.X) * (QHi.Y - QLo.Y) < (BestHi.X - BestLo.X) * (BestHi.Y - BestLo.Y)) then
+      begin
+        Result := J;
+        BestLo := QLo;
+        BestHi := QHi;
+      end;
     end;
   end;
 
-begin
-  Result := -1;
-  Span(All[I], Lo, Hi);
-  BestLo := P3(0, 0, 0); BestHi := P3(0, 0, 0);
-  for J := 0 to High(All) do
+  { A word, centered on CX. }
+  procedure Word_(const W: string; CX, OY, S, Z: double);
+  var
+    I: integer;
+    Wide, X: double;
   begin
-    if J = I then Continue;
-    Span(All[J], QLo, QHi);
-    if (Lo.X < QLo.X - 1E-9) or (Hi.X > QHi.X + 1E-9) or
-       (Lo.Y < QLo.Y - 1E-9) or (Hi.Y > QHi.Y + 1E-9) then Continue;
-    { the same size is not inside }
-    if ((QHi.X - QLo.X) - (Hi.X - Lo.X) < 1E-9) and
-       ((QHi.Y - QLo.Y) - (Hi.Y - Lo.Y) < 1E-9) then Continue;
-    if (Result < 0) or
-       ((QHi.X - QLo.X) * (QHi.Y - QLo.Y) <
-        (BestHi.X - BestLo.X) * (BestHi.Y - BestLo.Y)) then
+    Wide := 0;
+    for I := 1 to Length(W) do
     begin
-      Result := J; BestLo := QLo; BestHi := QHi;
+      if W[I] = ' ' then Wide := Wide + 3 * S
+      else
+        Wide := Wide + 6 * S;
+      if I < Length(W) then Wide := Wide + S;
     end;
+    X := CX - Wide / 2;
+    for I := 1 to Length(W) do
+      X := X + Letter(W[I], X, OY, S, Z) + S;
   end;
-end;
 
-{ A word, centered on CX. }
-procedure Word_(const W: string; CX, OY, S, Z: Double);
-var
-  I: Integer;
-  Wide, X: Double;
-begin
-  Wide := 0;
-  for I := 1 to Length(W) do
+  { A line of the drawing on the screen. }
+  procedure Stroke(X0, Y0, X1, Y1: double);
   begin
-    if W[I] = ' ' then Wide := Wide + 3 * S else Wide := Wide + 6 * S;
-    if I < Length(W) then Wide := Wide + S;
+    D.AddLine(P(X0, Y0, BT - RECESS), P(X1, Y1, BT - RECESS), INK, 1.0, False);
   end;
-  X := CX - Wide / 2;
-  for I := 1 to Length(W) do
-    X := X + Letter(W[I], X, OY, S, Z) + S;
-end;
-
-{ A line of the drawing on the screen. }
-procedure Stroke(X0, Y0, X1, Y1: Double);
-begin
-  D.AddLine(P(X0, Y0, BT - RECESS), P(X1, Y1, BT - RECESS), INK, 1.0, False);
-end;
 
 { A box in stylus lines.  It goes through Loop so it gets a face of its own;
   drawn with Stroke it would be four lines nobody can push. }
-procedure BoxLine(X0, Y0, X1, Y1: Double);
-begin
-  Loop([X0, Y0, X1, Y0, X1, Y1, X0, Y1], 0, 0, 1, BT - RECESS);
-end;
+  procedure BoxLine(X0, Y0, X1, Y1: double);
+  begin
+    Loop([X0, Y0, X1, Y0, X1, Y1, X0, Y1], 0, 0, 1, BT - RECESS);
+  end;
 
 { One knob: a short cylinder sunk a little into the frame so no two faces
   land in the same place. }
-procedure Knob(CX, CY: Double);
-var
-  I: Integer;
-  A0, A1, Z0, Z1: Double;
-  Top, Bot: array of TP3;
-begin
-  Inc(Grp);
-  Z0 := BT - 0.06;
-  Z1 := BT + KNOB_H;
-  SetLength(Top, KNOB_SIDES);
-  SetLength(Bot, KNOB_SIDES);
-  for I := 0 to KNOB_SIDES - 1 do
+  procedure Knob(CX, CY: double);
+  var
+    I: integer;
+    A0, A1, Z0, Z1: double;
+    Top, Bot: array of TP3;
   begin
-    A0 := I * 2 * Pi / KNOB_SIDES;
-    Top[I] := P(CX + KNOB_R * Cos(A0), CY + KNOB_R * Sin(A0), Z1);
-    Bot[KNOB_SIDES - 1 - I] :=
-      P(CX + KNOB_R * Cos(A0), CY + KNOB_R * Sin(A0), Z0);
+    Inc(Grp);
+    Z0 := BT - 0.06;
+    Z1 := BT + KNOB_H;
+    SetLength(Top, KNOB_SIDES);
+    SetLength(Bot, KNOB_SIDES);
+    for I := 0 to KNOB_SIDES - 1 do
+    begin
+      A0 := I * 2 * Pi / KNOB_SIDES;
+      Top[I] := P(CX + KNOB_R * Cos(A0), CY + KNOB_R * Sin(A0), Z1);
+      Bot[KNOB_SIDES - 1 - I] :=
+        P(CX + KNOB_R * Cos(A0), CY + KNOB_R * Sin(A0), Z0);
+    end;
+    Face(Top, WHITE);                 { the lid, anticlockwise seen from above }
+    Face(Bot, WHITE);                 { the underside, the other way round }
+    for I := 0 to KNOB_SIDES - 1 do
+    begin
+      A0 := I * 2 * Pi / KNOB_SIDES;
+      A1 := ((I + 1) mod KNOB_SIDES) * 2 * Pi / KNOB_SIDES;
+      Wall(CX + KNOB_R * Cos(A0), CY + KNOB_R * Sin(A0),
+        CX + KNOB_R * Cos(A1), CY + KNOB_R * Sin(A1), Z0, Z1, WHITE);
+    end;
   end;
-  Face(Top, WHITE);                 { the lid, anticlockwise seen from above }
-  Face(Bot, WHITE);                 { the underside, the other way round }
-  for I := 0 to KNOB_SIDES - 1 do
-  begin
-    A0 := I * 2 * Pi / KNOB_SIDES;
-    A1 := ((I + 1) mod KNOB_SIDES) * 2 * Pi / KNOB_SIDES;
-    Wall(CX + KNOB_R * Cos(A0), CY + KNOB_R * Sin(A0),
-         CX + KNOB_R * Cos(A1), CY + KNOB_R * Sin(A1), Z0, Z1, WHITE);
-  end;
-end;
 
 var
-  ZF: Double;
-  I, J, TopFace, ScrFace: Integer;
+  ZF: double;
+  I, J, TopFace, ScrFace: integer;
   U: TStringList;
   Outer, Screen: TP3Array;
   Logo, Robot: array of TP3Array;
-  LetterFace: Integer;
+  LetterFace: integer;
   Holes: array of TP3Array;
-  BaseP, Diag, CamZoom: Double;
+  BaseP, Diag, CamZoom: double;
   BLo, BHi, CamMid: TP3;
   CamV: TProjector;
   CamP: TPointF;
@@ -472,9 +502,8 @@ begin
     The notes are for whoever opens the copy the program writes out. }
   ExampleText(D, 'Etch a Sketch', 4, 1, CamV.Az, CamV.El, CamZoom,
     ART_W / 2 - CamP.X, ART_H / 2 - CamP.Y,
-    ['Written out beside Heckers Sketch, and put back whenever it is missing',
-     'or untouched.  Draw on it all you like - once you save over it, it is',
-     'yours and the program leaves it alone.'], L);
+    ['Written out beside Heckers Sketch, and put back whenever it is missing', 'or untouched.  Draw on it all you like - once you save over it, it is',
+    'yours and the program leaves it alone.'], L);
   L.SaveToFile('etch-a-sketch.hsk');
 
   { and the same thing as a unit, so a portable build carries it }
@@ -508,6 +537,5 @@ begin
   U.SaveToFile('../src/examples/hsExToy.pas');
   U.Free;
 
-  WriteLn(Format('%d things -> etch-a-sketch.hsk and hsExToy.pas (%d lines)',
-    [D.Live, L.Count]));
+  WriteLn(Format('%d things -> etch-a-sketch.hsk and hsExToy.pas (%d lines)', [D.Live, L.Count]));
 end.

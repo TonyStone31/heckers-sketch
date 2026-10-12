@@ -18,8 +18,7 @@ uses
   camera at Az, El, Zoom and panned by PanX, PanY.  ScaleIdx and SnapIdx index
   ScaleTable and the snap list.  The camera is rounded so an unchanged model
   regenerates to the same bytes.  Notes go first as '//' comment lines. }
-procedure ExampleText(D: TWorkDoc; const Name: string; ScaleIdx, SnapIdx: Integer;
-  Az, El, Zoom, PanX, PanY: Double; const Notes: array of string; L: TStrings);
+procedure ExampleText(D: TWorkDoc; const Name: string; ScaleIdx, SnapIdx: integer; Az, El, Zoom, PanX, PanY: double; const Notes: array of string; L: TStrings);
 
 { Adds to U (already holding the unit up to "implementation") a procedure Decl
   that adds L's lines one by one.  The compiler rejects one huge procedure
@@ -29,7 +28,7 @@ procedure Lines2Unit(L, U: TStrings; const Decl: string);
 
 { A carried example's first sheet into D, for a model built from another one.
   False when it will not read. }
-function ReadExample(L: TStrings; D: TWorkDoc): Boolean;
+function ReadExample(L: TStrings; D: TWorkDoc): boolean;
 
 const
   PART_LINES = 4000;
@@ -42,23 +41,27 @@ implementation
 procedure RoundDoc(D: TWorkDoc);
 var
   A: TWorkEntArray;
-  I, K, H: Integer;
+  I, K, H: integer;
 
-  function R6(V: Double): Double;
+  function R6(V: double): double;
   begin
     Result := RoundTo(V, -6);
   end;
 
   procedure P6(var P: TP3);
   begin
-    P.X := R6(P.X); P.Y := R6(P.Y); P.Z := R6(P.Z);
+    P.X := R6(P.X);
+    P.Y := R6(P.Y);
+    P.Z := R6(P.Z);
   end;
 
 begin
   A := D.Snapshot;
   for I := 0 to High(A) do
   begin
-    P6(A[I].A); P6(A[I].B); P6(A[I].C);
+    P6(A[I].A);
+    P6(A[I].B);
+    P6(A[I].C);
     A[I].R := R6(A[I].R);
     A[I].A0 := R6(A[I].A0);
     A[I].Sweep := R6(A[I].Sweep);
@@ -69,11 +72,10 @@ begin
   D.RestoreSnap(A);
 end;
 
-procedure ExampleText(D: TWorkDoc; const Name: string; ScaleIdx, SnapIdx: Integer;
-  Az, El, Zoom, PanX, PanY: Double; const Notes: array of string; L: TStrings);
+procedure ExampleText(D: TWorkDoc; const Name: string; ScaleIdx, SnapIdx: integer; Az, El, Zoom, PanX, PanY: double; const Notes: array of string; L: TStrings);
 var
   S: array of THeckSheet;
-  I: Integer;
+  I: integer;
 begin
   RoundDoc(D);
   SetLength(S, 1);
@@ -98,11 +100,11 @@ end;
 
 procedure Lines2Unit(L, U: TStrings; const Decl: string);
 var
-  P, NParts: Integer;
+  P, NParts: integer;
 
-  procedure Adds(From, Upto: Integer);
+  procedure Adds(From, Upto: integer);
   var
-    K: Integer;
+    K: integer;
   begin
     for K := From to Upto do
       U.Add('  L.Add(''' + StringReplace(L[K], '''', '''''', [rfReplaceAll]) + ''');');
@@ -131,16 +133,17 @@ begin
   U.Add('end.');
 end;
 
-function ReadExample(L: TStrings; D: TWorkDoc): Boolean;
+function ReadExample(L: TStrings; D: TWorkDoc): boolean;
 var
   Sheets: THeckSheets;
-  I, ErrLine: Integer;
+  I, ErrLine: integer;
   Err: string;
 begin
   Sheets := nil;
   Result := ReadDrawingFile(L, Sheets, ErrLine, Err) and (Length(Sheets) > 0);
   if Result then D.RestoreSnap(Sheets[0].Doc.Snapshot)
-  else WriteLn('the example will not read: ', Err);
+  else
+    WriteLn('the example will not read: ', Err);
   for I := 0 to High(Sheets) do Sheets[I].Doc.Free;
 end;
 

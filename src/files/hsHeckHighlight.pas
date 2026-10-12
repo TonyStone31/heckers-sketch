@@ -25,44 +25,43 @@ type
   private
     FAttr: array[THskToken] of TLazEditHighlighterAttributes;
     FTok: THskToken;
-    FTokPos: Integer;
-    Run: Integer;
-    FOpens, FCloses, FDone: Boolean;   { this line opens a block / is "end" }
-    FJigLine: Boolean;                  { "jig = ...": what follows is its output, folded under it }
-    FListOpens, FListCloses: Boolean;  { "key = (" and the ")" that ends it }
-    FSeenEquals: Boolean;
+    FTokPos: integer;
+    Run: integer;
+    FOpens, FCloses, FDone: boolean;   { this line opens a block / is "end" }
+    FJigLine: boolean;                  { "jig = ...": what follows is its output, folded under it }
+    FListOpens, FListCloses: boolean;  { "key = (" and the ")" that ends it }
+    FSeenEquals: boolean;
     FAxisNext: THskToken;              { the number after "x" is red, and so on }
-    function LineLen_: Integer;
-    function WordAt(P: Integer; out Len: Integer): string;
+    function LineLen_: integer;
+    function WordAt(P: integer; out Len: integer): string;
     function AxisOf(const W: string): THskToken;
   protected
-    function GetFoldConfigInstance(Index: Integer): TSynCustomFoldConfig; override;
-    function GetFoldConfigCount: Integer; override;
-    function GetFoldConfigInternalCount: Integer; override;
+    function GetFoldConfigInstance(Index: integer): TSynCustomFoldConfig; override;
+    function GetFoldConfigCount: integer; override;
+    function GetFoldConfigInternalCount: integer; override;
     procedure CreateRootCodeFoldBlock; override;
   public
     class function GetLanguageName: string; override;
     constructor Create(AOwner: TComponent); override;
-    function GetTokenClassAttribute(ATkClass: TLazEditTokenClass;
-      ATkDetails: TLazEditTokenDetails = []): TLazEditTextAttribute; override;
-    function GetEol: Boolean; override;
+    function GetTokenClassAttribute(ATkClass: TLazEditTokenClass; ATkDetails: TLazEditTokenDetails = []): TLazEditTextAttribute; override;
+    function GetEol: boolean; override;
     procedure InitForScanningLine; override;
-    function GetToken: String; override;
+    function GetToken: string; override;
     procedure GetTokenEx(out TokenStart: PChar; out TokenLength: integer); override;
     function GetTokenAttribute: TLazEditTextAttribute; override;
     function GetTokenKind: integer; override;
-    function GetTokenPos: Integer; override;
+    function GetTokenPos: integer; override;
     procedure Next; override;
     { Colors for a light or dark page; the axis colors are adjusted to read
       on either. }
-    procedure UseDark(Dark: Boolean);
+    procedure UseDark(Dark: boolean);
   end;
 
 const
   { the axes as the sheet draws them, darkened enough to read on white }
-  HSK_RED   = TColor($2020C8);
+  HSK_RED = TColor($2020C8);
   HSK_GREEN = TColor($207A20);
-  HSK_BLUE  = TColor($C85020);
+  HSK_BLUE = TColor($C85020);
 
 implementation
 
@@ -70,8 +69,7 @@ uses
   StrUtils, hsHeckWriter;
 
 const
-  KEYWORDS = ' heckerssketch sheet group solid points ring const face noface hole line arc circle ' +
-    'box rect pull bore dim note guide jig begin end to true false none ';
+  KEYWORDS = ' heckerssketch sheet group solid points ring const face noface hole line arc circle ' + 'box rect pull bore dim note guide jig begin end to true false none ';
   NAMES: array[THskToken] of string = ('Space', 'Note', 'Keyword', 'Property',
     'Name', 'Text', 'Symbol', 'East-west', 'North-south', 'Up-down', 'Number', 'Color');
 
@@ -91,7 +89,7 @@ begin
   SetAttributesOnChange(@DefHighlightChange);
 end;
 
-procedure TSynHsk2Syn.UseDark(Dark: Boolean);
+procedure TSynHsk2Syn.UseDark(Dark: boolean);
 begin
   if Dark then
   begin
@@ -128,8 +126,7 @@ begin
   Result := 'Heckers Sketch 2';
 end;
 
-function TSynHsk2Syn.GetTokenClassAttribute(ATkClass: TLazEditTokenClass;
-  ATkDetails: TLazEditTokenDetails): TLazEditTextAttribute;
+function TSynHsk2Syn.GetTokenClassAttribute(ATkClass: TLazEditTokenClass; ATkDetails: TLazEditTokenDetails): TLazEditTextAttribute;
 begin
   case ATkClass of
     tcComment: Result := FAttr[htComment];
@@ -139,12 +136,12 @@ begin
     tcWhiteSpace: Result := FAttr[htSpace];
     tcSymbol: Result := FAttr[htSymbol];
     tcNumber: Result := FAttr[htNumber];
-  else
-    Result := nil;
+    else
+      Result := nil;
   end;
 end;
 
-function TSynHsk2Syn.GetFoldConfigInstance(Index: Integer): TSynCustomFoldConfig;
+function TSynHsk2Syn.GetFoldConfigInstance(Index: integer): TSynCustomFoldConfig;
 begin
   Result := inherited GetFoldConfigInstance(Index);
   Result.Enabled := True;
@@ -153,12 +150,12 @@ begin
   Result.Modes := Result.Modes + [fmMarkup];
 end;
 
-function TSynHsk2Syn.GetFoldConfigCount: Integer;
+function TSynHsk2Syn.GetFoldConfigCount: integer;
 begin
   Result := 2;
 end;
 
-function TSynHsk2Syn.GetFoldConfigInternalCount: Integer;
+function TSynHsk2Syn.GetFoldConfigInternalCount: integer;
 begin
   Result := 3;
 end;
@@ -169,15 +166,15 @@ begin
   RootCodeFoldBlock.InitRootBlockType(Pointer(PtrInt(0)));
 end;
 
-function TSynHsk2Syn.LineLen_: Integer;
+function TSynHsk2Syn.LineLen_: integer;
 begin
   Result := Length(CurrentLineText);
 end;
 
-function TSynHsk2Syn.WordAt(P: Integer; out Len: Integer): string;
+function TSynHsk2Syn.WordAt(P: integer; out Len: integer): string;
 var
   L: PChar;
-  N: Integer;
+  N: integer;
 begin
   L := LinePtr;
   N := LineLen_;
@@ -192,7 +189,8 @@ begin
   if (W = 'x') or (W = 'east') or (W = 'west') then Result := htEast
   else if (W = 'y') or (W = 'north') or (W = 'south') then Result := htNorth
   else if (W = 'z') or (W = 'up') or (W = 'down') then Result := htUp
-  else Result := htNumber;
+  else
+    Result := htNumber;
 end;
 
 { Rule 7, worked out once for the line: is there an "=" outside text and
@@ -200,8 +198,8 @@ end;
 procedure TSynHsk2Syn.InitForScanningLine;
 var
   L: PChar;
-  I, N, WLen: Integer;
-  InText, HasEq: Boolean;
+  I, N, WLen: integer;
+  InText, HasEq: boolean;
   W: string;
 begin
   inherited;
@@ -219,7 +217,11 @@ begin
     else if (L[I] = '''') and ((I = 0) or not (L[I - 1] in ['0'..'9'])) then InText := True
     else if L[I] = '{' then Break
     else if (L[I] = '/') and (I + 1 < N) and (L[I + 1] = '/') then Break
-    else if L[I] = '=' then begin HasEq := True; Break; end;
+    else if L[I] = '=' then
+    begin
+      HasEq := True;
+      Break;
+    end;
     Inc(I);
   end;
   { the last thing on the line that is not a space or a note }
@@ -240,9 +242,8 @@ begin
   { inside a bracketed list the lines are its items, not blocks }
   { A "begin" under the block's opening word opens nothing; the block is
     already open. }
-  FOpens := (not HasEq) and (WLen > 0) and (not FCloses) and (W <> 'heckerssketch') and
-            (W <> 'begin') and
-            (not FListCloses) and (PtrUInt(TopCodeFoldBlockType) <> 2);
+  FOpens := (not HasEq) and (WLen > 0) and (not FCloses) and (W <> 'heckerssketch') and (W <> 'begin') and (not FListCloses) and
+    (PtrUInt(TopCodeFoldBlockType) <> 2);
   { In a group, everything after the jig line is the jig's output and folds
     under that line.  The fold closes at the group's "end". }
   FJigLine := HasEq and (W = 'jig') and (PtrUInt(TopCodeFoldBlockType) = 1);
@@ -256,7 +257,7 @@ end;
 procedure TSynHsk2Syn.Next;
 var
   L: PChar;
-  N, WLen, P: Integer;
+  N, WLen, P: integer;
   W: string;
 begin
   L := LinePtr;
@@ -266,120 +267,125 @@ begin
 
   case L[Run] of
     ' ', #9:
-      begin
-        FTok := htSpace;
-        while (Run < N) and (L[Run] in [' ', #9]) do Inc(Run);
-      end;
+    begin
+      FTok := htSpace;
+      while (Run < N) and (L[Run] in [' ', #9]) do Inc(Run);
+    end;
     '{':
-      begin
-        FTok := htComment;
-        while (Run < N) and (L[Run] <> '}') do Inc(Run);
-        if Run < N then Inc(Run);
-      end;
-    '''':
-      begin
-        FTok := htText;
-        Inc(Run);
-        while Run < N do
-        begin
-          if L[Run] = '''' then
-          begin
-            Inc(Run);
-            if (Run < N) and (L[Run] = '''') then Inc(Run) else Break;
-          end
-          else
-            Inc(Run);
-        end;
-      end;
-    '#':
-      begin
-        FTok := htColor;
-        Inc(Run);
-        while (Run < N) and (L[Run] in ['0'..'9', 'A'..'F', 'a'..'f']) do Inc(Run);
-      end;
-    '0'..'9', '.', '-':
-      begin
-        if L[Run] = '-' then Inc(Run);
-        { A length like 5' 10 5/8" takes the color of the direction word
-          after it, if any. }
-        while Run < N do
-        begin
-          if L[Run] in ['0'..'9', '.', '/', '''', '"'] then Inc(Run)
-          else if (L[Run] = ' ') and (Run + 1 < N) and (L[Run + 1] in ['0'..'9']) then Inc(Run)
-          else if (L[Run] = #$C2) and (Run + 1 < N) and (L[Run + 1] = #$B0) then Inc(Run, 2)
-          else Break;
-        end;
-        { Color from the direction word after it ("4' east") or the axis
-          letter before it ("x 4'"). }
-        FTok := FAxisNext;
-        FAxisNext := htNumber;
-        if FTok = htNumber then
-        begin
-          P := Run;
-          while (P < N) and (L[P] = ' ') do Inc(P);
-          W := WordAt(P, WLen);
-          if WLen > 1 then FTok := AxisOf(W);
-        end;
-      end;
-  else
-    if (L[Run] = '/') and (Run + 1 < N) and (L[Run + 1] = '/') then
     begin
       FTok := htComment;
-      Run := N;
-    end
-    else if L[Run] in ['A'..'Z', 'a'..'z', '_'] then
+      while (Run < N) and (L[Run] <> '}') do Inc(Run);
+      if Run < N then Inc(Run);
+    end;
+    '''':
     begin
-      W := WordAt(Run, WLen);
-      Inc(Run, WLen);
-      FTok := AxisOf(W);
-      { "x", "y" and "z" are axes only in front of a number; anywhere else a
-        single letter is a point name. }
-      if (FTok <> htNumber) and (Length(W) = 1) then
+      FTok := htText;
+      Inc(Run);
+      while Run < N do
+      begin
+        if L[Run] = '''' then
+        begin
+          Inc(Run);
+          if (Run < N) and (L[Run] = '''') then Inc(Run)
+          else
+            Break;
+        end
+        else
+          Inc(Run);
+      end;
+    end;
+    '#':
+    begin
+      FTok := htColor;
+      Inc(Run);
+      while (Run < N) and (L[Run] in ['0'..'9', 'A'..'F', 'a'..'f']) do Inc(Run);
+    end;
+    '0'..'9', '.', '-':
+    begin
+      if L[Run] = '-' then Inc(Run);
+        { A length like 5' 10 5/8" takes the color of the direction word
+          after it, if any. }
+      while Run < N do
+      begin
+        if L[Run] in ['0'..'9', '.', '/', '''', '"'] then Inc(Run)
+        else if (L[Run] = ' ') and (Run + 1 < N) and (L[Run + 1] in ['0'..'9']) then Inc(Run)
+        else if (L[Run] = #$C2) and (Run + 1 < N) and (L[Run + 1] = #$B0) then Inc(Run, 2)
+        else
+          Break;
+      end;
+        { Color from the direction word after it ("4' east") or the axis
+          letter before it ("x 4'"). }
+      FTok := FAxisNext;
+      FAxisNext := htNumber;
+      if FTok = htNumber then
       begin
         P := Run;
         while (P < N) and (L[P] = ' ') do Inc(P);
-        if (P < N) and (L[P] in ['0'..'9', '.', '-']) then FAxisNext := FTok
-        else FTok := htNumber;
+        W := WordAt(P, WLen);
+        if WLen > 1 then FTok := AxisOf(W);
       end;
-      if FTok = htNumber then
-      begin
-        if Pos(' ' + W + ' ', KEYWORDS) > 0 then FTok := htKey
-        else if not FSeenEquals then FTok := htProp
-        else if AnsiIndexStr(W, HECK_COLOR_NAMES) >= 0 then FTok := htColor
-        else FTok := htName;
-      end;
-      { the block opens at its first word, and "end" closes at "end" }
-      if not FDone then
-      begin
-        FDone := True;
-        if FOpens then StartCodeFoldBlock(Pointer(PtrInt(1)), True)
-        else if FJigLine then StartCodeFoldBlock(Pointer(PtrInt(3)), True)
-        else if FCloses then
-        begin
-          { the group's end closes the jig's output first, then the group }
-          if PtrUInt(TopCodeFoldBlockType) = 3 then EndCodeFoldBlock(True);
-          EndCodeFoldBlock(True);
-        end;
-      end;
-    end
-    else
-    begin
-      if L[Run] = '=' then FSeenEquals := True;
-      if (L[Run] = '(') and FListOpens then StartCodeFoldBlock(Pointer(PtrInt(2)), True);
-      if (L[Run] = ')') and FListCloses and (PtrUInt(TopCodeFoldBlockType) = 2) then
-        EndCodeFoldBlock(True);
-      FTok := htSymbol;
-      Inc(Run);
     end;
+    else
+      if (L[Run] = '/') and (Run + 1 < N) and (L[Run + 1] = '/') then
+      begin
+        FTok := htComment;
+        Run := N;
+      end
+      else if L[Run] in ['A'..'Z', 'a'..'z', '_'] then
+      begin
+        W := WordAt(Run, WLen);
+        Inc(Run, WLen);
+        FTok := AxisOf(W);
+      { "x", "y" and "z" are axes only in front of a number; anywhere else a
+        single letter is a point name. }
+        if (FTok <> htNumber) and (Length(W) = 1) then
+        begin
+          P := Run;
+          while (P < N) and (L[P] = ' ') do Inc(P);
+          if (P < N) and (L[P] in ['0'..'9', '.', '-']) then FAxisNext := FTok
+          else
+            FTok := htNumber;
+        end;
+        if FTok = htNumber then
+        begin
+          if Pos(' ' + W + ' ', KEYWORDS) > 0 then FTok := htKey
+          else if not FSeenEquals then FTok := htProp
+          else if AnsiIndexStr(W, HECK_COLOR_NAMES) >= 0 then FTok := htColor
+          else
+            FTok := htName;
+        end;
+        { the block opens at its first word, and "end" closes at "end" }
+        if not FDone then
+        begin
+          FDone := True;
+          if FOpens then StartCodeFoldBlock(Pointer(PtrInt(1)), True)
+          else if FJigLine then StartCodeFoldBlock(Pointer(PtrInt(3)), True)
+          else if FCloses then
+          begin
+            { the group's end closes the jig's output first, then the group }
+            if PtrUInt(TopCodeFoldBlockType) = 3 then EndCodeFoldBlock(True);
+            EndCodeFoldBlock(True);
+          end;
+        end;
+      end
+      else
+      begin
+        if L[Run] = '=' then FSeenEquals := True;
+        if (L[Run] = '(') and FListOpens then StartCodeFoldBlock(Pointer(PtrInt(2)), True);
+        if (L[Run] = ')') and FListCloses and (PtrUInt(TopCodeFoldBlockType) = 2) then
+          EndCodeFoldBlock(True);
+        FTok := htSymbol;
+        Inc(Run);
+      end;
   end;
 end;
 
-function TSynHsk2Syn.GetEol: Boolean;
+function TSynHsk2Syn.GetEol: boolean;
 begin
   Result := FTokPos >= LineLen_;
 end;
 
-function TSynHsk2Syn.GetToken: String;
+function TSynHsk2Syn.GetToken: string;
 begin
   SetString(Result, LinePtr + FTokPos, Run - FTokPos);
 end;
@@ -400,7 +406,7 @@ begin
   Result := Ord(FTok);
 end;
 
-function TSynHsk2Syn.GetTokenPos: Integer;
+function TSynHsk2Syn.GetTokenPos: integer;
 begin
   Result := FTokPos;
 end;

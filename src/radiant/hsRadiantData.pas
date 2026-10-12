@@ -26,9 +26,9 @@ type
 
   TTubeFacts = record
     Name: string;         { what the trade calls it - the nominal size }
-    OdIn: Double;          { outer diameter, inches }
-    MinBendIn: Double;     { the tightest a run can turn, inches - 8x OD }
-    MaxLoopFt: Double;     { a safe everyday maximum circuit length, feet }
+    OdIn: double;          { outer diameter, inches }
+    MinBendIn: double;     { the tightest a run can turn, inches - 8x OD }
+    MaxLoopFt: double;     { a safe everyday maximum circuit length, feet }
   end;
 
 const
@@ -39,7 +39,7 @@ const
     (Name: '1/2"'; OdIn: 0.625; MinBendIn: 5.0; MaxLoopFt: 300),
     (Name: '5/8"'; OdIn: 0.750; MinBendIn: 6.0; MaxLoopFt: 400),
     (Name: '3/4"'; OdIn: 0.875; MinBendIn: 7.0; MaxLoopFt: 500)
-  );
+    );
 
   { default spacing and the range outside of which we warn, inches }
   SPACING_DEFAULT_IN = 9.0;

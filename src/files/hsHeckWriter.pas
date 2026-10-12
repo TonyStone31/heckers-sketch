@@ -20,7 +20,7 @@ const
   { the colors Heck has names for, as TColor; any other is written #RRGGBB }
   HECK_COLOR_NAMES: array[0..9] of string = ('black', 'white', 'gray', 'red',
     'orange', 'yellow', 'green', 'blue', 'purple', 'brown');
-  HECK_COLOR_VALUES: array[0..9] of Integer = ($000000, $FFFFFF, $808080,
+  HECK_COLOR_VALUES: array[0..9] of integer = ($000000, $FFFFFF, $808080,
     $0000FF, $3CB0FF, $00FFFF, $008000, $FF0000, $800080, $2A2AA5);
 
   { a box's sides, in the order the reader makes them; "open = top" names them }
@@ -46,17 +46,15 @@ const
 { Names, if given, gets "line|name=place" for every named point, ring
   corners included, where line is the "points" line of the naming block.
   A name is looked up from where it is used by taking the nearest block above. }
-procedure WriteFormat2(D: TWorkDoc; const SheetName: string; U: TUnitSystem;
-  L: TStrings; out First, Last, LineThing: TIntArrayW; Hints: TStrings = nil;
-  Names: TStrings = nil; SheetLines: TStrings = nil; Quick: Boolean = False);
+procedure WriteFormat2(D: TWorkDoc; const SheetName: string; U: TUnitSystem; L: TStrings; out First, Last, LineThing: TIntArrayW;
+  Hints: TStrings = nil; Names: TStrings = nil; SheetLines: TStrings = nil; Quick: boolean = False);
 
 type
-  TBoolArray = array of Boolean;
+  TBoolArray = array of boolean;
   { The reader.  Implied comes back with one flag per thing: True for a face
     the reader would have made by itself from its scope's edges, facing the
     same way. }
-  TReadBack = function(L: TStrings; D: TWorkDoc; U: TUnitSystem;
-    out ErrLine: Integer; out Err: string; out Implied: TBoolArray): Boolean;
+  TReadBack = function(L: TStrings; D: TWorkDoc; U: TUnitSystem; out ErrLine: integer; out Err: string; out Implied: TBoolArray): boolean;
 
 var
   { The reader, so the writer can see what its own text becomes; hsHeckReader
@@ -68,13 +66,13 @@ var
 
 { A whole circle.  Older drawings, rounded to six places, hold the circle
   tool's circles as sweeps a hair short of 2 pi (359.9999824 degrees). }
-function FullCircle(Sweep: Double): Boolean;
+function FullCircle(Sweep: double): boolean;
 
 { A fingerprint of solid G's geometry in group Part: its faces, lines and
   circles, in any order, to a hundred-thousandth of a foot.  A statement the
   writer cannot work out from geometry (a loft) is kept with the fingerprint
   of what it made, and written back only while that still matches. }
-function SolidPrint(D: TWorkDoc; G, Part: Integer): string;
+function SolidPrint(D: TWorkDoc; G, Part: integer): string;
 
 { the two directions a flat thing's angles are measured in: from east when
   facing up or down, otherwise from its level line (up x facing) }
@@ -82,25 +80,25 @@ procedure SpecAxes(const F: TP3; out AU, AV: TP3);
 
 { One length as the file writes it; always positive, since the direction
   word carries the sign. }
-function Len2(V: Double; U: TUnitSystem): string;
+function Len2(V: double; U: TUnitSystem): string;
 { a place ("1" east, 1" north, 0 up") or, with Offset, a step giving only
   what changes }
-function Place2(const P: TP3; U: TUnitSystem; Offset: Boolean): string;
+function Place2(const P: TP3; U: TUnitSystem; Offset: boolean): string;
 
 implementation
 
 uses
   Contnrs;
 
-function FullCircle(Sweep: Double): Boolean;
+function FullCircle(Sweep: double): boolean;
 begin
   Result := Abs(Abs(Sweep) - 2 * Pi) < 1E-5;
 end;
 
-function SolidPrint(D: TWorkDoc; G, Part: Integer): string;
+function SolidPrint(D: TWorkDoc; G, Part: integer): string;
 var
   All, One: TStringList;
-  I, K, H: Integer;
+  I, K, H: integer;
   Hash: QWord;
   Txt: string;
 
@@ -120,22 +118,22 @@ begin
       One.Clear;
       case D.EntRef(I)^.Kind of
         ekFace:
-          begin
-            for K := 0 to High(D.EntRef(I)^.Poly) do One.Add(Key(D.EntRef(I)^.Poly[K]));
-            for H := 0 to High(D.EntRef(I)^.Holes) do
-              for K := 0 to High(D.EntRef(I)^.Holes[H]) do One.Add('h' + Key(D.EntRef(I)^.Holes[H][K]));
-          end;
+        begin
+          for K := 0 to High(D.EntRef(I)^.Poly) do One.Add(Key(D.EntRef(I)^.Poly[K]));
+          for H := 0 to High(D.EntRef(I)^.Holes) do
+            for K := 0 to High(D.EntRef(I)^.Holes[H]) do One.Add('h' + Key(D.EntRef(I)^.Holes[H][K]));
+        end;
         ekLine:
-          begin
-            One.Add(Key(D.EntRef(I)^.A));
-            One.Add(Key(D.EntRef(I)^.B));
-            if D.EntRef(I)^.Soft then One.Add('soft');
-          end;
+        begin
+          One.Add(Key(D.EntRef(I)^.A));
+          One.Add(Key(D.EntRef(I)^.B));
+          if D.EntRef(I)^.Soft then One.Add('soft');
+        end;
         ekArc:
-          begin
-            One.Add(Key(D.EntRef(I)^.C));
-            One.Add(IntToStr(Round(D.EntRef(I)^.R * 1E5)));
-          end;
+        begin
+          One.Add(Key(D.EntRef(I)^.C));
+          One.Add(IntToStr(Round(D.EntRef(I)^.R * 1E5)));
+        end;
       end;
       One.Sort;
       All.Add(IntToStr(Ord(D.EntRef(I)^.Kind)) + ':' + One.CommaText);
@@ -144,7 +142,9 @@ begin
     { FNV-1a over the lot; it wraps on purpose }
     Txt := All.Text;
     Hash := QWord($CBF29CE484222325);
-    {$PUSH}{$Q-}{$R-}
+    {$PUSH}
+    {$Q-}
+    {$R-}
     for I := 1 to Length(Txt) do
     begin
       Hash := Hash xor Ord(Txt[I]);
@@ -160,15 +160,15 @@ end;
 
 var
   { pass one is running: every face is written and no noface }
-  InPass1: Boolean = False;
+  InPass1: boolean = False;
 
 type
   TPt = record
     P: TP3;
     Read: TP3;           { where the reader will put it, from the text }
     Name: string;
-    Ring: Integer;       { which ring it is a corner of, or -1 }
-    InHole: Boolean;     { a corner of a hole, and of no outline }
+    Ring: integer;       { which ring it is a corner of, or -1 }
+    InHole: boolean;     { a corner of a hole, and of no outline }
   end;
   TPts = array of TPt;
 
@@ -177,15 +177,15 @@ type
   TRing = record
     Name: string;
     C, Facing: TP3;
-    R, Starts: Double;
-    N: Integer;
+    R, Starts: double;
+    N: integer;
   end;
   TRings = array of TRing;
 
-function Len2(V: Double; U: TUnitSystem): string;
+function Len2(V: double; U: TUnitSystem): string;
 var
-  Inches, R, Frac: Double;
-  Feet, Whole, Num, Den: Integer;
+  Inches, R, Frac: double;
+  Feet, Whole, Num, Den: integer;
   S: string;
 begin
   V := Abs(V);
@@ -218,7 +218,11 @@ begin
   Frac := R - Whole;
   Num := Round(Frac * 64);
   Den := 64;
-  while (Num > 0) and (Num mod 2 = 0) do begin Num := Num div 2; Den := Den div 2; end;
+  while (Num > 0) and (Num mod 2 = 0) do
+  begin
+    Num := Num div 2;
+    Den := Den div 2;
+  end;
   S := '';
   if Feet > 0 then S := IntToStr(Feet) + '''';
   if (Whole > 0) or (Num > 0) then
@@ -242,9 +246,9 @@ end;
   the reader will be, not where the drawing is, so each corner reads back as
   its own rounded self; otherwise forty-eight tiny errors drift a disk off
   its ring. }
-function AsRead(V: Double; U: TUnitSystem): Double;
+function AsRead(V: double; U: TUnitSystem): double;
 var
-  A, Inches, R: Double;
+  A, Inches, R: double;
 begin
   A := Abs(V);
   Result := 0;
@@ -265,7 +269,8 @@ begin
     begin
       R := Round(Inches * 1000) / 1000;
       if Abs(R / 12 - A) <= ROUNDING_NOISE then Result := R / 12
-      else Result := StrToFloat(FloatToStrF(Inches, ffGeneral, 12, 0, DotFS), DotFS) / 12;
+      else
+        Result := StrToFloat(FloatToStrF(Inches, ffGeneral, 12, 0, DotFS), DotFS) / 12;
     end
     else
       Result := R / 12;
@@ -281,9 +286,9 @@ end;
 { A place always gives all three parts ("1" east, 1" north, 0 up"), so the
   height is visible; "0 up" is on the floor.  West, south and down carry the
   sign, so no number is negative.  A step gives only the parts that change. }
-function Place2(const P: TP3; U: TUnitSystem; Offset: Boolean): string;
+function Place2(const P: TP3; U: TUnitSystem; Offset: boolean): string;
 
-  procedure Part(V: Double; const Plus, Minus: string);
+  procedure Part(V: double; const Plus, Minus: string);
   var
     S: string;
   begin
@@ -292,7 +297,8 @@ function Place2(const P: TP3; U: TUnitSystem; Offset: Boolean): string;
     if Offset and (S = '0') then Exit;
     if Result <> '' then Result := Result + ', ';
     if V >= -FRIENDLY_TOL then Result := Result + S + ' ' + Plus
-    else Result := Result + S + ' ' + Minus;
+    else
+      Result := Result + S + ' ' + Minus;
   end;
 
 begin
@@ -303,14 +309,13 @@ begin
   if Result = '' then Result := '0 east';
 end;
 
-function SameP(const A, B: TP3): Boolean;
+function SameP(const A, B: TP3): boolean;
 begin
-  Result := (Abs(A.X - B.X) < 1E-9) and (Abs(A.Y - B.Y) < 1E-9) and
-            (Abs(A.Z - B.Z) < 1E-9);
+  Result := (Abs(A.X - B.X) < 1E-9) and (Abs(A.Y - B.Y) < 1E-9) and (Abs(A.Z - B.Z) < 1E-9);
 end;
 
 { how many of the three parts of a difference are not zero }
-function AxesUsed(const V: TP3): Integer;
+function AxesUsed(const V: TP3): integer;
 begin
   Result := Ord(Abs(V.X) > 1E-9) + Ord(Abs(V.Y) > 1E-9) + Ord(Abs(V.Z) > 1E-9);
 end;
@@ -319,9 +324,13 @@ function FacingWord(const N: TP3): string;
 begin
   Result := '';
   if AxesUsed(N) <> 1 then Exit;
-  if N.X > 0.5 then Result := 'east' else if N.X < -0.5 then Result := 'west'
-  else if N.Y > 0.5 then Result := 'north' else if N.Y < -0.5 then Result := 'south'
-  else if N.Z > 0.5 then Result := 'up' else Result := 'down';
+  if N.X > 0.5 then Result := 'east'
+  else if N.X < -0.5 then Result := 'west'
+  else if N.Y > 0.5 then Result := 'north'
+  else if N.Y < -0.5 then Result := 'south'
+  else if N.Z > 0.5 then Result := 'up'
+  else
+    Result := 'down';
 end;
 
 { The two directions a flat thing's angles are measured in ("facing").  Facing up or down: from east.  Otherwise from its level line,
@@ -329,7 +338,7 @@ end;
   side it faces. }
 procedure SpecAxes(const F: TP3; out AU, AV: TP3);
 var
-  L: Double;
+  L: double;
 begin
   if (Abs(F.X) < 1E-9) and (Abs(F.Y) < 1E-9) then
     AU := P3(1, 0, 0)
@@ -342,7 +351,7 @@ begin
   AV := P3(F.Y * AU.Z - F.Z * AU.Y, F.Z * AU.X - F.X * AU.Z, F.X * AU.Y - F.Y * AU.X);
 end;
 
-function Deg2(A: Double): string;
+function Deg2(A: double): string;
 begin
   A := RadToDeg(A);
   if Abs(A - Round(A * 1000) / 1000) < 1E-7 then A := Round(A * 1000) / 1000;
@@ -355,16 +364,17 @@ end;
   three numbers, which are always right. }
 function Facing2(const N: TP3): string;
 var
-  Tilt, Head, T2, H2: Double;
+  Tilt, Head, T2, H2: double;
   W: string;
   Back: TP3;
 
-  { a plain decimal, never 8.28E-15: noise that small is nought }
-  function Way(V: Double; const Plus, Minus: string): string;
+{ a plain decimal, never 8.28E-15: noise that small is nought }
+  function Way(V: double; const Plus, Minus: string): string;
   begin
     if Abs(V) < 1E-9 then V := 0;
     if V < 0 then Result := FormatFloat('0.#########', -V, DotFS) + ' ' + Minus
-    else Result := FormatFloat('0.#########', V, DotFS) + ' ' + Plus;
+    else
+      Result := FormatFloat('0.#########', V, DotFS) + ' ' + Plus;
   end;
 
 begin
@@ -381,7 +391,8 @@ begin
     else if Abs(H2 - Pi / 2) < 1E-9 then W := 'north'
     else if Abs(Abs(H2) - Pi) < 1E-9 then W := 'west'
     else if Abs(H2 + Pi / 2) < 1E-9 then W := 'south'
-    else W := Deg2(H2) + ' round from east';
+    else
+      W := Deg2(H2) + ' round from east';
     Exit('up, leaning ' + Deg2(T2) + ' toward ' + W);
   end;
   { the word carries the sign, as in a place: 0.28 south, not -0.28 north }
@@ -390,7 +401,7 @@ end;
 
 function Color2(C: TColor): string;
 var
-  I: Integer;
+  I: integer;
 begin
   C := C and $FFFFFF;
   for I := 0 to High(HECK_COLOR_NAMES) do
@@ -398,36 +409,35 @@ begin
   Result := Format('#%.2x%.2x%.2x', [C and $FF, (C shr 8) and $FF, (C shr 16) and $FF]);
 end;
 
-procedure WriteFormat2(D: TWorkDoc; const SheetName: string; U: TUnitSystem;
-  L: TStrings; out First, Last, LineThing: TIntArrayW; Hints: TStrings = nil;
-  Names: TStrings = nil; SheetLines: TStrings = nil; Quick: Boolean = False);
+procedure WriteFormat2(D: TWorkDoc; const SheetName: string; U: TUnitSystem; L: TStrings; out First, Last, LineThing: TIntArrayW;
+  Hints: TStrings = nil; Names: TStrings = nil; SheetLines: TStrings = nil; Quick: boolean = False);
 var
   NextHint: string;
   DefInk: TColor;
-  DefWidth: Single;
-  NLine: Integer;
+  DefWidth: single;
+  NLine: integer;
   Circles: TIntArrayW;        { the whole circles on the sheet: c1, c2... }
   CircleNames: TStringArray;  { their names: the one each was given, or c1, c2... }
   { the solid being written has corners named by the text, so a name made
     up for another corner has to be checked against them }
-  Given: Boolean;
+  Given: boolean;
   { from pass one: the faces the reader restores by itself, and the loops it
     closes that are not faces of the drawing }
-  ImpliedGeom: array of Boolean;
+  ImpliedGeom: array of boolean;
   NoFaceLoops: TLoopArray;
-  NoFaceScope: array of Integer;   { the Grp each loop was closed in }
-  NoFacePart: array of Integer;    { and the group (Part) it is in }
+  NoFaceScope: array of integer;   { the Grp each loop was closed in }
+  NoFacePart: array of integer;    { and the group (Part) it is in }
 
-  function CircleName(I: Integer): string;
+  function CircleName(I: integer): string;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := '';
     for K := 0 to High(Circles) do
       if Circles[K] = I then Exit(CircleNames[K]);
   end;
 
-  procedure Put(Depth: Integer; const S: string; Thing: Integer);
+  procedure Put(Depth: integer; const S: string; Thing: integer);
   begin
     L.Add(StringOfChar(' ', Depth * 2) + S);
     if Hints <> nil then Hints.Add(NextHint);
@@ -446,22 +456,24 @@ var
     not, nothing when there is none. }
   function NameWord(const Nm: string): string;
   var
-    K: Integer;
-    Bare: Boolean;
+    K: integer;
+    Bare: boolean;
   begin
     if Nm = '' then Exit('');
     Bare := Nm[1] in ['A'..'Z', 'a'..'z', '_'];
     for K := 2 to Length(Nm) do
       if not (Nm[K] in ['A'..'Z', 'a'..'z', '_', '0'..'9']) then Bare := False;
-    if Bare then Result := ' ' + Nm else Result := ' ' + QuotedStr(Nm);
+    if Bare then Result := ' ' + Nm
+    else
+      Result := ' ' + QuotedStr(Nm);
   end;
 
   { the comments kept with a thing (TWorkEnt.Note): those above it here, and
     TailNote gives the one that goes at the end of its first line }
-  procedure PutNote(Depth: Integer; const Note: string; Thing: Integer);
+  procedure PutNote(Depth: integer; const Note: string; Thing: integer);
   var
     Parts: TStringList;
-    K: Integer;
+    K: integer;
   begin
     if Note = '' then Exit;
     Parts := TStringList.Create;
@@ -477,7 +489,7 @@ var
   function TailNote(const Note: string): string;
   var
     Parts: TStringList;
-    K: Integer;
+    K: integer;
   begin
     Result := '';
     if Pos(#9, Note) = 0 then Exit;
@@ -493,9 +505,9 @@ var
   end;
 
   { a solid's name and comments, from whichever member carries them }
-  procedure SolidNaming(Part_, G: Integer; out Nm, Note: string);
+  procedure SolidNaming(Part_, G: integer; out Nm, Note: string);
   var
-    I: Integer;
+    I: integer;
   begin
     Nm := '';
     Note := '';
@@ -512,7 +524,7 @@ var
     circle has; the rest are c1, c2... skipping names taken. }
   procedure NameCircles;
   var
-    K, N: Integer;
+    K, N: integer;
     Taken: TStringList;
   begin
     SetLength(CircleNames, Length(Circles));
@@ -523,7 +535,7 @@ var
       begin
         CircleNames[K] := '';
         if (D.EntRef(Circles[K])^.Name <> '') and (Trim(NameWord(D.EntRef(Circles[K])^.Name)) = D.EntRef(Circles[K])^.Name) and
-           (Taken.IndexOf(D.EntRef(Circles[K])^.Name) < 0) then
+          (Taken.IndexOf(D.EntRef(Circles[K])^.Name) < 0) then
         begin
           CircleNames[K] := D.EntRef(Circles[K])^.Name;
           Taken.Add(CircleNames[K]);
@@ -548,9 +560,15 @@ var
     everything, not a sample, so the choice does not depend on read order. }
   procedure FindDefaults;
   var
-    I, K, Best: Integer;
-    Inks: array of record C: TColor; N: Integer; end;
-    Wds: array of record W: Single; N: Integer; end;
+    I, K, Best: integer;
+    Inks: array of record
+    C: TColor;
+    N: integer;
+    end;
+    Wds: array of record
+    W: single;
+    N: integer;
+    end;
   begin
     DefInk := $201C1A;
     DefWidth := 1;
@@ -583,21 +601,30 @@ var
       end;
     Best := 0;
     for K := 0 to High(Inks) do
-      if Inks[K].N > Best then begin Best := Inks[K].N; DefInk := Inks[K].C; end;
+      if Inks[K].N > Best then
+      begin
+        Best := Inks[K].N;
+        DefInk := Inks[K].C;
+      end;
     Best := 0;
     for K := 0 to High(Wds) do
-      if Wds[K].N > Best then begin Best := Wds[K].N; DefWidth := Wds[K].W; end;
+      if Wds[K].N > Best then
+      begin
+        Best := Wds[K].N;
+        DefWidth := Wds[K].W;
+      end;
   end;
 
-  function PointName(Index, Count: Integer): string;
+  function PointName(Index, Count: integer): string;
   begin
     if Count <= 23 then Result := Chr(Ord('a') + Index)
-    else Result := 'p' + IntToStr(Index + 1);
+    else
+      Result := 'p' + IntToStr(Index + 1);
   end;
 
-  function FindPt(const Pts: TPts; const P: TP3): Integer;
+  function FindPt(const Pts: TPts; const P: TP3): integer;
   var
-    I: Integer;
+    I: integer;
   begin
     for I := 0 to High(Pts) do
       if SameP(Pts[I].P, P) then Exit(I);
@@ -617,11 +644,12 @@ var
 
   function Ref(const Pts: TPts; const P: TP3): string;
   var
-    K: Integer;
+    K: integer;
   begin
     K := FindPt(Pts, P);
     if K >= 0 then Result := Pts[K].Name
-    else Result := Place2(P, U, False);
+    else
+      Result := Place2(P, U, False);
   end;
 
   { A list of places.  Named corners are just names; written-out places are
@@ -629,7 +657,7 @@ var
     "0; + 4' east; + 4' north; + 4' west" is a square. }
   function Items(const Pts: TPts; const Poly: array of TP3): TStringArray;
   var
-    K, F: Integer;
+    K, F: integer;
     Acc, Step: TP3;
   begin
     SetLength(Result, Length(Poly));
@@ -658,9 +686,9 @@ var
     end;
   end;
 
-  function Named(const It: TStringArray): Boolean;
+  function Named(const It: TStringArray): boolean;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := Length(It) > 0;
     for K := 0 to High(It) do
@@ -671,12 +699,12 @@ var
     its ends: ra1..ra24 }
   function Runs(const It: TStringArray): TStringArray;
   var
-    K, J, N, Step, A, B, Q: Integer;
+    K, J, N, Step, A, B, Q: integer;
     Stem: string;
 
-    function Split(const S: string; out St: string; out Num: Integer): Boolean;
+    function Split(const S: string; out St: string; out Num: integer): boolean;
     var
-      P: Integer;
+      P: integer;
     begin
       P := Length(S);
       while (P > 0) and (S[P] in ['0'..'9']) do Dec(P);
@@ -691,13 +719,11 @@ var
     while K <= High(It) do
     begin
       J := K;
-      if Split(It[K], Stem, A) and (K < High(It)) and Split(It[K + 1], Result[N], B) and
-         (Result[N] = Stem) and (Abs(B - A) = 1) then
+      if Split(It[K], Stem, A) and (K < High(It)) and Split(It[K + 1], Result[N], B) and (Result[N] = Stem) and (Abs(B - A) = 1) then
       begin
         Step := B - A;
         J := K + 1;
-        while (J < High(It)) and Split(It[J + 1], Result[N], Q) and (Result[N] = Stem) and
-              (Q - B = Step) do
+        while (J < High(It)) and Split(It[J + 1], Result[N], Q) and (Result[N] = Stem) and (Q - B = Step) do
         begin
           B := Q;
           Inc(J);
@@ -720,25 +746,26 @@ var
 
   function Joined(const It: TStringArray): string;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := '';
     for K := 0 to High(It) do
     begin
       if K > 0 then
-        if Named(It) then Result := Result + ' ' else Result := Result + ' to ';
+        if Named(It) then Result := Result + ' '
+        else
+          Result := Result + ' to ';
       Result := Result + It[K];
     end;
   end;
 
   { "key = list" on one line when it fits, else LFM style: "key = (", the
     list over as many lines as needed, ")". }
-  procedure PutList(Depth: Integer; const Key: string; const It: TStringArray;
-    Thing: Integer; const Note: string = '');
+  procedure PutList(Depth: integer; const Key: string; const It: TStringArray; Thing: integer; const Note: string = '');
   const
     WIDE = 78;
   var
-    K: Integer;
+    K: integer;
     Row, Sep: string;
   begin
     if Depth * 2 + Length(Key) + 3 + Length(Joined(It)) <= WIDE then
@@ -746,7 +773,9 @@ var
       Put(Depth, Key + ' = ' + Joined(It) + Note, Thing);
       Exit;
     end;
-    if Named(It) then Sep := ' ' else Sep := ' to ';
+    if Named(It) then Sep := ' '
+    else
+      Sep := ' to ';
     Put(Depth, Key + ' = (' + Note, Thing);
     Row := '';
     for K := 0 to High(It) do
@@ -767,11 +796,11 @@ var
 
   { If this loop is one of the sheet's circles, corner for corner, write it
     by name ("face = c1") instead of thirty-two places. }
-  function CircleNamed(const Poly: array of TP3; Part_: Integer): string;
+  function CircleNamed(const Poly: array of TP3; Part_: integer): string;
   var
-    C, K, Q, N, Hit: Integer;
+    C, K, Q, N, Hit: integer;
     P: TP3;
-    Ok_: Boolean;
+    Ok_: boolean;
   begin
     Result := '';
     N := Length(Poly);
@@ -782,14 +811,22 @@ var
       Ok_ := True;
       for K := 0 to N - 1 do
       begin
-        P := ArcPoint(D.EntRef(Circles[C])^.C, D.EntRef(Circles[C])^.R,
-          D.EntRef(Circles[C])^.A0 + K * D.EntRef(Circles[C])^.Sweep / N, D.EntRef(Circles[C])^.Plane, D.EntRef(Circles[C])^.Nm);
+        P := ArcPoint(D.EntRef(Circles[C])^.C, D.EntRef(Circles[C])^.R, D.EntRef(Circles[C])^.A0 + K * D.EntRef(Circles[C])^.Sweep /
+          N, D.EntRef(Circles[C])^.Plane, D.EntRef(Circles[C])^.Nm);
         { Tolerance covers the six-place rounding older drawings carry; ring
           corners are far further apart than that. }
         Hit := -1;
         for Q := 0 to N - 1 do
-          if SamePt(Poly[Q], P, 2E-5) then begin Hit := Q; Break; end;
-        if Hit < 0 then begin Ok_ := False; Break; end;
+          if SamePt(Poly[Q], P, 2E-5) then
+          begin
+            Hit := Q;
+            Break;
+          end;
+        if Hit < 0 then
+        begin
+          Ok_ := False;
+          Break;
+        end;
       end;
       if Ok_ then Exit(CircleNames[C]);
     end;
@@ -798,7 +835,7 @@ var
   { the way a circle faces, as the reader will turn the disk "face = c1" }
   function CircleFacing(const Nm: string): TP3;
   var
-    I: Integer;
+    I: integer;
   begin
     Result := P3(0, 0, 1);
     I := StrToIntDef(Copy(Nm, 2, MaxInt), 0) - 1;
@@ -810,12 +847,11 @@ var
     end;
   end;
 
-  function Outline(const Pts: TPts; const Poly: array of TP3; Part_: Integer;
-    IsHole: Boolean = False): TStringArray;
+  function Outline(const Pts: TPts; const Poly: array of TP3; Part_: integer; IsHole: boolean = False): TStringArray;
   var
     Nm: string;
     Lp: TP3Array;
-    K: Integer;
+    K: integer;
   begin
     Nm := CircleNamed(Poly, Part_);
     { A circle by name is the disk facing the circle's way; a face turned the
@@ -841,7 +877,7 @@ var
 
   function NameKey(const Nm: string): string;
   var
-    P: Integer;
+    P: integer;
     Stem: string;
   begin
     P := Length(Nm);
@@ -854,7 +890,8 @@ var
     else if Stem = 'midin' then Result := '4'
     else if Stem = 'top' then Result := '5'
     else if Stem = 'topin' then Result := '6'
-    else Result := '7' + Stem;
+    else
+      Result := '7' + Stem;
     Result := Result + Format('%.4d', [StrToIntDef(Copy(Nm, P + 1, 9), 0)]);
   end;
 
@@ -864,7 +901,7 @@ var
   var
     Keys: TStringList;
     Was: TPts;
-    I: Integer;
+    I: integer;
   begin
     if Length(Pts) < 2 then Exit;
     Keys := TStringList.Create;
@@ -881,9 +918,9 @@ var
     end;
   end;
 
-  function TakenName(const Pts: TPts; const Nm: string): Boolean;
+  function TakenName(const Pts: TPts; const Nm: string): boolean;
   var
-    I: Integer;
+    I: integer;
   begin
     for I := 0 to High(Pts) do
       if SameText(Pts[I].Name, Nm) then Exit(True);
@@ -891,7 +928,7 @@ var
   end;
 
   { Stem and N, or the next number up that no corner has yet }
-  function Fresh(const Pts: TPts; const Stem: string; N: Integer): string;
+  function Fresh(const Pts: TPts; const Stem: string; N: integer): string;
   begin
     if not Given then Exit(Stem + IntToStr(N));
     repeat
@@ -903,12 +940,12 @@ var
   { The names the text gave a solid's corners, from its faces, edges and
     bores (TWorkEnt.Corners).  A face split or copied can carry a name to the
     wrong place, so each name goes to the place most of them give it. }
-  procedure GivenNames(var Pts: TPts; Part_, G: Integer);
+  procedure GivenNames(var Pts: TPts; Part_, G: integer);
   var
     Votes, At, Taken: TFPHashList;
-    VPt, VCount: array of Integer;
+    VPt, VCount: array of integer;
     VName: TStringArray;
-    NV, I, J, K, H, N, Pt, Most, C: Integer;
+    NV, I, J, K, H, N, Pt, Most, C: integer;
     Parts: TStringArray;
     Nm: string;
 
@@ -919,7 +956,7 @@ var
 
     procedure Vote(const P: TP3; const Name_: string);
     var
-      X, V: Integer;
+      X, V: integer;
     begin
       if Name_ = '' then Exit;
       X := At.FindIndexOf(KeyOf(P));
@@ -950,7 +987,11 @@ var
     Given := False;
     K := -1;
     for I := 0 to D.Live - 1 do
-      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Corners <> '') then begin K := I; Break; end;
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Corners <> '') then
+      begin
+        K := I;
+        Break;
+      end;
     if K < 0 then Exit;
     NV := 0;
     Votes := TFPHashList.Create;
@@ -975,15 +1016,23 @@ var
               Vote(D.EntRef(I)^.B, Parts[1]);
             end;
           ekFace, ekBore:
+          begin
+            N := Length(D.EntRef(I)^.Poly);
+            for H := 0 to High(D.EntRef(I)^.Holes) do Inc(N, Length(D.EntRef(I)^.Holes[H]));
+            if Length(Parts) <> N then Continue;
+            N := 0;
+            for J := 0 to High(D.EntRef(I)^.Poly) do
             begin
-              N := Length(D.EntRef(I)^.Poly);
-              for H := 0 to High(D.EntRef(I)^.Holes) do Inc(N, Length(D.EntRef(I)^.Holes[H]));
-              if Length(Parts) <> N then Continue;
-              N := 0;
-              for J := 0 to High(D.EntRef(I)^.Poly) do begin Vote(D.EntRef(I)^.Poly[J], Parts[N]); Inc(N); end;
-              for H := 0 to High(D.EntRef(I)^.Holes) do
-                for J := 0 to High(D.EntRef(I)^.Holes[H]) do begin Vote(D.EntRef(I)^.Holes[H][J], Parts[N]); Inc(N); end;
+              Vote(D.EntRef(I)^.Poly[J], Parts[N]);
+              Inc(N);
             end;
+            for H := 0 to High(D.EntRef(I)^.Holes) do
+              for J := 0 to High(D.EntRef(I)^.Holes[H]) do
+              begin
+                Vote(D.EntRef(I)^.Holes[H][J], Parts[N]);
+                Inc(N);
+              end;
+          end;
         end;
       end;
       { the names with most votes first; a name or a corner already given
@@ -996,8 +1045,7 @@ var
           if VCount[I] <> C then Continue;
           Pt := VPt[I];
           Nm := VName[I];
-          if (Pts[Pt].Name <> '') or (Trim(NameWord(Nm)) <> Nm) or
-             (Taken.FindIndexOf(LowerCase(Nm)) >= 0) then Continue;
+          if (Pts[Pt].Name <> '') or (Trim(NameWord(Nm)) <> Nm) or (Taken.FindIndexOf(LowerCase(Nm)) >= 0) then Continue;
           Pts[Pt].Name := Nm;
           Taken.Add(LowerCase(Nm), Pointer(1));
           Given := True;
@@ -1013,14 +1061,13 @@ var
     into a few levels }
   procedure NameByPlace(var Pts: TPts);
   var
-    I, J, N, NLevels, Best, Pass: Integer;
-    Z: array of Double;
-    Level: array of Integer;
-    Count: array of Integer;
-    Order: array of Integer;
-    Ang, BestAng, BestAng2, CX, CY: Double;
+    I, J, N, NLevels, Best, Pass: integer;
+    Z: array of double;
+    Level: array of integer;
+    Count: array of integer;
+    Order: array of integer;
+    Ang, BestAng, BestAng2, CX, CY: double;
     W: string;
-
   begin
     N := 0;
     for I := 0 to High(Pts) do
@@ -1034,7 +1081,11 @@ var
       Level[I] := -1;
       if Pts[I].Ring >= 0 then Continue;
       for J := 0 to High(Z) do
-        if Abs(Z[J] - Pts[I].P.Z) < 1E-6 then begin Level[I] := J; Break; end;
+        if Abs(Z[J] - Pts[I].P.Z) < 1E-6 then
+        begin
+          Level[I] := J;
+          Break;
+        end;
       if Level[I] < 0 then
       begin
         SetLength(Z, Length(Z) + 1);
@@ -1060,15 +1111,22 @@ var
     for I := 0 to NLevels - 1 do Count[I] := 0;
     for J := 0 to NLevels - 1 do
     begin
-      CX := 0; CY := 0; N := 0;
+      CX := 0;
+      CY := 0;
+      N := 0;
       for I := 0 to High(Pts) do
-        if Level[I] = J then begin CX := CX + Pts[I].P.X; CY := CY + Pts[I].P.Y; Inc(N); end;
+        if Level[I] = J then
+        begin
+          CX := CX + Pts[I].P.X;
+          CY := CY + Pts[I].P.Y;
+          Inc(N);
+        end;
       if N = 0 then Continue;
-      CX := CX / N; CY := CY / N;
+      CX := CX / N;
+      CY := CY / N;
       Best := -1;
       for I := 0 to High(Pts) do
-        if (Level[I] = J) and ((Best < 0) or
-           (Sqr(Pts[I].P.X) + Sqr(Pts[I].P.Y) < Sqr(Pts[Best].P.X) + Sqr(Pts[Best].P.Y) - 1E-9)) then
+        if (Level[I] = J) and ((Best < 0) or (Sqr(Pts[I].P.X) + Sqr(Pts[I].P.Y) < Sqr(Pts[Best].P.X) + Sqr(Pts[Best].P.Y) - 1E-9)) then
           Best := I;
       BestAng := ArcTan2(Pts[Best].P.Y - CY, Pts[Best].P.X - CX);
       { number them counterclockwise from that one }
@@ -1083,49 +1141,53 @@ var
         hole cut in that level, as "in" corners }
       for Pass := 0 to 1 do
       begin
-      N := 0;
-      while N < Count[J] do
-      begin
-        Best := -1;
-        for I := 0 to High(Pts) do
-          if (Level[I] = J) and (Pts[I].Name = '') and (Ord(Pts[I].InHole) = Pass) then
-          begin
-            Ang := ArcTan2(Pts[I].P.Y - CY, Pts[I].P.X - CX) - BestAng;
-            while Ang < -1E-9 do Ang := Ang + 2 * Pi;
-            if (Best < 0) or (Ang < BestAng2) then begin Best := I; BestAng2 := Ang; end;
+        N := 0;
+        while N < Count[J] do
+        begin
+          Best := -1;
+          for I := 0 to High(Pts) do
+            if (Level[I] = J) and (Pts[I].Name = '') and (Ord(Pts[I].InHole) = Pass) then
+            begin
+              Ang := ArcTan2(Pts[I].P.Y - CY, Pts[I].P.X - CX) - BestAng;
+              while Ang < -1E-9 do Ang := Ang + 2 * Pi;
+              if (Best < 0) or (Ang < BestAng2) then
+              begin
+                Best := I;
+                BestAng2 := Ang;
+              end;
+            end;
+          if Best < 0 then Break;
+          case NLevels of
+            1: W := 'p';
+            2: if Order[J] = 0 then W := 'floor'
+              else
+                W := 'top';
+            else
+              case Order[J] of
+                0: W := 'floor';
+                1: W := 'mid';
+                else
+                  W := 'top';
+              end;
           end;
-        if Best < 0 then Break;
-        case NLevels of
-          1: W := 'p';
-          2: if Order[J] = 0 then W := 'floor' else W := 'top';
-        else
-          case Order[J] of
-            0: W := 'floor';
-            1: W := 'mid';
-          else
-            W := 'top';
-          end;
+          if Pass = 1 then W := W + 'in';
+          Pts[Best].Name := Fresh(Pts, W, N + 1);
+          Inc(N);
         end;
-        if Pass = 1 then W := W + 'in';
-        Pts[Best].Name := Fresh(Pts, W, N + 1);
-        Inc(N);
-      end;
       end;
     end;
   end;
 
   { lower, then further south, then further west: the order corners are
     numbered in when nothing better names them }
-  function Below(const A, B: TP3): Boolean;
+  function Below(const A, B: TP3): boolean;
   begin
-    Result := (A.Z < B.Z - 1E-9) or
-      ((Abs(A.Z - B.Z) <= 1E-9) and (A.Y < B.Y - 1E-9)) or
-      ((Abs(A.Z - B.Z) <= 1E-9) and (Abs(A.Y - B.Y) <= 1E-9) and (A.X < B.X - 1E-9));
+    Result := (A.Z < B.Z - 1E-9) or ((Abs(A.Z - B.Z) <= 1E-9) and (A.Y < B.Y - 1E-9)) or ((Abs(A.Z - B.Z) <= 1E-9) and (Abs(A.Y - B.Y) <= 1E-9) and (A.X < B.X - 1E-9));
   end;
 
-  procedure PutPoints(Depth: Integer; var Pts: TPts; const Rings: TRings);
+  procedure PutPoints(Depth: integer; var Pts: TPts; const Rings: TRings);
   var
-    I, J, From, Loose, K: Integer;
+    I, J, From, Loose, K: integer;
     Nm: string;
     V: TP3;
     Tmp: TPt;
@@ -1154,9 +1216,12 @@ var
       for J := I downto 1 do
         if Below(Pts[Slots[J]].P, Pts[Slots[J - 1]].P) then
         begin
-          Tmp := Pts[Slots[J]]; Pts[Slots[J]] := Pts[Slots[J - 1]]; Pts[Slots[J - 1]] := Tmp;
+          Tmp := Pts[Slots[J]];
+          Pts[Slots[J]] := Pts[Slots[J - 1]];
+          Pts[Slots[J - 1]] := Tmp;
         end
-        else Break;
+        else
+          Break;
     K := 0;
     for I := 0 to High(Pts) do
       if (Pts[I].Ring < 0) and (Pts[I].Name = '') then
@@ -1199,7 +1264,11 @@ var
         if AxesUsed(V) <> 1 then Continue;
         { the axis it runs along, not the noise on the other two, or the
           choice flips from one save to the next }
-        if (V.X > 1E-9) or (V.Y > 1E-9) or (V.Z > 1E-9) then begin From := J; Break; end;
+        if (V.X > 1E-9) or (V.Y > 1E-9) or (V.Z > 1E-9) then
+        begin
+          From := J;
+          Break;
+        end;
         if From < 0 then From := J;
       end;
       if From >= 0 then NextHint := Place2(Pts[I].P, U, False);
@@ -1207,10 +1276,8 @@ var
       begin
         { step from where the reader will have put the other, so nothing drifts }
         V := Sub3(Pts[I].P, Pts[From].Read);
-        Put(Depth + 1, Format('%s = %s + %s', [Pts[I].Name, Pts[From].Name,
-          Place2(V, U, True)]), -1);
-        Pts[I].Read := P3(Pts[From].Read.X + AsRead(V.X, U), Pts[From].Read.Y + AsRead(V.Y, U),
-          Pts[From].Read.Z + AsRead(V.Z, U));
+        Put(Depth + 1, Format('%s = %s + %s', [Pts[I].Name, Pts[From].Name, Place2(V, U, True)]), -1);
+        Pts[I].Read := P3(Pts[From].Read.X + AsRead(V.X, U), Pts[From].Read.Y + AsRead(V.Y, U), Pts[From].Read.Z + AsRead(V.Z, U));
       end
       else
       begin
@@ -1223,11 +1290,11 @@ var
   end;
 
   { If these corners are spaced evenly around a circle, they are a ring. }
-  function RingOf(const Poly: array of TP3; out Rg: TRing): Boolean;
+  function RingOf(const Poly: array of TP3; out Rg: TRing): boolean;
   var
-    K, N: Integer;
+    K, N: integer;
     C, Nm, AU, AV, W0, W1: TP3;
-    R, A, A1: Double;
+    R, A, A1: double;
   begin
     Result := False;
     N := Length(Poly);
@@ -1250,9 +1317,8 @@ var
     for K := 1 to N - 1 do
     begin
       A1 := A + K * 2 * Pi / N;
-      if not SameP(Poly[K], P3(C.X + (AU.X * Cos(A1) + AV.X * Sin(A1)) * R,
-                               C.Y + (AU.Y * Cos(A1) + AV.Y * Sin(A1)) * R,
-                               C.Z + (AU.Z * Cos(A1) + AV.Z * Sin(A1)) * R)) then Exit;
+      if not SameP(Poly[K], P3(C.X + (AU.X * Cos(A1) + AV.X * Sin(A1)) * R, C.Y + (AU.Y * Cos(A1) + AV.Y * Sin(A1)) * R,
+        C.Z + (AU.Z * Cos(A1) + AV.Z * Sin(A1)) * R)) then Exit;
     end;
     Rg.C := C;
     Rg.R := R;
@@ -1263,10 +1329,10 @@ var
   end;
 
   { a group's data, as it came; see hsGroupData }
-  procedure PutData(Depth: Integer; const Data: string; I: Integer);
+  procedure PutData(Depth: integer; const Data: string; I: integer);
   var
     Lines: TStringList;
-    K: Integer;
+    K: integer;
   begin
     Lines := DataIndented(Data);
     try
@@ -1278,7 +1344,7 @@ var
     end;
   end;
 
-  procedure PutInk(Depth, I: Integer);
+  procedure PutInk(Depth, I: integer);
   begin
     if D.EntRef(I)^.Ink <> DefInk then Put(Depth, 'ink = ' + Color2(D.EntRef(I)^.Ink), I);
     if (D.EntRef(I)^.Kind in [ekLine, ekArc]) and (Abs(D.EntRef(I)^.Weight - DefWidth) > 1E-3) then
@@ -1287,15 +1353,16 @@ var
 
   { HasMat/Mat: what the solid says its faces are made of, so a face only
     gives a material when it differs }
-  procedure PutFace(Depth, I: Integer; const Pts: TPts; HasMat: Boolean = False;
-    Mat: TColor = 0);
+  procedure PutFace(Depth, I: integer; const Pts: TPts; HasMat: boolean = False; Mat: TColor = 0);
   var
-    K: Integer;
+    K: integer;
     Note, W: string;
-    SameMat: Boolean;
+    SameMat: boolean;
   begin
     W := FacingWord(D.FaceNormal(I));
-    if W <> '' then Note := '   { facing ' + W + ' }' else Note := '';
+    if W <> '' then Note := '   { facing ' + W + ' }'
+    else
+      Note := '';
     Note := Note + TailNote(D.EntRef(I)^.Note);
     PutNote(Depth, D.EntRef(I)^.Note, I);
     SameMat := (D.EntRef(I)^.MatSet = HasMat) and ((not HasMat) or (D.EntRef(I)^.Mat = Mat));
@@ -1310,20 +1377,20 @@ var
       PutList(Depth + 1, 'hole', Outline(Pts, D.EntRef(I)^.Holes[K], D.EntRef(I)^.Part, True), I);
     if not SameMat then
       if D.EntRef(I)^.MatSet then Put(Depth + 1, 'paint = ' + Color2(D.EntRef(I)^.Mat), I)
-      else Put(Depth + 1, 'paint = none', I);
+      else
+        Put(Depth + 1, 'paint = none', I);
     if D.EntRef(I)^.Ink <> DefInk then Put(Depth + 1, 'ink = ' + Color2(D.EntRef(I)^.Ink), I);
     Put(Depth, 'end', I);
   end;
 
   { A line is two points; their order means nothing. }
-  procedure PutLine(Depth, I: Integer; const Pts: TPts);
+  procedure PutLine(Depth, I: integer; const Pts: TPts);
   var
     Ends: string;
   begin
     Ends := Ref(Pts, D.EntRef(I)^.A) + ' to ' + Ref(Pts, D.EntRef(I)^.B);
     PutNote(Depth, D.EntRef(I)^.Note, I);
-    if (D.EntRef(I)^.Ink = DefInk) and (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) and
-       (not D.EntRef(I)^.Soft) and (not D.EntRef(I)^.Dim) then
+    if (D.EntRef(I)^.Ink = DefInk) and (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) and (not D.EntRef(I)^.Soft) and (not D.EntRef(I)^.Dim) then
     begin
       Put(Depth, 'line' + NameWord(D.EntRef(I)^.Name) + ' = ' + Ends + TailNote(D.EntRef(I)^.Note), I);
       Exit;
@@ -1339,9 +1406,9 @@ var
   { Named lines joined end to end, as the reader makes them from
     "line Cable = a to b to c": one statement again.  Chain is in order and
     Poly its places. }
-  procedure PutChain(Depth: Integer; const Chain: TIntArrayW; const Poly: TP3Array);
+  procedure PutChain(Depth: integer; const Chain: TIntArrayW; const Poly: TP3Array);
   var
-    I, K, Header: Integer;
+    I, K, Header: integer;
     It: TStringArray;
     None: TPts;
   begin
@@ -1350,8 +1417,7 @@ var
     It := Items(None, Poly);
     Header := NLine;
     PutNote(Depth, D.EntRef(I)^.Note, I);
-    if (D.EntRef(I)^.Ink = DefInk) and (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) and
-       (not D.EntRef(I)^.Soft) and (not D.EntRef(I)^.Dim) then
+    if (D.EntRef(I)^.Ink = DefInk) and (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) and (not D.EntRef(I)^.Soft) and (not D.EntRef(I)^.Dim) then
       PutList(Depth, 'line' + NameWord(D.EntRef(I)^.Name), It, I, TailNote(D.EntRef(I)^.Note))
     else
     begin
@@ -1369,93 +1435,90 @@ var
     end;
   end;
 
-  procedure PutOther(Depth, I: Integer);
+  procedure PutOther(Depth, I: integer);
   var
     Parts: TStringList;
-    K: Integer;
+    K: integer;
     Nm, AU, AV, P0: TP3;
-    A0: Double;
+    A0: double;
     Tl: string;
   begin
     PutNote(Depth, D.EntRef(I)^.Note, I);
     Tl := TailNote(D.EntRef(I)^.Note);
     case D.EntRef(I)^.Kind of
       ekArc:
-        begin
+      begin
           { Facing follows its own turning, and the start is measured the grammar's
             way (from the level line), whatever axes the program keeps for the plane. }
-          Nm := P3(0, 0, 1);
-          case D.EntRef(I)^.Plane of
-            plXZ: Nm := P3(0, -1, 0);
-            plYZ: Nm := P3(1, 0, 0);
-            plFree: Nm := D.EntRef(I)^.Nm;
-          end;
-          SpecAxes(Nm, AU, AV);
-          P0 := Sub3(ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm), D.EntRef(I)^.C);
-          A0 := ArcTan2(Dot3(P0, AV), Dot3(P0, AU));
+        Nm := P3(0, 0, 1);
+        case D.EntRef(I)^.Plane of
+          plXZ: Nm := P3(0, -1, 0);
+          plYZ: Nm := P3(1, 0, 0);
+          plFree: Nm := D.EntRef(I)^.Nm;
+        end;
+        SpecAxes(Nm, AU, AV);
+        P0 := Sub3(ArcPoint(D.EntRef(I)^.C, D.EntRef(I)^.R, D.EntRef(I)^.A0, D.EntRef(I)^.Plane, D.EntRef(I)^.Nm), D.EntRef(I)^.C);
+        A0 := ArcTan2(Dot3(P0, AV), Dot3(P0, AU));
           { A plain circle is one line: center, radius, and facing only when not up.
             Anything more (start, its own sides, an ink) makes it a block. }
-          if FullCircle(D.EntRef(I)^.Sweep) and (Abs(A0) <= 1E-9) and
-             (D.EntRef(I)^.Sides = HECK_SIDES) and (D.EntRef(I)^.Ink = DefInk) and
-             (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) then
-          begin
-            if Abs(Nm.Z - 1) < 1E-9 then
-              Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D.EntRef(I)^.C, U, False) +
-                '; ' + Len2(D.EntRef(I)^.R, U) + Tl, I)
-            else
-              Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D.EntRef(I)^.C, U, False) +
-                '; ' + Len2(D.EntRef(I)^.R, U) + '; ' + Facing2(Nm) + Tl, I);
-            Exit;
-          end;
-          if FullCircle(D.EntRef(I)^.Sweep) then Put(Depth, 'circle ' + CircleName(I) + Tl, I)
-          else Put(Depth, 'arc' + NameWord(D.EntRef(I)^.Name) + Tl, I);
-          Put(Depth + 1, 'center = ' + Place2(D.EntRef(I)^.C, U, False), I);
-          Put(Depth + 1, 'radius = ' + Len2(D.EntRef(I)^.R, U), I);
-          Put(Depth + 1, 'facing = ' + Facing2(Nm), I);
-          if Abs(A0) > 1E-9 then Put(Depth + 1, 'starts = ' + Deg2(A0), I);
-          if not FullCircle(D.EntRef(I)^.Sweep) then
-            Put(Depth + 1, 'sweep = ' + Deg2(D.EntRef(I)^.Sweep), I);
+        if FullCircle(D.EntRef(I)^.Sweep) and (Abs(A0) <= 1E-9) and (D.EntRef(I)^.Sides = HECK_SIDES) and (D.EntRef(I)^.Ink = DefInk) and
+          (Abs(D.EntRef(I)^.Weight - DefWidth) <= 1E-3) then
+        begin
+          if Abs(Nm.Z - 1) < 1E-9 then
+            Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D.EntRef(I)^.C, U, False) + '; ' + Len2(D.EntRef(I)^.R, U) + Tl, I)
+          else
+            Put(Depth, Trim('circle ' + CircleName(I)) + ' = ' + Place2(D.EntRef(I)^.C, U, False) + '; ' + Len2(D.EntRef(I)^.R, U) + '; ' + Facing2(Nm) + Tl, I);
+          Exit;
+        end;
+        if FullCircle(D.EntRef(I)^.Sweep) then Put(Depth, 'circle ' + CircleName(I) + Tl, I)
+        else
+          Put(Depth, 'arc' + NameWord(D.EntRef(I)^.Name) + Tl, I);
+        Put(Depth + 1, 'center = ' + Place2(D.EntRef(I)^.C, U, False), I);
+        Put(Depth + 1, 'radius = ' + Len2(D.EntRef(I)^.R, U), I);
+        Put(Depth + 1, 'facing = ' + Facing2(Nm), I);
+        if Abs(A0) > 1E-9 then Put(Depth + 1, 'starts = ' + Deg2(A0), I);
+        if not FullCircle(D.EntRef(I)^.Sweep) then
+          Put(Depth + 1, 'sweep = ' + Deg2(D.EntRef(I)^.Sweep), I);
           { the ring's sides for the faces it implies, written whenever they differ
             from what a one-line circle reads back with }
-          if ArcSteps(D[I]) <> HECK_SIDES then Put(Depth + 1, 'sides = ' + IntToStr(ArcSteps(D[I])), I);
-          PutInk(Depth + 1, I);
-          Put(Depth, 'end', I);
-        end;
+        if ArcSteps(D[I]) <> HECK_SIDES then Put(Depth + 1, 'sides = ' + IntToStr(ArcSteps(D[I])), I);
+        PutInk(Depth + 1, I);
+        Put(Depth, 'end', I);
+      end;
       ekDim:
-        begin
-          Put(Depth, 'dim' + NameWord(D.EntRef(I)^.Name) + Tl, I);
-          Put(Depth + 1, 'from = ' + Place2(D.EntRef(I)^.A, U, False), I);
-          Put(Depth + 1, 'to = ' + Place2(D.EntRef(I)^.B, U, False), I);
-          Put(Depth + 1, 'off = ' + Place2(D.EntRef(I)^.C, U, True), I);
-          if D.EntRef(I)^.Txt <> '' then Put(Depth + 1, 'label = ' + QuotedStr(D.EntRef(I)^.Txt), I);
-          PutInk(Depth + 1, I);
-          Put(Depth, 'end', I);
-        end;
+      begin
+        Put(Depth, 'dim' + NameWord(D.EntRef(I)^.Name) + Tl, I);
+        Put(Depth + 1, 'from = ' + Place2(D.EntRef(I)^.A, U, False), I);
+        Put(Depth + 1, 'to = ' + Place2(D.EntRef(I)^.B, U, False), I);
+        Put(Depth + 1, 'off = ' + Place2(D.EntRef(I)^.C, U, True), I);
+        if D.EntRef(I)^.Txt <> '' then Put(Depth + 1, 'label = ' + QuotedStr(D.EntRef(I)^.Txt), I);
+        PutInk(Depth + 1, I);
+        Put(Depth, 'end', I);
+      end;
       ekGuide:
         if SameP(D.EntRef(I)^.A, D.EntRef(I)^.B) then
           Put(Depth, 'guide' + NameWord(D.EntRef(I)^.Name) + ' = ' + Place2(D.EntRef(I)^.A, U, False) + Tl, I)
         else
-          Put(Depth, 'guide' + NameWord(D.EntRef(I)^.Name) + ' = ' + Place2(D.EntRef(I)^.A, U, False) + ' to ' +
-            Place2(D.EntRef(I)^.B, U, False) + Tl, I);
+          Put(Depth, 'guide' + NameWord(D.EntRef(I)^.Name) + ' = ' + Place2(D.EntRef(I)^.A, U, False) + ' to ' + Place2(D.EntRef(I)^.B, U, False) + Tl, I);
       ekText:
-        begin
-          Put(Depth, 'note' + NameWord(D.EntRef(I)^.Name) + Tl, I);
-          Put(Depth + 1, 'at = ' + Place2(D.EntRef(I)^.A, U, False), I);
-          if not SameP(D.EntRef(I)^.A, D.EntRef(I)^.B) then
-            Put(Depth + 1, 'to = ' + Place2(D.EntRef(I)^.B, U, False), I);
-          Parts := TStringList.Create;
-          try
-            Parts.Text := D.EntRef(I)^.Txt;
-            for K := 0 to Parts.Count - 1 do
-              Put(Depth + 1, 'text = ' + QuotedStr(Parts[K]), I);
-          finally
-            Parts.Free;
-          end;
-          if (D.EntRef(I)^.Size > 0) and (Abs(D.EntRef(I)^.Size - 1) > 1E-6) then
-            Put(Depth + 1, 'size = ' + FloatToStrF(D.EntRef(I)^.Size, ffGeneral, 4, 0, DotFS), I);
-          PutInk(Depth + 1, I);
-          Put(Depth, 'end', I);
+      begin
+        Put(Depth, 'note' + NameWord(D.EntRef(I)^.Name) + Tl, I);
+        Put(Depth + 1, 'at = ' + Place2(D.EntRef(I)^.A, U, False), I);
+        if not SameP(D.EntRef(I)^.A, D.EntRef(I)^.B) then
+          Put(Depth + 1, 'to = ' + Place2(D.EntRef(I)^.B, U, False), I);
+        Parts := TStringList.Create;
+        try
+          Parts.Text := D.EntRef(I)^.Txt;
+          for K := 0 to Parts.Count - 1 do
+            Put(Depth + 1, 'text = ' + QuotedStr(Parts[K]), I);
+        finally
+          Parts.Free;
         end;
+        if (D.EntRef(I)^.Size > 0) and (Abs(D.EntRef(I)^.Size - 1) > 1E-6) then
+          Put(Depth + 1, 'size = ' + FloatToStrF(D.EntRef(I)^.Size, ffGeneral, 4, 0, DotFS), I);
+        PutInk(Depth + 1, I);
+        Put(Depth, 'end', I);
+      end;
     end;
   end;
 
@@ -1467,7 +1530,7 @@ var
     which the reader applies)?  Then it is not written.  Loose covers the
     level's loose lines, since a disk in a box's top is implied by the circle
     drawn beside the box. }
-  function FaceImplied(I: Integer; HasMat: Boolean; SMat: TColor): Boolean;
+  function FaceImplied(I: integer; HasMat: boolean; SMat: TColor): boolean;
   begin
     Result := False;
     if InPass1 or (I >= Length(ImpliedGeom)) or not ImpliedGeom[I] then Exit;
@@ -1479,9 +1542,9 @@ var
 
   { Loops that close but are not faces, which the reader must not restore.
     Their corners use the drawing's names where it has them. }
-  procedure PutNoFaces(Depth: Integer; const Pts: TPts; Part_, G: Integer);
+  procedure PutNoFaces(Depth: integer; const Pts: TPts; Part_, G: integer);
   var
-    R, K, F: Integer;
+    R, K, F: integer;
     Lp: TP3Array;
   begin
     if InPass1 then Exit;
@@ -1492,7 +1555,11 @@ var
       for K := 0 to High(Lp) do
       begin
         for F := 0 to High(Pts) do
-          if SamePt(Pts[F].P, Lp[K], 1E-5) then begin Lp[K] := Pts[F].P; Break; end;
+          if SamePt(Pts[F].P, Lp[K], 1E-5) then
+          begin
+            Lp[K] := Pts[F].P;
+            Break;
+          end;
       end;
       { a loop that is no face has no way round: a circle by its name either way }
       PutList(Depth, 'noface', Outline(Pts, Lp, Part_, True), -1);
@@ -1504,38 +1571,38 @@ var
     "rect = corner; size", or as a block with a paint.  Anything else (odd
     lines, a reversed face, a hole, no face) is written as its lines. }
   { are A and B neighboring corners of face F, either way around? }
-  function EdgeOf(F: Integer; const A, B: TP3): Boolean;
+  function EdgeOf(F: integer; const A, B: TP3): boolean;
   var
-    K, N: Integer;
+    K, N: integer;
   begin
     Result := False;
     N := Length(D.EntRef(F)^.Poly);
     for K := 0 to N - 1 do
-      if (SameP(D.EntRef(F)^.Poly[K], A) and SameP(D.EntRef(F)^.Poly[(K + 1) mod N], B)) or
-         (SameP(D.EntRef(F)^.Poly[K], B) and SameP(D.EntRef(F)^.Poly[(K + 1) mod N], A)) then Exit(True);
+      if (SameP(D.EntRef(F)^.Poly[K], A) and SameP(D.EntRef(F)^.Poly[(K + 1) mod N], B)) or (SameP(D.EntRef(F)^.Poly[K], B) and SameP(D.EntRef(F)^.Poly[(K + 1) mod N], A))
+      then Exit(True);
   end;
 
-  function IsRect(Part_, I: Integer; out Lines: TIntArrayW; out Face: Integer;
-    out Lo, Size: TP3; out HasPaint: Boolean; out Paint: TColor; out Ink: TColor; out Wd: Single): Boolean;
+  function IsRect(Part_, I: integer; out Lines: TIntArrayW; out Face: integer; out Lo, Size: TP3; out HasPaint: boolean; out Paint: TColor;
+    out Ink: TColor; out Wd: single): boolean;
   var
-    K, J, F: Integer;
+    K, J, F: integer;
     Pts: array[0..3] of TP3;
     Hi: TP3;
     Loop: TP3Array;
 
-    function Plain(L: Integer): Boolean;
+    function Plain(L: integer): boolean;
     begin
-      Result := (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Part = Part_) and (D.EntRef(L)^.Grp = 0) and
-        (not D.EntRef(L)^.Soft) and (not D.EntRef(L)^.Dim) and (D.EntRef(L)^.Ink = D.EntRef(I)^.Ink) and
-        (Abs(D.EntRef(L)^.Weight - D.EntRef(I)^.Weight) <= 1E-3) and (AxesUsed(Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A)) = 1);
+      Result := (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Part = Part_) and (D.EntRef(L)^.Grp = 0) and (not D.EntRef(L)^.Soft) and
+        (not D.EntRef(L)^.Dim) and (D.EntRef(L)^.Ink = D.EntRef(I)^.Ink) and (Abs(D.EntRef(L)^.Weight - D.EntRef(I)^.Weight) <= 1E-3) and
+        (AxesUsed(Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A)) = 1);
     end;
 
     { Walk around, trying every plain line that leaves the corner and turns;
       three lines can meet at a corner and the first that turns may not be the
       rectangle's. }
-    function Walk(K: Integer; const Cur: TP3): Boolean;
+    function Walk(K: integer; const Cur: TP3): boolean;
     var
-      J: Integer;
+      J: integer;
       Nxt: TP3;
     begin
       Result := False;
@@ -1547,7 +1614,8 @@ var
         if (K > 1) and ((J = Lines[1]) or ((K > 2) and (J = Lines[2]))) then Continue;
         if SameP(D.EntRef(J)^.A, Cur) then Nxt := D.EntRef(J)^.B
         else if SameP(D.EntRef(J)^.B, Cur) then Nxt := D.EntRef(J)^.A
-        else Continue;
+        else
+          Continue;
         if SameP(Nxt, Pts[K - 1]) then Continue;            { back the way we came }
         { a corner: the next edge runs along a different axis }
         if (Abs(Nxt.X - Cur.X) > 1E-9) = (Abs(Pts[K - 1].X - Cur.X) > 1E-9) then
@@ -1574,7 +1642,8 @@ var
       for J := K + 1 to 3 do
         if (Lines[K] = Lines[J]) or SameP(Pts[K], Pts[J]) then Exit;
     { in one plane, square to it: two axes used across the four corners }
-    Lo := Pts[0]; Hi := Pts[0];
+    Lo := Pts[0];
+    Hi := Pts[0];
     for K := 1 to 3 do
     begin
       Lo := P3(Min(Lo.X, Pts[K].X), Min(Lo.Y, Pts[K].Y), Min(Lo.Z, Pts[K].Z));
@@ -1586,8 +1655,8 @@ var
     SetLength(Loop, 4);
     for K := 0 to 3 do Loop[K] := Pts[K];
     for F := 0 to D.Live - 1 do
-      if (D.EntRef(F)^.Kind = ekFace) and (D.EntRef(F)^.Part = Part_) and (D.EntRef(F)^.Grp = 0) and
-         (Length(D.EntRef(F)^.Holes) = 0) and (D.EntRef(F)^.Ink = DefInk) and SameLoop(D.EntRef(F)^.Poly, Loop) then
+      if (D.EntRef(F)^.Kind = ekFace) and (D.EntRef(F)^.Part = Part_) and (D.EntRef(F)^.Grp = 0) and (Length(D.EntRef(F)^.Holes) = 0) and
+        (D.EntRef(F)^.Ink = DefInk) and SameLoop(D.EntRef(F)^.Poly, Loop) then
       begin
         Face := F;
         Break;
@@ -1604,8 +1673,8 @@ var
       HasPaint := True;
       Paint := D.EntRef(Face)^.Mat;
       { turned the way the reader turns one it paints: OrientFace's way }
-      if Dot3(D.FaceNormal(Face), P3(Ord(Abs(Size.X) < 1E-9), Ord((Abs(Size.X) >= 1E-9) and (Abs(Size.Y) < 1E-9)),
-           Ord((Abs(Size.X) >= 1E-9) and (Abs(Size.Y) >= 1E-9)))) <= 0 then Exit;
+      if Dot3(D.FaceNormal(Face), P3(Ord(Abs(Size.X) < 1E-9), Ord((Abs(Size.X) >= 1E-9) and (Abs(Size.Y) < 1E-9)), Ord(
+        (Abs(Size.X) >= 1E-9) and (Abs(Size.Y) >= 1E-9)))) <= 0 then Exit;
     end
     else if not FaceImplied(Face, False, 0) then Exit;
     Result := True;
@@ -1614,17 +1683,16 @@ var
   { A disk in a box's face: a face of the solid whose outline is a named
     circle.  Written after the box as "face = c1"; the reader cuts the hole
     again from the circle. }
-  function IsDisk(I, Part_: Integer): Boolean;
+  function IsDisk(I, Part_: integer): boolean;
   begin
-    Result := (D.EntRef(I)^.Kind = ekFace) and (Length(D.EntRef(I)^.Poly) >= 8) and
-      (Length(D.EntRef(I)^.Holes) = 0) and (CircleNamed(D.EntRef(I)^.Poly, Part_) <> '');
+    Result := (D.EntRef(I)^.Kind = ekFace) and (Length(D.EntRef(I)^.Poly) >= 8) and (Length(D.EntRef(I)^.Holes) = 0) and (CircleNamed(D.EntRef(I)^.Poly, Part_) <> '');
   end;
 
   { One pen over all of a fold's lines, any ink or width as long as they all
     match; written in the block when not the sheet's. }
-  function OnePen(Part_, G: Integer; out Ink: TColor; out Wd: Single): Boolean;
+  function OnePen(Part_, G: integer; out Ink: TColor; out Wd: single): boolean;
   var
-    I, N: Integer;
+    I, N: integer;
   begin
     Result := False;
     N := 0;
@@ -1633,7 +1701,11 @@ var
     for I := 0 to D.Live - 1 do
       if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) then
       begin
-        if N = 0 then begin Ink := D.EntRef(I)^.Ink; Wd := D.EntRef(I)^.Weight; end
+        if N = 0 then
+        begin
+          Ink := D.EntRef(I)^.Ink;
+          Wd := D.EntRef(I)^.Weight;
+        end
         else if (D.EntRef(I)^.Ink <> Ink) or (Abs(D.EntRef(I)^.Weight - Wd) > 1E-3) then Exit;
         Inc(N);
       end;
@@ -1642,14 +1714,14 @@ var
 
   { a hole whose sides are all loose lines of the group (a rectangle drawn
     on the face): written on its own, it cuts the face again when read }
-  function LooseLoop(const Lp: array of TP3; Part_: Integer): Boolean;
+  function LooseLoop(const Lp: array of TP3; Part_: integer): boolean;
   var
-    K, L: Integer;
-    Found: Boolean;
+    K, L: integer;
+    Found: boolean;
 
-    function OnLine(const P: TP3; L: Integer): Boolean;
+    function OnLine(const P: TP3; L: integer): boolean;
     var
-      T, Len2: Double;
+      T, Len2: double;
       Q: TP3;
     begin
       Q := Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A);
@@ -1666,8 +1738,7 @@ var
     begin
       Found := False;
       for L := 0 to D.Live - 1 do
-        if (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Grp = 0) and (D.EntRef(L)^.Part = Part_) and
-           OnLine(Lp[K], L) and OnLine(Lp[(K + 1) mod Length(Lp)], L) then
+        if (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Grp = 0) and (D.EntRef(L)^.Part = Part_) and OnLine(Lp[K], L) and OnLine(Lp[(K + 1) mod Length(Lp)], L) then
         begin
           Found := True;
           Break;
@@ -1681,22 +1752,25 @@ var
     heights, twelve ordinary edges, and a four-corner face facing out on
     each side but those left open (Open, a bit per BOX_SIDES), with no
     hole but a circle drawn on it; one paint or none. }
-  function IsBox(Part_, G: Integer; out Lo, Hi: TP3; out HasPaint: Boolean; out Paint: TColor;
-    out Ink: TColor; out Wd: Single; out Open: Integer): Boolean;
+  function IsBox(Part_, G: integer; out Lo, Hi: TP3; out HasPaint: boolean; out Paint: TColor; out Ink: TColor; out Wd: single; out Open: integer): boolean;
   const
     FACINGS: array[0..5] of string = ('down', 'up', 'south', 'east', 'north', 'west');
   var
-    I, K, NF, NL, NPaint, Side, Have: Integer;
+    I, K, NF, NL, NPaint, Side, Have: integer;
     Pts: TPts;
     W: string;
-    OnSide: Boolean;
-    Sides: array[0..5] of Integer;
+    OnSide: boolean;
+    Sides: array[0..5] of integer;
   begin
     Result := False;
     Open := 0;
     SetLength(Pts, 0);
-    NF := 0; NL := 0; NPaint := 0; Have := 0;
-    HasPaint := False; Paint := 0;
+    NF := 0;
+    NL := 0;
+    NPaint := 0;
+    Have := 0;
+    HasPaint := False;
+    Paint := 0;
     if not OnePen(Part_, G, Ink, Wd) then Exit;
     for I := 0 to D.Live - 1 do
     begin
@@ -1704,41 +1778,42 @@ var
       if IsDisk(I, Part_) then Continue;
       case D.EntRef(I)^.Kind of
         ekFace:
-          begin
-            Inc(NF);
-            if (Length(D.EntRef(I)^.Poly) <> 4) or (D.EntRef(I)^.Ink <> DefInk) then Exit;
+        begin
+          Inc(NF);
+          if (Length(D.EntRef(I)^.Poly) <> 4) or (D.EntRef(I)^.Ink <> DefInk) then Exit;
             { a hole is allowed when it is a circle drawn on the face: the box is
               still a box, and the circle is written on its own }
-            for K := 0 to High(D.EntRef(I)^.Holes) do
-              if (CircleNamed(D.EntRef(I)^.Holes[K], Part_) = '') and not LooseLoop(D.EntRef(I)^.Holes[K], Part_) then Exit;
-            W := FacingWord(D.FaceNormal(I));
-            Side := High(FACINGS);
-            while (Side >= 0) and (FACINGS[Side] <> W) do Dec(Side);
-            if (Side < 0) or (Have and (1 shl Side) <> 0) then Exit;
-            Have := Have or (1 shl Side);
-            Sides[Side] := I;
-            if D.EntRef(I)^.MatSet then
-            begin
-              if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
-              Paint := D.EntRef(I)^.Mat;
-              Inc(NPaint);
-            end;
-          end;
-        ekLine:
+          for K := 0 to High(D.EntRef(I)^.Holes) do
+            if (CircleNamed(D.EntRef(I)^.Holes[K], Part_) = '') and not LooseLoop(D.EntRef(I)^.Holes[K], Part_) then Exit;
+          W := FacingWord(D.FaceNormal(I));
+          Side := High(FACINGS);
+          while (Side >= 0) and (FACINGS[Side] <> W) do Dec(Side);
+          if (Side < 0) or (Have and (1 shl Side) <> 0) then Exit;
+          Have := Have or (1 shl Side);
+          Sides[Side] := I;
+          if D.EntRef(I)^.MatSet then
           begin
-            Inc(NL);
-            if D.EntRef(I)^.Soft or D.EntRef(I)^.Dim then Exit;
-            if AxesUsed(Sub3(D.EntRef(I)^.B, D.EntRef(I)^.A)) <> 1 then Exit;
-            AddPt(Pts, D.EntRef(I)^.A);
-            AddPt(Pts, D.EntRef(I)^.B);
+            if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
+            Paint := D.EntRef(I)^.Mat;
+            Inc(NPaint);
           end;
+        end;
+        ekLine:
+        begin
+          Inc(NL);
+          if D.EntRef(I)^.Soft or D.EntRef(I)^.Dim then Exit;
+          if AxesUsed(Sub3(D.EntRef(I)^.B, D.EntRef(I)^.A)) <> 1 then Exit;
+          AddPt(Pts, D.EntRef(I)^.A);
+          AddPt(Pts, D.EntRef(I)^.B);
+        end;
         ekBore: Exit;
       end;
     end;
     if (NF < 1) or (NL <> 12) or (Length(Pts) <> 8) then Exit;
     if (NPaint <> 0) and (NPaint <> NF) then Exit;
     HasPaint := NPaint = NF;
-    Lo := Pts[0].P; Hi := Pts[0].P;
+    Lo := Pts[0].P;
+    Hi := Pts[0].P;
     for I := 1 to 7 do
     begin
       Lo := P3(Min(Lo.X, Pts[I].P.X), Min(Lo.Y, Pts[I].P.Y), Min(Lo.Z, Pts[I].P.Z));
@@ -1746,9 +1821,8 @@ var
     end;
     { every corner at a min or max of each axis: the eight of a box }
     for I := 0 to 7 do
-      if not ((Abs(Pts[I].P.X - Lo.X) < 1E-9) or (Abs(Pts[I].P.X - Hi.X) < 1E-9)) or
-         not ((Abs(Pts[I].P.Y - Lo.Y) < 1E-9) or (Abs(Pts[I].P.Y - Hi.Y) < 1E-9)) or
-         not ((Abs(Pts[I].P.Z - Lo.Z) < 1E-9) or (Abs(Pts[I].P.Z - Hi.Z) < 1E-9)) then Exit;
+      if not ((Abs(Pts[I].P.X - Lo.X) < 1E-9) or (Abs(Pts[I].P.X - Hi.X) < 1E-9)) or not ((Abs(Pts[I].P.Y - Lo.Y) < 1E-9) or
+        (Abs(Pts[I].P.Y - Hi.Y) < 1E-9)) or not ((Abs(Pts[I].P.Z - Lo.Z) < 1E-9) or (Abs(Pts[I].P.Z - Hi.Z) < 1E-9)) then Exit;
     if (Hi.X - Lo.X < 1E-9) or (Hi.Y - Lo.Y < 1E-9) or (Hi.Z - Lo.Z < 1E-9) then Exit;
     { each face on its own side, facing out }
     for Side := 0 to 5 do
@@ -1766,8 +1840,8 @@ var
           2: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].Y - Lo.Y) < 1E-9;
           3: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].X - Hi.X) < 1E-9;
           4: OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].Y - Hi.Y) < 1E-9;
-        else
-          OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].X - Lo.X) < 1E-9;
+          else
+            OnSide := Abs(D.EntRef(Sides[Side])^.Poly[K].X - Lo.X) < 1E-9;
         end;
         if not OnSide then Exit;
       end;
@@ -1776,9 +1850,9 @@ var
   end;
 
   { the open sides as words, "top north" }
-  function OpenWords(Open: Integer): string;
+  function OpenWords(Open: integer): string;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := '';
     for K := 0 to High(BOX_SIDES) do
@@ -1790,21 +1864,20 @@ var
   end;
 
   { the pen of a fold's lines, when it is not the sheet's }
-  procedure PutPen(Depth: Integer; Ink: TColor; Wd: Single);
+  procedure PutPen(Depth: integer; Ink: TColor; Wd: single);
   begin
     if Ink <> DefInk then Put(Depth, 'ink = ' + Color2(Ink), -1);
     if Abs(Wd - DefWidth) > 1E-3 then Put(Depth, 'width = ' + FloatToStrF(Wd, ffGeneral, 4, 0, DotFS), -1);
   end;
 
-  function PlainPen(Ink: TColor; Wd: Single): Boolean;
+  function PlainPen(Ink: TColor; Wd: single): boolean;
   begin
     Result := (Ink = DefInk) and (Abs(Wd - DefWidth) <= 1E-3);
   end;
 
-  procedure PutBox(Depth, Part_, G: Integer; const Lo, Hi: TP3; HasPaint: Boolean; Paint: TColor;
-    Ink: TColor; Wd: Single; Open: Integer);
+  procedure PutBox(Depth, Part_, G: integer; const Lo, Hi: TP3; HasPaint: boolean; Paint: TColor; Ink: TColor; Wd: single; Open: integer);
   var
-    I, Header: Integer;
+    I, Header: integer;
     NoPts: TPts;
     Nm, Note: string;
   begin
@@ -1822,16 +1895,13 @@ var
       Put(Depth, 'end', -1);
     end
     else if Open <> 0 then
-      Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) +
-        '; open ' + OpenWords(Open) + TailNote(Note), -1)
+      Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) + '; open ' + OpenWords(Open) + TailNote(Note), -1)
     else
-      Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) +
-        TailNote(Note), -1);
+      Put(Depth, 'box' + NameWord(Nm) + ' = ' + Place2(Lo, U, False) + '; ' + Place2(Sub3(Hi, Lo), U, True) + TailNote(Note), -1);
     { every face and edge maps to this statement, so picking on the sheet
       lights up the box }
     for I := 0 to D.Live - 1 do
-      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) and
-         not IsDisk(I, Part_) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) and not IsDisk(I, Part_) then
       begin
         First[I] := Header;
         Last[I] := NLine - 1;
@@ -1857,23 +1927,22 @@ var
     twin a step away, and a wall per side: no hole or bore, one paint or none,
     every line an edge of those (uprights soft around a circle).  Every face must
     face the way the reader will turn it, since the reader rebuilds them. }
-  function IsPull(Part_, G: Integer; out Bottom: Integer; out By: TP3; out Round_: Boolean;
-    out HasPaint: Boolean; out Paint: TColor; out Ink: TColor; out Wd: Single): Boolean;
+  function IsPull(Part_, G: integer; out Bottom: integer; out By: TP3; out Round_: boolean; out HasPaint: boolean; out Paint: TColor; out Ink: TColor; out Wd: single): boolean;
   var
-    I, J, K, C, N, NF, NPaint, Top, Best, NBottom, NTop, NUp, NArc: Integer;
+    I, J, K, C, N, NF, NPaint, Top, Best, NBottom, NTop, NUp, NArc: integer;
     V, Mid: TP3;
     Segs: TSegArray;
-    Faces: array of Integer;
-    Used: array of Boolean;
+    Faces: array of integer;
+    Used: array of boolean;
     Q: TP3Array;
-    Hit, Ok_: Boolean;
+    Hit, Ok_: boolean;
     Outer: TP3Array;
     Holes: TLoopArray;
     R: TRegion;
 
-    function CornerAt(const P: TP3; const Poly: TP3Array): Integer;
+    function CornerAt(const P: TP3; const Poly: TP3Array): integer;
     var
-      C: Integer;
+      C: integer;
     begin
       Result := -1;
       for C := 0 to High(Poly) do
@@ -1894,21 +1963,21 @@ var
       if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part_) then Continue;
       case D.EntRef(I)^.Kind of
         ekFace:
-          begin
-            if D.EntRef(I)^.Ink <> DefInk then Exit;
+        begin
+          if D.EntRef(I)^.Ink <> DefInk then Exit;
             { a circle drawn on an end (a motor on a housing) is written on
               its own and cuts the end again when read, as on a box }
-            for K := 0 to High(D.EntRef(I)^.Holes) do
-              if CircleNamed(D.EntRef(I)^.Holes[K], Part_) = '' then Exit;
-            SetLength(Faces, Length(Faces) + 1);
-            Faces[High(Faces)] := I;
-            if D.EntRef(I)^.MatSet then
-            begin
-              if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
-              Paint := D.EntRef(I)^.Mat;
-              Inc(NPaint);
-            end;
+          for K := 0 to High(D.EntRef(I)^.Holes) do
+            if CircleNamed(D.EntRef(I)^.Holes[K], Part_) = '' then Exit;
+          SetLength(Faces, Length(Faces) + 1);
+          Faces[High(Faces)] := I;
+          if D.EntRef(I)^.MatSet then
+          begin
+            if (NPaint > 0) and (D.EntRef(I)^.Mat <> Paint) then Exit;
+            Paint := D.EntRef(I)^.Mat;
+            Inc(NPaint);
           end;
+        end;
         ekBore: Exit;
         ekLine:
           if D.EntRef(I)^.Dim then Exit;
@@ -1945,9 +2014,8 @@ var
             { Either end could be the bottom.  Prefer the circle (the tool pulled the
               disk up from it), else the one the step goes up, north or east from, so
               the same solid is always written the same way. }
-            if (Top < 0) or (CircleNamed(D.EntRef(Faces[I])^.Poly, Part_) <> '') or
-               ((CircleNamed(D.EntRef(Bottom)^.Poly, Part_) = '') and
-                (V.Z + V.Y * 1E-3 + V.X * 1E-6 > By.Z + By.Y * 1E-3 + By.X * 1E-6)) then
+            if (Top < 0) or (CircleNamed(D.EntRef(Faces[I])^.Poly, Part_) <> '') or ((CircleNamed(D.EntRef(Bottom)^.Poly, Part_) = '') and
+              (V.Z + V.Y * 1E-3 + V.X * 1E-6 > By.Z + By.Y * 1E-3 + By.X * 1E-6)) then
             begin
               Bottom := Faces[I];
               Top := Faces[J];
@@ -1985,7 +2053,10 @@ var
     { Every line must be a bottom, top or upright edge and every such edge a
       line of this solid, since the reader makes them all.  So a solid sharing
       its bottom edges with the one it stands on is not a pull. }
-    NBottom := 0; NTop := 0; NUp := 0; NArc := 0;
+    NBottom := 0;
+    NTop := 0;
+    NUp := 0;
+    NArc := 0;
     for I := 0 to D.Live - 1 do
     begin
       if (D.EntRef(I)^.Grp <> G) or (D.EntRef(I)^.Part <> Part_) then Continue;
@@ -2025,7 +2096,10 @@ var
     if (NTop <> N) or (NUp <> N) then Exit;
     { Round: the circle may be this solid's or another's (a disk drawn on a
       box and pulled stands on the box's hole), but there are no bottom lines. }
-    if Round_ then begin if (NArc > 1) or (NBottom <> 0) then Exit; end
+    if Round_ then
+    begin
+      if (NArc > 1) or (NBottom <> 0) then Exit;
+    end
     else if NBottom <> N then Exit;
     { and facing the way the reader will turn them: away from the middle of
       the edges it will be given }
@@ -2051,10 +2125,9 @@ var
     Result := True;
   end;
 
-  procedure PutPull(Depth, Part_, G, Bottom: Integer; const By: TP3; Round_, HasPaint: Boolean;
-    Paint: TColor; Ink: TColor; Wd: Single);
+  procedure PutPull(Depth, Part_, G, Bottom: integer; const By: TP3; Round_, HasPaint: boolean; Paint: TColor; Ink: TColor; Wd: single);
   var
-    I, Header, Best: Integer;
+    I, Header, Best: integer;
     NoPts: TPts;
     It: TStringArray;
     Step, Nm, Note: string;
@@ -2069,10 +2142,8 @@ var
     Poly := Copy(D.EntRef(Bottom)^.Poly);
     Best := 0;
     for I := 1 to High(Poly) do
-      if (Poly[I].X < Poly[Best].X - 1E-9) or
-         ((Abs(Poly[I].X - Poly[Best].X) <= 1E-9) and (Poly[I].Y < Poly[Best].Y - 1E-9)) or
-         ((Abs(Poly[I].X - Poly[Best].X) <= 1E-9) and (Abs(Poly[I].Y - Poly[Best].Y) <= 1E-9) and
-          (Poly[I].Z < Poly[Best].Z - 1E-9)) then Best := I;
+      if (Poly[I].X < Poly[Best].X - 1E-9) or ((Abs(Poly[I].X - Poly[Best].X) <= 1E-9) and (Poly[I].Y < Poly[Best].Y - 1E-9)) or
+        ((Abs(Poly[I].X - Poly[Best].X) <= 1E-9) and (Abs(Poly[I].Y - Poly[Best].Y) <= 1E-9) and (Poly[I].Z < Poly[Best].Z - 1E-9)) then Best := I;
     for I := 0 to High(Poly) do Poly[I] := D.EntRef(Bottom)^.Poly[(Best + I) mod Length(Poly)];
     { a named circle whichever way the bottom faces: a pull's outline has no
       facing of its own }
@@ -2109,12 +2180,12 @@ var
   { A solid a statement made (a loft) and nothing since: its fingerprint
     still matches, one paint or none, one pen, and every circle it names is
     still there by that name.  Gives the statement's outlines and open ends. }
-  function MadeAs(Part_, G: Integer; out Through, OpenW, Exact: string; out HasPaint: Boolean;
-    out Paint: TColor; out Ink: TColor; out Wd: Single; out Extras: TIntArrayW): Boolean;
+  function MadeAs(Part_, G: integer; out Through, OpenW, Exact: string; out HasPaint: boolean; out Paint: TColor; out Ink: TColor;
+    out Wd: single; out Extras: TIntArrayW): boolean;
   var
-    I, K, NPaint, NF: Integer;
+    I, K, NPaint, NF: integer;
     Made, Stmt, Fp, W: string;
-    Found: Boolean;
+    Found: boolean;
   begin
     Result := False;
     Through := '';
@@ -2174,7 +2245,8 @@ var
       Through := Copy(Stmt, 1, K - 1);
       OpenW := Copy(Stmt, K + 1, MaxInt);
     end
-    else Through := Stmt;
+    else
+      Through := Stmt;
     for W in Through.Split([';']) do
       if (Pos(' ', Trim(W)) = 0) and (Pos(',', Trim(W)) = 0) then
       begin
@@ -2186,20 +2258,19 @@ var
     Result := True;
   end;
 
-  procedure PutMade(Depth, Part_, G: Integer; Through: string; const OpenW, Exact: string;
-    HasPaint: Boolean; Paint: TColor; Ink: TColor; Wd: Single; const Extras: TIntArrayW);
+  procedure PutMade(Depth, Part_, G: integer; Through: string; const OpenW, Exact: string; HasPaint: boolean; Paint: TColor; Ink: TColor; Wd: single; const Extras: TIntArrayW);
   var
-    I, K, Header: Integer;
+    I, K, Header: integer;
     Nm, Note, W, C: string;
     Outlines, Ex, It: TStringArray;
     Polys: array of array of TP3;
     Pts, NoPts: TPts;
-    Named_: Boolean;
+    Named_: boolean;
 
-    { on one line if it fits, else an outline to a line between brackets }
-    procedure PutThrough(D_: Integer; const Head: string);
+{ on one line if it fits, else an outline to a line between brackets }
+    procedure PutThrough(D_: integer; const Head: string);
     var
-      K: Integer;
+      K: integer;
     begin
       if D_ * 2 + Length(Head) + 3 + Length(Through) <= 78 then
       begin
@@ -2210,7 +2281,8 @@ var
       Outlines := Through.Split([';']);
       for K := 0 to High(Outlines) do
         if K < High(Outlines) then Put(D_ + 1, Trim(Outlines[K]) + ';', -1)
-        else Put(D_ + 1, Trim(Outlines[K]), -1);
+        else
+          Put(D_ + 1, Trim(Outlines[K]), -1);
       Put(D_, ')', -1);
     end;
 
@@ -2255,7 +2327,8 @@ var
         begin
           if I > 0 then Through := Through + '; ';
           if Length(Polys[I]) = 0 then Through := Through + Trim(Outlines[I])
-          else Through := Through + String.Join(' ', Runs(Items(Pts, Polys[I])));
+          else
+            Through := Through + string.Join(' ', Runs(Items(Pts, Polys[I])));
         end;
       end;
       PutThrough(Depth + 1, 'through');
@@ -2265,8 +2338,7 @@ var
       Put(Depth, 'end', -1);
     end;
     for I := 0 to D.Live - 1 do
-      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) and
-         (D.EntRef(I)^.Made[1] <> #4) then
+      if (D.EntRef(I)^.Grp = G) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Kind in [ekFace, ekLine]) and (D.EntRef(I)^.Made[1] <> #4) then
       begin
         First[I] := Header;
         Last[I] := NLine - 1;
@@ -2279,17 +2351,16 @@ var
 
   { One solid: its corners once, its faces, and only unusual edges; the rest
     are the faces' sides and go unwritten. }
-  procedure PutSolid(Depth, Part_, G: Integer);
+  procedure PutSolid(Depth, Part_, G: integer);
   var
     Pts: TPts;
-    I, J, K, N, Header, Best, LinesFrom: Integer;
-    HasMat: Boolean;
+    I, J, K, N, Header, Best, LinesFrom: integer;
+    HasMat: boolean;
     SMat: TColor;
     Rings: TRings;
     Rg: TRing;
-    Implied: array of Boolean;
+    Implied: array of boolean;
     Nm, Note: string;
-
   begin
     SetLength(Implied, D.Live);
     SetLength(Pts, 0);
@@ -2319,9 +2390,13 @@ var
       begin
         K := 0;
         for J := 0 to D.Live - 1 do
-          if (D.EntRef(J)^.Kind = ekFace) and (D.EntRef(J)^.Grp = G) and (D.EntRef(J)^.Part = Part_) and
-             D.EntRef(J)^.MatSet and (D.EntRef(J)^.Mat = D.EntRef(I)^.Mat) then Inc(K);
-        if K > Best then begin Best := K; SMat := D.EntRef(I)^.Mat; end;
+          if (D.EntRef(J)^.Kind = ekFace) and (D.EntRef(J)^.Grp = G) and (D.EntRef(J)^.Part = Part_) and D.EntRef(J)^.MatSet and
+            (D.EntRef(J)^.Mat = D.EntRef(I)^.Mat) then Inc(K);
+        if K > Best then
+        begin
+          Best := K;
+          SMat := D.EntRef(I)^.Mat;
+        end;
         if Best * 2 > N then Break;
       end;
     HasMat := (Best >= 2) and (Best * 2 > N);
@@ -2334,11 +2409,17 @@ var
         for J := -1 to High(D.EntRef(I)^.Holes) do
         begin
           if J < 0 then Best := Ord(RingOf(D.EntRef(I)^.Poly, Rg))
-          else Best := Ord(RingOf(D.EntRef(I)^.Holes[J], Rg));
+          else
+            Best := Ord(RingOf(D.EntRef(I)^.Holes[J], Rg));
           if Best = 0 then Continue;
-          if J < 0 then begin if CircleNamed(D.EntRef(I)^.Poly, Part_) <> '' then Continue; end
+          if J < 0 then
+          begin
+            if CircleNamed(D.EntRef(I)^.Poly, Part_) <> '' then Continue;
+          end
           else if CircleNamed(D.EntRef(I)^.Holes[J], Part_) <> '' then Continue;
-          if J < 0 then K := FindPt(Pts, D.EntRef(I)^.Poly[0]) else K := FindPt(Pts, D.EntRef(I)^.Holes[J][0]);
+          if J < 0 then K := FindPt(Pts, D.EntRef(I)^.Poly[0])
+          else
+            K := FindPt(Pts, D.EntRef(I)^.Holes[J][0]);
           if (K < 0) or (Pts[K].Ring >= 0) then Continue;   { that ring is known }
           Rg.Name := 'r' + Chr(Ord('a') + Length(Rings) mod 26);
           if Length(Rings) >= 26 then Rg.Name := Rg.Name + IntToStr(Length(Rings) div 26);
@@ -2346,7 +2427,9 @@ var
           Rings[High(Rings)] := Rg;
           for Best := 0 to Rg.N - 1 do
           begin
-            if J < 0 then K := FindPt(Pts, D.EntRef(I)^.Poly[Best]) else K := FindPt(Pts, D.EntRef(I)^.Holes[J][Best]);
+            if J < 0 then K := FindPt(Pts, D.EntRef(I)^.Poly[Best])
+            else
+              K := FindPt(Pts, D.EntRef(I)^.Holes[J][Best]);
             if (K >= 0) and (Pts[K].Ring < 0) then
             begin
               Pts[K].Ring := High(Rings);
@@ -2392,28 +2475,28 @@ var
   end;
 
   { everything in one group (Part_ 0 is the sheet), then the groups inside it }
-  procedure PutLevel(Depth, Part_: Integer);
+  procedure PutLevel(Depth, Part_: integer);
   var
-    I, J, G, LinesFrom, PBottom, RFace, Header, BOpen: Integer;
+    I, J, G, LinesFrom, PBottom, RFace, Header, BOpen: integer;
     MThrough, MOpen, MExact: string;
     MExtras: TIntArrayW;
-    Done: array of Integer;
-    Seen, BPaintOn, PRound: Boolean;
+    Done: array of integer;
+    Seen, BPaintOn, PRound: boolean;
     None: TPts;
     BLo, BHi, PBy, RLo, RSize: TP3;
     BPaint, PInk: TColor;
-    PWd: Single;
-    Implied, RectDone, RectAt, ChainDone: array of Boolean;
+    PWd: single;
+    Implied, RectDone, RectAt, ChainDone: array of boolean;
     RLines, Chain: TIntArrayW;
     ChainPoly: TP3Array;
 
     { the named loose lines that carry on from line I, end to end, in the
       same pen }
-    procedure FindChain(I: Integer);
+    procedure FindChain(I: integer);
     var
-      K: Integer;
+      K: integer;
       Tip: TP3;
-      More: Boolean;
+      More: boolean;
     begin
       SetLength(Chain, 1);
       Chain[0] := I;
@@ -2424,12 +2507,13 @@ var
       repeat
         More := False;
         for K := I + 1 to D.Live - 1 do
-          if (D.EntRef(K)^.Kind = ekLine) and not ChainDone[K] and not RectDone[K] and (D.EntRef(K)^.Part = Part_) and
-             (D.EntRef(K)^.Grp = 0) and (D.EntRef(K)^.Name = D.EntRef(I)^.Name) and (D.EntRef(K)^.Ink = D.EntRef(I)^.Ink) and
-             (Abs(D.EntRef(K)^.Weight - D.EntRef(I)^.Weight) <= 1E-3) and (D.EntRef(K)^.Soft = D.EntRef(I)^.Soft) and
-             (D.EntRef(K)^.Dim = D.EntRef(I)^.Dim) and (SameP(D.EntRef(K)^.A, Tip) or SameP(D.EntRef(K)^.B, Tip)) then
+          if (D.EntRef(K)^.Kind = ekLine) and not ChainDone[K] and not RectDone[K] and (D.EntRef(K)^.Part = Part_) and (D.EntRef(K)^.Grp = 0) and
+            (D.EntRef(K)^.Name = D.EntRef(I)^.Name) and (D.EntRef(K)^.Ink = D.EntRef(I)^.Ink) and (Abs(D.EntRef(K)^.Weight - D.EntRef(I)^.Weight) <= 1E-3) and
+            (D.EntRef(K)^.Soft = D.EntRef(I)^.Soft) and (D.EntRef(K)^.Dim = D.EntRef(I)^.Dim) and (SameP(D.EntRef(K)^.A, Tip) or SameP(D.EntRef(K)^.B, Tip)) then
           begin
-            if SameP(D.EntRef(K)^.A, Tip) then Tip := D.EntRef(K)^.B else Tip := D.EntRef(K)^.A;
+            if SameP(D.EntRef(K)^.A, Tip) then Tip := D.EntRef(K)^.B
+            else
+              Tip := D.EntRef(K)^.A;
             ChainDone[K] := True;
             SetLength(Chain, Length(Chain) + 1);
             Chain[High(Chain)] := K;
@@ -2455,7 +2539,7 @@ var
     for I := 0 to D.Live - 1 do RectAt[I] := False;
     for I := 0 to D.Live - 1 do
       if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Part = Part_) and (D.EntRef(I)^.Grp = 0) and not RectDone[I] and
-         IsRect(Part_, I, RLines, RFace, RLo, RSize, BPaintOn, BPaint, PInk, PWd) then
+        IsRect(Part_, I, RLines, RFace, RLo, RSize, BPaintOn, BPaint, PInk, PWd) then
       begin
         for J := 0 to 3 do RectDone[RLines[J]] := True;
         RectDone[RFace] := True;
@@ -2478,7 +2562,11 @@ var
       begin
         Seen := False;
         for J := 0 to High(Done) do
-          if Done[J] = G then begin Seen := True; Break; end;
+          if Done[J] = G then
+          begin
+            Seen := True;
+            Break;
+          end;
         if Seen then Continue;
         SetLength(Done, Length(Done) + 1);
         Done[High(Done)] := G;
@@ -2496,10 +2584,10 @@ var
       if ChainDone[I] then Continue;
       case D.EntRef(I)^.Kind of
         ekFace:
-          begin
-            Implied[I] := FaceImplied(I, False, 0);
-            if not Implied[I] then PutFace(Depth, I, None);
-          end;
+        begin
+          Implied[I] := FaceImplied(I, False, 0);
+          if not Implied[I] then PutFace(Depth, I, None);
+        end;
         ekLine:
           if RectAt[I] and IsRect(Part_, I, RLines, RFace, RLo, RSize, BPaintOn, BPaint, PInk, PWd) then
           begin
@@ -2515,8 +2603,8 @@ var
               Put(Depth, 'end', -1);
             end
             else
-              Put(Depth, 'rect' + NameWord(D.EntRef(RLines[0])^.Name) + ' = ' + Place2(RLo, U, False) + '; ' +
-                Place2(RSize, U, True) + TailNote(D.EntRef(RLines[0])^.Note), -1);
+              Put(Depth, 'rect' + NameWord(D.EntRef(RLines[0])^.Name) + ' = ' + Place2(RLo, U, False) + '; ' + Place2(RSize, U, True) +
+                TailNote(D.EntRef(RLines[0])^.Note), -1);
             for J := 0 to 3 do
             begin
               RectDone[RLines[J]] := True;
@@ -2530,12 +2618,15 @@ var
           else
           begin
             if LinesFrom < 0 then LinesFrom := NLine;
-            if D.EntRef(I)^.Name <> '' then FindChain(I) else SetLength(Chain, 1);
+            if D.EntRef(I)^.Name <> '' then FindChain(I)
+            else
+              SetLength(Chain, 1);
             if Length(Chain) > 1 then PutChain(Depth, Chain, ChainPoly)
-            else PutLine(Depth, I, None);
+            else
+              PutLine(Depth, I, None);
           end;
-      else
-        PutOther(Depth, I);
+        else
+          PutOther(Depth, I);
       end;
     end;
     PutNoFaces(Depth, None, Part_, 0);
@@ -2565,20 +2656,22 @@ var
     since the reader's order is its own. }
   procedure Decide(E: TWorkDoc; const EImplied: TBoolArray);
   var
-    F, I, K, S, R, Grp, Prt, C: Integer;
-    Match: array of Integer;
-    Taken: array of Boolean;
-    Found: Boolean;
+    F, I, K, S, R, Grp, Prt, C: integer;
+    Match: array of integer;
+    Taken: array of boolean;
+    Found: boolean;
     DFaces, DLines, DHoles: TLoopIndex;
     Cands: TIntArrayW;
-    GrpMap: array of record E, D: Integer; end;
+    GrpMap: array of record
+    E, D: integer;
+    end;
     Seg: TP3Array;
 
     { E's groups are numbered as the reader numbers them; each maps to the D
       group its lines are in }
-    function GrpOfE(G: Integer): Integer;
+    function GrpOfE(G: integer): integer;
     var
-      K: Integer;
+      K: integer;
     begin
       Result := 0;
       if G = 0 then Exit;
@@ -2587,19 +2680,18 @@ var
       Result := -1;
     end;
 
-    function MatchOf(F: Integer): Integer;
+    function MatchOf(F: integer): integer;
     var
-      C, I, Want: Integer;
+      C, I, Want: integer;
     begin
       Result := -1;
       Want := GrpOfE(E.EntRef(F)^.Grp);
-      Cands := DFaces.Near(E.EntRef(F)^.Poly);
+      Cands := DFaces. Near(E.EntRef(F)^.Poly);
       for C := 0 to High(Cands) do
       begin
         I := Cands[C];
         if Taken[I] or (D.EntRef(I)^.Grp <> Want) then Continue;
-        if (Length(D.EntRef(I)^.Holes) = Length(E.EntRef(F)^.Holes)) and
-           SameLoopTol(D.EntRef(I)^.Poly, E.EntRef(F)^.Poly, 1E-4) then
+        if (Length(D.EntRef(I)^.Holes) = Length(E.EntRef(F)^.Holes)) and SameLoopTol(D.EntRef(I)^.Poly, E.EntRef(F)^.Poly, 1E-4) then
           Exit(I);
       end;
     end;
@@ -2608,8 +2700,8 @@ var
       original) have the same lines, and each needs a group of its own. }
     procedure MapGroups;
     var
-      F, I, K, C: Integer;
-      Known, Used: Boolean;
+      F, I, K, C: integer;
+      Known, Used: boolean;
     begin
       SetLength(GrpMap, 0);
       SetLength(Seg, 2);
@@ -2618,20 +2710,29 @@ var
         if (E.EntRef(F)^.Kind <> ekLine) or (E.EntRef(F)^.Grp = 0) then Continue;
         Known := False;
         for K := 0 to High(GrpMap) do
-          if GrpMap[K].E = E.EntRef(F)^.Grp then begin Known := True; Break; end;
+          if GrpMap[K].E = E.EntRef(F)^.Grp then
+          begin
+            Known := True;
+            Break;
+          end;
         if Known then Continue;
-        Seg[0] := E.EntRef(F)^.A; Seg[1] := E.EntRef(F)^.B;
-        Cands := DLines.Near(Seg);
+        Seg[0] := E.EntRef(F)^.A;
+        Seg[1] := E.EntRef(F)^.B;
+        Cands := DLines. Near(Seg);
         for C := 0 to High(Cands) do
         begin
           I := Cands[C];
           if D.EntRef(I)^.Grp = 0 then Continue;
           if ((SamePt(D.EntRef(I)^.A, E.EntRef(F)^.A, 1E-4) and SamePt(D.EntRef(I)^.B, E.EntRef(F)^.B, 1E-4)) or
-              (SamePt(D.EntRef(I)^.A, E.EntRef(F)^.B, 1E-4) and SamePt(D.EntRef(I)^.B, E.EntRef(F)^.A, 1E-4))) then
+            (SamePt(D.EntRef(I)^.A, E.EntRef(F)^.B, 1E-4) and SamePt(D.EntRef(I)^.B, E.EntRef(F)^.A, 1E-4))) then
           begin
             Used := False;
             for K := 0 to High(GrpMap) do
-              if GrpMap[K].D = D.EntRef(I)^.Grp then begin Used := True; Break; end;
+              if GrpMap[K].D = D.EntRef(I)^.Grp then
+              begin
+                Used := True;
+                Break;
+              end;
             if Used then Continue;
             SetLength(GrpMap, Length(GrpMap) + 1);
             GrpMap[High(GrpMap)].E := E.EntRef(F)^.Grp;
@@ -2647,16 +2748,24 @@ var
         if (E.EntRef(F)^.Kind <> ekFace) or (E.EntRef(F)^.Grp = 0) then Continue;
         Known := False;
         for K := 0 to High(GrpMap) do
-          if GrpMap[K].E = E.EntRef(F)^.Grp then begin Known := True; Break; end;
+          if GrpMap[K].E = E.EntRef(F)^.Grp then
+          begin
+            Known := True;
+            Break;
+          end;
         if Known then Continue;
-        Cands := DFaces.Near(E.EntRef(F)^.Poly);
+        Cands := DFaces. Near(E.EntRef(F)^.Poly);
         for C := 0 to High(Cands) do
         begin
           I := Cands[C];
           if (D.EntRef(I)^.Grp = 0) or not SameLoopTol(D.EntRef(I)^.Poly, E.EntRef(F)^.Poly, 1E-4) then Continue;
           Used := False;
           for K := 0 to High(GrpMap) do
-            if GrpMap[K].D = D.EntRef(I)^.Grp then begin Used := True; Break; end;
+            if GrpMap[K].D = D.EntRef(I)^.Grp then
+            begin
+              Used := True;
+              Break;
+            end;
           if Used then Continue;
           SetLength(GrpMap, Length(GrpMap) + 1);
           GrpMap[High(GrpMap)].E := E.EntRef(F)^.Grp;
@@ -2666,20 +2775,19 @@ var
       end;
     end;
 
-  { is face F's outline the ring of a whole circle in its group? }
-  function RingOfCircle(F: Integer): Boolean;
-  var
-    A, N: Integer;
-  begin
-    Result := False;
-    N := Length(D.EntRef(F)^.Poly);
-    if N < 8 then Exit;
-    for A := 0 to D.Live - 1 do
-      if (D.EntRef(A)^.Kind = ekArc) and FullCircle(D.EntRef(A)^.Sweep) and (D.EntRef(A)^.Part = D.EntRef(F)^.Part) and
-         (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[0]) - D.EntRef(A)^.R) < 1E-5) and
-         (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[N div 2]) - D.EntRef(A)^.R) < 1E-5) and
-         (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[N div 4]) - D.EntRef(A)^.R) < 1E-5) then Exit(True);
-  end;
+    { is face F's outline the ring of a whole circle in its group? }
+    function RingOfCircle(F: integer): boolean;
+    var
+      A, N: integer;
+    begin
+      Result := False;
+      N := Length(D.EntRef(F)^.Poly);
+      if N < 8 then Exit;
+      for A := 0 to D.Live - 1 do
+        if (D.EntRef(A)^.Kind = ekArc) and FullCircle(D.EntRef(A)^.Sweep) and (D.EntRef(A)^.Part = D.EntRef(F)^.Part) and
+          (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[0]) - D.EntRef(A)^.R) < 1E-5) and (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[N div 2]) - D.EntRef(A)^.R) < 1E-5) and
+          (Abs(Dist(D.EntRef(A)^.C, D.EntRef(F)^.Poly[N div 4]) - D.EntRef(A)^.R) < 1E-5) then Exit(True);
+    end;
 
   begin
     SetLength(ImpliedGeom, D.Live);
@@ -2698,7 +2806,8 @@ var
         if D.EntRef(I)^.Kind = ekFace then DFaces.Add(D.EntRef(I)^.Poly, I)
         else if D.EntRef(I)^.Kind = ekLine then
         begin
-          Seg[0] := D.EntRef(I)^.A; Seg[1] := D.EntRef(I)^.B;
+          Seg[0] := D.EntRef(I)^.A;
+          Seg[1] := D.EntRef(I)^.B;
           DLines.Add(Seg, I);
         end;
       end;
@@ -2716,8 +2825,7 @@ var
       { faces the reader closes by itself: D's face goes unwritten when it faces
         the way the reader would turn it }
       for F := 0 to E.Live - 1 do
-        if (F <= High(EImplied)) and EImplied[F] and (Match[F] >= 0) and
-           (Dot3(E.FaceNormal(F), D.FaceNormal(Match[F])) > 0) then
+        if (F <= High(EImplied)) and EImplied[F] and (Match[F] >= 0) and (Dot3(E.FaceNormal(F), D.FaceNormal(Match[F])) > 0) then
           ImpliedGeom[Match[F]] := True;
       { Faces of E with no match in D are loops the reader closed on its own and
         must be told not to.  They go in the scope of D their edges are in. }
@@ -2733,31 +2841,35 @@ var
             Grp := GrpOfE(E.EntRef(F)^.Grp);
             Prt := E.EntRef(F)^.Part;
             for I := 0 to D.Live - 1 do
-              if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp = Grp) then begin Prt := D.EntRef(I)^.Part; Break; end;
-          end
-          else
-          for S := 0 to High(E.EntRef(F)^.Poly) do
-          begin
-            Seg[0] := E.EntRef(F)^.Poly[S]; Seg[1] := E.EntRef(F)^.Poly[(S + 1) mod Length(E.EntRef(F)^.Poly)];
-            Cands := DLines.Near(Seg);
-            for C := 0 to High(Cands) do
-            begin
-              I := Cands[C];
-              if (SamePt(D.EntRef(I)^.A, Seg[0], 1E-4) and SamePt(D.EntRef(I)^.B, Seg[1], 1E-4)) or
-                 (SamePt(D.EntRef(I)^.A, Seg[1], 1E-4) and SamePt(D.EntRef(I)^.B, Seg[0], 1E-4)) then
+              if (D.EntRef(I)^.Kind = ekLine) and (D.EntRef(I)^.Grp = Grp) then
               begin
-                Grp := D.EntRef(I)^.Grp;
                 Prt := D.EntRef(I)^.Part;
                 Break;
               end;
+          end
+          else
+            for S := 0 to High(E.EntRef(F)^.Poly) do
+            begin
+              Seg[0] := E.EntRef(F)^.Poly[S];
+              Seg[1] := E.EntRef(F)^.Poly[(S + 1) mod Length(E.EntRef(F)^.Poly)];
+              Cands := DLines. Near(Seg);
+              for C := 0 to High(Cands) do
+              begin
+                I := Cands[C];
+                if (SamePt(D.EntRef(I)^.A, Seg[0], 1E-4) and SamePt(D.EntRef(I)^.B, Seg[1], 1E-4)) or (SamePt(D.EntRef(I)^.A, Seg[1], 1E-4) and
+                  SamePt(D.EntRef(I)^.B, Seg[0], 1E-4)) then
+                begin
+                  Grp := D.EntRef(I)^.Grp;
+                  Prt := D.EntRef(I)^.Part;
+                  Break;
+                end;
+              end;
+              if Prt >= 0 then Break;
             end;
-            if Prt >= 0 then Break;
-          end;
           if Prt < 0 then
             for I := 0 to D.Live - 1 do
-              if (D.EntRef(I)^.Kind = ekArc) and
-                 (Abs(Dist(D.EntRef(I)^.C, E.EntRef(F)^.Poly[0]) - D.EntRef(I)^.R) < 1E-4) and
-                 (Abs(Dist(D.EntRef(I)^.C, E.EntRef(F)^.Poly[Length(E.EntRef(F)^.Poly) div 2]) - D.EntRef(I)^.R) < 1E-4) then
+              if (D.EntRef(I)^.Kind = ekArc) and (Abs(Dist(D.EntRef(I)^.C, E.EntRef(F)^.Poly[0]) - D.EntRef(I)^.R) < 1E-4) and
+                (Abs(Dist(D.EntRef(I)^.C, E.EntRef(F)^.Poly[Length(E.EntRef(F)^.Poly) div 2]) - D.EntRef(I)^.R) < 1E-4) then
               begin
                 Grp := D.EntRef(I)^.Grp;
                 Prt := D.EntRef(I)^.Part;
@@ -2768,8 +2880,11 @@ var
             and two in one scope are one }
           Found := False;
           for R := 0 to High(NoFaceLoops) do
-            if (NoFaceScope[R] = Grp) and (NoFacePart[R] = Prt) and
-               SameLoopTol(NoFaceLoops[R], E.EntRef(F)^.Poly, 1E-4) then begin Found := True; Break; end;
+            if (NoFaceScope[R] = Grp) and (NoFacePart[R] = Prt) and SameLoopTol(NoFaceLoops[R], E.EntRef(F)^.Poly, 1E-4) then
+            begin
+              Found := True;
+              Break;
+            end;
           if Found then Continue;
           SetLength(NoFaceLoops, Length(NoFaceLoops) + 1);
           NoFaceLoops[High(NoFaceLoops)] := Copy(E.EntRef(F)^.Poly);
@@ -2800,7 +2915,7 @@ var
         for I := 0 to D.Live - 1 do
           if ImpliedGeom[I] and not RingOfCircle(I) then
           begin
-            Cands := DHoles.Near(D.EntRef(I)^.Poly);
+            Cands := DHoles. Near(D.EntRef(I)^.Poly);
             for C := 0 to High(Cands) do
             begin
               F := Cands[C];
@@ -2820,7 +2935,7 @@ var
   end;
 
 var
-  I, EL: Integer;
+  I, EL: integer;
   T0, T1, T2: QWord;
   Pass1: TStringList;
   EImplied: TBoolArray;
@@ -2849,8 +2964,7 @@ begin
         T2 := GetTickCount64;
         Decide(E, EImplied);
         if GetEnvironmentVariable('HECK_TIMING') <> '' then
-          WriteLn(StdErr, Format('pass one: write %d ms, read %d ms, decide %d ms',
-            [T1 - T0, T2 - T1, GetTickCount64 - T2]));
+          WriteLn(StdErr, Format('pass one: write %d ms, read %d ms, decide %d ms', [T1 - T0, T2 - T1, GetTickCount64 - T2]));
       end;
     finally
       E.Free;
@@ -2864,7 +2978,11 @@ begin
   SetLength(LineThing, 256);
   SetLength(First, D.Live);
   SetLength(Last, D.Live);
-  for I := 0 to D.Live - 1 do begin First[I] := 0; Last[I] := -1; end;
+  for I := 0 to D.Live - 1 do
+  begin
+    First[I] := 0;
+    Last[I] := -1;
+  end;
   FindDefaults;
   SetLength(Circles, 0);
   for I := 0 to D.Live - 1 do
@@ -2877,7 +2995,8 @@ begin
 
   Put(0, HECK_MAGIC, -1);
   if U = usMetric then Put(0, 'units = mm', -1)
-  else Put(0, 'units = ft in', -1);
+  else
+    Put(0, 'units = ft in', -1);
   Put(0, '', -1);
   PutNote(0, D.HeadNote, -1);
   Put(0, 'sheet ' + QuotedStr(SheetName), -1);

@@ -14,7 +14,7 @@ uses
   Classes, SysUtils, Math, hsDrawing, hsText;
 
 type
-  TDataNums = array of Double;
+  TDataNums = array of double;
 
   { one line of the data, or a block and what is in it }
   TDataNode = class
@@ -22,20 +22,20 @@ type
     FKids: TList;
   public
     Key, Value: string;
-    Block: Boolean;
+    Block: boolean;
     constructor Create;
     destructor Destroy; override;
-    function Count: Integer;
-    function Kid(I: Integer): TDataNode;
-    function Add(const AKey, AValue: string; ABlock: Boolean): TDataNode;
+    function Count: integer;
+    function Kid(I: integer): TDataNode;
+    function Add(const AKey, AValue: string; ABlock: boolean): TDataNode;
     { the first line or block called K, or nil }
     function Find(const K: string): TDataNode;
     { every block called K, in order }
     function Blocks(const K: string): TList;
-    function Has(const K: string): Boolean;
-    function Num(const K: string; Def: Double = 0): Double;
-    function Int(const K: string; Def: Integer = 0): Integer;
-    function Bool(const K: string; Def: Boolean = False): Boolean;
+    function Has(const K: string): boolean;
+    function Num(const K: string; Def: double = 0): double;
+    function Int(const K: string; Def: integer = 0): integer;
+    function Bool(const K: string; Def: boolean = False): boolean;
     function Text(const K: string; const Def: string = ''): string;
     function Nums(const K: string): TDataNums;
     function Pts(const K: string): TP3Array;
@@ -45,15 +45,15 @@ type
   TDataWriter = class
   private
     FL: TStringList;
-    FDepth: Integer;
+    FDepth: integer;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Num(const K: string; V: Double);
-    procedure Int(const K: string; V: Integer);
-    procedure Bool(const K: string; V: Boolean);
+    procedure Num(const K: string; V: double);
+    procedure Int(const K: string; V: integer);
+    procedure Bool(const K: string; V: boolean);
     procedure Text(const K, V: string);
-    procedure Nums(const K: string; const V: array of Double);
+    procedure Nums(const K: string; const V: array of double);
     procedure Pts(const K: string; const P: array of TP3);
     procedure Open(const K: string);
     procedure Close;
@@ -67,21 +67,21 @@ function ReadData(const S: string): TDataNode;
 { the lines indented two spaces per block, for the source window }
 function DataIndented(const S: string): TStringList;
 { always a decimal point whatever the locale, and no extra digits }
-function DataNum(V: Double): string;
+function DataNum(V: double): string;
 { a text as the data writes it, and back }
 function DataQuote(const S: string): string;
 function DataUnquote(const V: string): string;
 
 implementation
 
-function DataNum(V: Double): string;
+function DataNum(V: double): string;
 begin
   if IsNan(V) or IsInfinite(V) then Exit('0');
   Result := FloatToStrF(V, ffGeneral, 15, 0, DotFS);
 end;
 
 { a coordinate to 0.00001 ft (about a thousandth of an inch) }
-function PtNum(V: Double): string;
+function PtNum(V: double): string;
 begin
   if IsNan(V) or IsInfinite(V) then Exit('0');
   Result := FormatFloat('0.#####', V, DotFS);
@@ -102,7 +102,7 @@ end;
 function DataUnquote(const V: string): string;
 var
   T: string;
-  I: Integer;
+  I: integer;
 begin
   T := Trim(V);
   if (Length(T) >= 2) and (T[1] = '''') and (T[Length(T)] = '''') then
@@ -114,7 +114,8 @@ begin
     if (T[I] = '\') and (I < Length(T)) then
     begin
       if T[I + 1] = 'n' then Result := Result + LineEnding
-      else Result := Result + T[I + 1];
+      else
+        Result := Result + T[I + 1];
       Inc(I, 2);
       Continue;
     end;
@@ -133,24 +134,24 @@ end;
 
 destructor TDataNode.Destroy;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to FKids.Count - 1 do TDataNode(FKids[I]).Free;
   FKids.Free;
   inherited Destroy;
 end;
 
-function TDataNode.Count: Integer;
+function TDataNode.Count: integer;
 begin
   Result := FKids.Count;
 end;
 
-function TDataNode.Kid(I: Integer): TDataNode;
+function TDataNode.Kid(I: integer): TDataNode;
 begin
   Result := TDataNode(FKids[I]);
 end;
 
-function TDataNode.Add(const AKey, AValue: string; ABlock: Boolean): TDataNode;
+function TDataNode.Add(const AKey, AValue: string; ABlock: boolean): TDataNode;
 begin
   Result := TDataNode.Create;
   Result.Key := AKey;
@@ -161,7 +162,7 @@ end;
 
 function TDataNode.Find(const K: string): TDataNode;
 var
-  I: Integer;
+  I: integer;
   L: string;
 begin
   L := LowerCase(K);
@@ -172,7 +173,7 @@ end;
 
 function TDataNode.Blocks(const K: string): TList;
 var
-  I: Integer;
+  I: integer;
   L: string;
 begin
   L := LowerCase(K);
@@ -181,12 +182,12 @@ begin
     if TDataNode(FKids[I]).Block and (TDataNode(FKids[I]).Key = L) then Result.Add(FKids[I]);
 end;
 
-function TDataNode.Has(const K: string): Boolean;
+function TDataNode.Has(const K: string): boolean;
 begin
   Result := Find(K) <> nil;
 end;
 
-function TDataNode.Num(const K: string; Def: Double): Double;
+function TDataNode.Num(const K: string; Def: double): double;
 var
   N: TDataNode;
 begin
@@ -195,15 +196,17 @@ begin
   Result := StrToFloatDef(Trim(N.Value), Def, DotFS);
 end;
 
-function TDataNode.Int(const K: string; Def: Integer): Integer;
+function TDataNode.Int(const K: string; Def: integer): integer;
 var
-  V: Double;
+  V: double;
 begin
   V := Num(K, Def);
-  if (V > MaxInt) or (V < -MaxInt) then Result := Def else Result := Round(V);
+  if (V > MaxInt) or (V < -MaxInt) then Result := Def
+  else
+    Result := Round(V);
 end;
 
-function TDataNode.Bool(const K: string; Def: Boolean): Boolean;
+function TDataNode.Bool(const K: string; Def: boolean): boolean;
 var
   N: TDataNode;
   V: string;
@@ -213,7 +216,8 @@ begin
   V := LowerCase(Trim(N.Value));
   if (V = 'true') or (V = '1') or (V = 'yes') then Result := True
   else if (V = 'false') or (V = '0') or (V = 'no') then Result := False
-  else Result := Def;
+  else
+    Result := Def;
 end;
 
 function TDataNode.Text(const K: string; const Def: string): string;
@@ -229,7 +233,7 @@ function TDataNode.Nums(const K: string): TDataNums;
 var
   N: TDataNode;
   Parts: TStringArray;
-  I: Integer;
+  I: integer;
 begin
   SetLength(Result, 0);
   N := Find(K);
@@ -243,7 +247,7 @@ function TDataNode.Pts(const K: string): TP3Array;
 var
   N: TDataNode;
   Parts, W: TStringArray;
-  I, C: Integer;
+  I, C: integer;
 begin
   SetLength(Result, 0);
   N := Find(K);
@@ -257,17 +261,19 @@ begin
     if Length(W) < 2 then Continue;
     Result[C].X := StrToFloatDef(W[0], 0, DotFS);
     Result[C].Y := StrToFloatDef(W[1], 0, DotFS);
-    if Length(W) >= 3 then Result[C].Z := StrToFloatDef(W[2], 0, DotFS) else Result[C].Z := 0;
+    if Length(W) >= 3 then Result[C].Z := StrToFloatDef(W[2], 0, DotFS)
+    else
+      Result[C].Z := 0;
     Inc(C);
   end;
   SetLength(Result, C);
 end;
 
 { the "=" that is not in a text, or 0 }
-function EqualsAt(const Line: string): Integer;
+function EqualsAt(const Line: string): integer;
 var
-  K: Integer;
-  InText: Boolean;
+  K: integer;
+  InText: boolean;
 begin
   InText := False;
   for K := 1 to Length(Line) do
@@ -282,7 +288,7 @@ function ReadData(const S: string): TDataNode;
 var
   Lines: TStringList;
   Stack: TList;
-  I, E: Integer;
+  I, E: integer;
   Line: string;
   Top, N: TDataNode;
 begin
@@ -325,7 +331,7 @@ end;
 function DataIndented(const S: string): TStringList;
 var
   Lines: TStringList;
-  I, Depth: Integer;
+  I, Depth: integer;
   Line: string;
 begin
   Result := TStringList.Create;
@@ -373,19 +379,21 @@ begin
   inherited Destroy;
 end;
 
-procedure TDataWriter.Num(const K: string; V: Double);
+procedure TDataWriter.Num(const K: string; V: double);
 begin
   FL.Add(K + ' = ' + DataNum(V));
 end;
 
-procedure TDataWriter.Int(const K: string; V: Integer);
+procedure TDataWriter.Int(const K: string; V: integer);
 begin
   FL.Add(K + ' = ' + IntToStr(V));
 end;
 
-procedure TDataWriter.Bool(const K: string; V: Boolean);
+procedure TDataWriter.Bool(const K: string; V: boolean);
 begin
-  if V then FL.Add(K + ' = true') else FL.Add(K + ' = false');
+  if V then FL.Add(K + ' = true')
+  else
+    FL.Add(K + ' = false');
 end;
 
 procedure TDataWriter.Text(const K, V: string);
@@ -393,9 +401,9 @@ begin
   FL.Add(K + ' = ' + DataQuote(V));
 end;
 
-procedure TDataWriter.Nums(const K: string; const V: array of Double);
+procedure TDataWriter.Nums(const K: string; const V: array of double);
 var
-  I: Integer;
+  I: integer;
   S: string;
 begin
   S := '';
@@ -409,7 +417,7 @@ end;
 
 procedure TDataWriter.Pts(const K: string; const P: array of TP3);
 var
-  I: Integer;
+  I: integer;
   S: string;
 begin
   S := '';
@@ -436,7 +444,7 @@ end;
 
 function TDataWriter.Done: string;
 var
-  I: Integer;
+  I: integer;
 begin
   while FDepth > 0 do Close;
   Result := '';

@@ -21,7 +21,7 @@ type
 
   { A point in the model.  Everything is 3D, so a new view is only a new projection. }
   TP3 = record
-    X, Y, Z: Double;
+    X, Y, Z: double;
   end;
 
   { How the model is mapped onto the screen: vkPlan looks straight down Z,
@@ -35,16 +35,16 @@ type
 
   TProjector = record
     Kind: TViewKind;
-    Ppu: Double;          // pixels per world unit
-    OX, OY: Double;       // screen position of world 0,0,0
-    Az, El: Double;       // vkOrbit only: turntable and tilt, in radians
+    Ppu: double;          // pixels per world unit
+    OX, OY: double;       // screen position of world 0,0,0
+    Az, El: double;       // vkOrbit only: turntable and tilt, in radians
   end;
 
   { A drawing scale.  Paper is the fraction of a paper unit that one world
     unit occupies - for 1/4" = 1'-0" that is 0.25 paper inches per foot. }
   TDrawScale = record
     Name: string;
-    Paper: Double;
+    Paper: double;
   end;
 
   { ekGuide: an infinite construction line that snaps but never makes a face;
@@ -54,21 +54,21 @@ type
     are entities so undo, save, load and copy carry them for free. }
   TEntKind = (ekLine, ekArc, ekText, ekDim, ekFace, ekGuide, ekBore, ekPart);
 
-  TIntArrayW = array of Integer;
+  TIntArrayW = array of integer;
   TIntArrayWArray = array of TIntArrayW;
 
   { Long work reports progress through this and stops if told to.  Nil in
     the tests and tools. }
-  TProgressHook = function(const What: string; Frac: Double): Boolean of object;
+  TProgressHook = function(const What: string; Frac: double): boolean of object;
 
 var
   Progress: TProgressHook = nil;
   { Off so the tests and command line tools never start a thread; the
     program turns it on. }
-  DefaultThreads: Boolean = False;
+  DefaultThreads: boolean = False;
   { The lamp rides on the camera; off fixes it in the world with a narrow
     spread.  /light toggles it. }
-  CameraLamp: Boolean = True;
+  CameraLamp: boolean = True;
 
 type
 
@@ -77,41 +77,42 @@ type
     Sweep - a circle is a sweep of 2*pi - and keeps A and B as its endpoints
     for snapping.  ekText uses A and Txt.  ekDim uses A and B. }
   PWorkEnt = ^TWorkEnt;
+
   TWorkEnt = record
     Kind: TEntKind;
     A, B, C: TP3;
-    R, A0, Sweep: Double;
+    R, A0, Sweep: double;
     Plane: TPlane;
     { Where the note's box last landed on screen, so a click can find it.
       Not saved. }
-    BoxL, BoxT, BoxR, BoxB: Single;
+    BoxL, BoxT, BoxR, BoxB: single;
     { For an arc in plFree, its plane's normal.  The arc carries its own so
       it does not drop back flat when the cursor moves on. }
     Nm: TP3;
     { straight pieces an arc is drawn and cut in; 0 means the default 48 }
-    Sides: Integer;
+    Sides: integer;
     Poly: array of TP3;   // ekFace: the closed outline, in order
     { Loops cut out of a face: a window, a duct opening, the inside of a
       ring.  Empty for most faces. }
     Holes: array of array of TP3;
-    Solid: Boolean;       // ekFace: part of a solid, so its back is hidden
+    Solid: boolean;       // ekFace: part of a solid, so its back is hidden
     { The solid this belongs to, or 0 for loose drawing.  Push/pull drags
       only geometry in the same solid, so a box does not deform its neighbor. }
-    Grp: Integer;
+    Grp: integer;
     { The group this belongs to, or 0.  Not the same as Grp: a group can hold
       several solids.  Geometry in different groups does not join, split or
       stretch each other. }
-    Part: Integer;
+    Part: integer;
     Txt: string;
     Ink: TColor;
     { ekFace: the material on its front.  MatSet says whether there is one,
       since a zeroed entity would otherwise come out painted black.  Kept
       apart from Ink: an edge has a color, a face has a material. }
-    MatSet: Boolean;
+    MatSet: boolean;
     Mat: TColor;
-    Weight: Single;
+    Weight: single;
     { ekText: text size as a multiple of the normal note size; 0 means normal. }
-    Size: Single;
+    Size: single;
     { ekPart: the jig that makes this group - "'star' with Points = 5" -
       or nothing.  See the manual's Heck page. }
     Jig: string;
@@ -119,14 +120,14 @@ type
       wizard reopens its zone from it).  "name = value" lines and blocks to
       "end" (see hsGroupData), kept whole even when not understood. }
     Data: string;
-    Dim: Boolean;
+    Dim: boolean;
     { A soft edge is one of the creases that stand in for a curved surface.
       Hidden except where it forms the outline, so a cylinder looks round. }
-    Soft: Boolean;
+    Soft: boolean;
     { ekPart: the group is put away - not drawn, picked or snapped to, along
       with every group inside it.  Kept on the group so its members hide as
       one; see EntHidden. }
-    Hidden: Boolean;
+    Hidden: boolean;
     { What the text said about it, kept for when it is written again: the
       name it was given and the comments around it, as written.  A comment
       line starting with a tab went at the end of its first line.  SName and
@@ -180,427 +181,405 @@ type
     touches each of them, and the arc itself.  See TWorkDoc.FilletAt. }
   TFillet = record
     Corner, S, E: TP3;       { the corner, and the two tangent points }
-    LineA, LineB: Integer;   { S lies on LineA, E on LineB }
-    R, T: Double;            { radius; corner to each tangent point }
+    LineA, LineB: integer;   { S lies on LineA, E on LineB }
+    R, T: double;            { radius; corner to each tangent point }
     Pl: TPlane;
     Nm: TP3;                 { the plane's facing, for a free one }
     ArcC: TP3;
-    A0, Sweep, Bulge: Double;
+    A0, Sweep, Bulge: double;
   end;
 
   TWorkDoc = class
   private
     FEnts: array of TWorkEnt;
-    FLive: Integer;      // entities in play; anything past this is redo space
+    FLive: integer;      // entities in play; anything past this is redo space
     FSnapCache: array of TSnapHit;
     FSnapScreen: array of TPointF;
     FSnapScreenV: TProjector;
-    FSnapScreenOK: Boolean;
-    FSnapDirty: Boolean;
+    FSnapScreenOK: boolean;
+    FSnapDirty: boolean;
     { FaceUnder's last answer and everything that could change it.  One mouse
       move asks it two or three times, and each call ray-casts every face. }
-    FFaceMemoOK: Boolean;
-    FFaceMemoSeq: Int64;
-    FFaceMemoX, FFaceMemoY: Double;
+    FFaceMemoOK: boolean;
+    FFaceMemoSeq: int64;
+    FFaceMemoX, FFaceMemoY: double;
     FFaceMemoV: TProjector;
-    FFaceMemoFace: Integer;
+    FFaceMemoFace: integer;
     FFaceMemoPt: TP3;
-    FFaceMemoSlice: Boolean;
-    FFaceMemoLo, FFaceMemoHi: Double;
-    FGuidesHidden: Boolean;
-    FNextGrp: Integer;
+    FFaceMemoSlice: boolean;
+    FFaceMemoLo, FFaceMemoHi: double;
+    FGuidesHidden: boolean;
+    FNextGrp: integer;
     { Groups: FNextPart numbers them, FContext is the group open for editing
       (0 the drawing), FStamp the group new geometry is born into. }
-    FNextPart: Integer;
-    FContext: Integer;
-    FStamp: Integer;
+    FNextPart: integer;
+    FContext: integer;
+    FStamp: integer;
     { The slice a plan view is cut out of - see SetSlice. }
-    FSliceOn: Boolean;
+    FSliceOn: boolean;
     { which solids are closed, and the edit it was worked out at }
-    FClosedSeq: Integer;
-    FClosedGrp: array of Boolean;
+    FClosedSeq: integer;
+    FClosedGrp: array of boolean;
     { every face cut into triangles, and the edit each cut was made at - see
       FaceCut }
     FCut: array of record
-      Seq: Integer;
+      Seq: integer;
       Tris: TTriList;
-    end;
-    FSliceLo, FSliceHi: Double;
-    FLastBore: Integer;
-    function GetEnt(I: Integer): TWorkEnt;
+      end;
+    FSliceLo, FSliceHi: double;
+    FLastBore: integer;
+    function GetEnt(I: integer): TWorkEnt;
     procedure RebuildSnapCache;
-    procedure ArcSnaps(var N: Integer);
+    procedure ArcSnaps(var N: integer);
   public
     { the comments above the sheet's first thing and after its last }
     HeadNote, TailNote: string;
-    procedure AddLine(const A, B: TP3; Ink: TColor; Weight: Single; Dim: Boolean);
+    procedure AddLine(const A, B: TP3; Ink: TColor; Weight: single; Dim: boolean);
     { True when a line with these ends is already there, either way round. }
-    function HasLine(const A, B: TP3): Boolean;
+    function HasLine(const A, B: TP3): boolean;
     { Add a line, splitting it and any loose line it overlaps so the shared
       run is one edge.  Lines of a solid are not cut.  Returns how many pieces,
       or 0 when nothing overlapped. }
-    function AddLineSplit(const A, B: TP3; Ink: TColor; Weight: Single): Integer;
+    function AddLineSplit(const A, B: TP3; Ink: TColor; Weight: single): integer;
     { Cut every loose edge that something drawn since FirstNew crosses, and
       the new edge where it is crossed, so each piece can be erased alone.
       Returns how many edges were broken. }
-    function SplitCrossings(FirstNew: Integer): Integer;
+    function SplitCrossings(FirstNew: integer): integer;
     { Rounding a corner, SketchUp's way - see the bodies. }
-    function FarEnd(I: Integer; const P: TP3): TP3;
-    function ArcFromChordFor(var F: TFillet): Boolean;
-    function CornerLines(const Corner: TP3; out LA, LB: Integer): Boolean;
-    function FilletAt(const Corner: TP3; R: Double; out F: TFillet): Boolean;
-    function FilletFromEnds(const S, E: TP3; out F: TFillet): Boolean;
-    function NearestCorner(const V: TProjector; SX, SY, TolPx: Double;
-      out Corner: TP3): Boolean;
-    function ApplyFillet(const F: TFillet; Sides: Integer; Ink: TColor;
-      Weight: Single; Trim: Boolean): Boolean;
-    function TrimFillet(const F: TFillet): Integer;
+    function FarEnd(I: integer; const P: TP3): TP3;
+    function ArcFromChordFor(var F: TFillet): boolean;
+    function CornerLines(const Corner: TP3; out LA, LB: integer): boolean;
+    function FilletAt(const Corner: TP3; R: double; out F: TFillet): boolean;
+    function FilletFromEnds(const S, E: TP3; out F: TFillet): boolean;
+    function NearestCorner(const V: TProjector; SX, SY, TolPx: double; out Corner: TP3): boolean;
+    function ApplyFillet(const F: TFillet; Sides: integer; Ink: TColor; Weight: single; Trim: boolean): boolean;
+    function TrimFillet(const F: TFillet): integer;
     { A line's length, typed.  See the body for which end gives. }
-    function LineEndJoined(I: Integer; AtB: Boolean): Boolean;
-    function LineLengthEnd(I: Integer; out MoveB: Boolean): Boolean;
-    function SetLineLength(I: Integer; NewLen: Double): Boolean;
-    procedure AddArc(const C: TP3; R, A0, Sweep: Double; Pl: TPlane;
-      Ink: TColor; Weight: Single);
-    procedure SetArcSides(Index, N: Integer);
+    function LineEndJoined(I: integer; AtB: boolean): boolean;
+    function LineLengthEnd(I: integer; out MoveB: boolean): boolean;
+    function SetLineLength(I: integer; NewLen: double): boolean;
+    procedure AddArc(const C: TP3; R, A0, Sweep: double; Pl: TPlane; Ink: TColor; Weight: single);
+    procedure SetArcSides(Index, N: integer);
     { Follow Me, the turning half: spin the face Face about the axis through
       AxisP along AxisDir by Angle, in Steps gores, into one solid.  Returns
       the index of the first thing made, or -1.  A full turn consumes the
       profile face; a part turn keeps it as one cap and makes the other. }
-    function Revolve(Face: Integer; const AxisP, AxisDir: TP3; Angle: Double;
-      Steps: Integer): Integer;
+    function Revolve(Face: integer; const AxisP, AxisDir: TP3; Angle: double; Steps: integer): integer;
     { Follow Me, the path half: push face Face along Path, mitred at every
       corner, into one solid.  A closed path has no caps and uses up the
       profile.  Returns the index of the first thing made, or -1. }
-    function Sweep(Face: Integer; const Path: TP3Array; Closed: Boolean;
-      Caps: Boolean = True): Integer;
+    function Sweep(Face: integer; const Path: TP3Array; Closed: boolean; Caps: boolean = True): integer;
     { the points of an arc or a line, in order, for building a path }
-    procedure EdgePoints(I: Integer; out Pts: TP3Array);
-    procedure MarkProfileArcs(const Poly: TP3Array; G: Integer);
+    procedure EdgePoints(I: integer; out Pts: TP3Array);
+    procedure MarkProfileArcs(const Poly: TP3Array; G: integer);
     { where a dimension's line sits: the offset from what it measures }
-    procedure SetDimOffset(Index: Integer; const Off: TP3);
+    procedure SetDimOffset(Index: integer; const Off: TP3);
     procedure AddText(const A: TP3; const S: string; Ink: TColor);
     { A note with a leader out to Target.  Target = A means no leader, which
       is a plain label. }
     procedure AddNote(const A, Target: TP3; const S: string; Ink: TColor);
     { Off is the vector from what is measured to where the dimension line
       sits - a real displacement in the model, not a number of pixels. }
-    procedure AddDim(const A, B: TP3; Ink: TColor; const Off: TP3;
-      const Note: string = '');
+    procedure AddDim(const A, B: TP3; Ink: TColor; const Off: TP3; const Note: string = '');
     { Write over a dimension's figure, or hand it back to the measurement by
       passing an empty string.  False when that entity is not a dimension. }
-    function SetDimNote(Index: Integer; const Note: string): Boolean;
+    function SetDimNote(Index: integer; const Note: string): boolean;
     { A construction line through A running towards B, or - when the two are
       the same point - a construction point at A. }
     procedure AddGuide(const A, B: TP3);
-    function GuideCount: Integer;
+    function GuideCount: integer;
     { Hiding guides must reach the snap cache, or the cursor jumps to guide
       points that are not shown. }
-    procedure SetGuidesHidden(On_: Boolean);
+    procedure SetGuidesHidden(On_: boolean);
     { Guides can be hidden without deleting them.  Stored as "hidden" so a
       new document shows them. }
-    property GuidesHidden: Boolean read FGuidesHidden write SetGuidesHidden;
+    property GuidesHidden: boolean read FGuidesHidden write SetGuidesHidden;
     { The horizontal section a plan view is cut from: only what lies between
       Lo and Hi is drawn, snapped to or picked.  Off means the whole model.
       What is visible and what can be touched must always be the same set. }
-    procedure SetSlice(AOn: Boolean; ALo, AHi: Double);
-    property SliceOn: Boolean read FSliceOn;
-    property SliceLo: Double read FSliceLo;
-    property SliceHi: Double read FSliceHi;
+    procedure SetSlice(AOn: boolean; ALo, AHi: double);
+    property SliceOn: boolean read FSliceOn;
+    property SliceLo: double read FSliceLo;
+    property SliceHi: double read FSliceHi;
     { Is this entity in the slice?  True for everything when it is off. }
-    function InSlice(Index: Integer): Boolean;
+    function InSlice(Index: integer): boolean;
     { How many things the slice keeps out, so the program can say so. }
-    function OutsideSlice: Integer;
+    function OutsideSlice: integer;
     { Is this solid closed - every edge of it shared by exactly two faces,
       run opposite ways?  On one that is, a face turned away from the camera
       can never be seen, so it need not be drawn at all. }
-    function GroupClosed(G: Integer): Boolean;
+    function GroupClosed(G: integer): boolean;
     { Where a group is not closed: edges not shared by exactly two faces
       running opposite ways, as pairs of points.  T-junctions are resolved
       first, as in GroupClosed.  Nothing draws these yet. }
-    function OpenEdges(G: Integer): TP3Array;
+    function OpenEdges(G: integer): TP3Array;
 
     { This face cut into triangles, as index triples into FaceCorners.  Cut in
       the face's own plane so it does not depend on the camera and can be
       cached per edit; that also keeps a bent face from projecting to an
       outline that crosses itself.  Empty if degenerate. }
-    function FaceCut(Index: Integer): TTriList;
+    function FaceCut(Index: integer): TTriList;
     { The corners FaceCut indexes: the outline, then each hole in order. }
-    function FaceCorners(Index: Integer): TP3Array;
+    function FaceCorners(Index: integer): TP3Array;
     { The Z range of everything, for setting a slice that holds the lot. }
-    function ZRange(out Lo, Hi: Double): Boolean;
-    function ClearGuides: Integer;
-    procedure AddFace(const Pts: array of TP3; Ink: TColor; Solid: Boolean = False);
-    procedure AddFaceRaw(const Pts: array of TP3; Ink: TColor; Solid: Boolean);
+    function ZRange(out Lo, Hi: double): boolean;
+    function ClearGuides: integer;
+    procedure AddFace(const Pts: array of TP3; Ink: TColor; Solid: boolean = False);
+    procedure AddFaceRaw(const Pts: array of TP3; Ink: TColor; Solid: boolean);
     { Turns a face over; the last word when the winding rule guessed wrong. }
-    function ReverseFace(Index: Integer): Boolean;
+    function ReverseFace(Index: integer): boolean;
     { Make the loose faces of one group agree about which way is out.
       OrientFace winds each face alone and gets roof slopes and gable ends
       backwards; faces sharing an edge must run opposite ways along it, which
       settles a whole sheet.  Only across edges with exactly two faces;
       solids are left alone.  Returns how many faces it turned. }
-    function OrientLooseShells(Part: Integer = 0): Integer;
+    function OrientLooseShells(Part: integer = 0): integer;
     { The record of a tunnel: its opening, where the first corner of that
       opening comes out, and whose solid it is. }
-    procedure AddBore(const Loop: TP3Array; const FarOfFirst: TP3; G: Integer);
+    procedure AddBore(const Loop: TP3Array; const FarOfFirst: TP3; G: integer);
     { Give a face the loops cut out of it - a window in a wall, the middle of
       a ring left by an offset. }
-    procedure SetFaceHoles(Index: Integer; const H: array of TP3Array);
+    procedure SetFaceHoles(Index: integer; const H: array of TP3Array);
     { Make a face part of a solid - the one whose face it was cut from. }
-    procedure SetFaceGroup(Index, G: Integer);
+    procedure SetFaceGroup(Index, G: integer);
     { a line belongs to a solid: the Heck reader puts a solid's edges back }
-    procedure SetLineGroup(Index, G: Integer);
+    procedure SetLineGroup(Index, G: integer);
     { turn an arc to face any way: the plane becomes a free one with this
       normal, and A0 is then measured in AxesFromNormal's terms }
-    procedure SetArcFacing(Index: Integer; const Nm: TP3; A0: Double);
+    procedure SetArcFacing(Index: integer; const Nm: TP3; A0: double);
     { the same for anything - a line that belongs to a solid, say }
-    procedure SetGroup(Index, G: Integer);
+    procedure SetGroup(Index, G: integer);
     { what the text named it and said about it; see TWorkEnt.Name }
-    procedure SetNaming(Index: Integer; const AName, ANote: string);
-    procedure SetSolidNaming(Index: Integer; const AName, ANote: string);
-    procedure SetCorners(Index: Integer; const ACorners: string);
-    procedure SetMade(Index: Integer; const AMade: string);
+    procedure SetNaming(Index: integer; const AName, ANote: string);
+    procedure SetSolidNaming(Index: integer; const AName, ANote: string);
+    procedure SetCorners(Index: integer; const ACorners: string);
+    procedure SetMade(Index: integer; const AMade: string);
     { a fresh solid identity, for something built rather than pulled }
-    function NewGroup: Integer;
-    procedure SetSoft(Index: Integer; Soft: Boolean);
+    function NewGroup: integer;
+    procedure SetSoft(Index: integer; Soft: boolean);
     { What an entity is drawn with, changed after the fact - the entity
       panel's color and width rows. }
-    procedure SetInk(Index: Integer; Ink: TColor);
-    procedure SetWeight(Index: Integer; Weight: Single);
+    procedure SetInk(Index: integer; Ink: TColor);
+    procedure SetWeight(Index: integer; Weight: single);
     { The material on a face's front.  Material returns False for a face
       never painted. }
-    procedure SetMaterial(Index: Integer; C: TColor);
-    procedure ClearMaterial(Index: Integer);
-    function Material(Index: Integer; out C: TColor): Boolean;
+    procedure SetMaterial(Index: integer; C: TColor);
+    procedure ClearMaterial(Index: integer);
+    function Material(Index: integer; out C: TColor): boolean;
     { Turn a face over: its outline and its openings run the other way round,
       so its normal points the other way. }
-    procedure FlipFace(Index: Integer);
+    procedure FlipFace(Index: integer);
     { A note's text size as a multiple of normal; 1 when never set. }
-    function NoteSize(Index: Integer): Single;
-    procedure SetNoteSize(Index: Integer; Factor: Single);
+    function NoteSize(Index: integer): single;
+    procedure SetNoteSize(Index: integer; Factor: single);
 
     { Hand the edges round a face to a solid's group, so they stop counting
       as loose lines. }
-    procedure ClaimOutline(Face, G: Integer);
+    procedure ClaimOutline(Face, G: integer);
     { push/pull: lift the face along its own normal and wall in the sides }
-    function PushPull(Index: Integer; Dist: Double): Boolean;
+    function PushPull(Index: integer; Dist: double): boolean;
     { How far this face has to travel along its own normal to come out the
       far side of the solid it is on.  Want gives the direction, and comes
       back unchanged when there is nothing to come out of. }
-    function ThroughDistance(Face: Integer; Want: Double): Double;
+    function ThroughDistance(Face: integer; Want: double): double;
     { Slide a face along a vector, dragging everything joined to it. }
-    procedure MoveFaceWith(Index: Integer; const D: TP3);
+    procedure MoveFaceWith(Index: integer; const D: TP3);
     { after a face of a solid has been moved: if that pressed the solid
       flat, take away what is left of it and leave the one face }
-    function FlattenedAway(Index: Integer): Boolean;
+    function FlattenedAway(Index: integer): boolean;
     { A pushed patch whose far end lands on another face of the same solid
       that contains it.  Opens that face, walls the tunnel, removes the patch
       and its edges' claim.  False when the push lands anywhere else. }
-    function TunnelThrough(Index: Integer; const Top: TP3Array;
-      const Nm: TP3; Dist: Double): Boolean;
+    function TunnelThrough(Index: integer; const Top: TP3Array; const Nm: TP3; Dist: double): boolean;
     { Every corner of these entities, for moving or for stretching. }
-    procedure VertsOf(const Idx: array of Integer; out Pts: TP3Array);
+    procedure VertsOf(const Idx: array of integer; out Pts: TP3Array);
     { The faces these edges hold up, as outline or opening.  Erasing an edge
       takes them with it. }
-    function FacesOnEdges(const Idx: array of Integer;
-      out Faces: TIntArrayW): Integer;
+    function FacesOnEdges(const Idx: array of integer; out Faces: TIntArrayW): integer;
     { The guide points on these guide lines, which go when the line is erased. }
-    function PointsOnGuides(const Idx: array of Integer;
-      out Pts: TIntArrayW): Integer;
+    function PointsOnGuides(const Idx: array of integer; out Pts: TIntArrayW): integer;
     { Shift every vertex sitting on one of these points; joined geometry
       stretches along. }
     procedure MoveVerts(const Pts: TP3Array; const D: TP3);
     { For every edge not itself moving but with an end at one of these
       corners, the two points it will run between after a move of D - so the
       preview can show the stretch. }
-    procedure StretchPreview(const Pts: TP3Array; const D: TP3;
-      const Skip: array of Integer; out Segs: TP3Array);
+    procedure StretchPreview(const Pts: TP3Array; const D: TP3; const Skip: array of integer; out Segs: TP3Array);
     { Every stored point at or past the plane through Base facing Dir.  What
       a dimension pushes when it is given a new length. }
     procedure VertsBeyond(const Base, Dir: TP3; out Pts: TP3Array);
     { Give a dimension a new length and let the drawing follow.  MoveB moves
       the end it was drawn to; False moves the end it was drawn from. }
-    function ResizeDim(Index: Integer; NewLen: Double; MoveB: Boolean): Boolean;
+    function ResizeDim(Index: integer; NewLen: double; MoveB: boolean): boolean;
     { What an axis will do to an outline, before it does it.  True when the
       axis runs through the outline rather than beside it; RLo and RHi are
       the inside and outside radius of what would come off the lathe. }
-    function AxisSplitsFace(Face: Integer; const AxisP, AxisDir: TP3;
-      out RLo, RHi: Double): Boolean;
-    procedure RotateEnt(I: Integer; const Pts: TP3Array; const C, Axis: TP3;
-      Ang: Double; All: Boolean);
+    function AxisSplitsFace(Face: integer; const AxisP, AxisDir: TP3; out RLo, RHi: double): boolean;
+    procedure RotateEnt(I: integer; const Pts: TP3Array; const C, Axis: TP3; Ang: double; All: boolean);
     { Every corner on the set turns about the axis; whatever shares a corner
       stretches to follow, the same rule as MoveVerts.  An arc turns whole. }
-    procedure RotateVerts(const Pts: TP3Array; const C, Axis: TP3; Ang: Double);
+    procedure RotateVerts(const Pts: TP3Array; const C, Axis: TP3; Ang: double);
     { These entities turn whole, whatever they touch - for a copy. }
-    procedure RotateEnts(const Idx: array of Integer; const C, Axis: TP3; Ang: Double);
+    procedure RotateEnts(const Idx: array of integer; const C, Axis: TP3; Ang: double);
     { These entities shift whole, whatever they touch - a built part being
       put down, which must not drag the corner it happened to be built on. }
-    procedure TranslateEnts(const Idx: array of Integer; const D: TP3);
+    procedure TranslateEnts(const Idx: array of integer; const D: TP3);
     { The middle of these things, or of everything if none are named. }
-    function MiddleOf(const Idx: array of Integer; out Mid: TP3): Boolean;
+    function MiddleOf(const Idx: array of integer; out Mid: TP3): boolean;
     { The box these things sit in. }
-    function SpanOf(const Idx: array of Integer; out Lo, Hi: TP3): Boolean;
+    function SpanOf(const Idx: array of integer; out Lo, Hi: TP3): boolean;
     { SketchUp's arrays: N copies of Src at D, 2D, 3D... (3x), or at D/N,
       2D/N ... D when Divide is on (/3); ArrayRotate likewise by Ang.  Made
       is every new entity, in order, appended at the end. }
-    procedure ArrayMove(const Src: array of Integer; const D: TP3; N: Integer;
-      Divide: Boolean; out Made: TIntArrayW);
-    procedure ArrayRotate(const Src: array of Integer; const C, Axis: TP3;
-      Ang: Double; N: Integer; Divide: Boolean; out Made: TIntArrayW);
+    procedure ArrayMove(const Src: array of integer; const D: TP3; N: integer; Divide: boolean; out Made: TIntArrayW);
+    procedure ArrayRotate(const Src: array of integer; const C, Axis: TP3; Ang: double; N: integer; Divide: boolean; out Made: TIntArrayW);
     { The points Outline projects, before projection - for drawing a ghost
       of the thing somewhere other than where it is. }
-    function OutlineWorld(I: Integer): TP3Array;
+    function OutlineWorld(I: integer): TP3Array;
     { --- groups -----------------------------------------------------------
       A group is an ekPart entity; its members are the entities whose Part is
       its id.  Context is the group open for editing (0: the drawing), and
       everything drawn while it is open belongs to it. }
-    function NewPart(const Name: string; Parent: Integer): Integer;
+    function NewPart(const Name: string; Parent: integer): integer;
     { the ekPart entity carrying this id, or -1 }
-    function PartEnt(Id: Integer): Integer;
-    function PartName(Id: Integer): string;
-    function PartLocked(Id: Integer): Boolean;
-    function PartParent(Id: Integer): Integer;
-    procedure SetPartName(Id: Integer; const Name: string);
-    procedure SetPartLocked(Id: Integer; Locked: Boolean);
-    function PartJig(Id: Integer): string;
-    procedure SetPartJig(Id: Integer; const Spec: string);
-    function PartData(Id: Integer): string;
-    procedure SetPartData(Id: Integer; const Data: string);
-    procedure SetPartParent(Id, Parent: Integer);
+    function PartEnt(Id: integer): integer;
+    function PartName(Id: integer): string;
+    function PartLocked(Id: integer): boolean;
+    function PartParent(Id: integer): integer;
+    procedure SetPartName(Id: integer; const Name: string);
+    procedure SetPartLocked(Id: integer; Locked: boolean);
+    function PartJig(Id: integer): string;
+    procedure SetPartJig(Id: integer; const Spec: string);
+    function PartData(Id: integer): string;
+    procedure SetPartData(Id: integer; const Data: string);
+    procedure SetPartParent(Id, Parent: integer);
     { a group put away, or brought back - see TWorkEnt.Hidden }
-    function PartHidden(Id: Integer): Boolean;
-    procedure SetPartHidden(Id: Integer; Hidden: Boolean);
+    function PartHidden(Id: integer): boolean;
+    procedure SetPartHidden(Id: integer; Hidden: boolean);
     { Is this entity in a hidden group, however deep?  A group's own record
       counts as inside itself. }
-    function EntHidden(I: Integer): Boolean;
+    function EntHidden(I: integer): boolean;
     procedure WorkOutHidden;
     { which group an entity is in, and putting it in one }
-    procedure SetPart(Index, Id: Integer);
+    procedure SetPart(Index, Id: integer);
     { Is this entity inside the open context - in it, or in a group inside
       it, however deep?  With nothing open, everything is. }
-    function InsideContext(I: Integer): Boolean;
+    function InsideContext(I: integer): boolean;
     { The group you would take hold of by clicking this entity: the outermost
       group between it and the open context.  0 when the entity lies loose
       in the context; -1 when it is outside the context altogether. }
-    function TopPartIn(I: Integer): Integer;
+    function TopPartIn(I: integer): integer;
     { Is that group, or any group between it and the context, locked? }
-    function PartLockedUp(Id: Integer): Boolean;
+    function PartLockedUp(Id: integer): boolean;
     { every entity in the group, groups inside it and all, and its own
       record last if asked for }
-    function PartMembers(Id: Integer; WithRecord: Boolean): TIntArrayW;
-    function PartBounds(Id: Integer; out Lo, Hi: TP3): Boolean;
+    function PartMembers(Id: integer; WithRecord: boolean): TIntArrayW;
+    function PartBounds(Id: integer; out Lo, Hi: TP3): boolean;
     { walk the ids again after a load or an undo, so the next one is new }
     procedure RecountParts;
     { the group's box as snap points - see the body }
-    procedure CrateSnaps(var N: Integer);
-    procedure SetContext(Id: Integer);
-    function DimIf(I: Integer; const C: TPix): TPix;
-    function InkPix(I: Integer): TPix;
-    property Context: Integer read FContext write SetContext;
+    procedure CrateSnaps(var N: integer);
+    procedure SetContext(Id: integer);
+    function DimIf(I: integer; const C: TPix): TPix;
+    function InkPix(I: integer): TPix;
+    property Context: integer read FContext write SetContext;
     { changes when the drawing does, not when a group is opened or left:
       for what shows the drawing's text and need not redo it then }
-    function ContentSeq: Integer;
-    property Stamp: Integer read FStamp write FStamp;
-    property NextPart: Integer read FNextPart;
+    function ContentSeq: integer;
+    property Stamp: integer read FStamp write FStamp;
+    property NextPart: integer read FNextPart;
     { Copy these entities, offset.  A copy stretches nothing. }
-    procedure Duplicate(const Idx: array of Integer; const D: TP3);
+    procedure Duplicate(const Idx: array of integer; const D: TP3);
     { A deep copy of a selection that survives a switch to another sheet.
       PasteIn puts it back, here or in another document, offset by D, with
       group ids remapped. }
-    function CopyOut(const Idx: array of Integer): TWorkEntArray;
-    function PasteIn(const Ents: TWorkEntArray; const D: TP3;
-      out First, Last: Integer): Integer;
+    function CopyOut(const Idx: array of integer): TWorkEntArray;
+    function PasteIn(const Ents: TWorkEntArray; const D: TP3; out First, Last: integer): integer;
     { Does a box dragged over the screen take this?  The geometry is tested,
       not its bounding box. }
-    function BoxTakes(const V: TProjector; I: Integer;
-      X0, Y0, X1, Y1: Double; Crossing: Boolean): Boolean;
+    function BoxTakes(const V: TProjector; I: integer; X0, Y0, X1, Y1: double; Crossing: boolean): boolean;
     { everything a box takes, with guides only if it caught nothing else }
-    function BoxPick(const V: TProjector; X0, Y0, X1, Y1: Double;
-      Crossing: Boolean): TIntArrayW;
+    function BoxPick(const V: TProjector; X0, Y0, X1, Y1: double; Crossing: boolean): TIntArrayW;
     { where an entity lands on screen }
-    procedure ScreenBounds(const V: TProjector; I: Integer;
-      out X0, Y0, X1, Y1: Double);
+    procedure ScreenBounds(const V: TProjector; I: integer; out X0, Y0, X1, Y1: double);
     { Cut every flat face this segment crosses in two.  Returns how many were
       split.  This is what makes a line drawn across a shape divide it. }
-    function SplitFacesWith(const A, B: TP3): Integer;
+    function SplitFacesWith(const A, B: TP3): integer;
     { The smallest face this point lies on, inside its outline and not in a
       hole; -1 for none.  For a replayed press, which knows the point but not
       the camera. }
-    function FaceHolding(const P: TP3): Integer;
+    function FaceHolding(const P: TP3): integer;
     { Is this face a piece of a larger flat area - another face in its plane
       running along one of its edges?  Push slides a whole side but lifts a
       patch out. }
-    function IsPatch(Index: Integer): Boolean;
+    function IsPatch(Index: integer): boolean;
     { Can this face slide along its normal without bending anything?  Only
       when every neighboring face of its solid stands square to it; otherwise
       it is lifted out as a new block. }
-    function WallsSquareTo(Index: Integer): Boolean;
+    function WallsSquareTo(Index: integer): boolean;
     { The face a point lies on, or -1.  Used to work out which plane a new
       shape belongs in when the cursor has snapped to a corner. }
-    function FaceThrough(const P: TP3): Integer;
-    function SplitFace(Index: Integer; const A, B: TP3): Boolean;
-    function HitFace(const V: TProjector; SX, SY: Double): Integer;
+    function FaceThrough(const P: TP3): integer;
+    function SplitFace(Index: integer; const A, B: TP3): boolean;
+    function HitFace(const V: TProjector; SX, SY: double): integer;
     { The same search, but also handing back the point on that face where the
       cursor meets it - which is where a new shape drawn there should sit. }
-    function FaceUnder(const V: TProjector; SX, SY: Double;
-      out Face: Integer; out Pt: TP3): Boolean;
-    function FaceNormal(Index: Integer): TP3;
-    function FaceArea(Index: Integer): Double;
-    procedure Delete(I: Integer);
+    function FaceUnder(const V: TProjector; SX, SY: double; out Face: integer; out Pt: TP3): boolean;
+    function FaceNormal(Index: integer): TP3;
+    function FaceArea(Index: integer): double;
+    procedure Delete(I: integer);
     { every entity marked True goes, in one pass; the rest keep their order }
-    procedure DeleteMarked(const Doomed: array of Boolean);
+    procedure DeleteMarked(const Doomed: array of boolean);
     procedure Room;
     procedure Clear;
     function Snapshot: TWorkEntArray;
     procedure RestoreSnap(const A: TWorkEntArray);
-    function Stored: Integer;
+    function Stored: integer;
 
     { the run of chained lines ending at the last entity }
-    function FirstOfChain: Integer;
-    function ChainLength: Double;
-    function ChainClosed(Tol: Double): Boolean;
-    function ChainArea: Double;
+    function FirstOfChain: integer;
+    function ChainLength: double;
+    function ChainClosed(Tol: double): boolean;
+    function ChainArea: double;
 
     { Hit testing and snapping work in screen space so every view behaves the
       same.  Guides False leaves guides out; only the measure tool takes them. }
-    function HitTest(const V: TProjector; SX, SY, TolPx: Double; Guides: Boolean = True): Integer;
+    function HitTest(const V: TProjector; SX, SY, TolPx: double; Guides: boolean = True): integer;
     { Is this point of the model hidden behind a face, from where we look? }
-    function HiddenAt(const V: TProjector; const P: TP3): Boolean;
+    function HiddenAt(const V: TProjector; const P: TP3): boolean;
     { The note whose box is under this point, or -1, from where the box was
       last drawn. }
-    function HitNote(SX, SY: Double): Integer;
+    function HitNote(SX, SY: double): integer;
     { Carry a note's box to a new place.  Only the box - what it points at is
       left where it is. }
-    procedure MoveNote(Index: Integer; const From, ToPt, Grab: TP3);
+    procedure MoveNote(Index: integer; const From, ToPt, Grab: TP3);
     { Like HitTest but edges only.  GuideTolPx is how close the cursor must be
       to a guide, kept tight so a guide is not picked by accident; left out it
       is TolPx, and HIT_NO_GUIDES leaves guides out. }
-    function HitEdge(const V: TProjector; SX, SY, TolPx: Double;
-      GuideTolPx: Double = -1): Integer;
+    function HitEdge(const V: TProjector; SX, SY, TolPx: double; GuideTolPx: double = -1): integer;
     { the guide line under the cursor - guides alone, for the measure tool }
-    function HitGuideLine(const V: TProjector; SX, SY, TolPx: Double): Integer;
+    function HitGuideLine(const V: TProjector; SX, SY, TolPx: double): integer;
     { Does the run from A to B lie along any edge through A?  At a corner
       every edge is asked, not only the one the click found. }
-    function RunsAlongEdge(const A, B: TP3): Boolean;
+    function RunsAlongEdge(const A, B: TP3): boolean;
     { The guide point nearest the cursor, or -1.  Asked first, because a guide
       point usually sits on the line it was measured along. }
-    function HitGuidePoint(const V: TProjector; SX, SY, TolPx: Double): Integer;
+    function HitGuidePoint(const V: TProjector; SX, SY, TolPx: double): integer;
     { The pen weight of the line between these two points, or 0.  New solid
       edges copy it. }
-    function EdgeWeight(const A, B: TP3): Single;
+    function EdgeWeight(const A, B: TP3): single;
     { The color of the pen that drew this face's outline, or Default when no
       edge of it can be found.  A solid's new edges are drawn with it. }
-    function OutlineInk(Face: Integer; Default: TColor): TColor;
+    function OutlineInk(Face: integer; Default: TColor): TColor;
     { how many points the cursor is choosing between - for measuring with }
-    function SnapCacheCount: Integer;
+    function SnapCacheCount: integer;
     { The nearest point on a line or arc within TolPx - SketchUp's On Edge,
       as opposed to the nearest corner. }
-    function EdgeSnap(const V: TProjector; SX, SY, TolPx: Double;
-      out P: TP3; out Ent: Integer): Boolean;
+    function EdgeSnap(const V: TProjector; SX, SY, TolPx: double; out P: TP3; out Ent: integer): boolean;
     { Like EdgeSnap, but hands back the segment under the cursor, A to B.  For
       a line or arc that is the whole entity; for a face it is the one side of
       the outline pointed at, which HitEdge cannot see. }
-    function EdgeUnder(const V: TProjector; SX, SY, TolPx: Double;
-      out P, A, B: TP3; out Ent: Integer): Boolean;
+    function EdgeUnder(const V: TProjector; SX, SY, TolPx: double; out P, A, B: TP3; out Ent: integer): boolean;
 
     { Marks the snap cache dirty so a new drawing builds it, origin included. }
     constructor Create;
@@ -611,15 +590,13 @@ type
     procedure SnapPoints(out Pts: TP3Array);
 
     { An entity's outline in screen coordinates, for highlighting it. }
-    function Outline(const V: TProjector; I: Integer): TPointFArray;
-    function BestSnap(const V: TProjector; SX, SY, TolPx: Double;
-      out Hit: TSnapHit): Boolean;
-    function Bounds(out Lo, Hi: TP3): Boolean;
+    function Outline(const V: TProjector; I: integer): TPointFArray;
+    function BestSnap(const V: TProjector; SX, SY, TolPx: double; out Hit: TSnapHit): boolean;
+    function Bounds(out Lo, Hi: TP3): boolean;
 
     { EdgeW is one weight for every edge, a style setting as in SketchUp, so
       push/pull never has to guess what pen an outline was drawn with. }
-    procedure Render(S: TArtSurface; const V: TProjector;
-      U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
+    procedure Render(S: TArtSurface; const V: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
       Half: TArtSurface = nil; Phase: TRenderPhase = rpAll);
 
     { Pull every arc end that falls a hair short of a line's or arc's end
@@ -631,99 +608,94 @@ type
       faces and all; otherwise this view, flat, as snappable entities.
       AtOrigin centers the model on 0,0,0 so it does not land far off in
       someone else's CAD. }
-    procedure WriteDXF(L: TStrings; const V: TProjector; U: TUnitSystem;
-      ThreeD: Boolean; AtOrigin: Boolean = False);
+    procedure WriteDXF(L: TStrings; const V: TProjector; U: TUnitSystem; ThreeD: boolean; AtOrigin: boolean = False);
     { The model as binary STL for a slicer: FaceCut's triangles in millimeters
       (304.8 per foot, 1000 per meter), since STL has no units.  Returns the
       triangle count; Closed says whether every solid was closed.  AtOrigin
       centers the model on 0,0,0. }
-    function WriteSTL(St: TStream; U: TUnitSystem; out Closed: Boolean;
-      AtOrigin: Boolean = True): Integer;
+    function WriteSTL(St: TStream; U: TUnitSystem; out Closed: boolean; AtOrigin: boolean = True): integer;
     { The model as an OpenSCAD polyhedron - the surface, not a parametric
       build.  One module per closed solid plus a union, in millimeters.
       OpenSCAD wants each face CLOCKWISE seen from outside, the opposite of
       STL; backwards looks right in preview and fails on subtraction.
       Returns the triangle count, and the solid count through Solids. }
-    function WriteSCAD(L: TStrings; U: TUnitSystem; out Solids: Integer;
-      out Closed: Boolean; AtOrigin: Boolean = True): Integer;
-    procedure WriteVectors(Writer: TVectorWriter; const V: TProjector;
-      U: TUnitSystem; EdgeW: Single);
-    procedure WriteSVG(L: TStrings; const V: TProjector; U: TUnitSystem;
-      EdgeW: Single);
+    function WriteSCAD(L: TStrings; U: TUnitSystem; out Solids: integer; out Closed: boolean; AtOrigin: boolean = True): integer;
+    procedure WriteVectors(Writer: TVectorWriter; const V: TProjector; U: TUnitSystem; EdgeW: single);
+    procedure WriteSVG(L: TStrings; const V: TProjector; U: TUnitSystem; EdgeW: single);
 
   public
     { Where a frame's time went, ms, summed until cleared: 0 setup and whole
       edges, 1 faces gathered and depths taken, 2 sorted and painted, 3 lines
       on faces, 4 guide points and tidying. }
-    ProfMs: array[0..5] of Double;
+    ProfMs: array[0..5] of double;
     { The surface and projector of the last render.  Its depth buffer answers
       "is this point hidden" in one lookup for the same projector. }
     LastSurf: TArtSurface;
     LastV: TProjector;
     { True once a borrowed surface was freed under us; only for reports. }
-    LastSurfDied: Boolean;
+    LastSurfDied: boolean;
     { For each line, arc, dimension or note, the faces it lies on.  Depends
       only on geometry, so it is built once per change. }
     FOnFace: array of TIntArrayW;
-    FOnFaceOK: Boolean;
-    OnFaceBuilds: Integer;
+    FOnFaceOK: boolean;
+    OnFaceBuilds: integer;
     { With Threads on, the on-face cache is built on a worker from a copy and
       taken only if the drawing has not changed since.  Until then the
       renderer searches every face, so a late or dropped result is harmless.
       See docs/render-acceleration.md. }
-    Threads: Boolean;
+    Threads: boolean;
     { notes put away for the view (/hide notes): drawn, picked and snapped
       to no more, still saved }
-    NotesHidden: Boolean;
-    FEditSeq: Integer;
+    NotesHidden: boolean;
+    FEditSeq: integer;
     { how many of FEditSeq's steps were only a group opened or left }
-    FContextSteps: Integer;
+    FContextSteps: integer;
     { EntHidden's answers, worked out once per edit: FHideOf[I] for each
       entity, good while FHideSeq is FEditSeq and the list is as long }
-    FHideOf: array of Boolean;
-    FHideSeq: Integer;
-    FAnyHidden: Boolean;
+    FHideOf: array of boolean;
+    FHideSeq: integer;
+    FAnyHidden: boolean;
     FOnFaceWorker: TThread;
     { the last build of the cache: how long, and where it ran }
-    OnFaceWorkerMs: Double;
+    OnFaceWorkerMs: double;
     OnFaceBuiltOn: string;
     { how long the result waited in the queue, and what a frame without the
       cache spent on lines on faces - whether the worker is worth it }
-    OnFaceLagMs: Double;
-    OnFaceFallbackMs: Double;
-    OnFaceDiscarded, OnFaceFailed, OnFaceFallbacks: Integer;
+    OnFaceLagMs: double;
+    OnFaceFallbackMs: double;
+    OnFaceDiscarded, OnFaceFailed, OnFaceFallbacks: integer;
     { The quick frame, while the camera is moving: coarser lines on faces.
       The full frame comes when it stops. }
-    Quick: Boolean;
+    Quick: boolean;
     { the last push pressed a solid flat; the caller works out the flat areas
       again so the face under it is cut round it }
-    LastFlattened: Boolean;
+    LastFlattened: boolean;
     { samples per line and halvings per run end in a quick frame; coarser
       lets lines bleed through face edges while orbiting.  tools/inkprof
       sweeps the choices. }
-    QuickSteps: Integer;
-    QuickBisect: Integer;
+    QuickSteps: integer;
+    QuickBisect: integer;
     procedure EnsureOnFace;
     procedure OnFaceArrived;
     { the cache is there and current }
-    function OnFaceReady: Boolean;
+    function OnFaceReady: boolean;
     { the one-lookup form of HiddenAt; only valid straight after a render
       with the same projector }
-    function DepthHidden(const P: TP3): Boolean;
+    function DepthHidden(const P: TP3): boolean;
     { the nearest drawn thing within Radius pixels of a screen point, as a
       world point, from the last frame's depth buffer - what the eye is
       looking at, whether or not a face is exactly under the cursor }
-    function DepthPointNear(SX, SY, Radius: Integer; out P: TP3): Boolean;
+    function DepthPointNear(SX, SY, Radius: integer; out P: TP3): boolean;
   public
-    property Live: Integer read FLive;
+    property Live: integer read FLive;
     { the bore the last PushPull made, or -1 - so the caller can cut it
       against the others }
-    property LastBore: Integer read FLastBore;
-    property Ent[I: Integer]: TWorkEnt read GetEnt; default;
+    property LastBore: integer read FLastBore;
+    property Ent[I: integer]: TWorkEnt read GetEnt; default;
     { The thing itself, for reading a field without copying the whole
       record (D[I] copies it, strings and outlines and all, which made a big
       drawing's save take seconds).  Read only; good until the next change. }
-    function EntRef(I: Integer): PWorkEnt; inline;
+    function EntRef(I: integer): PWorkEnt; inline;
   end;
 
 const
@@ -734,95 +706,93 @@ const
 
   IMPERIAL_SCALES: array[0..SCALE_COUNT - 1] of TDrawScale = (
     (Name: '1/16"'; Paper: 0.0625),
-    (Name: '1/8"';  Paper: 0.125),
-    (Name: '1/4"';  Paper: 0.25),
-    (Name: '1/2"';  Paper: 0.5),
-    (Name: '1"';    Paper: 1.0));
+    (Name: '1/8"'; Paper: 0.125),
+    (Name: '1/4"'; Paper: 0.25),
+    (Name: '1/2"'; Paper: 0.5),
+    (Name: '1"'; Paper: 1.0));
 
   METRIC_SCALES: array[0..SCALE_COUNT - 1] of TDrawScale = (
     (Name: '1:200'; Paper: 0.005),
     (Name: '1:100'; Paper: 0.01),
-    (Name: '1:50';  Paper: 0.02),
-    (Name: '1:20';  Paper: 0.05),
-    (Name: '1:10';  Paper: 0.1));
+    (Name: '1:50'; Paper: 0.02),
+    (Name: '1:20'; Paper: 0.05),
+    (Name: '1:10'; Paper: 0.1));
 
   SNAP_COUNT = 10;
 
   { snap increments in feet or meters; 0 means none.  A sixteenth of an inch
     is 1/192 ft. }
-  IMPERIAL_SNAPS: array[0..SNAP_COUNT - 1] of Double =
+  IMPERIAL_SNAPS: array[0..SNAP_COUNT - 1] of double =
     (0, 1 / 192, 1 / 96, 1 / 48, 1 / 24, 1 / 12, 1 / 6, 0.25, 0.5, 1.0);
   IMPERIAL_SNAP_NAMES: array[0..SNAP_COUNT - 1] of string =
     ('OFF', '1/16"', '1/8"', '1/4"', '1/2"', '1"', '2"', '3"', '6"', '1''-0"');
 
-  METRIC_SNAPS: array[0..SNAP_COUNT - 1] of Double =
+  METRIC_SNAPS: array[0..SNAP_COUNT - 1] of double =
     (0, 0.001, 0.002, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 1.0);
   METRIC_SNAP_NAMES: array[0..SNAP_COUNT - 1] of string =
     ('OFF', '1mm', '2mm', '5mm', '10mm', '25mm', '50mm', '100mm', '250mm', '1m');
 
 function UnitName(U: TUnitSystem): string;
-function ScaleTable(U: TUnitSystem; I: Integer): TDrawScale;
-function SnapValue(U: TUnitSystem; I: Integer): Double;
-function SnapName(U: TUnitSystem; I: Integer): string;
+function ScaleTable(U: TUnitSystem; I: integer): TDrawScale;
+function SnapValue(U: TUnitSystem; I: integer): double;
+function SnapName(U: TUnitSystem; I: integer): string;
 
 { Pixels per world unit for a scale, given the display resolution in pixels
   per paper inch. }
-function PixelsPerUnit(U: TUnitSystem; const Sc: TDrawScale; DPI: Double): Double;
+function PixelsPerUnit(U: TUnitSystem; const Sc: TDrawScale; DPI: double): double;
 
 { How finely an imperial length is written, and what the last field of a
   dashed entry counts in.  A sixteenth unless the drawing says otherwise. }
-procedure SetLenDenom(D: Integer);
-function LenDenom: Integer;
+procedure SetLenDenom(D: integer);
+function LenDenom: integer;
 
-function FormatLen(V: Double; U: TUnitSystem): string;
-function FormatArea(V: Double; U: TUnitSystem): string;
+function FormatLen(V: double; U: TUnitSystem): string;
+function FormatArea(V: double; U: TUnitSystem): string;
 { A typed length - and a little arithmetic of them: 8' + 8", 8'17" / 2,
   10' - 3'4", (8' + 4") * 2 (see its body) }
-function ParseLen(const S: string; U: TUnitSystem; out V: Double): Boolean;
+function ParseLen(const S: string; U: TUnitSystem; out V: double): boolean;
 { one length alone, no arithmetic }
-function ParseLenPlain(const S: string; U: TUnitSystem; out V: Double): Boolean;
+function ParseLenPlain(const S: string; U: TUnitSystem; out V: double): boolean;
 
 { An angle as typed for the rotate tool and the protractor: decimal degrees
   (34.1, -45, 90d), or a slope as rise:run (8:12).  Negative is the other way. }
-function ParseAngle(const S: string; out Deg: Double): Boolean;
-function FormatAngle(Deg: Double): string;
+function ParseAngle(const S: string; out Deg: double): boolean;
+function FormatAngle(Deg: double): string;
 
 { The number of straight pieces this arc is walked in, everywhere it is
   walked: drawn, picked, cut into regions, laid flat. }
-function ArcSteps(const E: TWorkEnt): Integer;
+function ArcSteps(const E: TWorkEnt): integer;
 
 { SketchUp's way of saying how many sides: 24s, or s24.  Nothing else. }
-function ParseSides(const S: string; out N: Integer): Boolean;
+function ParseSides(const S: string; out N: integer): boolean;
 
 { P turned about the line through C along the unit vector Axis, by Ang
   radians, right-handed.  RotV does the same to a direction. }
-function RotP(const P, C, Axis: TP3; Ang: Double): TP3;
-function RotV(const V, Axis: TP3; Ang: Double): TP3;
+function RotP(const P, C, Axis: TP3; Ang: double): TP3;
+function RotV(const V, Axis: TP3; Ang: double): TP3;
 { Reads "[3', 4', 5']" or "<3', 4', 5'>" - a point in the drawing, or an
   offset from where you are.  Returns how many of the three were given;
   any left out come back as zero. }
-function ParseTriple(const S: string; U: TUnitSystem;
-  out X, Y, Z: Double): Integer;
+function ParseTriple(const S: string; U: TUnitSystem; out X, Y, Z: double): integer;
 
 { A "nice" round bar length that lands between MinPx and MaxPx on screen. }
-function NiceBarLength(Ppu: Double; MinPx, MaxPx: Double; U: TUnitSystem): Double;
+function NiceBarLength(Ppu: double; MinPx, MaxPx: double; U: TUnitSystem): double;
 
 { Build an arc through A and B that bulges Bulge units away from the chord -
   how two loose line ends get joined by a curve. }
-function ArcFromChord(const A, B: TP3; Bulge: Double; Pl: TPlane;
-  out C: TP3; out R, A0, Sweep: Double): Boolean;
+function ArcFromChord(const A, B: TP3; Bulge: double; Pl: TPlane; out C: TP3; out R, A0, Sweep: double): boolean;
 
-function P3(X, Y, Z: Double): TP3; inline;
-function Dist(const A, B: TP3): Double; inline;
+function P3(X, Y, Z: double): TP3; inline;
+function Dist(const A, B: TP3): double; inline;
 { the point T of the way from A to B }
-function Lerp3(const A, B: TP3; T: Double): TP3;
-function SamePt(const A, B: TP3; Tol: Double): Boolean; inline;
+function Lerp3(const A, B: TP3; T: double): TP3;
+function SamePt(const A, B: TP3; Tol: double): boolean; inline;
 { Do these two segments overlap over a run, not just touch or cross?  Decides
   whether an edge holds up a face and whether a line traces over another. }
-function SharesRun(const P1, Q1, P2, Q2: TP3): Boolean;
+function SharesRun(const P1, Q1, P2, Q2: TP3): boolean;
 
 { --- projection ---------------------------------------------------------- }
-function SameProjector(const A, B: TProjector): Boolean;
+function SameProjector(const A, B: TProjector): boolean;
 function Project(const V: TProjector; const P: TP3): TPointF;
 
 { The same projection with the camera worked out once.  Project redoes the
@@ -831,7 +801,7 @@ function Project(const V: TProjector; const P: TP3): TPointF;
 type
   TProjCache = record
     Kind: TViewKind;
-    Ppu, OX, OY: Double;
+    Ppu, OX, OY: double;
     R, U: TP3;
   end;
 
@@ -840,45 +810,39 @@ function ProjectAt(const C: TProjCache; const P: TP3): TPointF; inline;
 
 { Screen point back to the model, on the working plane through Base.  In PLAN
   that is simply the XY plane; in ISO the plane is picked by Pl. }
-function Unproject(const V: TProjector; SX, SY: Double; Pl: TPlane;
-  const Base: TP3): TP3;
+function Unproject(const V: TProjector; SX, SY: double; Pl: TPlane; const Base: TP3): TP3;
 
 { Which plane is the mouse moving across?  The one that explains the drag
   with the least travel in the model, so dragging up in iso stands a rectangle
   up and dragging across lays it flat.  Keep, the plane in force now, wins
   ties and anything closer than Bias, so a shape does not flip while the hand
   shakes. }
-function PlaneByDrag(const V: TProjector; const Anchor: TP3;
-  SX, SY: Double; Keep: TPlane; Bias: Double = 0.8): TPlane;
+function PlaneByDrag(const V: TProjector; const Anchor: TP3; SX, SY: double; Keep: TPlane; Bias: double = 0.8): TPlane;
 
 { A point on one of the three model axes near the cursor - EdgeSnap without
   the ends.  Axis is 0, 1 or 2 for X, Y or Z. }
-function AxisSnap(const V: TProjector; SX, SY, TolPx: Double;
-  out P: TP3; out Axis: Integer): Boolean;
+function AxisSnap(const V: TProjector; SX, SY, TolPx: double; out P: TP3; out Axis: integer): boolean;
 
 { The six axis directions, and how they read on screen in the given view. }
-function AxisDir(Index: Integer): TP3;
-function AxisName(Index: Integer): string;
+function AxisDir(Index: integer): TP3;
+function AxisName(Index: integer): string;
 
 { Lay out a dimension.  Off is a vector in the model, not pixels, so the
   dimension keeps its distance as you zoom and stays put as you orbit.  False
   when the two points are too close together on screen. }
-function DimGeometry(const V: TProjector; const A, B, Off: TP3;
-  U: TUnitSystem; out G: TDimGeom; const Note: string = ''): Boolean;
+function DimGeometry(const V: TProjector; const A, B, Off: TP3; U: TUnitSystem; out G: TDimGeom; const Note: string = ''): boolean;
 
 { The offset, square to AB, that puts a dimension's line under the pointer at
   (MX, MY).  Its direction is whichever allowed one (axes square to AB, level
   and upright, or Extra, the faces on the edge) points most nearly from AB's
   middle to the pointer.  Prefer, the last choice, is kept unless another is
   clearly better so it does not flicker.  Zero when AB has no screen length. }
-function DimOffsetAt(const V: TProjector; const A, B: TP3; MX, MY: Double;
-  const Extra: array of TP3; const Prefer: TP3): TP3;
+function DimOffsetAt(const V: TProjector; const A, B: TP3; MX, MY: double; const Extra: array of TP3; const Prefer: TP3): TP3;
 
 { Where the top-left of a dimension's TW x TH text goes.  The whole box is
   cleared along the normal, or half the figure sits on the line in iso.  From
   the middle of a W x H box to its edge along (nx, ny) is (|nx|W + |ny|H) / 2. }
-function DimTextTopLeft(const G: TDimGeom; TW, TH: Integer;
-  Gap: Double = 8): TPoint;
+function DimTextTopLeft(const G: TDimGeom; TW, TH: integer; Gap: double = 8): TPoint;
 
 { Where plFree lies: a point on it and the way it faces.  Set from the face
   under the cursor, read back by everything that draws in a plane. }
@@ -891,9 +855,8 @@ procedure PlaneAxes(Pl: TPlane; out AU, AV: TP3);
 
 { A point on a circle of radius R about C, at Ang radians, in plane Pl.  The
   second form is for a stored shape, which carries its own normal. }
-function ArcPoint(const C: TP3; R, Ang: Double; Pl: TPlane): TP3;
-function ArcPoint(const C: TP3; R, Ang: Double; Pl: TPlane;
-  const Nm: TP3): TP3;
+function ArcPoint(const C: TP3; R, Ang: double; Pl: TPlane): TP3;
+function ArcPoint(const C: TP3; R, Ang: double; Pl: TPlane; const Nm: TP3): TP3;
 
 { Unit vectors of the view: screen right, screen up, and the direction the
   camera looks along (used to sort faces back to front). }
@@ -904,10 +867,10 @@ function ViewDir(const V: TProjector): TP3;
 { point and vector arithmetic }
 function Add3(const A, B: TP3): TP3; inline;
 function Sub3(const A, B: TP3): TP3; inline;
-function Mul3(const A: TP3; K: Double): TP3; inline;
-function Len3(const A: TP3): Double; inline;
+function Mul3(const A: TP3; K: double): TP3; inline;
+function Len3(const A: TP3): double; inline;
 function Cross3(const A, B: TP3): TP3;
-function Dot3(const A, B: TP3): Double; inline;
+function Dot3(const A, B: TP3): double; inline;
 function Norm3(const A: TP3): TP3;
 
 { What the tape leaves behind, by where it was pulled from: off an edge, a
@@ -916,15 +879,13 @@ function Norm3(const A: TP3): TP3;
 type
   TTapeGuide = (tgPointOnly, tgAlongEdge, tgAcrossRun);
 
-function TapeGuide(HaveEdge: Boolean; const EdgeDir, A, B, PlaneNm: TP3;
-  out Dir: TP3): TTapeGuide;
+function TapeGuide(HaveEdge: boolean; const EdgeDir, A, B, PlaneNm: TP3; out Dir: TP3): TTapeGuide;
 
 { The sagitta (bulge) of the arc that leaves A along Dir and ends at B -
   SketchUp's tangent arc.  The chord-to-tangent angle is half the arc's angle,
   so it is (chord / 2) * tan(angle / 2); the sign says which side.  False when
   the tangent runs along the chord or out of the plane. }
-function TangentSagitta(const A, B, Dir: TP3; Pl: TPlane;
-  out Bulge: Double): Boolean;
+function TangentSagitta(const A, B, Dir: TP3; Pl: TPlane; out Bulge: double): boolean;
 
 
 { An equidistant copy of a closed loop in its own plane - a duct wall, a
@@ -932,16 +893,15 @@ function TangentSagitta(const A, B, Dir: TP3; Pl: TPlane;
   to meet, which keeps the corners sharp.  D is positive outward, judged from
   how the loop winds about Normal.  A loop that eats itself is left for the
   region engine to split. }
-function OffsetLoop(const Loop: TP3Array; const Normal: TP3; D: Double;
-  Tidy: Boolean = True): TP3Array;
+function OffsetLoop(const Loop: TP3Array; const Normal: TP3; D: double; Tidy: boolean = True): TP3Array;
 
 { The two in-plane coordinates of a model point. }
-procedure PlaneCoords(Pl: TPlane; const P: TP3; out U, W: Double);
+procedure PlaneCoords(Pl: TPlane; const P: TP3; out U, W: double);
 
 { The stretch of an infinite line that crosses a W x H box: the parameters
   where it enters and leaves, False if it misses.  Lets the axes run off the
   window wherever you pan. }
-function ClipToBox(PX, PY, DX, DY, W, H: Double; out T0, T1: Double): Boolean;
+function ClipToBox(PX, PY, DX, DY, W, H: double; out T0, T1: double): boolean;
 
 const
   ISO_COS = 0.86602540378443865;   // cos 30
@@ -959,8 +919,8 @@ const
     settings, 45 and 80; a face turned well away comes out near 72 percent. }
   LAMP_AMBIENT = 0.45;
   LAMP_DIFFUSE = 0.80;
-  LAMP_UP      = 0.25;
-  LAMP_LEFT    = 0.20;
+  LAMP_UP = 0.25;
+  LAMP_LEFT = 0.20;
   { A guide point, in amber.  Deliberately placed and deliberately findable. }
   GUIDE_POINT: TPix = (B: $10; G: $B0; R: $F0; A: 255);
   { how finely a line lying on a face is chopped up when working out which
@@ -969,10 +929,12 @@ const
 
 function UnitName(U: TUnitSystem): string;
 begin
-  if U = usImperial then Result := 'FEET' else Result := 'METRIC';
+  if U = usImperial then Result := 'FEET'
+  else
+    Result := 'METRIC';
 end;
 
-function ScaleTable(U: TUnitSystem; I: Integer): TDrawScale;
+function ScaleTable(U: TUnitSystem; I: integer): TDrawScale;
 begin
   I := EnsureRange(I, 0, SCALE_COUNT - 1);
   if U = usImperial then
@@ -981,13 +943,15 @@ begin
     Result := METRIC_SCALES[I];
 end;
 
-function SnapValue(U: TUnitSystem; I: Integer): Double;
+function SnapValue(U: TUnitSystem; I: integer): double;
 begin
   I := EnsureRange(I, 0, SNAP_COUNT - 1);
-  if U = usImperial then Result := IMPERIAL_SNAPS[I] else Result := METRIC_SNAPS[I];
+  if U = usImperial then Result := IMPERIAL_SNAPS[I]
+  else
+    Result := METRIC_SNAPS[I];
 end;
 
-function SnapName(U: TUnitSystem; I: Integer): string;
+function SnapName(U: TUnitSystem; I: integer): string;
 begin
   I := EnsureRange(I, 0, SNAP_COUNT - 1);
   if U = usImperial then
@@ -996,7 +960,7 @@ begin
     Result := METRIC_SNAP_NAMES[I];
 end;
 
-function PixelsPerUnit(U: TUnitSystem; const Sc: TDrawScale; DPI: Double): Double;
+function PixelsPerUnit(U: TUnitSystem; const Sc: TDrawScale; DPI: double): double;
 begin
   if U = usImperial then
     { Sc.Paper is paper inches per foot, DPI is pixels per paper inch }
@@ -1016,24 +980,24 @@ end;
   up as a different one.  It governs display only; the model keeps the exact
   value. }
 var
-  GLenDenom: Integer = 16;
+  GLenDenom: integer = 16;
 
-procedure SetLenDenom(D: Integer);
+procedure SetLenDenom(D: integer);
 begin
   { powers of two up to a sixty-fourth, or hundredths for the shops that
     work that way }
   if D in [2, 4, 8, 16, 32, 64, 100] then GLenDenom := D;
 end;
 
-function LenDenom: Integer;
+function LenDenom: integer;
 begin
   Result := GLenDenom;
 end;
 
 { Reduce PARTS/LenDenom to the tidiest fraction, e.g. 8/16 -> 1/2. }
-function FractionText(Parts: Integer): string;
+function FractionText(Parts: integer): string;
 var
-  N, D: Integer;
+  N, D: integer;
 begin
   N := Parts;
   D := GLenDenom;
@@ -1048,10 +1012,10 @@ begin
     Result := Format('%d/%d', [N, D]);
 end;
 
-function FormatLen(V: Double; U: TUnitSystem): string;
+function FormatLen(V: double; U: TUnitSystem): string;
 var
-  Neg: Boolean;
-  TotalSix, Ft, Inch, Six: Int64;
+  Neg: boolean;
+  TotalSix, Ft, Inch, Six: int64;
   Frac: string;
 begin
   Neg := V < 0;
@@ -1085,7 +1049,7 @@ begin
     Result := '-' + Result;
 end;
 
-function FormatArea(V: Double; U: TUnitSystem): string;
+function FormatArea(V: double; U: TUnitSystem): string;
 begin
   if U = usMetric then
     Result := Format('%.2f m2', [V])
@@ -1098,10 +1062,10 @@ end;
 { ---------------------------------------------------------------------- }
 
 { Accepts a plain number, or a number with a fraction: 6, 6.5, 6 1/2, 6-1/2 }
-function ParseMixed(S: string; out V: Double): Boolean;
+function ParseMixed(S: string; out V: double): boolean;
 var
-  P, Q: Integer;
-  Whole, Num, Den: Double;
+  P, Q: integer;
+  Whole, Num, Den: double;
   FracPart: string;
 begin
   Result := False;
@@ -1144,13 +1108,13 @@ end;
   Imperial:  12'6"   12' 6   12-6   12'   6"   150"   12   6 1/2"
              a bare number is feet; anything after a ' or ending in " is inches
   Metric:    3.5   3.5m   350cm   3500mm   (bare number is meters) }
-function ParseLenPlain(const S: string; U: TUnitSystem; out V: Double): Boolean;
+function ParseLenPlain(const S: string; U: TUnitSystem; out V: double): boolean;
 var
   T, FtPart, InPart: string;
   Parts: array[0..2] of string;
-  P, NDash: Integer;
-  Neg: Boolean;
-  A, B, C: Double;
+  P, NDash: integer;
+  Neg: boolean;
+  A, B, C: double;
 begin
   Result := False;
   V := 0;
@@ -1236,10 +1200,8 @@ begin
       else
         Parts[NDash] := Parts[NDash] + T[P];
 
-    if (NDash = 2) and (Parts[0] <> '') and (Parts[1] <> '') and
-       (Parts[2] <> '') and ParseMixed(Parts[0], A) and
-       ParseMixed(Parts[1], B) and ParseMixed(Parts[2], C) and
-       (B >= 0) and (B < 12) and (C >= 0) and (C < GLenDenom) then
+    if (NDash = 2) and (Parts[0] <> '') and (Parts[1] <> '') and (Parts[2] <> '') and ParseMixed(Parts[0], A) and ParseMixed(Parts[1], B) and
+      ParseMixed(Parts[2], C) and (B >= 0) and (B < 12) and (C >= 0) and (C < GLenDenom) then
     begin
       V := Abs(A) + B / 12 + C / (GLenDenom * 12);
       if Neg then V := -V;
@@ -1286,18 +1248,18 @@ const
 
 type
   TLenVal = record
-    V: Double;
-    Len: Boolean;     { a length, not a plain number }
+    V: double;
+    Len: boolean;     { a length, not a plain number }
   end;
 
-function ParseLen(const S: string; U: TUnitSystem; out V: Double): Boolean;
+function ParseLen(const S: string; U: TUnitSystem; out V: double): boolean;
 var
   T: string;
-  Pos_: Integer;
-  Bad: Boolean;
+  Pos_: integer;
+  Bad: boolean;
 
-  { is the slash at I division, not a fraction's? }
-  function DivSlash(I: Integer): Boolean;
+{ is the slash at I division, not a fraction's? }
+  function DivSlash(I: integer): boolean;
   begin
     Result := not ((I > 1) and (I < Length(T)) and (T[I - 1] in ['0'..'9']) and (T[I + 1] in ['0'..'9']));
   end;
@@ -1305,9 +1267,9 @@ var
   { A spaced dash between a foot mark and inches alone - 6' - 8" - is six foot
     eight, not a subtraction.  To take inches off write 10' - 0'8" or
     10' - (8"). }
-  function WrittenFeetInches(I: Integer): Boolean;
+  function WrittenFeetInches(I: integer): boolean;
   var
-    J: Integer;
+    J: integer;
     W: string;
   begin
     Result := False;
@@ -1316,8 +1278,7 @@ var
     if (J < 1) or (T[J] <> QUOTE1) then Exit;
     W := '';
     J := I + 1;
-    while (J <= Length(T)) and not (T[J] in ['+', '*', '(', ')']) and
-          not ((T[J] = '-') and (J > 1) and (T[J - 1] = ' ')) do
+    while (J <= Length(T)) and not (T[J] in ['+', '*', '(', ')']) and not ((T[J] = '-') and (J > 1) and (T[J - 1] = ' ')) do
     begin
       W := W + T[J];
       Inc(J);
@@ -1327,9 +1288,9 @@ var
   end;
 
   { after the dash at I, up to the next sign: a foot mark? }
-  function FeetAfter(I: Integer): Boolean;
+  function FeetAfter(I: integer): boolean;
   var
-    J: Integer;
+    J: integer;
   begin
     J := I + 1;
     while (J <= Length(T)) and not (T[J] in ['+', '*', '(', ')', '-']) do
@@ -1343,19 +1304,17 @@ var
   { A dash is a minus with a space either side (except 6' - 8"), or unspaced
     straight after an inch mark (8'6"-3") or after a foot mark with feet on
     the other side (10'-3'4").  6'-8" and 6-8-15 stay lengths. }
-  function IsOperator(I: Integer): Boolean;
+  function IsOperator(I: integer): boolean;
   begin
     case T[I] of
       '+', '*', '(', ')': Result := True;
       '/': Result := DivSlash(I);
       { two dashes are always a minus - truss notation never has two in
         a row, and both are on the number pad: 6-8-0--2-4-0 }
-      '-': Result := (I > 1) and (I < Length(T)) and
-             ((T[I + 1] = '-') or
-              ((T[I - 1] = ' ') and (T[I + 1] = ' ') and not WrittenFeetInches(I)) or
-              (T[I - 1] = '"') or
-              ((T[I - 1] = QUOTE1) and FeetAfter(I)));
-    else Result := False;
+      '-': Result := (I > 1) and (I < Length(T)) and ((T[I + 1] = '-') or ((T[I - 1] = ' ') and (T[I + 1] = ' ') and
+          not WrittenFeetInches(I)) or (T[I - 1] = '"') or ((T[I - 1] = QUOTE1) and FeetAfter(I)));
+      else
+        Result := False;
     end;
   end;
 
@@ -1369,29 +1328,41 @@ var
   { a length or a plain number as typed, up to the next operator }
   function Atom: TLenVal;
   var
-    Start: Integer;
+    Start: integer;
     W: string;
   begin
-    Result.V := 0; Result.Len := False;
+    Result.V := 0;
+    Result.Len := False;
     Skip;
-    if Pos_ > Length(T) then begin Bad := True; Exit; end;
+    if Pos_ > Length(T) then
+    begin
+      Bad := True;
+      Exit;
+    end;
     if T[Pos_] = '(' then
     begin
       Inc(Pos_);
       Result := Expr;
       Skip;
-      if (Pos_ > Length(T)) or (T[Pos_] <> ')') then begin Bad := True; Exit; end;
+      if (Pos_ > Length(T)) or (T[Pos_] <> ')') then
+      begin
+        Bad := True;
+        Exit;
+      end;
       Inc(Pos_);
       Exit;
     end;
     Start := Pos_;
     while (Pos_ <= Length(T)) and not IsOperator(Pos_) do Inc(Pos_);
     W := Trim(Copy(T, Start, Pos_ - Start));
-    if W = '' then begin Bad := True; Exit; end;
+    if W = '' then
+    begin
+      Bad := True;
+      Exit;
+    end;
     { a plain number - no mark, no dash, no space between feet and
       inches - is a number; anything else a length }
-    if (Pos('''', W) = 0) and (Pos('"', W) = 0) and ((Pos('-', W) = 0) or (W[1] = '-')) and
-       ((Pos(' ', W) = 0) or (Pos('/', W) > 0)) and ParseMixed(W, Result.V) then
+    if (Pos('''', W) = 0) and (Pos('"', W) = 0) and ((Pos('-', W) = 0) or (W[1] = '-')) and ((Pos(' ', W) = 0) or (Pos('/', W) > 0)) and ParseMixed(W, Result.V) then
       Exit;
     Result.Len := True;
     if not ParseLenPlain(W, U, Result.V) then Bad := True;
@@ -1400,7 +1371,7 @@ var
   function Term: TLenVal;
   var
     B: TLenVal;
-    Op: Char;
+    Op: char;
   begin
     Result := Atom;
     repeat
@@ -1413,13 +1384,21 @@ var
       if Op = '*' then
       begin
         { a length times a length is an area, not a length }
-        if Result.Len and B.Len then begin Bad := True; Exit; end;
+        if Result.Len and B.Len then
+        begin
+          Bad := True;
+          Exit;
+        end;
         Result.V := Result.V * B.V;
         Result.Len := Result.Len or B.Len;
       end
       else
       begin
-        if B.Len or (Abs(B.V) < 1E-12) then begin Bad := True; Exit; end;
+        if B.Len or (Abs(B.V) < 1E-12) then
+        begin
+          Bad := True;
+          Exit;
+        end;
         Result.V := Result.V / B.V;
       end;
     until False;
@@ -1428,7 +1407,7 @@ var
   function Expr: TLenVal;
   var
     B: TLenVal;
-    Op: Char;
+    Op: char;
   begin
     Result := Term;
     repeat
@@ -1441,37 +1420,45 @@ var
       B := Term;
       if Bad then Exit;
       { a plain number in a sum is a bare length: feet, or meters }
-      if Op = '+' then Result.V := Result.V + B.V else Result.V := Result.V - B.V;
+      if Op = '+' then Result.V := Result.V + B.V
+      else
+        Result.V := Result.V - B.V;
       Result.Len := True;
     until False;
   end;
 
 var
-  I: Integer;
-  Any: Boolean;
+  I: integer;
+  Any: boolean;
   R: TLenVal;
 begin
   T := Trim(S);
   Any := False;
   for I := 1 to Length(T) do
-    if IsOperator(I) then begin Any := True; Break; end;
+    if IsOperator(I) then
+    begin
+      Any := True;
+      Break;
+    end;
   if not Any then Exit(ParseLenPlain(S, U, V));
   V := 0;
-  Pos_ := 1; Bad := False;
+  Pos_ := 1;
+  Bad := False;
   R := Expr;
   Skip;
   Result := not Bad and (Pos_ > Length(T));
   if Result then V := R.V;
 end;
 
-function ParseTriple(const S: string; U: TUnitSystem;
-  out X, Y, Z: Double): Integer;
+function ParseTriple(const S: string; U: TUnitSystem; out X, Y, Z: double): integer;
 var
   Body, Part: string;
-  I, N: Integer;
-  V: array[0..2] of Double;
+  I, N: integer;
+  V: array[0..2] of double;
 begin
-  X := 0; Y := 0; Z := 0;
+  X := 0;
+  Y := 0;
+  Z := 0;
   Result := 0;
   Body := Trim(S);
   if Length(Body) < 2 then Exit;
@@ -1480,7 +1467,9 @@ begin
     Delete(Body, Length(Body), 1);
 
   N := 0;
-  V[0] := 0; V[1] := 0; V[2] := 0;
+  V[0] := 0;
+  V[1] := 0;
+  V[2] := 0;
   while (Body <> '') and (N < 3) do
   begin
     I := Pos(',', Body);
@@ -1503,32 +1492,34 @@ begin
     else
       Exit;                            // a field we cannot read spoils the lot
   end;
-  X := V[0]; Y := V[1]; Z := V[2];
+  X := V[0];
+  Y := V[1];
+  Z := V[2];
   Result := N;
 end;
 
 { A round length that comes out between MinPx and MaxPx on screen.  The
   tables cover the whole zoom range, in steps that land on inch fractions,
   inches and feet. }
-function NiceBarLength(Ppu: Double; MinPx, MaxPx: Double; U: TUnitSystem): Double;
+function NiceBarLength(Ppu: double; MinPx, MaxPx: double; U: TUnitSystem): double;
 const
   N_STEP = 16;
   { Feet, with exact inch fractions at the short end so the label never reads
     0'-0". }
-  IMP: array[0..N_STEP] of Double =
-    (1/192, 1/96, 1/48, 1/24, 1/12, 0.25, 0.5,
-     1, 2, 5, 10, 20, 50, 100, 200, 500, 1000);
-  MET: array[0..N_STEP] of Double =
-    (0.0005, 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05,
-     0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100);
+  IMP: array[0..N_STEP] of double =
+    (1 / 192, 1 / 96, 1 / 48, 1 / 24, 1 / 12, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000);
+  MET: array[0..N_STEP] of double =
+    (0.0005, 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100);
 var
-  I: Integer;
-  V: Double;
+  I: integer;
+  V: double;
 begin
   Result := 1;
   for I := 0 to N_STEP do
   begin
-    if U = usImperial then V := IMP[I] else V := MET[I];
+    if U = usImperial then V := IMP[I]
+    else
+      V := MET[I];
     Result := V;
     if V * Ppu >= MinPx then Exit;
   end;
@@ -1538,19 +1529,19 @@ end;
 { geometry and projection                                                  }
 { ---------------------------------------------------------------------- }
 
-function P3(X, Y, Z: Double): TP3;
+function P3(X, Y, Z: double): TP3;
 begin
   Result.X := X;
   Result.Y := Y;
   Result.Z := Z;
 end;
 
-function Dist(const A, B: TP3): Double;
+function Dist(const A, B: TP3): double;
 begin
   Result := Sqrt(Sqr(B.X - A.X) + Sqr(B.Y - A.Y) + Sqr(B.Z - A.Z));
 end;
 
-function SamePt(const A, B: TP3; Tol: Double): Boolean;
+function SamePt(const A, B: TP3; Tol: double): boolean;
 begin
   Result := Dist(A, B) <= Tol;
 end;
@@ -1565,12 +1556,12 @@ begin
   Result := P3(A.X - B.X, A.Y - B.Y, A.Z - B.Z);
 end;
 
-function Mul3(const A: TP3; K: Double): TP3;
+function Mul3(const A: TP3; K: double): TP3;
 begin
   Result := P3(A.X * K, A.Y * K, A.Z * K);
 end;
 
-function Len3(const A: TP3): Double;
+function Len3(const A: TP3): double;
 begin
   Result := Sqrt(A.X * A.X + A.Y * A.Y + A.Z * A.Z);
 end;
@@ -1582,14 +1573,14 @@ begin
   Result.Z := A.X * B.Y - A.Y * B.X;
 end;
 
-function Dot3(const A, B: TP3): Double;
+function Dot3(const A, B: TP3): double;
 begin
   Result := A.X * B.X + A.Y * B.Y + A.Z * B.Z;
 end;
 
 function Norm3(const A: TP3): TP3;
 var
-  L: Double;
+  L: double;
 begin
   L := Sqrt(A.X * A.X + A.Y * A.Y + A.Z * A.Z);
   if L < 1E-12 then
@@ -1598,13 +1589,13 @@ begin
     Result := P3(A.X / L, A.Y / L, A.Z / L);
 end;
 
-function ClipToBox(PX, PY, DX, DY, W, H: Double; out T0, T1: Double): Boolean;
+function ClipToBox(PX, PY, DX, DY, W, H: double; out T0, T1: double): boolean;
 
   { Liang-Barsky, one edge at a time: the line runs P + T*D, and each edge
     says either "no T at all" or trims one end of the range. }
-  function Edge(Num, Den: Double): Boolean;
+  function Edge(Num, Den: double): boolean;
   var
-    T: Double;
+    T: double;
   begin
     Result := True;
     if Abs(Den) < 1E-12 then
@@ -1633,8 +1624,7 @@ begin
   { Num is the distance inside the edge, Den the rate the line crosses it:
     negative coming in, positive going out.  Swapping them clips every line
     to nothing. }
-  Result := Edge(PX, -DX) and Edge(W - PX, DX) and
-            Edge(PY, -DY) and Edge(H - PY, DY) and (T0 <= T1);
+  Result := Edge(PX, -DX) and Edge(W - PX, DX) and Edge(PY, -DY) and Edge(H - PY, DY) and (T0 <= T1);
 end;
 
 { A turntable camera: Az spins about the world Z axis, El tilts up from the
@@ -1643,9 +1633,9 @@ function ViewRight(const V: TProjector): TP3;
 begin
   case V.Kind of
     vkOrbit: Result := P3(-Sin(V.Az), Cos(V.Az), 0);
-    vkIso:   Result := P3(ISO_COS, ISO_COS, 0);
-  else
-    Result := P3(1, 0, 0);
+    vkIso: Result := P3(ISO_COS, ISO_COS, 0);
+    else
+      Result := P3(1, 0, 0);
   end;
 end;
 
@@ -1653,9 +1643,9 @@ function ViewUp(const V: TProjector): TP3;
 begin
   case V.Kind of
     vkOrbit: Result := P3(-Sin(V.El) * Cos(V.Az), -Sin(V.El) * Sin(V.Az), Cos(V.El));
-    vkIso:   Result := P3(-ISO_SIN, ISO_SIN, 1);
-  else
-    Result := P3(0, 1, 0);
+    vkIso: Result := P3(-ISO_SIN, ISO_SIN, 1);
+    else
+      Result := P3(0, 1, 0);
   end;
 end;
 
@@ -1665,16 +1655,15 @@ function ViewDir(const V: TProjector): TP3;
 begin
   case V.Kind of
     vkOrbit: Result := P3(Cos(V.El) * Cos(V.Az), Cos(V.El) * Sin(V.Az), Sin(V.El));
-    vkIso:   Result := Norm3(P3(1, -1, 1));
-  else
-    Result := P3(0, 0, 1);
+    vkIso: Result := Norm3(P3(1, -1, 1));
+    else
+      Result := P3(0, 0, 1);
   end;
 end;
 
-function SameProjector(const A, B: TProjector): Boolean;
+function SameProjector(const A, B: TProjector): boolean;
 begin
-  Result := (A.Kind = B.Kind) and (A.Ppu = B.Ppu) and (A.OX = B.OX) and
-            (A.OY = B.OY) and (A.Az = B.Az) and (A.El = B.El);
+  Result := (A.Kind = B.Kind) and (A.Ppu = B.Ppu) and (A.OX = B.OX) and (A.OY = B.OY) and (A.Az = B.Az) and (A.El = B.El);
 end;
 
 procedure BeginProject(const V: TProjector; out C: TProjCache);
@@ -1736,11 +1725,10 @@ end;
 
 { Two screen equations, three unknowns, so the working plane pins one of
   them; the remaining 2x2 system is solved directly. }
-procedure UnprojectOrbit(const V: TProjector; SX, SY: Double; Pl: TPlane;
-  const Base: TP3; out Res: TP3);
+procedure UnprojectOrbit(const V: TProjector; SX, SY: double; Pl: TPlane; const Base: TP3; out Res: TP3);
 var
   R, U: TP3;
-  A11, A12, A21, A22, B1, B2, Det, S, T, Scale: Double;
+  A11, A12, A21, A22, B1, B2, Det, S, T, Scale: double;
 begin
   Res := Base;
   R := ViewRight(V);
@@ -1750,19 +1738,31 @@ begin
 
   case Pl of
     plXY:
-      begin
-        A11 := R.X; A12 := R.Y; B1 := B1 - R.Z * Base.Z;
-        A21 := U.X; A22 := U.Y; B2 := B2 - U.Z * Base.Z;
-      end;
-    plXZ:
-      begin
-        A11 := R.X; A12 := R.Z; B1 := B1 - R.Y * Base.Y;
-        A21 := U.X; A22 := U.Z; B2 := B2 - U.Y * Base.Y;
-      end;
-  else
     begin
-      A11 := R.Y; A12 := R.Z; B1 := B1 - R.X * Base.X;
-      A21 := U.Y; A22 := U.Z; B2 := B2 - U.X * Base.X;
+      A11 := R.X;
+      A12 := R.Y;
+      B1 := B1 - R.Z * Base.Z;
+      A21 := U.X;
+      A22 := U.Y;
+      B2 := B2 - U.Z * Base.Z;
+    end;
+    plXZ:
+    begin
+      A11 := R.X;
+      A12 := R.Z;
+      B1 := B1 - R.Y * Base.Y;
+      A21 := U.X;
+      A22 := U.Z;
+      B2 := B2 - U.Y * Base.Y;
+    end;
+    else
+    begin
+      A11 := R.Y;
+      A12 := R.Z;
+      B1 := B1 - R.X * Base.X;
+      A21 := U.Y;
+      A22 := U.Z;
+      B2 := B2 - U.X * Base.X;
     end;
   end;
 
@@ -1776,10 +1776,19 @@ begin
   T := (A11 * B2 - B1 * A21) / Det;
 
   case Pl of
-    plXY: begin Res.X := S; Res.Y := T; end;
-    plXZ: begin Res.X := S; Res.Z := T; end;
-  else
-    begin Res.Y := S; Res.Z := T; end;
+    plXY: begin
+      Res.X := S;
+      Res.Y := T;
+    end;
+    plXZ: begin
+      Res.X := S;
+      Res.Z := T;
+    end;
+    else
+    begin
+      Res.Y := S;
+      Res.Z := T;
+    end;
   end;
 end;
 
@@ -1794,13 +1803,12 @@ var
 { Where the cursor meets an arbitrary plane, in any view.  The projection is
   linear, so where the origin and unit vectors land gives two equations and
   the plane is the third. }
-function UnprojectPlane(const V: TProjector; SX, SY: Double;
-  const Org, N: TP3; const Base: TP3): TP3;
+function UnprojectPlane(const V: TProjector; SX, SY: double; const Org, N: TP3; const Base: TP3): TP3;
 var
   P0, PX, PY, PZ: TPointF;
-  A: array[0..2, 0..2] of Double;
-  B: array[0..2] of Double;
-  Det, D0, D1, D2, Scale, R0, R1, R2: Double;
+  A: array[0..2, 0..2] of double;
+  B: array[0..2] of double;
+  Det, D0, D1, D2, Scale, R0, R1, R2: double;
 begin
   Result := Base;
   P0 := Project(V, P3(0, 0, 0));
@@ -1808,45 +1816,42 @@ begin
   PY := Project(V, P3(0, 1, 0));
   PZ := Project(V, P3(0, 0, 1));
 
-  A[0, 0] := PX.X - P0.X;  A[0, 1] := PY.X - P0.X;  A[0, 2] := PZ.X - P0.X;
-  A[1, 0] := PX.Y - P0.Y;  A[1, 1] := PY.Y - P0.Y;  A[1, 2] := PZ.Y - P0.Y;
-  A[2, 0] := N.X;          A[2, 1] := N.Y;          A[2, 2] := N.Z;
+  A[0, 0] := PX.X - P0.X;
+  A[0, 1] := PY.X - P0.X;
+  A[0, 2] := PZ.X - P0.X;
+  A[1, 0] := PX.Y - P0.Y;
+  A[1, 1] := PY.Y - P0.Y;
+  A[1, 2] := PZ.Y - P0.Y;
+  A[2, 0] := N.X;
+  A[2, 1] := N.Y;
+  A[2, 2] := N.Z;
 
   B[0] := SX - P0.X;
   B[1] := SY - P0.Y;
   B[2] := N.X * Org.X + N.Y * Org.Y + N.Z * Org.Z;
 
-  Det := A[0,0] * (A[1,1] * A[2,2] - A[1,2] * A[2,1])
-       - A[0,1] * (A[1,0] * A[2,2] - A[1,2] * A[2,0])
-       + A[0,2] * (A[1,0] * A[2,1] - A[1,1] * A[2,0]);
+  Det := A[0, 0] * (A[1, 1] * A[2, 2] - A[1, 2] * A[2, 1]) - A[0, 1] * (A[1, 0] * A[2, 2] - A[1, 2] * A[2, 0]) + A[0, 2] * (A[1, 0] * A[2, 1] - A[1, 1] * A[2, 0]);
 
   { Edge-on there is no crossing worth having.  Judge against all three rows:
     the first two are pixels per foot and the third a unit normal, so the
     first row alone lets a hopeless solve through and a circle on a leaning
     roof leaps to an absurd size. }
-  R0 := Sqrt(Sqr(A[0,0]) + Sqr(A[0,1]) + Sqr(A[0,2]));
-  R1 := Sqrt(Sqr(A[1,0]) + Sqr(A[1,1]) + Sqr(A[1,2]));
-  R2 := Sqrt(Sqr(A[2,0]) + Sqr(A[2,1]) + Sqr(A[2,2]));
+  R0 := Sqrt(Sqr(A[0, 0]) + Sqr(A[0, 1]) + Sqr(A[0, 2]));
+  R1 := Sqrt(Sqr(A[1, 0]) + Sqr(A[1, 1]) + Sqr(A[1, 2]));
+  R2 := Sqrt(Sqr(A[2, 0]) + Sqr(A[2, 1]) + Sqr(A[2, 2]));
   Scale := R0 * R1 * R2;
   if (Scale < 1E-12) or (Abs(Det) < 1E-3 * Scale) then Exit;
 
-  D0 := B[0]    * (A[1,1] * A[2,2] - A[1,2] * A[2,1])
-      - A[0,1]  * (B[1]   * A[2,2] - A[1,2] * B[2])
-      + A[0,2]  * (B[1]   * A[2,1] - A[1,1] * B[2]);
-  D1 := A[0,0]  * (B[1]   * A[2,2] - A[1,2] * B[2])
-      - B[0]    * (A[1,0] * A[2,2] - A[1,2] * A[2,0])
-      + A[0,2]  * (A[1,0] * B[2]   - B[1]   * A[2,0]);
-  D2 := A[0,0]  * (A[1,1] * B[2]   - B[1]   * A[2,1])
-      - A[0,1]  * (A[1,0] * B[2]   - B[1]   * A[2,0])
-      + B[0]    * (A[1,0] * A[2,1] - A[1,1] * A[2,0]);
+  D0 := B[0] * (A[1, 1] * A[2, 2] - A[1, 2] * A[2, 1]) - A[0, 1] * (B[1] * A[2, 2] - A[1, 2] * B[2]) + A[0, 2] * (B[1] * A[2, 1] - A[1, 1] * B[2]);
+  D1 := A[0, 0] * (B[1] * A[2, 2] - A[1, 2] * B[2]) - B[0] * (A[1, 0] * A[2, 2] - A[1, 2] * A[2, 0]) + A[0, 2] * (A[1, 0] * B[2] - B[1] * A[2, 0]);
+  D2 := A[0, 0] * (A[1, 1] * B[2] - B[1] * A[2, 1]) - A[0, 1] * (A[1, 0] * B[2] - B[1] * A[2, 0]) + B[0] * (A[1, 0] * A[2, 1] - A[1, 1] * A[2, 0]);
 
   Result := P3(D0 / Det, D1 / Det, D2 / Det);
 end;
 
-function Unproject(const V: TProjector; SX, SY: Double; Pl: TPlane;
-  const Base: TP3): TP3;
+function Unproject(const V: TProjector; SX, SY: double; Pl: TPlane; const Base: TP3): TP3;
 var
-  U, W: Double;
+  U, W: double;
 begin
   Result := Base;
   if Pl = plFree then
@@ -1871,18 +1876,18 @@ begin
 
   case Pl of
     plXY:
-      begin
-        Result.Z := Base.Z;
-        Result.Y := (U + (W - Base.Z) / ISO_SIN) / 2;
-        Result.X := (U - (W - Base.Z) / ISO_SIN) / 2;
-      end;
+    begin
+      Result.Z := Base.Z;
+      Result.Y := (U + (W - Base.Z) / ISO_SIN) / 2;
+      Result.X := (U - (W - Base.Z) / ISO_SIN) / 2;
+    end;
     plXZ:
-      begin
-        Result.Y := Base.Y;
-        Result.X := U - Base.Y;
-        Result.Z := W - (Base.Y - Result.X) * ISO_SIN;
-      end;
-  else
+    begin
+      Result.Y := Base.Y;
+      Result.X := U - Base.Y;
+      Result.Z := W - (Base.Y - Result.X) * ISO_SIN;
+    end;
+    else
     begin
       Result.X := Base.X;
       Result.Y := U - Base.X;
@@ -1891,11 +1896,10 @@ begin
   end;
 end;
 
-function PlaneByDrag(const V: TProjector; const Anchor: TP3;
-  SX, SY: Double; Keep: TPlane; Bias: Double): TPlane;
+function PlaneByDrag(const V: TProjector; const Anchor: TP3; SX, SY: double; Keep: TPlane; Bias: double): TPlane;
 var
   Pl: TPlane;
-  D, Best: Double;
+  D, Best: double;
 begin
   Result := Keep;
   Best := Dist(Anchor, Unproject(V, SX, SY, Keep, Anchor));
@@ -1915,7 +1919,7 @@ begin
   end;
 end;
 
-function AxisDir(Index: Integer): TP3;
+function AxisDir(Index: integer): TP3;
 begin
   case Index of
     0: Result := P3(1, 0, 0);
@@ -1923,16 +1927,15 @@ begin
     2: Result := P3(0, 1, 0);
     3: Result := P3(0, -1, 0);
     4: Result := P3(0, 0, 1);
-  else
-    Result := P3(0, 0, -1);
+    else
+      Result := P3(0, 0, -1);
   end;
 end;
 
-function DimGeometry(const V: TProjector; const A, B, Off: TP3;
-  U: TUnitSystem; out G: TDimGeom; const Note: string): Boolean;
+function DimGeometry(const V: TProjector; const A, B, Off: TP3; U: TUnitSystem; out G: TDimGeom; const Note: string): boolean;
 var
   PA, PB: TPointF;
-  L, UX, UY, NX, NY, OL: Double;
+  L, UX, UY, NX, NY, OL: double;
 begin
   Result := False;
   FillChar(G, SizeOf(G), 0);
@@ -1986,7 +1989,8 @@ begin
     on an iso that is not drawn to scale.  "<>" in it is the measured length,
     as in SketchUp, so "R <>" stays true when the circle changes. }
   if Note <> '' then G.Txt := StringReplace(Note, '<>', FormatLen(Dist(A, B), U), [rfReplaceAll])
-  else G.Txt := FormatLen(Dist(A, B), U);
+  else
+    G.Txt := FormatLen(Dist(A, B), U);
   { a radius has one end on the arc and the other at the center: the mark
     goes at the arc only }
   if (Copy(Note, 1, 2) = 'R ') and (Pos('<>', Note) > 0) then
@@ -1997,19 +2001,18 @@ begin
   Result := True;
 end;
 
-function DimOffsetAt(const V: TProjector; const A, B: TP3; MX, MY: Double;
-  const Extra: array of TP3; const Prefer: TP3): TP3;
+function DimOffsetAt(const V: TProjector; const A, B: TP3; MX, MY: double; const Extra: array of TP3; const Prefer: TP3): TP3;
 var
   Cands: array of TP3;
   D, Mid: TP3;
   PA, PB, PM, S: TPointF;
-  L, EX, EY, VX, VY, VL, SL, Cr, Score, Best, T, BestT: Double;
-  K, BestK: Integer;
+  L, EX, EY, VX, VY, VL, SL, Cr, Score, Best, T, BestT: double;
+  K, BestK: integer;
 
   procedure AddC(C: TP3);
   var
-    Q: Double;
-    J: Integer;
+    Q: double;
+    J: integer;
   begin
     { square to AB, and a unit long }
     Q := Dot3(C, D);
@@ -2031,22 +2034,29 @@ begin
   D := P3(D.X / L, D.Y / L, D.Z / L);
   PA := Project(V, A);
   PB := Project(V, B);
-  EX := PB.X - PA.X; EY := PB.Y - PA.Y;
+  EX := PB.X - PA.X;
+  EY := PB.Y - PA.Y;
   L := Sqrt(EX * EX + EY * EY);
   if L < 1E-6 then Exit;
-  EX := EX / L; EY := EY / L;
+  EX := EX / L;
+  EY := EY / L;
   Cands := nil;
   { the planes of the faces on it first: they are what the edge is part of }
   for K := 0 to High(Extra) do AddC(Extra[K]);
-  AddC(P3(1, 0, 0)); AddC(P3(0, 1, 0)); AddC(P3(0, 0, 1));
+  AddC(P3(1, 0, 0));
+  AddC(P3(0, 1, 0));
+  AddC(P3(0, 0, 1));
   { a line along no axis: the level square to it, and the upright }
   AddC(Cross3(P3(0, 0, 1), D));
   AddC(P3(0, 0, 1));
   Mid := P3((A.X + B.X) / 2, (A.Y + B.Y) / 2, (A.Z + B.Z) / 2);
   PM := Project(V, Mid);
-  VX := MX - PM.X; VY := MY - PM.Y;
+  VX := MX - PM.X;
+  VY := MY - PM.Y;
   VL := Sqrt(VX * VX + VY * VY);
-  Best := -1; BestK := -1; BestT := 0;
+  Best := -1;
+  BestK := -1;
+  BestT := 0;
   for K := 0 to High(Cands) do
   begin
     S := Project(V, Add3(Mid, Cands[K]));
@@ -2057,7 +2067,8 @@ begin
     Cr := S.X * EY - S.Y * EX;
     if (SL < 1E-9) or (Abs(Cr) < 0.05 * SL) then Continue;
     if VL < 1E-9 then Score := 0
-    else Score := Abs(VX * S.X + VY * S.Y) / (VL * SL);
+    else
+      Score := Abs(VX * S.X + VY * S.Y) / (VL * SL);
     { and one that runs nearly along the edge on screen throws the line a
       long way for a small move - worth less }
     Score := Score * (0.6 + 0.4 * Abs(Cr) / SL);
@@ -2076,10 +2087,9 @@ begin
   Result := Mul3(Cands[BestK], BestT);
 end;
 
-function DimTextTopLeft(const G: TDimGeom; TW, TH: Integer;
-  Gap: Double): TPoint;
+function DimTextTopLeft(const G: TDimGeom; TW, TH: integer; Gap: double): TPoint;
 var
-  Reach, CX, CY: Double;
+  Reach, CX, CY: double;
 begin
   Reach := (Abs(G.Nrm.X) * TW + Abs(G.Nrm.Y) * TH) / 2;
   CX := G.Mid.X + G.Nrm.X * (Gap + Reach);
@@ -2090,13 +2100,13 @@ end;
 
 { Axes are named by color, as SketchUp does on screen.  A lock runs both ways
   along its axis. }
-function AxisName(Index: Integer): string;
+function AxisName(Index: integer): string;
 begin
   case Index of
     0, 1: Result := 'red X';
     2, 3: Result := 'green Y';
-  else
-    Result := 'blue Z';
+    else
+      Result := 'blue Z';
   end;
 end;
 
@@ -2105,7 +2115,7 @@ end;
 procedure AxesFromNormal(const Nm: TP3; out AU, AV: TP3);
 var
   N, T: TP3;
-  L: Double;
+  L: double;
 begin
   L := Sqrt(Sqr(Nm.X) + Sqr(Nm.Y) + Sqr(Nm.Z));
   if L < 1E-12 then
@@ -2117,14 +2127,15 @@ begin
   N := P3(Nm.X / L, Nm.Y / L, Nm.Z / L);
   if (Abs(N.Z) <= Abs(N.X)) and (Abs(N.Z) <= Abs(N.Y)) then T := P3(0, 0, 1)
   else if Abs(N.Y) <= Abs(N.X) then T := P3(0, 1, 0)
-  else T := P3(1, 0, 0);
+  else
+    T := P3(1, 0, 0);
   AU := Norm3(Cross3(T, N));
   AV := Norm3(Cross3(N, AU));
 end;
 
 procedure SetFreePlane(const Org, Normal: TP3);
 var
-  L: Double;
+  L: double;
 begin
   L := Sqrt(Sqr(Normal.X) + Sqr(Normal.Y) + Sqr(Normal.Z));
   if L < 1E-12 then Exit;
@@ -2147,18 +2158,29 @@ end;
 procedure PlaneAxes(Pl: TPlane; out AU, AV: TP3);
 begin
   case Pl of
-    plXY: begin AU := P3(1, 0, 0); AV := P3(0, 1, 0); end;
-    plXZ: begin AU := P3(1, 0, 0); AV := P3(0, 0, 1); end;
-    plFree: begin AU := GFreeU; AV := GFreeV; end;
-  else
-    begin AU := P3(0, 1, 0); AV := P3(0, 0, 1); end;
+    plXY: begin
+      AU := P3(1, 0, 0);
+      AV := P3(0, 1, 0);
+    end;
+    plXZ: begin
+      AU := P3(1, 0, 0);
+      AV := P3(0, 0, 1);
+    end;
+    plFree: begin
+      AU := GFreeU;
+      AV := GFreeV;
+    end;
+    else
+    begin
+      AU := P3(0, 1, 0);
+      AV := P3(0, 0, 1);
+    end;
   end;
 end;
 
-function TangentSagitta(const A, B, Dir: TP3; Pl: TPlane;
-  out Bulge: Double): Boolean;
+function TangentSagitta(const A, B, Dir: TP3; Pl: TPlane; out Bulge: double): boolean;
 var
-  U1, V1, U2, V2, DU, DV, Ln, TU, TV, TL, Cs, Sn, Ang: Double;
+  U1, V1, U2, V2, DU, DV, Ln, TU, TV, TL, Cs, Sn, Ang: double;
   AU, AV: TP3;
 begin
   Result := False;
@@ -2194,11 +2216,10 @@ begin
   Result := True;
 end;
 
-function TapeGuide(HaveEdge: Boolean; const EdgeDir, A, B, PlaneNm: TP3;
-  out Dir: TP3): TTapeGuide;
+function TapeGuide(HaveEdge: boolean; const EdgeDir, A, B, PlaneNm: TP3; out Dir: TP3): TTapeGuide;
 var
   Run, E, X: TP3;
-  L: Double;
+  L: double;
 begin
   Dir := P3(0, 0, 0);
   Run := Sub3(B, A);
@@ -2234,21 +2255,20 @@ begin
   Result := tgAcrossRun;
 end;
 
-function OffsetLoop(const Loop: TP3Array; const Normal: TP3; D: Double;
-  Tidy: Boolean = True): TP3Array;
+function OffsetLoop(const Loop: TP3Array; const Normal: TP3; D: double; Tidy: boolean = True): TP3Array;
 const
   EPS = 1E-9;
 var
   N, Ax, Bx: TP3;
-  Cnt, I, J, K: Integer;
-  PU, PV: array of Double;         // the loop, in plane coordinates
-  DU, DV: array of Double;         // each edge's unit direction
-  NU, NV: array of Double;         // each edge's outward normal
-  RU, RV: array of Double;         // the answer, in plane coordinates
-  Act: array of Integer;           // the edges still in it
-  Keep: array of Boolean;
-  M, Q, Turned: Integer;
-  Area, L, Cr, T, Sgn, AU, AV, Lift: Double;
+  Cnt, I, J, K: integer;
+  PU, PV: array of double;         // the loop, in plane coordinates
+  DU, DV: array of double;         // each edge's unit direction
+  NU, NV: array of double;         // each edge's outward normal
+  RU, RV: array of double;         // the answer, in plane coordinates
+  Act: array of integer;           // the edges still in it
+  Keep: array of boolean;
+  M, Q, Turned: integer;
+  Area, L, Cr, T, Sgn, AU, AV, Lift: double;
 begin
   Result := nil;
   Cnt := Length(Loop);
@@ -2269,7 +2289,8 @@ begin
   Ax := Norm3(Cross3(N, Ax));
   Bx := Norm3(Cross3(N, Ax));
 
-  SetLength(PU, Cnt); SetLength(PV, Cnt);
+  SetLength(PU, Cnt);
+  SetLength(PV, Cnt);
   for I := 0 to Cnt - 1 do
   begin
     PU[I] := Dot3(Loop[I], Ax);
@@ -2285,10 +2306,14 @@ begin
     Area := Area + (PU[I] * PV[J] - PU[J] * PV[I]);
   end;
   if Abs(Area) < EPS then Exit;
-  if Area > 0 then Sgn := 1 else Sgn := -1;
+  if Area > 0 then Sgn := 1
+  else
+    Sgn := -1;
 
-  SetLength(DU, Cnt); SetLength(DV, Cnt);
-  SetLength(NU, Cnt); SetLength(NV, Cnt);
+  SetLength(DU, Cnt);
+  SetLength(DV, Cnt);
+  SetLength(NU, Cnt);
+  SetLength(NV, Cnt);
   for I := 0 to Cnt - 1 do
   begin
     J := (I + 1) mod Cnt;
@@ -2299,7 +2324,10 @@ begin
     begin
       { a repeated point: the edge has no direction, so leave it flat and let
         its neighbors span the gap }
-      DU[I] := 0; DV[I] := 0; NU[I] := 0; NV[I] := 0;
+      DU[I] := 0;
+      DV[I] := 0;
+      NU[I] := 0;
+      NV[I] := 0;
       Continue;
     end;
     DU[I] := DU[I] / L;
@@ -2324,7 +2352,8 @@ begin
     shorter than the offset turns round - every piece of a rounded corner
     taken in past its radius does - and SketchUp's answer is a sharp corner.
     Dropping one moves its neighbors' corners, so repeat until none turns. }
-  SetLength(RU, Cnt); SetLength(RV, Cnt);
+  SetLength(RU, Cnt);
+  SetLength(RV, Cnt);
   repeat
     if M < 3 then Exit(nil);
     for Q := 0 to M - 1 do
@@ -2379,9 +2408,8 @@ begin
   for Q := 0 to M - 1 do
     { Back into the model, lifted along the normal to the loop's own plane.
       Ax and Bx alone land on the parallel plane through the origin. }
-    Result[Q] := P3(Ax.X * RU[Q] + Bx.X * RV[Q] + N.X * Lift,
-                    Ax.Y * RU[Q] + Bx.Y * RV[Q] + N.Y * Lift,
-                    Ax.Z * RU[Q] + Bx.Z * RV[Q] + N.Z * Lift);
+    Result[Q] := P3(Ax.X * RU[Q] + Bx.X * RV[Q] + N.X * Lift, Ax.Y * RU[Q] + Bx.Y * RV[Q] + N.Y * Lift, Ax.Z *
+      RU[Q] + Bx.Z * RV[Q] + N.Z * Lift);
 
   { An inward offset further than the shape can take turns it inside out.
     Return nothing rather than a sliver that measures wrong. }
@@ -2394,7 +2422,7 @@ begin
   if (T * Area <= 0) or (Abs(T) < Abs(Area) * 1E-6) then Result := nil;
 end;
 
-procedure PlaneCoords(Pl: TPlane; const P: TP3; out U, W: Double);
+procedure PlaneCoords(Pl: TPlane; const P: TP3; out U, W: double);
 var
   AU, AV: TP3;
 begin
@@ -2403,8 +2431,7 @@ begin
   W := P.X * AV.X + P.Y * AV.Y + P.Z * AV.Z;
 end;
 
-function ArcPoint(const C: TP3; R, Ang: Double; Pl: TPlane;
-  const Nm: TP3): TP3;
+function ArcPoint(const C: TP3; R, Ang: double; Pl: TPlane; const Nm: TP3): TP3;
 var
   AU, AV: TP3;
 begin
@@ -2412,15 +2439,14 @@ begin
     AxesFromNormal(Nm, AU, AV)
   else
     PlaneAxes(Pl, AU, AV);
-  Result := P3(C.X + (AU.X * Cos(Ang) + AV.X * Sin(Ang)) * R,
-               C.Y + (AU.Y * Cos(Ang) + AV.Y * Sin(Ang)) * R,
-               C.Z + (AU.Z * Cos(Ang) + AV.Z * Sin(Ang)) * R);
+  Result := P3(C.X + (AU.X * Cos(Ang) + AV.X * Sin(Ang)) * R, C.Y + (AU.Y * Cos(Ang) + AV.Y * Sin(Ang)) * R, C.Z +
+    (AU.Z * Cos(Ang) + AV.Z * Sin(Ang)) * R);
 end;
 
-function ArcPoint(const C: TP3; R, Ang: Double; Pl: TPlane): TP3;
+function ArcPoint(const C: TP3; R, Ang: double; Pl: TPlane): TP3;
 var
   AU, AV: TP3;
-  Cs, Sn: Double;
+  Cs, Sn: double;
 begin
   PlaneAxes(Pl, AU, AV);
   Cs := Cos(Ang) * R;
@@ -2430,12 +2456,14 @@ begin
   Result.Z := C.Z + AU.Z * Cs + AV.Z * Sn;
 end;
 
-function ArcSteps(const E: TWorkEnt): Integer;
+function ArcSteps(const E: TWorkEnt): integer;
 begin
-  if E.Sides >= 3 then Result := E.Sides else Result := 48;
+  if E.Sides >= 3 then Result := E.Sides
+  else
+    Result := 48;
 end;
 
-function ParseSides(const S: string; out N: Integer): Boolean;
+function ParseSides(const S: string; out N: integer): boolean;
 var
   T: string;
 begin
@@ -2445,16 +2473,17 @@ begin
   if Length(T) < 2 then Exit;
   if T[Length(T)] = 's' then Delete(T, Length(T), 1)
   else if T[1] = 's' then Delete(T, 1, 1)
-  else Exit;
+  else
+    Exit;
   if (T = '') or not TryStrToInt(T, N) then Exit;
   Result := (N >= 3) and (N <= 360);
 end;
 
-function ParseAngle(const S: string; out Deg: Double): Boolean;
+function ParseAngle(const S: string; out Deg: double): boolean;
 var
   T: string;
-  P: Integer;
-  Rise, Run: Double;
+  P: integer;
+  Rise, Run: double;
 begin
   Result := False;
   Deg := 0;
@@ -2480,7 +2509,7 @@ begin
   Result := TryStrToFloat(T, Deg, DotFS);
 end;
 
-function FormatAngle(Deg: Double): string;
+function FormatAngle(Deg: double): string;
 begin
   if Abs(Deg - Round(Deg)) < 0.005 then
     Result := IntToStr(Round(Deg)) + #$C2#$B0
@@ -2488,22 +2517,21 @@ begin
     Result := FormatFloat('0.0', Deg, DotFS) + #$C2#$B0;
 end;
 
-function RotV(const V, Axis: TP3; Ang: Double): TP3;
+function RotV(const V, Axis: TP3; Ang: double): TP3;
 var
   K: TP3;
-  Cs, Sn, D: Double;
+  Cs, Sn, D: double;
 begin
   { Rodrigues: V cos + (K x V) sin + K (K.V)(1 - cos) }
   K := Norm3(Axis);
   Cs := Cos(Ang);
   Sn := Sin(Ang);
   D := Dot3(K, V) * (1 - Cs);
-  Result := P3(V.X * Cs + (K.Y * V.Z - K.Z * V.Y) * Sn + K.X * D,
-               V.Y * Cs + (K.Z * V.X - K.X * V.Z) * Sn + K.Y * D,
-               V.Z * Cs + (K.X * V.Y - K.Y * V.X) * Sn + K.Z * D);
+  Result := P3(V.X * Cs + (K.Y * V.Z - K.Z * V.Y) * Sn + K.X * D, V.Y * Cs + (K.Z * V.X - K.X * V.Z) * Sn + K.Y * D,
+    V.Z * Cs + (K.X * V.Y - K.Y * V.X) * Sn + K.Z * D);
 end;
 
-function RotP(const P, C, Axis: TP3; Ang: Double): TP3;
+function RotP(const P, C, Axis: TP3; Ang: double): TP3;
 var
   V: TP3;
 begin
@@ -2511,13 +2539,12 @@ begin
   Result := Add3(C, V);
 end;
 
-function ArcFromChord(const A, B: TP3; Bulge: Double; Pl: TPlane;
-  out C: TP3; out R, A0, Sweep: Double): Boolean;
+function ArcFromChord(const A, B: TP3; Bulge: double; Pl: TPlane; out C: TP3; out R, A0, Sweep: double): boolean;
 var
   AU, AV, Nm: TP3;
-  AUx, AUy, BUx, BUy, Ch, H, NX, NY, MX, MY, D, AngA, AngB: Double;
+  AUx, AUy, BUx, BUy, Ch, H, NX, NY, MX, MY, D, AngA, AngB: double;
 
-  procedure ToPlane(const P: TP3; out U, W: Double);
+  procedure ToPlane(const P: TP3; out U, W: double);
   begin
     U := P.X * AU.X + P.Y * AU.Y + P.Z * AU.Z;
     W := P.X * AV.X + P.Y * AV.Y + P.Z * AV.Z;
@@ -2571,18 +2598,22 @@ begin
   while Sweep <= -Pi do Sweep := Sweep + 2 * Pi;
   while Sweep > Pi do Sweep := Sweep - 2 * Pi;
   if Abs(H) > Ch / 2 then
-    if Sweep > 0 then Sweep := Sweep - 2 * Pi else Sweep := Sweep + 2 * Pi;
+    if Sweep > 0 then Sweep := Sweep - 2 * Pi
+    else
+      Sweep := Sweep + 2 * Pi;
   if ((H > 0) and (Sweep > 0)) or ((H < 0) and (Sweep < 0)) then
-    if Sweep > 0 then Sweep := Sweep - 2 * Pi else Sweep := Sweep + 2 * Pi;
+    if Sweep > 0 then Sweep := Sweep - 2 * Pi
+    else
+      Sweep := Sweep + 2 * Pi;
 
   Result := True;
 end;
 
 { How far along a segment its nearest point to P lies, 0 at A and 1 at B.
   The pick wants the place as well as the distance. }
-function SegParam(PX, PY, AX, AY, BX, BY: Double): Double;
+function SegParam(PX, PY, AX, AY, BX, BY: double): double;
 var
-  DX, DY, L2: Double;
+  DX, DY, L2: double;
 begin
   DX := BX - AX;
   DY := BY - AY;
@@ -2592,9 +2623,9 @@ begin
 end;
 
 { Straight-line distance from a point to a segment - not squared. }
-function DistToSeg(PX, PY, AX, AY, BX, BY: Double): Double;
+function DistToSeg(PX, PY, AX, AY, BX, BY: double): double;
 var
-  DX, DY, T, L2: Double;
+  DX, DY, T, L2: double;
 begin
   DX := BX - AX;
   DY := BY - AY;
@@ -2609,57 +2640,55 @@ end;
 { TWorkDoc                                                                }
 { ---------------------------------------------------------------------- }
 
-function TWorkDoc.GetEnt(I: Integer): TWorkEnt;
+function TWorkDoc.GetEnt(I: integer): TWorkEnt;
 begin
   Result := FEnts[I];
 end;
 
-function TWorkDoc.EntRef(I: Integer): PWorkEnt;
+function TWorkDoc.EntRef(I: integer): PWorkEnt;
 begin
   Result := @FEnts[I];
 end;
 
-function TWorkDoc.Stored: Integer;
+function TWorkDoc.Stored: integer;
 begin
   Result := FLive;
 end;
 
-function TWorkDoc.HasLine(const A, B: TP3): Boolean;
+function TWorkDoc.HasLine(const A, B: TP3): boolean;
 const
   TOL = 1E-7;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := True;
   for I := 0 to FLive - 1 do
     if FEnts[I].Kind = ekLine then
-      if ((Dist(FEnts[I].A, A) < TOL) and (Dist(FEnts[I].B, B) < TOL)) or
-         ((Dist(FEnts[I].A, B) < TOL) and (Dist(FEnts[I].B, A) < TOL)) then
+      if ((Dist(FEnts[I].A, A) < TOL) and (Dist(FEnts[I].B, B) < TOL)) or ((Dist(FEnts[I].A, B) < TOL) and (Dist(FEnts[I].B, A) < TOL)) then
         Exit;
   Result := False;
 end;
 
-function TWorkDoc.AddLineSplit(const A, B: TP3; Ink: TColor;
-  Weight: Single): Integer;
+function TWorkDoc.AddLineSplit(const A, B: TP3; Ink: TColor; Weight: single): integer;
 const
   TOL = 1E-7;
 var
   U: TP3;
-  L, T0, T1, Mid: Double;
-  I, J, N, NC: Integer;
-  Hits: array of Integer;
-  HA, HB: array of Double;    { each hit's run, as a distance along U }
+  L, T0, T1, Mid: double;
+  I, J, N, NC: integer;
+  Hits: array of integer;
+  HA, HB: array of double;    { each hit's run, as a distance along U }
   { and the pen each was drawn with, read before anything is deleted:
     deleting moves every index above it down }
   HInk: array of TColor;
-  HW: array of Single;
-  Cuts: array of Double;
-  Doom: array of Boolean;
-  Src: Integer;
+  HW: array of single;
+  Cuts: array of double;
+  Doom: array of boolean;
+  Src: integer;
   PieceA, PieceB: TP3;
 
-  { how far along the line from A this point is, and how far off it }
-  function Along(const Q: TP3; out Off: Double): Double;
+{ how far along the line from A this point is, and how far off it }
+  function Along(const Q: TP3; out Off: double): double;
   var
     W, F: TP3;
   begin
@@ -2669,9 +2698,9 @@ var
     Off := Sqrt(F.X * F.X + F.Y * F.Y + F.Z * F.Z);
   end;
 
-  procedure Cut(T: Double);
+  procedure Cut(T: double);
   var
-    K: Integer;
+    K: integer;
   begin
     for K := 0 to NC - 1 do
       if Abs(Cuts[K] - T) < TOL then Exit;
@@ -2681,9 +2710,9 @@ var
   end;
 
   { which hit covers the middle of this piece, or -1 for the new line only }
-  function Owner(M: Double): Integer;
+  function Owner(M: double): integer;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := -1;
     for K := 0 to High(Hits) do
@@ -2713,11 +2742,16 @@ begin
     if Min(T0, T1) > L - TOL then Continue;
     if Max(T0, T1) < TOL then Continue;
     N := Length(Hits);
-    SetLength(Hits, N + 1); Hits[N] := I;
-    SetLength(HA, N + 1);   HA[N] := T0;
-    SetLength(HB, N + 1);   HB[N] := T1;
-    SetLength(HInk, N + 1); HInk[N] := FEnts[I].Ink;
-    SetLength(HW, N + 1);   HW[N] := FEnts[I].Weight;
+    SetLength(Hits, N + 1);
+    Hits[N] := I;
+    SetLength(HA, N + 1);
+    HA[N] := T0;
+    SetLength(HB, N + 1);
+    HB[N] := T1;
+    SetLength(HInk, N + 1);
+    HInk[N] := FEnts[I].Ink;
+    SetLength(HW, N + 1);
+    HW[N] := FEnts[I].Weight;
   end;
 
   if Length(Hits) = 0 then
@@ -2740,7 +2774,9 @@ begin
     for J := 0 to NC - 2 - I do
       if Cuts[J] > Cuts[J + 1] then
       begin
-        Mid := Cuts[J]; Cuts[J] := Cuts[J + 1]; Cuts[J + 1] := Mid;
+        Mid := Cuts[J];
+        Cuts[J] := Cuts[J + 1];
+        Cuts[J + 1] := Mid;
       end;
 
   { the old ones go; the run is laid again in pieces }
@@ -2771,8 +2807,7 @@ begin
 end;
 
 { Anything in redo space is dropped the moment you draw again. }
-procedure TWorkDoc.AddLine(const A, B: TP3; Ink: TColor; Weight: Single;
-  Dim: Boolean);
+procedure TWorkDoc.AddLine(const A, B: TP3; Ink: TColor; Weight: single; Dim: boolean);
 begin
   Room;
   Finalize(FEnts[FLive]);
@@ -2785,11 +2820,12 @@ begin
   FEnts[FLive].Weight := Weight;
   FEnts[FLive].Dim := Dim;
   Inc(FLive);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.AddArc(const C: TP3; R, A0, Sweep: Double; Pl: TPlane;
-  Ink: TColor; Weight: Single);
+procedure TWorkDoc.AddArc(const C: TP3; R, A0, Sweep: double; Pl: TPlane; Ink: TColor; Weight: single);
 var
   FreeO, FreeU, FreeV: TP3;
 begin
@@ -2811,7 +2847,9 @@ begin
   FEnts[FLive].Ink := Ink;
   FEnts[FLive].Weight := Weight;
   Inc(FLive);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 procedure TWorkDoc.AddText(const A: TP3; const S: string; Ink: TColor);
@@ -2832,10 +2870,12 @@ begin
   FEnts[FLive].Ink := Ink;
   FEnts[FLive].Weight := 1;
   Inc(FLive);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.AddBore(const Loop: TP3Array; const FarOfFirst: TP3; G: Integer);
+procedure TWorkDoc.AddBore(const Loop: TP3Array; const FarOfFirst: TP3; G: integer);
 var
   Own: TP3Array;
   Far: TP3;
@@ -2869,13 +2909,15 @@ begin
   FEnts[FLive].B := B;
   FEnts[FLive].Weight := 1;
   Inc(FLive);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 { Hiding guides must reach every picker, not just the drawing.  A setter
   because the snap cache is kept until an edit, and a guide point left in it
   stays snappable. }
-procedure TWorkDoc.SetGuidesHidden(On_: Boolean);
+procedure TWorkDoc.SetGuidesHidden(On_: boolean);
 begin
   if On_ = FGuidesHidden then Exit;
   FGuidesHidden := On_;
@@ -2883,18 +2925,18 @@ begin
   FSnapScreenOK := False;
 end;
 
-function TWorkDoc.GuideCount: Integer;
+function TWorkDoc.GuideCount: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := 0 to FLive - 1 do
     if FEnts[I].Kind = ekGuide then Inc(Result);
 end;
 
-function TWorkDoc.ClearGuides: Integer;
+function TWorkDoc.ClearGuides: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := FLive - 1 downto 0 do
@@ -2905,14 +2947,13 @@ begin
     end;
 end;
 
-function TWorkDoc.SetDimNote(Index: Integer; const Note: string): Boolean;
+function TWorkDoc.SetDimNote(Index: integer; const Note: string): boolean;
 begin
   Result := (Index >= 0) and (Index < FLive) and (FEnts[Index].Kind = ekDim);
   if Result then FEnts[Index].Txt := Trim(Note);
 end;
 
-procedure TWorkDoc.AddDim(const A, B: TP3; Ink: TColor; const Off: TP3;
-  const Note: string);
+procedure TWorkDoc.AddDim(const A, B: TP3; Ink: TColor; const Off: TP3; const Note: string);
 begin
   Room;
   Finalize(FEnts[FLive]);
@@ -2927,7 +2968,9 @@ begin
   FEnts[FLive].Dim := True;
   FEnts[FLive].Txt := Note;
   Inc(FLive);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 { FEnts is capacity and FLive the count, so adding one does not reallocate
@@ -2937,9 +2980,9 @@ begin
   if FLive >= Length(FEnts) then SetLength(FEnts, Max(16, Length(FEnts) * 2));
 end;
 
-procedure TWorkDoc.Delete(I: Integer);
+procedure TWorkDoc.Delete(I: integer);
 var
-  K: Integer;
+  K: integer;
 begin
   if (I < 0) or (I >= FLive) then Exit;
   for K := I to FLive - 2 do
@@ -2947,12 +2990,14 @@ begin
   Dec(FLive);
   Finalize(FEnts[FLive]);
   FillChar(FEnts[FLive], SizeOf(TWorkEnt), 0);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.DeleteMarked(const Doomed: array of Boolean);
+procedure TWorkDoc.DeleteMarked(const Doomed: array of boolean);
 var
-  K, W: Integer;
+  K, W: integer;
 begin
   W := 0;
   for K := 0 to FLive - 1 do
@@ -2967,7 +3012,9 @@ begin
     FillChar(FEnts[K], SizeOf(TWorkEnt), 0);
   end;
   FLive := W;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 procedure TWorkDoc.Clear;
@@ -2979,7 +3026,9 @@ begin
   FNextPart := 0;
   FContext := 0;
   FStamp := 0;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 
@@ -2988,7 +3037,7 @@ end;
   undo snapshot.  Every copy must be deep. }
 function CopyEnt(const Src: TWorkEnt): TWorkEnt;
 var
-  I, H: Integer;
+  I, H: integer;
 begin
   Result := Src;
   Result.Poly := nil;
@@ -3011,7 +3060,7 @@ end;
 { Undo copies the whole document; simpler and safer than replaying edits. }
 function TWorkDoc.Snapshot: TWorkEntArray;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := nil;
   SetLength(Result, FLive);
@@ -3021,7 +3070,7 @@ end;
 
 procedure TWorkDoc.RestoreSnap(const A: TWorkEntArray);
 var
-  I: Integer;
+  I: integer;
 begin
   SetLength(FEnts, Length(A));
   for I := 0 to High(A) do
@@ -3031,12 +3080,14 @@ begin
     and a context that was undone out of existence is nobody's to keep }
   RecountParts;
   if (FContext <> 0) and (PartEnt(FContext) < 0) then SetContext(0);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-function TWorkDoc.FirstOfChain: Integer;
+function TWorkDoc.FirstOfChain: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := FLive;
   for I := FLive - 1 downto 0 do
@@ -3047,9 +3098,9 @@ begin
   end;
 end;
 
-function TWorkDoc.ChainLength: Double;
+function TWorkDoc.ChainLength: double;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := FirstOfChain to FLive - 1 do
@@ -3057,20 +3108,19 @@ begin
       Result := Result + Dist(FEnts[I].A, FEnts[I].B);
 end;
 
-function TWorkDoc.ChainClosed(Tol: Double): Boolean;
+function TWorkDoc.ChainClosed(Tol: double): boolean;
 var
-  First: Integer;
+  First: integer;
 begin
   First := FirstOfChain;
-  Result := (FLive - First >= 3) and
-            SamePt(FEnts[FLive - 1].B, FEnts[First].A, Tol);
+  Result := (FLive - First >= 3) and SamePt(FEnts[FLive - 1].B, FEnts[First].A, Tol);
 end;
 
 { Shoelace in the XY plane - only meaningful for a flat closed run. }
-function TWorkDoc.ChainArea: Double;
+function TWorkDoc.ChainArea: double;
 var
-  I: Integer;
-  Acc: Double;
+  I: integer;
+  Acc: double;
 begin
   Acc := 0;
   for I := FirstOfChain to FLive - 1 do
@@ -3083,11 +3133,16 @@ end;
 { faces and push/pull                                                      }
 { ---------------------------------------------------------------------- }
 
-procedure TWorkDoc.SetSlice(AOn: Boolean; ALo, AHi: Double);
+procedure TWorkDoc.SetSlice(AOn: boolean; ALo, AHi: double);
 var
-  T: Double;
+  T: double;
 begin
-  if AHi < ALo then begin T := ALo; ALo := AHi; AHi := T; end;
+  if AHi < ALo then
+  begin
+    T := ALo;
+    ALo := AHi;
+    AHi := T;
+  end;
   if (FSliceOn = AOn) and (FSliceLo = ALo) and (FSliceHi = AHi) then Exit;
   FSliceOn := AOn;
   FSliceLo := ALo;
@@ -3099,14 +3154,14 @@ begin
   FOnFaceOK := False;
 end;
 
-function TWorkDoc.InSlice(Index: Integer): Boolean;
+function TWorkDoc.InSlice(Index: integer): boolean;
 const
   EPS = 1E-7;
 var
-  Lo, Hi: Double;
-  K: Integer;
+  Lo, Hi: double;
+  K: integer;
 
-  procedure Grow(V: Double);
+  procedure Grow(V: double);
   begin
     if V < Lo then Lo := V;
     if V > Hi then Hi := V;
@@ -3123,20 +3178,20 @@ begin
   Hi := -1E300;
   case FEnts[Index].Kind of
     ekFace:
-      begin
-        for K := 0 to High(FEnts[Index].Poly) do Grow(FEnts[Index].Poly[K].Z);
-        if Length(FEnts[Index].Poly) = 0 then Grow(FEnts[Index].A.Z);
-      end;
+    begin
+      for K := 0 to High(FEnts[Index].Poly) do Grow(FEnts[Index].Poly[K].Z);
+      if Length(FEnts[Index].Poly) = 0 then Grow(FEnts[Index].A.Z);
+    end;
     ekArc:
-      begin
+    begin
         { the whole circle it is cut from, because a tilted arc reaches above
           and below its own ends }
-        Grow(FEnts[Index].C.Z - FEnts[Index].R);
-        Grow(FEnts[Index].C.Z + FEnts[Index].R);
-      end;
+      Grow(FEnts[Index].C.Z - FEnts[Index].R);
+      Grow(FEnts[Index].C.Z + FEnts[Index].R);
+    end;
     ekText:
       Grow(FEnts[Index].A.Z);
-  else
+    else
     begin
       Grow(FEnts[Index].A.Z);
       Grow(FEnts[Index].B.Z);
@@ -3147,9 +3202,9 @@ begin
   Result := (Hi >= FSliceLo - EPS) and (Lo <= FSliceHi + EPS);
 end;
 
-function TWorkDoc.OutsideSlice: Integer;
+function TWorkDoc.OutsideSlice: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   if not FSliceOn then Exit;
@@ -3157,9 +3212,9 @@ begin
     if not EntHidden(I) and not InSlice(I) then Inc(Result);
 end;
 
-function TWorkDoc.FaceCorners(Index: Integer): TP3Array;
+function TWorkDoc.FaceCorners(Index: integer): TP3Array;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
 begin
   Result := nil;
   if (Index < 0) or (Index >= FLive) then Exit;
@@ -3182,14 +3237,14 @@ begin
     end;
 end;
 
-function TWorkDoc.FaceCut(Index: Integer): TTriList;
+function TWorkDoc.FaceCut(Index: integer): TTriList;
 var
   Nm, U, W: TP3;
   Corners: TP3Array;
   Flat2: array of TPointF;
   Ring: TIndexRing;
   Holes: TIndexRings;
-  I, J, N, Base, Was, Fresh: Integer;
+  I, J, N, Base, Was, Fresh: integer;
 begin
   Result := nil;
   if (Index < 0) or (Index >= FLive) then Exit;
@@ -3254,28 +3309,30 @@ end;
 function EdgeKeyOf(const A, B: TP3; out Way: PtrInt): string; forward;
 function PointKeyOf(const P: TP3): string; forward;
 
-function TWorkDoc.OpenEdges(G: Integer): TP3Array;
+function TWorkDoc.OpenEdges(G: integer): TP3Array;
 var
   Ix, Jx: TFPHashList;
-  I, J, N, NV, NOut, C1, C2, NCut: Integer;
+  I, J, N, NV, NOut, C1, C2, NCut: integer;
   Key: string;
   Way: PtrInt;
   PA, PB, CutA, CutB: TP3;
   Verts: array of TP3;
   Loops: array of TP3Array;
-  LI: Integer;
-  Cuts: array of Double;
-  T, TSwap: Double;
+  LI: integer;
+  Cuts: array of double;
+  T, TSwap: double;
   Ends: array of TP3;
 
   { the same test GroupClosed uses - a corner lying along an edge, strictly
     between its ends }
-  function Between(const A, B, P: TP3; out U: Double): Boolean;
+  function Between(const A, B, P: TP3; out U: double): boolean;
   var
-    DX, DY, DZ, L2, CX, CY, CZ: Double;
+    DX, DY, DZ, L2, CX, CY, CZ: double;
   begin
     Result := False;
-    DX := B.X - A.X; DY := B.Y - A.Y; DZ := B.Z - A.Z;
+    DX := B.X - A.X;
+    DY := B.Y - A.Y;
+    DZ := B.Z - A.Z;
     L2 := DX * DX + DY * DY + DZ * DZ;
     if L2 < 1E-18 then Exit;
     U := ((P.X - A.X) * DX + (P.Y - A.Y) * DY + (P.Z - A.Z) * DZ) / L2;
@@ -3304,8 +3361,7 @@ begin
       for LI := 0 to High(Loops) do
         for J := 0 to High(Loops[LI]) do
         begin
-          Key := Format('%d,%d,%d', [Round(Loops[LI][J].X * 1E6),
-            Round(Loops[LI][J].Y * 1E6), Round(Loops[LI][J].Z * 1E6)]);
+          Key := Format('%d,%d,%d', [Round(Loops[LI][J].X * 1E6), Round(Loops[LI][J].Y * 1E6), Round(Loops[LI][J].Z * 1E6)]);
           if Jx.FindIndexOf(Key) >= 0 then Continue;
           Jx.Add(Key, Pointer(1));
           if NV >= Length(Verts) then SetLength(Verts, Max(64, NV * 2));
@@ -3331,55 +3387,54 @@ begin
       for J := 0 to High(FEnts[I].Holes) do Loops[J + 1] := FEnts[I].Holes[J];
       for LI := 0 to High(Loops) do
       begin
-      N := Length(Loops[LI]);
-      if N < 3 then Continue;
-      for J := 0 to N - 1 do
-      begin
-        PA := Loops[LI][J];
-        PB := Loops[LI][(J + 1) mod N];
-        NCut := 0;
-        for C2 := 0 to NV - 1 do
-          if Between(PA, PB, Verts[C2], T) then
-          begin
-            if NCut >= Length(Cuts) then SetLength(Cuts, Max(8, NCut * 2));
-            Cuts[NCut] := T;
-            Inc(NCut);
-          end;
-        for C1 := 1 to NCut - 1 do
+        N := Length(Loops[LI]);
+        if N < 3 then Continue;
+        for J := 0 to N - 1 do
         begin
-          TSwap := Cuts[C1];
-          C2 := C1 - 1;
-          while (C2 >= 0) and (Cuts[C2] > TSwap) do
+          PA := Loops[LI][J];
+          PB := Loops[LI][(J + 1) mod N];
+          NCut := 0;
+          for C2 := 0 to NV - 1 do
+            if Between(PA, PB, Verts[C2], T) then
+            begin
+              if NCut >= Length(Cuts) then SetLength(Cuts, Max(8, NCut * 2));
+              Cuts[NCut] := T;
+              Inc(NCut);
+            end;
+          for C1 := 1 to NCut - 1 do
           begin
-            Cuts[C2 + 1] := Cuts[C2];
-            Dec(C2);
+            TSwap := Cuts[C1];
+            C2 := C1 - 1;
+            while (C2 >= 0) and (Cuts[C2] > TSwap) do
+            begin
+              Cuts[C2 + 1] := Cuts[C2];
+              Dec(C2);
+            end;
+            Cuts[C2 + 1] := TSwap;
           end;
-          Cuts[C2 + 1] := TSwap;
-        end;
-        CutA := PA;
-        for C1 := 0 to NCut do
-        begin
-          if C1 = NCut then CutB := PB
-          else
+          CutA := PA;
+          for C1 := 0 to NCut do
           begin
-            T := Cuts[C1];
-            CutB := P3(PA.X + (PB.X - PA.X) * T, PA.Y + (PB.Y - PA.Y) * T,
-                       PA.Z + (PB.Z - PA.Z) * T);
+            if C1 = NCut then CutB := PB
+            else
+            begin
+              T := Cuts[C1];
+              CutB := P3(PA.X + (PB.X - PA.X) * T, PA.Y + (PB.Y - PA.Y) * T, PA.Z + (PB.Z - PA.Z) * T);
+            end;
+            Key := EdgeKeyOf(CutA, CutB, Way);
+            C2 := Ix.FindIndexOf(Key);
+            if C2 < 0 then
+            begin
+              Ix.Add(Key, Pointer(Way + 8));
+              SetLength(Ends, Ix.Count * 2);
+              Ends[(Ix.Count - 1) * 2] := CutA;
+              Ends[(Ix.Count - 1) * 2 + 1] := CutB;
+            end
+            else
+              Ix.Items[C2] := Pointer(PtrInt(Ix.Items[C2]) + Way);
+            CutA := CutB;
           end;
-          Key := EdgeKeyOf(CutA, CutB, Way);
-          C2 := Ix.FindIndexOf(Key);
-          if C2 < 0 then
-          begin
-            Ix.Add(Key, Pointer(Way + 8));
-            SetLength(Ends, Ix.Count * 2);
-            Ends[(Ix.Count - 1) * 2] := CutA;
-            Ends[(Ix.Count - 1) * 2 + 1] := CutB;
-          end
-          else
-            Ix.Items[C2] := Pointer(PtrInt(Ix.Items[C2]) + Way);
-          CutA := CutB;
         end;
-      end;
       end;
     end;
 
@@ -3402,18 +3457,22 @@ end;
   opposite ways?  Then a back face can never be seen and is culled; an open
   shell such as a duct transition keeps its backs, since they can be looked
   at.  Worked out once per edit. }
-function TWorkDoc.GroupClosed(G: Integer): Boolean;
+function TWorkDoc.GroupClosed(G: integer): boolean;
 
   { the two ends to a millionth, smaller end first so either way round makes
     the same key, and a sign saying which way round this use ran }
   function EKey(const A, B: TP3; out Way: PtrInt): string;
   var
-    P, Q: array[0..2] of Int64;
-    I: Integer;
-    Swap: Boolean;
+    P, Q: array[0..2] of int64;
+    I: integer;
+    Swap: boolean;
   begin
-    P[0] := Round(A.X * 1E6); P[1] := Round(A.Y * 1E6); P[2] := Round(A.Z * 1E6);
-    Q[0] := Round(B.X * 1E6); Q[1] := Round(B.Y * 1E6); Q[2] := Round(B.Z * 1E6);
+    P[0] := Round(A.X * 1E6);
+    P[1] := Round(A.Y * 1E6);
+    P[2] := Round(A.Z * 1E6);
+    Q[0] := Round(B.X * 1E6);
+    Q[1] := Round(B.Y * 1E6);
+    Q[2] := Round(B.Z * 1E6);
     Swap := False;
     for I := 0 to 2 do
       if P[I] <> Q[I] then
@@ -3421,7 +3480,9 @@ function TWorkDoc.GroupClosed(G: Integer): Boolean;
         Swap := P[I] > Q[I];
         Break;
       end;
-    if Swap then Way := -1 else Way := 1;
+    if Swap then Way := -1
+    else
+      Way := 1;
     if Swap then
       Result := Format('%d,%d,%d|%d,%d,%d', [Q[0], Q[1], Q[2], P[0], P[1], P[2]])
     else
@@ -3431,12 +3492,14 @@ function TWorkDoc.GroupClosed(G: Integer): Boolean;
   { Is P on segment A-B, strictly between the ends?  The tolerance is finer
     than anything drawn but coarser than the millionths edge keys round to,
     so a point keyed onto the line is never rejected here. }
-  function Between(const A, B, P: TP3; out T: Double): Boolean;
+  function Between(const A, B, P: TP3; out T: double): boolean;
   var
-    DX, DY, DZ, L2, CX, CY, CZ: Double;
+    DX, DY, DZ, L2, CX, CY, CZ: double;
   begin
     Result := False;
-    DX := B.X - A.X; DY := B.Y - A.Y; DZ := B.Z - A.Z;
+    DX := B.X - A.X;
+    DY := B.Y - A.Y;
+    DZ := B.Z - A.Z;
     L2 := DX * DX + DY * DY + DZ * DZ;
     if L2 < 1E-18 then Exit;
     T := ((P.X - A.X) * DX + (P.Y - A.Y) * DY + (P.Z - A.Z) * DZ) / L2;
@@ -3448,27 +3511,27 @@ function TWorkDoc.GroupClosed(G: Integer): Boolean;
   end;
 
 var
-  I, J, N, K, Top: Integer;
+  I, J, N, K, Top: integer;
   Ix: TFPHashList;
   Key: string;
   Way: PtrInt;
-  Seen: array of Integer;
+  Seen: array of integer;
   { the endpoints behind each entry in the hash, so an edge that did not
     match can be looked at again rather than only counted }
   EdgeA, EdgeB: array of TP3;
-  EdgeG: array of Integer;
+  EdgeG: array of integer;
   { the second chance, for groups the plain count says are open }
-  Suspect: array of Boolean;
+  Suspect: array of boolean;
   Loops: array of TP3Array;
-  LI: Integer;
+  LI: integer;
   Verts: array of TP3;
-  NV, NU, Budget: Integer;
-  Cuts: array of Double;
-  NCut, C1, C2: Integer;
-  T, TSwap: Double;
+  NV, NU, Budget: integer;
+  Cuts: array of double;
+  NCut, C1, C2: integer;
+  T, TSwap: double;
   PA, PB, CutA, CutB: TP3;
   Jx: TFPHashList;
-  Shut: Boolean;
+  Shut: boolean;
 begin
   Result := False;
   if G <= 0 then Exit;
@@ -3500,30 +3563,30 @@ begin
         for J := 0 to High(FEnts[I].Holes) do Loops[J + 1] := FEnts[I].Holes[J];
         for LI := 0 to High(Loops) do
         begin
-        N := Length(Loops[LI]);
-        if N < 3 then Continue;
-        for J := 0 to N - 1 do
-        begin
-          Key := IntToStr(FEnts[I].Grp) + '@' +
-                 EKey(Loops[LI][J], Loops[LI][(J + 1) mod N], Way);
-          K := Ix.FindIndexOf(Key);
-          if K < 0 then
+          N := Length(Loops[LI]);
+          if N < 3 then Continue;
+          for J := 0 to N - 1 do
           begin
-            Ix.Add(Key, Pointer(Way + 8));
+            Key := IntToStr(FEnts[I].Grp) + '@' + EKey(Loops[LI][J], Loops[LI][(J + 1) mod N], Way);
+            K := Ix.FindIndexOf(Key);
+            if K < 0 then
+            begin
+              Ix.Add(Key, Pointer(Way + 8));
             { in step with the hash, which appends, so entry n of one is
               entry n of the other }
-            if Length(EdgeA) < Ix.Count then
-            begin
-              SetLength(EdgeA, Ix.Count * 2);
-              SetLength(EdgeB, Ix.Count * 2);
-              SetLength(EdgeG, Ix.Count * 2);
-            end;
-            EdgeA[Ix.Count - 1] := Loops[LI][J];
-            EdgeB[Ix.Count - 1] := Loops[LI][(J + 1) mod N];
-            EdgeG[Ix.Count - 1] := FEnts[I].Grp;
-          end
-          else Ix.Items[K] := Pointer(PtrInt(Ix.Items[K]) + Way);
-        end;
+              if Length(EdgeA) < Ix.Count then
+              begin
+                SetLength(EdgeA, Ix.Count * 2);
+                SetLength(EdgeB, Ix.Count * 2);
+                SetLength(EdgeG, Ix.Count * 2);
+              end;
+              EdgeA[Ix.Count - 1] := Loops[LI][J];
+              EdgeB[Ix.Count - 1] := Loops[LI][(J + 1) mod N];
+              EdgeG[Ix.Count - 1] := FEnts[I].Grp;
+            end
+            else
+              Ix.Items[K] := Pointer(PtrInt(Ix.Items[K]) + Way);
+          end;
         end;
       end;
       { an edge used once each way leaves its tally back at eight; anything
@@ -3565,8 +3628,7 @@ begin
             for LI := 0 to High(Loops) do
               for J := 0 to High(Loops[LI]) do
               begin
-                Key := Format('%d,%d,%d', [Round(Loops[LI][J].X * 1E6),
-                  Round(Loops[LI][J].Y * 1E6), Round(Loops[LI][J].Z * 1E6)]);
+                Key := Format('%d,%d,%d', [Round(Loops[LI][J].X * 1E6), Round(Loops[LI][J].Y * 1E6), Round(Loops[LI][J].Z * 1E6)]);
                 if Jx.FindIndexOf(Key) >= 0 then Continue;
                 Jx.Add(Key, Pointer(1));
                 if NV >= Length(Verts) then SetLength(Verts, Max(64, NV * 2));
@@ -3588,7 +3650,7 @@ begin
         { a ceiling on it, so a big genuinely-broken shape cannot turn a
           frame into a minute proving what the first count already said }
         Budget := 4000000;
-        if (NU = 0) or (NV = 0) or (Int64(NU) * NV > Budget) then Continue;
+        if (NU = 0) or (NV = 0) or (int64(NU) * NV > Budget) then Continue;
 
         { Count the group again from scratch with every edge cut at its
           corners; each piece is counted exactly as a whole edge would be. }
@@ -3603,50 +3665,49 @@ begin
             for J := 0 to High(FEnts[I].Holes) do Loops[J + 1] := FEnts[I].Holes[J];
             for LI := 0 to High(Loops) do
             begin
-            N := Length(Loops[LI]);
-            if N < 3 then Continue;
-            for J := 0 to N - 1 do
-            begin
-              PA := Loops[LI][J];
-              PB := Loops[LI][(J + 1) mod N];
-              NCut := 0;
-              for C2 := 0 to NV - 1 do
-                if Between(PA, PB, Verts[C2], T) then
-                begin
-                  if NCut >= Length(Cuts) then SetLength(Cuts, Max(8, NCut * 2));
-                  Cuts[NCut] := T;
-                  Inc(NCut);
-                end;
-              for C1 := 1 to NCut - 1 do
+              N := Length(Loops[LI]);
+              if N < 3 then Continue;
+              for J := 0 to N - 1 do
               begin
-                TSwap := Cuts[C1];
-                C2 := C1 - 1;
-                while (C2 >= 0) and (Cuts[C2] > TSwap) do
+                PA := Loops[LI][J];
+                PB := Loops[LI][(J + 1) mod N];
+                NCut := 0;
+                for C2 := 0 to NV - 1 do
+                  if Between(PA, PB, Verts[C2], T) then
+                  begin
+                    if NCut >= Length(Cuts) then SetLength(Cuts, Max(8, NCut * 2));
+                    Cuts[NCut] := T;
+                    Inc(NCut);
+                  end;
+                for C1 := 1 to NCut - 1 do
                 begin
-                  Cuts[C2 + 1] := Cuts[C2];
-                  Dec(C2);
+                  TSwap := Cuts[C1];
+                  C2 := C1 - 1;
+                  while (C2 >= 0) and (Cuts[C2] > TSwap) do
+                  begin
+                    Cuts[C2 + 1] := Cuts[C2];
+                    Dec(C2);
+                  end;
+                  Cuts[C2 + 1] := TSwap;
                 end;
-                Cuts[C2 + 1] := TSwap;
-              end;
 
-              CutA := PA;
-              for C1 := 0 to NCut do
-              begin
-                if C1 = NCut then CutB := PB
-                else
+                CutA := PA;
+                for C1 := 0 to NCut do
                 begin
-                  T := Cuts[C1];
-                  CutB := P3(PA.X + (PB.X - PA.X) * T,
-                             PA.Y + (PB.Y - PA.Y) * T,
-                             PA.Z + (PB.Z - PA.Z) * T);
+                  if C1 = NCut then CutB := PB
+                  else
+                  begin
+                    T := Cuts[C1];
+                    CutB := P3(PA.X + (PB.X - PA.X) * T, PA.Y + (PB.Y - PA.Y) * T, PA.Z + (PB.Z - PA.Z) * T);
+                  end;
+                  Key := EKey(CutA, CutB, Way);
+                  C2 := Jx.FindIndexOf(Key);
+                  if C2 < 0 then Jx.Add(Key, Pointer(Way + 8))
+                  else
+                    Jx.Items[C2] := Pointer(PtrInt(Jx.Items[C2]) + Way);
+                  CutA := CutB;
                 end;
-                Key := EKey(CutA, CutB, Way);
-                C2 := Jx.FindIndexOf(Key);
-                if C2 < 0 then Jx.Add(Key, Pointer(Way + 8))
-                else Jx.Items[C2] := Pointer(PtrInt(Jx.Items[C2]) + Way);
-                CutA := CutB;
               end;
-            end;
             end;
           end;
 
@@ -3674,10 +3735,10 @@ begin
     for I := 1 to Top do
       if Seen[I] = 0 then FClosedGrp[I] := False;
   end;
-    Result := (G > 0) and (G < Length(FClosedGrp)) and FClosedGrp[G];
+  Result := (G > 0) and (G < Length(FClosedGrp)) and FClosedGrp[G];
 end;
 
-function TWorkDoc.ZRange(out Lo, Hi: Double): Boolean;
+function TWorkDoc.ZRange(out Lo, Hi: double): boolean;
 var
   A, B: TP3;
 begin
@@ -3698,20 +3759,23 @@ end;
   reached by different arithmetic key alike. }
 function PointKeyOf(const P: TP3): string;
 begin
-  Result := Format('%d|%d|%d', [Round(P.X * 1E6), Round(P.Y * 1E6),
-                                Round(P.Z * 1E6)]);
+  Result := Format('%d|%d|%d', [Round(P.X * 1E6), Round(P.Y * 1E6), Round(P.Z * 1E6)]);
 end;
 
 { A key for the edge between two points, the same from either end, rounded
   to a millionth; Way says which way round this use ran. }
 function EdgeKeyOf(const A, B: TP3; out Way: PtrInt): string;
 var
-  P, Q: array[0..2] of Int64;
-  I: Integer;
-  Swap: Boolean;
+  P, Q: array[0..2] of int64;
+  I: integer;
+  Swap: boolean;
 begin
-  P[0] := Round(A.X * 1E6); P[1] := Round(A.Y * 1E6); P[2] := Round(A.Z * 1E6);
-  Q[0] := Round(B.X * 1E6); Q[1] := Round(B.Y * 1E6); Q[2] := Round(B.Z * 1E6);
+  P[0] := Round(A.X * 1E6);
+  P[1] := Round(A.Y * 1E6);
+  P[2] := Round(A.Z * 1E6);
+  Q[0] := Round(B.X * 1E6);
+  Q[1] := Round(B.Y * 1E6);
+  Q[2] := Round(B.Z * 1E6);
   Swap := False;
   for I := 0 to 2 do
     if P[I] <> Q[I] then
@@ -3719,7 +3783,9 @@ begin
       Swap := P[I] > Q[I];
       Break;
     end;
-  if Swap then Way := -1 else Way := 1;
+  if Swap then Way := -1
+  else
+    Way := 1;
   if Swap then
     Result := Format('%d,%d,%d|%d,%d,%d', [Q[0], Q[1], Q[2], P[0], P[1], P[2]])
   else
@@ -3733,10 +3799,10 @@ end;
   OrientLooseShells).  Solids are left alone. }
 procedure OrientFace(var Pts: TP3Array);
 var
-  I, N: Integer;
+  I, N: integer;
   Acc, Nm: TP3;
   Tmp: TP3;
-  D: Double;
+  D: double;
 begin
   N := Length(Pts);
   if N < 3 then Exit;
@@ -3750,7 +3816,8 @@ begin
   end;
   if (Abs(Acc.Z) >= Abs(Acc.X)) and (Abs(Acc.Z) >= Abs(Acc.Y)) then D := Acc.Z
   else if Abs(Acc.Y) >= Abs(Acc.X) then D := Acc.Y
-  else D := Acc.X;
+  else
+    D := Acc.X;
   if D >= 0 then Exit;
   for I := 0 to N div 2 - 1 do
   begin
@@ -3760,33 +3827,33 @@ begin
   end;
 end;
 
-function TWorkDoc.OrientLooseShells(Part: Integer): Integer;
+function TWorkDoc.OrientLooseShells(Part: integer): integer;
 type
   TUse = record
-    Face: Integer;   { slot in Cand, not an entity index }
+    Face: integer;   { slot in Cand, not an entity index }
     Dir: PtrInt;     { +1 if it ran the way the key is written, -1 if not }
   end;
 var
-  Cand: array of Integer;         { entity index of each slot }
-  Slot: array of Integer;         { slot of each entity, -1 if not a candidate }
-  Flip: array of Boolean;
-  Comp: array of Integer;
+  Cand: array of integer;         { entity index of each slot }
+  Slot: array of integer;         { slot of each entity, -1 if not a candidate }
+  Flip: array of boolean;
+  comp: array of integer;
   UseA, UseB: array of TUse;      { the one or two faces on each edge }
-  NUse: array of Integer;
+  NUse: array of integer;
   Ix: TFPHashList;
-  Queue: array of Integer;
-  Members: array of Integer;
-  I, J, K, N, NC, E, Head, Tail, NComp, NMem, Other: Integer;
+  Queue: array of integer;
+  Members: array of integer;
+  I, J, K, N, NC, E, Head, Tail, NComp, NMem, Other: integer;
   Key: string;
   Way: PtrInt;
   Nm, Cen, Acc, Mid: TP3;
-  Vol, Sgn, Ar, W: Double;
+  Vol, Sgn, Ar, W: double;
 
   { twice the vector area, by Newell - the same sum OrientFace uses, which
     points along the face's normal and is as long as twice its area }
   function Newell(const Pts: TP3Array): TP3;
   var
-    M, Cnt: Integer;
+    M, Cnt: integer;
     Q: TP3;
   begin
     Result := P3(0, 0, 0);
@@ -3802,7 +3869,7 @@ var
 
   function Middle(const Pts: TP3Array): TP3;
   var
-    M, Cnt: Integer;
+    M, Cnt: integer;
   begin
     Result := P3(0, 0, 0);
     Cnt := Length(Pts);
@@ -3819,9 +3886,11 @@ var
   end;
 
   { which way this face runs along that edge, allowing for a pending turn }
-  function DirOf(const U: TUse): Integer;
+  function DirOf(const U: TUse): integer;
   begin
-    if Flip[U.Face] then Result := -U.Dir else Result := U.Dir;
+    if Flip[U.Face] then Result := -U.Dir
+    else
+      Result := U.Dir;
   end;
 
 begin
@@ -3843,11 +3912,11 @@ begin
   if NC < 2 then Exit;
   SetLength(Cand, NC);
   SetLength(Flip, NC);
-  SetLength(Comp, NC);
+  SetLength(comp, NC);
   for I := 0 to NC - 1 do
   begin
     Flip[I] := False;
-    Comp[I] := -1;
+    comp[I] := -1;
   end;
 
   { every edge, and the one or two candidate faces along it }
@@ -3859,8 +3928,7 @@ begin
       N := Length(FEnts[Cand[I]].Poly);
       for J := 0 to N - 1 do
       begin
-        Key := EdgeKeyOf(FEnts[Cand[I]].Poly[J],
-                         FEnts[Cand[I]].Poly[(J + 1) mod N], Way);
+        Key := EdgeKeyOf(FEnts[Cand[I]].Poly[J], FEnts[Cand[I]].Poly[(J + 1) mod N], Way);
         K := Ix.FindIndexOf(Key);
         if K < 0 then
         begin
@@ -3895,38 +3963,43 @@ begin
     NComp := 0;
     for I := 0 to NC - 1 do
     begin
-      if Comp[I] >= 0 then Continue;
+      if comp[I] >= 0 then Continue;
       Inc(NComp);
-      Head := 0; Tail := 0;
-      Queue[Tail] := I; Inc(Tail);
-      Comp[I] := NComp;
+      Head := 0;
+      Tail := 0;
+      Queue[Tail] := I;
+      Inc(Tail);
+      comp[I] := NComp;
       NMem := 0;
       while Head < Tail do
       begin
-        K := Queue[Head]; Inc(Head);
-        Members[NMem] := K; Inc(NMem);
+        K := Queue[Head];
+        Inc(Head);
+        Members[NMem] := K;
+        Inc(NMem);
         N := Length(FEnts[Cand[K]].Poly);
         for J := 0 to N - 1 do
         begin
-          Key := EdgeKeyOf(FEnts[Cand[K]].Poly[J],
-                           FEnts[Cand[K]].Poly[(J + 1) mod N], Way);
+          Key := EdgeKeyOf(FEnts[Cand[K]].Poly[J], FEnts[Cand[K]].Poly[(J + 1) mod N], Way);
           E := Ix.FindIndexOf(Key);
           if E < 0 then Continue;
           E := PtrInt(Ix.Items[E]) - 1;
           { only where exactly two faces meet - three has no answer }
           if NUse[E] <> 2 then Continue;
           if UseA[E].Face = K then Other := UseB[E].Face
-          else Other := UseA[E].Face;
+          else
+            Other := UseA[E].Face;
           if Other = K then Continue;
-          if Comp[Other] >= 0 then Continue;
+          if comp[Other] >= 0 then Continue;
           { neighbors agree about out when they run the shared edge
             opposite ways }
           if UseA[E].Face = K then
             Flip[Other] := (DirOf(UseA[E]) = UseB[E].Dir)
           else
             Flip[Other] := (DirOf(UseB[E]) = UseA[E].Dir);
-          Comp[Other] := NComp;
-          Queue[Tail] := Other; Inc(Tail);
+          comp[Other] := NComp;
+          Queue[Tail] := Other;
+          Inc(Tail);
         end;
       end;
 
@@ -3957,7 +4030,9 @@ begin
         Nm := Sub3(Mid, Cen);
         W := W + Ar * (Nm.X * Acc.X + Nm.Y * Acc.Y + Nm.Z * Acc.Z);
       end;
-      if Abs(Vol) > 1E-6 then Sgn := Vol else Sgn := W;
+      if Abs(Vol) > 1E-6 then Sgn := Vol
+      else
+        Sgn := W;
       if Sgn < 0 then
         for J := 0 to NMem - 1 do
           Flip[Members[J]] := not Flip[Members[J]];
@@ -3977,11 +4052,11 @@ end;
 { Turns a face over, holes and all.  The winding rules are guesses - the two
   ends of a barn are back to back - so the person looking at it gets the
   last word, as in SketchUp. }
-function TWorkDoc.ReverseFace(Index: Integer): Boolean;
+function TWorkDoc.ReverseFace(Index: integer): boolean;
 
   procedure Flip(var Loop: array of TP3);
   var
-    I, N: Integer;
+    I, N: integer;
     T: TP3;
   begin
     N := Length(Loop);
@@ -3994,7 +4069,7 @@ function TWorkDoc.ReverseFace(Index: Integer): Boolean;
   end;
 
 var
-  K: Integer;
+  K: integer;
 begin
   Result := False;
   if (Index < 0) or (Index >= FLive) then Exit;
@@ -4013,9 +4088,9 @@ end;
 
 { Adds the polygon exactly as given.  Solids build their windings on purpose,
   so they come this way round. }
-procedure TWorkDoc.AddFaceRaw(const Pts: array of TP3; Ink: TColor; Solid: Boolean);
+procedure TWorkDoc.AddFaceRaw(const Pts: array of TP3; Ink: TColor; Solid: boolean);
 var
-  I: Integer;
+  I: integer;
 begin
   if Length(Pts) < 3 then Exit;
   Room;
@@ -4032,12 +4107,14 @@ begin
   FEnts[FLive].Weight := 1;
   FEnts[FLive].Solid := Solid;
   Inc(FLive);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.AddFace(const Pts: array of TP3; Ink: TColor; Solid: Boolean);
+procedure TWorkDoc.AddFace(const Pts: array of TP3; Ink: TColor; Solid: boolean);
 var
-  I: Integer;
+  I: integer;
   Fixed: TP3Array;
 begin
   if Length(Pts) < 3 then Exit;
@@ -4052,14 +4129,14 @@ begin
   AddFaceRaw(Fixed, Ink, Solid);
 end;
 
-function TWorkDoc.NoteSize(Index: Integer): Single;
+function TWorkDoc.NoteSize(Index: integer): single;
 begin
   Result := 1;
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekText) then Exit;
   if FEnts[Index].Size > 0 then Result := FEnts[Index].Size;
 end;
 
-procedure TWorkDoc.SetNoteSize(Index: Integer; Factor: Single);
+procedure TWorkDoc.SetNoteSize(Index: integer; Factor: single);
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekText) then Exit;
   { half normal to four times it - smaller cannot be read and bigger is a
@@ -4069,9 +4146,9 @@ begin
   FEnts[Index].Size := Factor;
 end;
 
-procedure TWorkDoc.FlipFace(Index: Integer);
+procedure TWorkDoc.FlipFace(Index: integer);
 var
-  I, H, N: Integer;
+  I, H, N: integer;
   T: TP3Array;
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekFace) then Exit;
@@ -4087,28 +4164,30 @@ begin
     for I := 0 to N - 1 do T[I] := FEnts[Index].Holes[H][N - 1 - I];
     FEnts[Index].Holes[H] := T;
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.SetSoft(Index: Integer; Soft: Boolean);
+procedure TWorkDoc.SetSoft(Index: integer; Soft: boolean);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Soft := Soft;
 end;
 
-procedure TWorkDoc.SetInk(Index: Integer; Ink: TColor);
+procedure TWorkDoc.SetInk(Index: integer; Ink: TColor);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Ink := Ink;
 end;
 
-procedure TWorkDoc.SetWeight(Index: Integer; Weight: Single);
+procedure TWorkDoc.SetWeight(Index: integer; Weight: single);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Weight := Weight;
 end;
 
-procedure TWorkDoc.SetMaterial(Index: Integer; C: TColor);
+procedure TWorkDoc.SetMaterial(Index: integer; C: TColor);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   if FEnts[Index].Kind <> ekFace then Exit;
@@ -4116,22 +4195,21 @@ begin
   FEnts[Index].Mat := C;
 end;
 
-procedure TWorkDoc.ClearMaterial(Index: Integer);
+procedure TWorkDoc.ClearMaterial(Index: integer);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].MatSet := False;
   FEnts[Index].Mat := 0;
 end;
 
-function TWorkDoc.Material(Index: Integer; out C: TColor): Boolean;
+function TWorkDoc.Material(Index: integer; out C: TColor): boolean;
 begin
   C := 0;
-  Result := (Index >= 0) and (Index < FLive) and (FEnts[Index].Kind = ekFace)
-    and FEnts[Index].MatSet;
+  Result := (Index >= 0) and (Index < FLive) and (FEnts[Index].Kind = ekFace) and FEnts[Index].MatSet;
   if Result then C := FEnts[Index].Mat;
 end;
 
-procedure TWorkDoc.SetDimOffset(Index: Integer; const Off: TP3);
+procedure TWorkDoc.SetDimOffset(Index: integer; const Off: TP3);
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekDim) then Exit;
   FEnts[Index].C := Off;
@@ -4146,28 +4224,30 @@ type
   private
     FMap: TFPHashList;
     FLists: array of TP3Array;
-    function KeyAt(X, Y, Z: Int64): shortstring;
+    function KeyAt(X, Y, Z: int64): shortstring;
   public
     constructor Create(const Pts: TP3Array);
     destructor Destroy; override;
-    function Has(const P: TP3; Tol: Double): Boolean;
+    function Has(const P: TP3; Tol: double): boolean;
   end;
 
 const
   PSET_CELL = 1E-5;
 
-function TPointSet.KeyAt(X, Y, Z: Int64): shortstring;
+function TPointSet.KeyAt(X, Y, Z: int64): shortstring;
 var
-  Q: array[0..2] of Int64;
+  Q: array[0..2] of int64;
 begin
-  Q[0] := X; Q[1] := Y; Q[2] := Z;
+  Q[0] := X;
+  Q[1] := Y;
+  Q[2] := Z;
   SetLength(Result, 24);
   Move(Q[0], Result[1], 24);
 end;
 
 constructor TPointSet.Create(const Pts: TP3Array);
 var
-  I, Ix: Integer;
+  I, Ix: integer;
   K: shortstring;
 begin
   FMap := TFPHashList.Create;
@@ -4196,13 +4276,15 @@ begin
   inherited;
 end;
 
-function TPointSet.Has(const P: TP3; Tol: Double): Boolean;
+function TPointSet.Has(const P: TP3; Tol: double): boolean;
 var
-  X, Y, Z, DX, DY, DZ: Int64;
-  Ix, J: Integer;
+  X, Y, Z, DX, DY, DZ: int64;
+  Ix, J: integer;
 begin
   Result := False;
-  X := Floor(P.X / PSET_CELL); Y := Floor(P.Y / PSET_CELL); Z := Floor(P.Z / PSET_CELL);
+  X := Floor(P.X / PSET_CELL);
+  Y := Floor(P.Y / PSET_CELL);
+  Z := Floor(P.Z / PSET_CELL);
   for DX := -1 to 1 do
     for DY := -1 to 1 do
       for DZ := -1 to 1 do
@@ -4218,12 +4300,12 @@ end;
 { Arcs whose points are all corners of the profile are its own edges: when
   the face is consumed they become soft seams of the solid, or they would
   stay drawn as a hard ring across it. }
-procedure TWorkDoc.MarkProfileArcs(const Poly: TP3Array; G: Integer);
+procedure TWorkDoc.MarkProfileArcs(const Poly: TP3Array; G: integer);
 var
-  I, K: Integer;
+  I, K: integer;
   Pts: TP3Array;
   Corners: TPointSet;
-  All: Boolean;
+  All: boolean;
 begin
   Corners := TPointSet.Create(Poly);
   try
@@ -4250,29 +4332,28 @@ begin
   end;
 end;
 
-function TWorkDoc.Revolve(Face: Integer; const AxisP, AxisDir: TP3; Angle: Double;
-  Steps: Integer): Integer;
+function TWorkDoc.Revolve(Face: integer; const AxisP, AxisDir: TP3; Angle: double; Steps: integer): integer;
 const
   { the turn in the profile at a vertex below which the ring it sweeps is a
     soft edge - the creases of a curve rather than a corner }
   SOFT_TURN = 30 * Pi / 180;
 var
   Poly: TP3Array;
-  N, S, K, K2, G, I, First: Integer;
-  Full: Boolean;
+  N, S, K, K2, G, I, First: integer;
+  Full: boolean;
   Ax, Nf, Cen, Side, E, Mid, Out, Tang, PrevE: TP3;
   Rings: array of array of TP3;
   Quad: array of TP3;
-  OnAxis: array of Boolean;
-  Turn: Double;
+  OnAxis: array of boolean;
+  Turn: double;
   Q: array[0..3] of TP3;
 
-  function Rot(const P: TP3; S: Integer): TP3;
+  function Rot(const P: TP3; S: integer): TP3;
   begin
     Result := RotP(P, AxisP, Ax, Angle * S / Steps);
   end;
 
-  function Near(const A, B: TP3): Boolean;
+  function Near(const A, B: TP3): boolean;
   begin
     Result := Dist(A, B) < 1E-9;
   end;
@@ -4287,7 +4368,7 @@ var
     if Dot3(FaceNormal(FLive - 1), Want) < 0 then FlipFace(FLive - 1);
   end;
 
-  procedure Edge(const A, B: TP3; Soft: Boolean);
+  procedure Edge(const A, B: TP3; Soft: boolean);
   begin
     if Near(A, B) then Exit;
     AddLine(A, B, FEnts[Face].Ink, FEnts[Face].Weight, False);
@@ -4296,15 +4377,13 @@ var
   end;
 
   { the line already in the drawing between two points, if there is one }
-  function LineAt(const A, B: TP3): Integer;
+  function LineAt(const A, B: TP3): integer;
   var
-    J: Integer;
+    J: integer;
   begin
     Result := -1;
     for J := 0 to FLive - 1 do
-      if (FEnts[J].Kind = ekLine) and
-         ((Near(FEnts[J].A, A) and Near(FEnts[J].B, B)) or
-          (Near(FEnts[J].A, B) and Near(FEnts[J].B, A))) then Exit(J);
+      if (FEnts[J].Kind = ekLine) and ((Near(FEnts[J].A, A) and Near(FEnts[J].B, B)) or (Near(FEnts[J].A, B) and Near(FEnts[J].B, A))) then Exit(J);
   end;
 
 begin
@@ -4353,7 +4432,10 @@ begin
     Side := Norm3(Cross3(E, Nf));
     for S := 0 to Steps - 1 do
     begin
-      Q[0] := Rings[S][K]; Q[1] := Rings[S][K2]; Q[2] := Rings[S + 1][K2]; Q[3] := Rings[S + 1][K];
+      Q[0] := Rings[S][K];
+      Q[1] := Rings[S][K2];
+      Q[2] := Rings[S + 1][K2];
+      Q[3] := Rings[S + 1][K];
       { a point on the axis stays put, so the gore there is a triangle }
       SetLength(Quad, 0);
       for I := 0 to 3 do
@@ -4377,8 +4459,7 @@ begin
   begin
     if OnAxis[K] then Continue;
     K2 := (K + 1) mod N;
-    PrevE := Norm3(P3(Poly[K].X - Poly[(K + N - 1) mod N].X, Poly[K].Y - Poly[(K + N - 1) mod N].Y,
-                      Poly[K].Z - Poly[(K + N - 1) mod N].Z));
+    PrevE := Norm3(P3(Poly[K].X - Poly[(K + N - 1) mod N].X, Poly[K].Y - Poly[(K + N - 1) mod N].Y, Poly[K].Z - Poly[(K + N - 1) mod N].Z));
     E := Norm3(Sub3(Poly[K2], Poly[K]));
     Turn := ArcCos(EnsureRange(Dot3(PrevE, E), -1.0, 1.0));
     for S := 0 to Steps - 1 do
@@ -4416,52 +4497,51 @@ begin
       if I >= 0 then SetGroup(I, G);
     end;
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := First;
 end;
 
-procedure TWorkDoc.EdgePoints(I: Integer; out Pts: TP3Array);
+procedure TWorkDoc.EdgePoints(I: integer; out Pts: TP3Array);
 var
-  K, N: Integer;
+  K, N: integer;
 begin
   Pts := nil;
   if (I < 0) or (I >= FLive) then Exit;
   case FEnts[I].Kind of
     ekLine:
-      begin
-        SetLength(Pts, 2);
-        Pts[0] := FEnts[I].A;
-        Pts[1] := FEnts[I].B;
-      end;
+    begin
+      SetLength(Pts, 2);
+      Pts[0] := FEnts[I].A;
+      Pts[1] := FEnts[I].B;
+    end;
     ekArc:
-      begin
-        N := ArcSteps(FEnts[I]);
-        SetLength(Pts, N + 1);
-        for K := 0 to N do
-          if FEnts[I].Plane = plFree then
-            Pts[K] := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / N,
-              FEnts[I].Plane, FEnts[I].Nm)
-          else
-            Pts[K] := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / N,
-              FEnts[I].Plane);
-      end;
+    begin
+      N := ArcSteps(FEnts[I]);
+      SetLength(Pts, N + 1);
+      for K := 0 to N do
+        if FEnts[I].Plane = plFree then
+          Pts[K] := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / N, FEnts[I].Plane, FEnts[I].Nm)
+        else
+          Pts[K] := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / N, FEnts[I].Plane);
+    end;
   end;
 end;
 
-function TWorkDoc.Sweep(Face: Integer; const Path: TP3Array; Closed: Boolean;
-  Caps: Boolean): Integer;
+function TWorkDoc.Sweep(Face: integer; const Path: TP3Array; Closed: boolean; Caps: boolean): integer;
 const
   SOFT_TURN = 30 * Pi / 180;
 var
   Poly: TP3Array;
   Pts: TP3Array;
-  N, M, S, K, K2, G, I, First: Integer;
+  N, M, S, K, K2, G, I, First: integer;
   Rings: array of array of TP3;
   DirIn, DirOut, B, Q, Cen, E, PrevE, Out, RingCen: TP3;
-  T, Turn: Double;
-  Hard: array of Boolean;
+  T, Turn: double;
+  Hard: array of boolean;
 
-  function Near(const A, C: TP3): Boolean;
+  function Near(const A, C: TP3): boolean;
   begin
     Result := Dist(A, C) < 1E-9;
   end;
@@ -4475,7 +4555,7 @@ var
     if Dot3(FaceNormal(FLive - 1), Want) < 0 then FlipFace(FLive - 1);
   end;
 
-  procedure Edge(const A, C: TP3; Soft: Boolean);
+  procedure Edge(const A, C: TP3; Soft: boolean);
   begin
     if Near(A, C) then Exit;
     AddLine(A, C, FEnts[Face].Ink, FEnts[Face].Weight, False);
@@ -4483,21 +4563,19 @@ var
     SetSoft(FLive - 1, Soft);
   end;
 
-  function LineAt(const A, C: TP3): Integer;
+  function LineAt(const A, C: TP3): integer;
   var
-    J: Integer;
+    J: integer;
   begin
     Result := -1;
     for J := 0 to FLive - 1 do
-      if (FEnts[J].Kind = ekLine) and
-         ((Near(FEnts[J].A, A) and Near(FEnts[J].B, C)) or
-          (Near(FEnts[J].A, C) and Near(FEnts[J].B, A))) then Exit(J);
+      if (FEnts[J].Kind = ekLine) and ((Near(FEnts[J].A, A) and Near(FEnts[J].B, C)) or (Near(FEnts[J].A, C) and Near(FEnts[J].B, A))) then Exit(J);
   end;
 
   { where the line through P along D meets the plane through O with normal Nm }
   function Meet(const P, D, O, Nm: TP3): TP3;
   var
-    Den: Double;
+    Den: double;
   begin
     Den := Dot3(D, Nm);
     if Abs(Den) < 1E-12 then Exit(P);
@@ -4532,7 +4610,9 @@ begin
     the leg; at a corner they are cut off on the plane that halves the
     corner, which is the mitre - so the ring there is the same ring seen
     from either leg.  A closed path has a mitre at its start too. }
-  if Closed then SetLength(Rings, M + 1) else SetLength(Rings, M);
+  if Closed then SetLength(Rings, M + 1)
+  else
+    SetLength(Rings, M);
   SetLength(Hard, Length(Rings));
   Rings[0] := Copy(Poly);
   Hard[0] := True;
@@ -4544,7 +4624,9 @@ begin
     begin
       DirOut := Norm3(Sub3(Pts[(S + 1) mod M], Pts[S mod M]));
       B := Add3(DirIn, DirOut);
-      if Dist(B, P3(0, 0, 0)) < 1E-9 then B := DirIn else B := Norm3(B);
+      if Dist(B, P3(0, 0, 0)) < 1E-9 then B := DirIn
+      else
+        B := Norm3(B);
       Turn := ArcCos(EnsureRange(Dot3(DirIn, DirOut), -1.0, 1.0));
     end
     else
@@ -4569,15 +4651,13 @@ begin
   begin
     RingCen := P3(0, 0, 0);
     for K := 0 to N - 1 do
-      RingCen := P3(RingCen.X + (Rings[S][K].X + Rings[S + 1][K].X) / (2 * N),
-                    RingCen.Y + (Rings[S][K].Y + Rings[S + 1][K].Y) / (2 * N),
-                    RingCen.Z + (Rings[S][K].Z + Rings[S + 1][K].Z) / (2 * N));
+      RingCen := P3(RingCen.X + (Rings[S][K].X + Rings[S + 1][K].X) / (2 * N), RingCen.Y + (Rings[S][K].Y + Rings[S + 1][K].Y) /
+        (2 * N), RingCen.Z + (Rings[S][K].Z + Rings[S + 1][K].Z) / (2 * N));
     for K := 0 to N - 1 do
     begin
       K2 := (K + 1) mod N;
-      Q := P3((Rings[S][K].X + Rings[S][K2].X + Rings[S + 1][K2].X + Rings[S + 1][K].X) / 4,
-              (Rings[S][K].Y + Rings[S][K2].Y + Rings[S + 1][K2].Y + Rings[S + 1][K].Y) / 4,
-              (Rings[S][K].Z + Rings[S][K2].Z + Rings[S + 1][K2].Z + Rings[S + 1][K].Z) / 4);
+      Q := P3((Rings[S][K].X + Rings[S][K2].X + Rings[S + 1][K2].X + Rings[S + 1][K].X) / 4, (Rings[S][K].Y + Rings[S][K2].Y +
+        Rings[S + 1][K2].Y + Rings[S + 1][K].Y) / 4, (Rings[S][K].Z + Rings[S][K2].Z + Rings[S + 1][K2].Z + Rings[S + 1][K].Z) / 4);
       Out := Sub3(Q, RingCen);
       FaceOut([Rings[S][K], Rings[S][K2], Rings[S + 1][K2], Rings[S + 1][K]], Out);
     end;
@@ -4645,27 +4725,32 @@ begin
     begin
       I := LineAt(Poly[K], Poly[(K + 1) mod N]);
       if I >= 0 then SetGroup(I, G)
-      else Edge(Poly[K], Poly[(K + 1) mod N], False);
+      else
+        Edge(Poly[K], Poly[(K + 1) mod N], False);
     end;
     MarkProfileArcs(Poly, G);
     Delete(Face);
     if Face < First then Dec(First);
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := First;
 end;
 
-procedure TWorkDoc.SetArcSides(Index, N: Integer);
+procedure TWorkDoc.SetArcSides(Index, N: integer);
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekArc) then Exit;
   if (N < 3) or (N > 360) then N := 0;
   FEnts[Index].Sides := N;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 { --- groups ------------------------------------------------------------- }
 
-procedure TWorkDoc.SetContext(Id: Integer);
+procedure TWorkDoc.SetContext(Id: integer);
 begin
   if (Id <> 0) and (PartEnt(Id) < 0) then Id := 0;
   FContext := Id;
@@ -4677,12 +4762,12 @@ begin
   Inc(FContextSteps);
 end;
 
-function TWorkDoc.ContentSeq: Integer;
+function TWorkDoc.ContentSeq: integer;
 begin
   Result := FEditSeq - FContextSteps;
 end;
 
-function TWorkDoc.NewPart(const Name: string; Parent: Integer): Integer;
+function TWorkDoc.NewPart(const Name: string; Parent: integer): integer;
 begin
   Inc(FNextPart);
   Result := FNextPart;
@@ -4698,9 +4783,9 @@ begin
   Inc(FEditSeq);
 end;
 
-function TWorkDoc.PartEnt(Id: Integer): Integer;
+function TWorkDoc.PartEnt(Id: integer): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := -1;
   if Id <= 0 then Exit;
@@ -4708,34 +4793,38 @@ begin
     if (FEnts[I].Kind = ekPart) and (FEnts[I].Grp = Id) then Exit(I);
 end;
 
-function TWorkDoc.PartName(Id: Integer): string;
+function TWorkDoc.PartName(Id: integer): string;
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
-  if E < 0 then Result := '' else Result := FEnts[E].Txt;
+  if E < 0 then Result := ''
+  else
+    Result := FEnts[E].Txt;
   if Result = '' then Result := 'Group ' + IntToStr(Id);
 end;
 
-function TWorkDoc.PartLocked(Id: Integer): Boolean;
+function TWorkDoc.PartLocked(Id: integer): boolean;
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   Result := (E >= 0) and FEnts[E].Solid;
 end;
 
-function TWorkDoc.PartParent(Id: Integer): Integer;
+function TWorkDoc.PartParent(Id: integer): integer;
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
-  if E < 0 then Result := 0 else Result := FEnts[E].Part;
+  if E < 0 then Result := 0
+  else
+    Result := FEnts[E].Part;
 end;
 
-procedure TWorkDoc.SetPartName(Id: Integer; const Name: string);
+procedure TWorkDoc.SetPartName(Id: integer; const Name: string);
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   if E < 0 then Exit;
@@ -4743,9 +4832,9 @@ begin
   Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.SetPartLocked(Id: Integer; Locked: Boolean);
+procedure TWorkDoc.SetPartLocked(Id: integer; Locked: boolean);
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   if E < 0 then Exit;
@@ -4753,9 +4842,9 @@ begin
   Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.SetPartParent(Id, Parent: Integer);
+procedure TWorkDoc.SetPartParent(Id, Parent: integer);
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   if (E < 0) or (Id = Parent) then Exit;
@@ -4763,17 +4852,17 @@ begin
   Inc(FEditSeq);
 end;
 
-function TWorkDoc.PartHidden(Id: Integer): Boolean;
+function TWorkDoc.PartHidden(Id: integer): boolean;
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   Result := (E >= 0) and FEnts[E].Hidden;
 end;
 
-procedure TWorkDoc.SetPartHidden(Id: Integer; Hidden: Boolean);
+procedure TWorkDoc.SetPartHidden(Id: integer; Hidden: boolean);
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   if (E < 0) or (FEnts[E].Hidden = Hidden) then Exit;
@@ -4782,7 +4871,7 @@ begin
   Inc(FEditSeq);
 end;
 
-function TWorkDoc.EntHidden(I: Integer): Boolean;
+function TWorkDoc.EntHidden(I: integer): boolean;
 begin
   if NotesHidden and (I >= 0) and (I < FLive) and (FEnts[I].Kind = ekText) then Exit(True);
   if (FHideSeq <> FEditSeq) or (Length(FHideOf) <> FLive) then WorkOutHidden;
@@ -4793,11 +4882,11 @@ end;
   its group.  With nothing hidden it costs one walk of the list. }
 procedure TWorkDoc.WorkOutHidden;
 var
-  I, Id, Up, Guard: Integer;
-  Self_, Parent_: array of Integer;
-  Down: array of ShortInt;       { 0 not known yet, 1 put away, 2 not }
+  I, Id, Up, Guard: integer;
+  Self_, Parent_: array of integer;
+  Down: array of shortint;       { 0 not known yet, 1 put away, 2 not }
 
-  function Away(G: Integer): Boolean;
+  function Away(G: integer): boolean;
   begin
     Result := False;
     Guard := 0;
@@ -4818,12 +4907,21 @@ begin
   SetLength(FHideOf, FLive);
   FAnyHidden := False;
   for I := 0 to FLive - 1 do
-    if (FEnts[I].Kind = ekPart) and FEnts[I].Hidden then begin FAnyHidden := True; Break; end;
+    if (FEnts[I].Kind = ekPart) and FEnts[I].Hidden then
+    begin
+      FAnyHidden := True;
+      Break;
+    end;
   if not FAnyHidden then Exit;
   SetLength(Self_, FNextPart + 1);
   SetLength(Parent_, FNextPart + 1);
   SetLength(Down, FNextPart + 1);
-  for Id := 0 to FNextPart do begin Self_[Id] := -1; Parent_[Id] := 0; Down[Id] := 0; end;
+  for Id := 0 to FNextPart do
+  begin
+    Self_[Id] := -1;
+    Parent_[Id] := 0;
+    Down[Id] := 0;
+  end;
   for I := 0 to FLive - 1 do
     if (FEnts[I].Kind = ekPart) and (FEnts[I].Grp > 0) and (FEnts[I].Grp <= FNextPart) then
     begin
@@ -4831,31 +4929,39 @@ begin
       Parent_[FEnts[I].Grp] := FEnts[I].Part;
     end;
   for Id := 1 to FNextPart do
-    if Away(Id) then Down[Id] := 1 else Down[Id] := 2;
+    if Away(Id) then Down[Id] := 1
+    else
+      Down[Id] := 2;
   for I := 0 to FLive - 1 do
   begin
-    if FEnts[I].Kind = ekPart then Id := FEnts[I].Grp else Id := FEnts[I].Part;
+    if FEnts[I].Kind = ekPart then Id := FEnts[I].Grp
+    else
+      Id := FEnts[I].Part;
     FHideOf[I] := (Id > 0) and (Id <= FNextPart) and (Down[Id] = 1);
   end;
 end;
 
-procedure TWorkDoc.SetPart(Index, Id: Integer);
+procedure TWorkDoc.SetPart(Index, Id: integer);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   if FEnts[Index].Kind = ekPart then Exit;      { a record moves by SetPartParent }
   FEnts[Index].Part := Id;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-function TWorkDoc.InsideContext(I: Integer): Boolean;
+function TWorkDoc.InsideContext(I: integer): boolean;
 var
-  P, Guard: Integer;
+  P, Guard: integer;
 begin
   Result := True;
   if FContext = 0 then Exit;
   if (I < 0) or (I >= FLive) then Exit(False);
   { a group's own record stands for the group }
-  if FEnts[I].Kind = ekPart then P := FEnts[I].Grp else P := FEnts[I].Part;
+  if FEnts[I].Kind = ekPart then P := FEnts[I].Grp
+  else
+    P := FEnts[I].Part;
   Guard := 0;
   while (P <> 0) and (Guard < 1000) do
   begin
@@ -4866,14 +4972,16 @@ begin
   Result := False;
 end;
 
-function TWorkDoc.TopPartIn(I: Integer): Integer;
+function TWorkDoc.TopPartIn(I: integer): integer;
 var
-  P, Up, Guard: Integer;
+  P, Up, Guard: integer;
 begin
   if (I < 0) or (I >= FLive) then Exit(-1);
   { a group's own record stands for the group, so a selection holding the
     record and every member reads as one group and not as one thing more }
-  if FEnts[I].Kind = ekPart then P := FEnts[I].Grp else P := FEnts[I].Part;
+  if FEnts[I].Kind = ekPart then P := FEnts[I].Grp
+  else
+    P := FEnts[I].Part;
   if P = FContext then Exit(0);
   Guard := 0;
   while (P <> 0) and (Guard < 1000) do
@@ -4886,9 +4994,9 @@ begin
   Result := -1;
 end;
 
-function TWorkDoc.PartLockedUp(Id: Integer): Boolean;
+function TWorkDoc.PartLockedUp(Id: integer): boolean;
 var
-  Guard: Integer;
+  Guard: integer;
 begin
   Result := False;
   Guard := 0;
@@ -4900,10 +5008,10 @@ begin
   end;
 end;
 
-function TWorkDoc.PartMembers(Id: Integer; WithRecord: Boolean): TIntArrayW;
+function TWorkDoc.PartMembers(Id: integer; WithRecord: boolean): TIntArrayW;
 var
-  I, N, P, Guard: Integer;
-  In_: Boolean;
+  I, N, P, Guard: integer;
+  In_: boolean;
 begin
   Result := nil;
   N := 0;
@@ -4917,7 +5025,11 @@ begin
     Guard := 0;
     while (P <> 0) and (Guard < 1000) do
     begin
-      if P = Id then begin In_ := True; Break; end;
+      if P = Id then
+      begin
+        In_ := True;
+        Break;
+      end;
       P := PartParent(P);
       Inc(Guard);
     end;
@@ -4939,18 +5051,20 @@ begin
   SetLength(Result, N);
 end;
 
-function TWorkDoc.PartBounds(Id: Integer; out Lo, Hi: TP3): Boolean;
+function TWorkDoc.PartBounds(Id: integer; out Lo, Hi: TP3): boolean;
 var
   M: TIntArrayW;
-  J, I, K, H: Integer;
-  Steps: Integer;
+  J, I, K, H: integer;
+  Steps: integer;
   P: TP3;
 
   procedure Take(const Q: TP3);
   begin
     if not Result then
     begin
-      Lo := Q; Hi := Q; Result := True;
+      Lo := Q;
+      Hi := Q;
+      Result := True;
       Exit;
     end;
     Lo := P3(Min(Lo.X, Q.X), Min(Lo.Y, Q.Y), Min(Lo.Z, Q.Z));
@@ -4967,38 +5081,37 @@ begin
     I := M[J];
     case FEnts[I].Kind of
       ekLine, ekGuide:
-        begin
-          Take(FEnts[I].A);
-          Take(FEnts[I].B);
-        end;
+      begin
+        Take(FEnts[I].A);
+        Take(FEnts[I].B);
+      end;
       ekArc:
+      begin
+        Steps := ArcSteps(FEnts[I]);
+        for K := 0 to Steps do
         begin
-          Steps := ArcSteps(FEnts[I]);
-          for K := 0 to Steps do
-          begin
-            P := ArcPoint(FEnts[I].C, FEnts[I].R,
-              FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
-            Take(P);
-          end;
+          P := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
+          Take(P);
         end;
+      end;
       ekFace:
-        begin
-          for K := 0 to High(FEnts[I].Poly) do Take(FEnts[I].Poly[K]);
-          for H := 0 to High(FEnts[I].Holes) do
-            for K := 0 to High(FEnts[I].Holes[H]) do Take(FEnts[I].Holes[H][K]);
-        end;
+      begin
+        for K := 0 to High(FEnts[I].Poly) do Take(FEnts[I].Poly[K]);
+        for H := 0 to High(FEnts[I].Holes) do
+          for K := 0 to High(FEnts[I].Holes[H]) do Take(FEnts[I].Holes[H][K]);
+      end;
       ekText, ekDim:
-        begin
-          Take(FEnts[I].A);
-          if FEnts[I].Kind = ekDim then Take(FEnts[I].B);
-        end;
+      begin
+        Take(FEnts[I].A);
+        if FEnts[I].Kind = ekDim then Take(FEnts[I].B);
+      end;
     end;
   end;
 end;
 
 procedure TWorkDoc.RecountParts;
 var
-  I: Integer;
+  I: integer;
 begin
   FNextPart := 0;
   for I := 0 to FLive - 1 do
@@ -5008,7 +5121,7 @@ end;
 
 { A pen or fill, faded when it lies outside the open group, as SketchUp
   grays the rest of the model while you are inside one. }
-function TWorkDoc.DimIf(I: Integer; const C: TPix): TPix;
+function TWorkDoc.DimIf(I: integer; const C: TPix): TPix;
 begin
   if (FContext <> 0) and not InsideContext(I) then
     Result := MixPix(C, Pix(255, 255, 255), 0.62)
@@ -5016,60 +5129,62 @@ begin
     Result := C;
 end;
 
-function TWorkDoc.InkPix(I: Integer): TPix;
+function TWorkDoc.InkPix(I: integer): TPix;
 begin
   Result := DimIf(I, ColorToPix(FEnts[I].Ink));
 end;
 
-function TWorkDoc.NewGroup: Integer;
+function TWorkDoc.NewGroup: integer;
 begin
   Inc(FNextGrp);
   Result := FNextGrp;
 end;
 
-procedure TWorkDoc.SetNaming(Index: Integer; const AName, ANote: string);
+procedure TWorkDoc.SetNaming(Index: integer; const AName, ANote: string);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Name := AName;
   FEnts[Index].Note := ANote;
 end;
 
-procedure TWorkDoc.SetSolidNaming(Index: Integer; const AName, ANote: string);
+procedure TWorkDoc.SetSolidNaming(Index: integer; const AName, ANote: string);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].SName := AName;
   FEnts[Index].SNote := ANote;
 end;
 
-procedure TWorkDoc.SetCorners(Index: Integer; const ACorners: string);
+procedure TWorkDoc.SetCorners(Index: integer; const ACorners: string);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Corners := ACorners;
 end;
 
-procedure TWorkDoc.SetMade(Index: Integer; const AMade: string);
+procedure TWorkDoc.SetMade(Index: integer; const AMade: string);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Made := AMade;
 end;
 
-procedure TWorkDoc.SetGroup(Index, G: Integer);
+procedure TWorkDoc.SetGroup(Index, G: integer);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   FEnts[Index].Grp := G;
 end;
 
-function TWorkDoc.PartJig(Id: Integer): string;
+function TWorkDoc.PartJig(Id: integer): string;
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
-  if E < 0 then Result := '' else Result := FEnts[E].Jig;
+  if E < 0 then Result := ''
+  else
+    Result := FEnts[E].Jig;
 end;
 
-procedure TWorkDoc.SetPartJig(Id: Integer; const Spec: string);
+procedure TWorkDoc.SetPartJig(Id: integer; const Spec: string);
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   if E < 0 then Exit;
@@ -5077,17 +5192,19 @@ begin
   Inc(FEditSeq);
 end;
 
-function TWorkDoc.PartData(Id: Integer): string;
+function TWorkDoc.PartData(Id: integer): string;
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
-  if E < 0 then Result := '' else Result := FEnts[E].Data;
+  if E < 0 then Result := ''
+  else
+    Result := FEnts[E].Data;
 end;
 
-procedure TWorkDoc.SetPartData(Id: Integer; const Data: string);
+procedure TWorkDoc.SetPartData(Id: integer; const Data: string);
 var
-  E: Integer;
+  E: integer;
 begin
   E := PartEnt(Id);
   if E < 0 then Exit;
@@ -5095,13 +5212,13 @@ begin
   Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.SetLineGroup(Index, G: Integer);
+procedure TWorkDoc.SetLineGroup(Index, G: integer);
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekLine) then Exit;
   FEnts[Index].Grp := G;
 end;
 
-procedure TWorkDoc.SetArcFacing(Index: Integer; const Nm: TP3; A0: Double);
+procedure TWorkDoc.SetArcFacing(Index: integer; const Nm: TP3; A0: double);
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekArc) then Exit;
   FEnts[Index].Plane := plFree;
@@ -5109,10 +5226,11 @@ begin
   FEnts[Index].A0 := A0;
   FEnts[Index].A := ArcPoint(FEnts[Index].C, FEnts[Index].R, A0, plFree, Nm);
   FEnts[Index].B := ArcPoint(FEnts[Index].C, FEnts[Index].R, A0 + FEnts[Index].Sweep, plFree, Nm);
-  FSnapDirty := True; Inc(FEditSeq);
+  FSnapDirty := True;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.SetFaceGroup(Index, G: Integer);
+procedure TWorkDoc.SetFaceGroup(Index, G: integer);
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekFace) then Exit;
   FEnts[Index].Grp := G;
@@ -5120,9 +5238,9 @@ begin
 end;
 
 { Give the face just added the loops cut out of it. }
-procedure TWorkDoc.SetFaceHoles(Index: Integer; const H: array of TP3Array);
+procedure TWorkDoc.SetFaceHoles(Index: integer; const H: array of TP3Array);
 var
-  I, K: Integer;
+  I, K: integer;
 begin
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekFace) then Exit;
   SetLength(FEnts[Index].Holes, Length(H));
@@ -5132,13 +5250,15 @@ begin
     for K := 0 to High(H[I]) do
       FEnts[Index].Holes[I][K] := H[I][K];
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 { Newell's method, which copes with slightly non-planar loops. }
-function TWorkDoc.FaceNormal(Index: Integer): TP3;
+function TWorkDoc.FaceNormal(Index: integer): TP3;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
   Acc: TP3;
 begin
   Result := P3(0, 0, 1);
@@ -5149,19 +5269,16 @@ begin
   for I := 0 to N - 1 do
   begin
     J := (I + 1) mod N;
-    Acc.X := Acc.X + (FEnts[Index].Poly[I].Y - FEnts[Index].Poly[J].Y) *
-                     (FEnts[Index].Poly[I].Z + FEnts[Index].Poly[J].Z);
-    Acc.Y := Acc.Y + (FEnts[Index].Poly[I].Z - FEnts[Index].Poly[J].Z) *
-                     (FEnts[Index].Poly[I].X + FEnts[Index].Poly[J].X);
-    Acc.Z := Acc.Z + (FEnts[Index].Poly[I].X - FEnts[Index].Poly[J].X) *
-                     (FEnts[Index].Poly[I].Y + FEnts[Index].Poly[J].Y);
+    Acc.X := Acc.X + (FEnts[Index].Poly[I].Y - FEnts[Index].Poly[J].Y) * (FEnts[Index].Poly[I].Z + FEnts[Index].Poly[J].Z);
+    Acc.Y := Acc.Y + (FEnts[Index].Poly[I].Z - FEnts[Index].Poly[J].Z) * (FEnts[Index].Poly[I].X + FEnts[Index].Poly[J].X);
+    Acc.Z := Acc.Z + (FEnts[Index].Poly[I].X - FEnts[Index].Poly[J].X) * (FEnts[Index].Poly[I].Y + FEnts[Index].Poly[J].Y);
   end;
   Result := Norm3(Acc);
 end;
 
-function TWorkDoc.FaceArea(Index: Integer): Double;
+function TWorkDoc.FaceArea(Index: integer): double;
 var
-  I, J, N, H: Integer;
+  I, J, N, H: integer;
   Acc: TP3;
 begin
   Result := 0;
@@ -5172,12 +5289,9 @@ begin
   for I := 0 to N - 1 do
   begin
     J := (I + 1) mod N;
-    Acc.X := Acc.X + FEnts[Index].Poly[I].Y * FEnts[Index].Poly[J].Z -
-                     FEnts[Index].Poly[I].Z * FEnts[Index].Poly[J].Y;
-    Acc.Y := Acc.Y + FEnts[Index].Poly[I].Z * FEnts[Index].Poly[J].X -
-                     FEnts[Index].Poly[I].X * FEnts[Index].Poly[J].Z;
-    Acc.Z := Acc.Z + FEnts[Index].Poly[I].X * FEnts[Index].Poly[J].Y -
-                     FEnts[Index].Poly[I].Y * FEnts[Index].Poly[J].X;
+    Acc.X := Acc.X + FEnts[Index].Poly[I].Y * FEnts[Index].Poly[J].Z - FEnts[Index].Poly[I].Z * FEnts[Index].Poly[J].Y;
+    Acc.Y := Acc.Y + FEnts[Index].Poly[I].Z * FEnts[Index].Poly[J].X - FEnts[Index].Poly[I].X * FEnts[Index].Poly[J].Z;
+    Acc.Z := Acc.Z + FEnts[Index].Poly[I].X * FEnts[Index].Poly[J].Y - FEnts[Index].Poly[I].Y * FEnts[Index].Poly[J].X;
   end;
   Result := Sqrt(Acc.X * Acc.X + Acc.Y * Acc.Y + Acc.Z * Acc.Z) / 2;
 
@@ -5191,12 +5305,9 @@ begin
     for I := 0 to N - 1 do
     begin
       J := (I + 1) mod N;
-      Acc.X := Acc.X + FEnts[Index].Holes[H][I].Y * FEnts[Index].Holes[H][J].Z -
-                       FEnts[Index].Holes[H][I].Z * FEnts[Index].Holes[H][J].Y;
-      Acc.Y := Acc.Y + FEnts[Index].Holes[H][I].Z * FEnts[Index].Holes[H][J].X -
-                       FEnts[Index].Holes[H][I].X * FEnts[Index].Holes[H][J].Z;
-      Acc.Z := Acc.Z + FEnts[Index].Holes[H][I].X * FEnts[Index].Holes[H][J].Y -
-                       FEnts[Index].Holes[H][I].Y * FEnts[Index].Holes[H][J].X;
+      Acc.X := Acc.X + FEnts[Index].Holes[H][I].Y * FEnts[Index].Holes[H][J].Z - FEnts[Index].Holes[H][I].Z * FEnts[Index].Holes[H][J].Y;
+      Acc.Y := Acc.Y + FEnts[Index].Holes[H][I].Z * FEnts[Index].Holes[H][J].X - FEnts[Index].Holes[H][I].X * FEnts[Index].Holes[H][J].Z;
+      Acc.Z := Acc.Z + FEnts[Index].Holes[H][I].X * FEnts[Index].Holes[H][J].Y - FEnts[Index].Holes[H][I].Y * FEnts[Index].Holes[H][J].X;
     end;
     Result := Result - Sqrt(Acc.X * Acc.X + Acc.Y * Acc.Y + Acc.Z * Acc.Z) / 2;
   end;
@@ -5208,22 +5319,18 @@ end;
   on top - wins.  Memoized for the pixel, since one mouse move asks two or
   three times and each call ray-casts every face; any edit, camera or slice
   change clears it. }
-function TWorkDoc.FaceUnder(const V: TProjector; SX, SY: Double;
-  out Face: Integer; out Pt: TP3): Boolean;
+function TWorkDoc.FaceUnder(const V: TProjector; SX, SY: double; out Face: integer; out Pt: TP3): boolean;
 var
-  I, J, K, N, M, HK: Integer;
-  Inside: Boolean;
+  I, J, K, N, M, HK: integer;
+  Inside: boolean;
   P, HP: array of TPointF;
   Look, Org, U, W, Hit: TP3;
   P0, P1, P2: TPointF;
-  AX, AY, BX, BY, Det, SS, TT, D, Best, Eps: Double;
+  AX, AY, BX, BY, Det, SS, TT, D, Best, Eps: double;
   PC: TProjCache;
 begin
-  if FFaceMemoOK and (FFaceMemoSeq = FEditSeq) and
-     (FFaceMemoX = SX) and (FFaceMemoY = SY) and
-     SameProjector(V, FFaceMemoV) and
-     (FFaceMemoSlice = FSliceOn) and (FFaceMemoLo = FSliceLo) and
-     (FFaceMemoHi = FSliceHi) then
+  if FFaceMemoOK and (FFaceMemoSeq = FEditSeq) and (FFaceMemoX = SX) and (FFaceMemoY = SY) and SameProjector(V, FFaceMemoV) and
+    (FFaceMemoSlice = FSliceOn) and (FFaceMemoLo = FSliceLo) and (FFaceMemoHi = FSliceHi) then
   begin
     Face := FFaceMemoFace;
     Pt := FFaceMemoPt;
@@ -5257,8 +5364,7 @@ begin
     J := N - 1;
     for K := 0 to N - 1 do
     begin
-      if ((P[K].Y > SY) <> (P[J].Y > SY)) and
-         (SX < (P[J].X - P[K].X) * (SY - P[K].Y) / (P[J].Y - P[K].Y) + P[K].X) then
+      if ((P[K].Y > SY) <> (P[J].Y > SY)) and (SX < (P[J].X - P[K].X) * (SY - P[K].Y) / (P[J].Y - P[K].Y) + P[K].X) then
         Inside := not Inside;
       J := K;
     end;
@@ -5274,9 +5380,7 @@ begin
         J := M - 1;
         for K := 0 to M - 1 do
         begin
-          if ((HP[K].Y > SY) <> (HP[J].Y > SY)) and
-             (SX < (HP[J].X - HP[K].X) * (SY - HP[K].Y) /
-                   (HP[J].Y - HP[K].Y) + HP[K].X) then
+          if ((HP[K].Y > SY) <> (HP[J].Y > SY)) and (SX < (HP[J].X - HP[K].X) * (SY - HP[K].Y) / (HP[J].Y - HP[K].Y) + HP[K].X) then
             Inside := not Inside;
           J := K;
         end;
@@ -5291,22 +5395,21 @@ begin
     P0 := ProjectAt(PC, Org);
     P1 := ProjectAt(PC, Add3(Org, U));
     P2 := ProjectAt(PC, Add3(Org, W));
-    AX := P1.X - P0.X; AY := P1.Y - P0.Y;
-    BX := P2.X - P0.X; BY := P2.Y - P0.Y;
+    AX := P1.X - P0.X;
+    AY := P1.Y - P0.Y;
+    BX := P2.X - P0.X;
+    BY := P2.Y - P0.Y;
     Det := AX * BY - AY * BX;
     if Abs(Det) < 1E-12 then Continue;      // edge-on: nothing to click
     SS := ((SX - P0.X) * BY - (SY - P0.Y) * BX) / Det;
     TT := (AX * (SY - P0.Y) - AY * (SX - P0.X)) / Det;
-    Hit := P3(Org.X + U.X * SS + W.X * TT,
-              Org.Y + U.Y * SS + W.Y * TT,
-              Org.Z + U.Z * SS + W.Z * TT);
+    Hit := P3(Org.X + U.X * SS + W.X * TT, Org.Y + U.Y * SS + W.Y * TT, Org.Z + U.Z * SS + W.Z * TT);
     { Coplanar faces differ in depth only by rounding, so compare with a
       tolerance and within it let the smaller face win - it is the one on
       top, and the one you aimed at. }
     D := Dot3(Hit, Look);
     Eps := 1E-4 * (1 + Abs(D));
-    if (Face < 0) or (D > Best + Eps) or
-       ((D > Best - Eps) and (FaceArea(I) < FaceArea(Face))) then
+    if (Face < 0) or (D > Best + Eps) or ((D > Best - Eps) and (FaceArea(I) < FaceArea(Face))) then
     begin
       Best := D;
       Face := I;
@@ -5326,7 +5429,7 @@ begin
   FFaceMemoHi := FSliceHi;
 end;
 
-function TWorkDoc.HitFace(const V: TProjector; SX, SY: Double): Integer;
+function TWorkDoc.HitFace(const V: TProjector; SX, SY: double): integer;
 var
   Pt: TP3;
 begin
@@ -5346,11 +5449,11 @@ end;
 { The two loose lines that meet at Corner - exactly two, not parallel.  A
   corner with three lines into it has no single fillet, and saying no is
   better than guessing which pair was meant. }
-function TWorkDoc.CornerLines(const Corner: TP3; out LA, LB: Integer): Boolean;
+function TWorkDoc.CornerLines(const Corner: TP3; out LA, LB: integer): boolean;
 const
   TOL = 1E-6;
 var
-  I, N: Integer;
+  I, N: integer;
   DA, DB: TP3;
 begin
   Result := False;
@@ -5369,31 +5472,30 @@ begin
     else if N = 2 then LB := I;
   end;
   if N <> 2 then Exit;
-  DA := Norm3(P3(FarEnd(LA, Corner).X - Corner.X, FarEnd(LA, Corner).Y - Corner.Y,
-                 FarEnd(LA, Corner).Z - Corner.Z));
-  DB := Norm3(P3(FarEnd(LB, Corner).X - Corner.X, FarEnd(LB, Corner).Y - Corner.Y,
-                 FarEnd(LB, Corner).Z - Corner.Z));
+  DA := Norm3(P3(FarEnd(LA, Corner).X - Corner.X, FarEnd(LA, Corner).Y - Corner.Y, FarEnd(LA, Corner).Z - Corner.Z));
+  DB := Norm3(P3(FarEnd(LB, Corner).X - Corner.X, FarEnd(LB, Corner).Y - Corner.Y, FarEnd(LB, Corner).Z - Corner.Z));
   { straight on through, or doubled back: no corner to round }
   Result := Abs(Dot3(DA, DB)) < 1 - 1E-6;
 end;
 
 { The other end of a line from P. }
-function TWorkDoc.FarEnd(I: Integer; const P: TP3): TP3;
+function TWorkDoc.FarEnd(I: integer; const P: TP3): TP3;
 begin
   if Dist(FEnts[I].A, P) < Dist(FEnts[I].B, P) then Result := FEnts[I].B
-  else Result := FEnts[I].A;
+  else
+    Result := FEnts[I].A;
 end;
 
 { Everything about a fillet of radius R at Corner, without doing it.  The
   tangent points sit R / tan(half the corner angle) from the corner.  A
   radius too big for the shorter line is refused rather than eating the next
   corner. }
-function TWorkDoc.FilletAt(const Corner: TP3; R: Double; out F: TFillet): Boolean;
+function TWorkDoc.FilletAt(const Corner: TP3; R: double; out F: TFillet): boolean;
 const
   TOL = 1E-6;
 var
   UA, UB, N, Mid, Dir: TP3;
-  Th, LenA, LenB, U1, V1, U2, V2, UC, VC, Ln, NU, NV, Sag: Double;
+  Th, LenA, LenB, U1, V1, U2, V2, UC, VC, Ln, NU, NV, Sag: double;
   FO, FU, FV: TP3;
 begin
   Result := False;
@@ -5447,7 +5549,8 @@ begin
   Sag := R * (1 - Cos((Pi - Th) / 2));
   Mid := P3((U1 + U2) / 2, (V1 + V2) / 2, 0);
   if (UC - Mid.X) * NU + (VC - Mid.Y) * NV >= 0 then F.Bulge := Sag
-  else F.Bulge := -Sag;
+  else
+    F.Bulge := -Sag;
   Result := ArcFromChord(F.S, F.E, F.Bulge, F.Pl, F.ArcC, R, F.A0, F.Sweep);
   if F.Pl = plFree then
   begin
@@ -5461,18 +5564,18 @@ end;
   other.  The radius comes from S's distance to the corner and E is moved to
   match, since a tangent arc touches both lines at the same distance - the
   magenta state. }
-function TWorkDoc.FilletFromEnds(const S, E: TP3; out F: TFillet): Boolean;
+function TWorkDoc.FilletFromEnds(const S, E: TP3; out F: TFillet): boolean;
 const
   TOL = 1E-6;
 var
-  I, J, Swap, LA, LB, Other: Integer;
+  I, J, Swap, LA, LB, Other: integer;
   Ends: array[0..1] of TP3;
   Corner, UA, UB: TP3;
-  T, Th: Double;
+  T, Th: double;
 
-  function OnLine(K: Integer; const P: TP3): Boolean;
+  function OnLine(K: integer; const P: TP3): boolean;
   var
-    L, D1, D2: Double;
+    L, D1, D2: double;
   begin
     L := Dist(FEnts[K].A, FEnts[K].B);
     D1 := Dist(FEnts[K].A, P);
@@ -5499,15 +5602,12 @@ begin
       if not CornerLines(Corner, LA, LB) then Continue;
       if LA = I then Other := LB
       else if LB = I then Other := LA
-      else Continue;
+      else
+        Continue;
       if not OnLine(Other, E) then Continue;
       { the radius whose tangent points are T from the corner }
-      UA := Norm3(P3(FarEnd(LA, Corner).X - Corner.X,
-                     FarEnd(LA, Corner).Y - Corner.Y,
-                     FarEnd(LA, Corner).Z - Corner.Z));
-      UB := Norm3(P3(FarEnd(LB, Corner).X - Corner.X,
-                     FarEnd(LB, Corner).Y - Corner.Y,
-                     FarEnd(LB, Corner).Z - Corner.Z));
+      UA := Norm3(P3(FarEnd(LA, Corner).X - Corner.X, FarEnd(LA, Corner).Y - Corner.Y, FarEnd(LA, Corner).Z - Corner.Z));
+      UB := Norm3(P3(FarEnd(LB, Corner).X - Corner.X, FarEnd(LB, Corner).Y - Corner.Y, FarEnd(LB, Corner).Z - Corner.Z));
       Th := ArcCos(EnsureRange(Dot3(UA, UB), -1, 1));
       if not FilletAt(Corner, T * Tan(Th / 2), F) then Continue;
       { S should come back as the S that was clicked, on whichever side }
@@ -5515,7 +5615,9 @@ begin
       begin
         F.E := F.S;
         F.S := S;
-        Swap := F.LineA; F.LineA := F.LineB; F.LineB := Swap;
+        Swap := F.LineA;
+        F.LineA := F.LineB;
+        F.LineB := Swap;
         { the arc was built S to E; built the other way round the bulge
           changes side }
         F.Bulge := -F.Bulge;
@@ -5528,15 +5630,17 @@ end;
 
 { Is anything else joined to this end of line I - another line or an arc
   with an end in the same place? }
-function TWorkDoc.LineEndJoined(I: Integer; AtB: Boolean): Boolean;
+function TWorkDoc.LineEndJoined(I: integer; AtB: boolean): boolean;
 const
   TOL = 1E-6;
 var
-  K: Integer;
+  K: integer;
   P: TP3;
 begin
   Result := False;
-  if AtB then P := FEnts[I].B else P := FEnts[I].A;
+  if AtB then P := FEnts[I].B
+  else
+    P := FEnts[I].A;
   for K := 0 to FLive - 1 do
   begin
     if K = I then Continue;
@@ -5549,9 +5653,9 @@ end;
 { Which end of a line gives when its length is typed - SketchUp's rule: a
   loose edge moves its last endpoint, one joined at one end moves its free
   end, and one joined at both ends cannot be changed (False). }
-function TWorkDoc.LineLengthEnd(I: Integer; out MoveB: Boolean): Boolean;
+function TWorkDoc.LineLengthEnd(I: integer; out MoveB: boolean): boolean;
 var
-  JA, JB: Boolean;
+  JA, JB: boolean;
 begin
   Result := False;
   MoveB := True;
@@ -5567,10 +5671,10 @@ end;
 
 { Make line I NewLen long, moving the end LineLengthEnd names along the line's
   own direction. }
-function TWorkDoc.SetLineLength(I: Integer; NewLen: Double): Boolean;
+function TWorkDoc.SetLineLength(I: integer; NewLen: double): boolean;
 var
-  MoveB: Boolean;
-  L: Double;
+  MoveB: boolean;
+  L: double;
   D: TP3;
 begin
   Result := False;
@@ -5580,19 +5684,17 @@ begin
   if L < 1E-9 then Exit;
   if MoveB then
   begin
-    D := P3((FEnts[I].B.X - FEnts[I].A.X) / L, (FEnts[I].B.Y - FEnts[I].A.Y) / L,
-            (FEnts[I].B.Z - FEnts[I].A.Z) / L);
-    FEnts[I].B := P3(FEnts[I].A.X + D.X * NewLen, FEnts[I].A.Y + D.Y * NewLen,
-                     FEnts[I].A.Z + D.Z * NewLen);
+    D := P3((FEnts[I].B.X - FEnts[I].A.X) / L, (FEnts[I].B.Y - FEnts[I].A.Y) / L, (FEnts[I].B.Z - FEnts[I].A.Z) / L);
+    FEnts[I].B := P3(FEnts[I].A.X + D.X * NewLen, FEnts[I].A.Y + D.Y * NewLen, FEnts[I].A.Z + D.Z * NewLen);
   end
   else
   begin
-    D := P3((FEnts[I].A.X - FEnts[I].B.X) / L, (FEnts[I].A.Y - FEnts[I].B.Y) / L,
-            (FEnts[I].A.Z - FEnts[I].B.Z) / L);
-    FEnts[I].A := P3(FEnts[I].B.X + D.X * NewLen, FEnts[I].B.Y + D.Y * NewLen,
-                     FEnts[I].B.Z + D.Z * NewLen);
+    D := P3((FEnts[I].A.X - FEnts[I].B.X) / L, (FEnts[I].A.Y - FEnts[I].B.Y) / L, (FEnts[I].A.Z - FEnts[I].B.Z) / L);
+    FEnts[I].A := P3(FEnts[I].B.X + D.X * NewLen, FEnts[I].B.Y + D.Y * NewLen, FEnts[I].B.Z + D.Z * NewLen);
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := True;
 end;
 
@@ -5600,12 +5702,12 @@ end;
   the corner and a touching point.  Separate because SketchUp's double-click
   is two clicks - the first adds the arc, the second trims.  Returns how many
   went. }
-function TWorkDoc.TrimFillet(const F: TFillet): Integer;
+function TWorkDoc.TrimFillet(const F: TFillet): integer;
 const
   TOL = 1E-6;
 var
-  Doomed: array of Boolean;
-  K: Integer;
+  Doomed: array of boolean;
+  K: integer;
 begin
   Result := 0;
   SetLength(Doomed, FLive);
@@ -5614,10 +5716,8 @@ begin
     Doomed[K] := False;
     if (FEnts[K].Kind <> ekLine) or FEnts[K].Dim or (FEnts[K].Grp <> 0) or (FEnts[K].Part <> FStamp) then
       Continue;
-    if (SamePt(FEnts[K].A, F.Corner, TOL) and
-        (SamePt(FEnts[K].B, F.S, TOL) or SamePt(FEnts[K].B, F.E, TOL))) or
-       (SamePt(FEnts[K].B, F.Corner, TOL) and
-        (SamePt(FEnts[K].A, F.S, TOL) or SamePt(FEnts[K].A, F.E, TOL))) then
+    if (SamePt(FEnts[K].A, F.Corner, TOL) and (SamePt(FEnts[K].B, F.S, TOL) or SamePt(FEnts[K].B, F.E, TOL))) or
+      (SamePt(FEnts[K].B, F.Corner, TOL) and (SamePt(FEnts[K].A, F.S, TOL) or SamePt(FEnts[K].A, F.E, TOL))) then
     begin
       Doomed[K] := True;
       Inc(Result);
@@ -5627,10 +5727,10 @@ begin
 end;
 
 { ArcFromChord for a fillet whose ends have been swapped, in its own plane. }
-function TWorkDoc.ArcFromChordFor(var F: TFillet): Boolean;
+function TWorkDoc.ArcFromChordFor(var F: TFillet): boolean;
 var
   FO, FU, FV, Dir: TP3;
-  R: Double;
+  R: double;
 begin
   if F.Pl = plFree then
   begin
@@ -5644,13 +5744,12 @@ end;
 { The roundable corner nearest a screen point, where exactly two loose lines
   meet at an angle - what a double-click reaches for to repeat the last
   fillet. }
-function TWorkDoc.NearestCorner(const V: TProjector; SX, SY, TolPx: Double;
-  out Corner: TP3): Boolean;
+function TWorkDoc.NearestCorner(const V: TProjector; SX, SY, TolPx: double; out Corner: TP3): boolean;
 var
-  I, K, LA, LB: Integer;
+  I, K, LA, LB: integer;
   P: TP3;
   Q: TPointF;
-  D, Best: Double;
+  D, Best: double;
   PC: TProjCache;
 begin
   Result := False;
@@ -5664,7 +5763,9 @@ begin
     if not InSlice(I) then Continue;
     for K := 0 to 1 do
     begin
-      if K = 0 then P := FEnts[I].A else P := FEnts[I].B;
+      if K = 0 then P := FEnts[I].A
+      else
+        P := FEnts[I].B;
       Q := ProjectAt(PC, P);
       D := Sqrt(Sqr(SX - Q.X) + Sqr(SY - Q.Y));
       if D >= Best then Continue;
@@ -5681,18 +5782,17 @@ end;
   Trim the two corner pieces go too (SketchUp's double-click) and the next
   rebuild draws the rounded face.  Without it the pieces stay, to be erased
   one at a time. }
-function TWorkDoc.ApplyFillet(const F: TFillet; Sides: Integer; Ink: TColor;
-  Weight: Single; Trim: Boolean): Boolean;
+function TWorkDoc.ApplyFillet(const F: TFillet; Sides: integer; Ink: TColor; Weight: single; Trim: boolean): boolean;
 const
   TOL = 1E-6;
 var
   FO, FU, FV, Dir, FarA, FarB: TP3;
-  LA, LB, Arc, K: Integer;
-  R: Double;
+  LA, LB, Arc, K: integer;
+  R: double;
 
   { cut line K at P, keeping the piece away from the corner in place and
     adding the corner piece; true when a corner piece was made }
-  function Cut(K: Integer; const P, FarP: TP3): Boolean;
+  function Cut(K: integer; const P, FarP: TP3): boolean;
   begin
     Result := False;
     if Dist(P, FarP) < TOL then
@@ -5721,9 +5821,8 @@ begin
   { A corner already rounded with a plain click still has its square corner,
     so a double-click there means trim it, not add a second arc. }
   for K := 0 to FLive - 1 do
-    if (FEnts[K].Kind = ekArc) and
-       ((SamePt(FEnts[K].A, F.S, 1E-6) and SamePt(FEnts[K].B, F.E, 1E-6)) or
-        (SamePt(FEnts[K].A, F.E, 1E-6) and SamePt(FEnts[K].B, F.S, 1E-6))) then
+    if (FEnts[K].Kind = ekArc) and ((SamePt(FEnts[K].A, F.S, 1E-6) and SamePt(FEnts[K].B, F.E, 1E-6)) or
+      (SamePt(FEnts[K].A, F.E, 1E-6) and SamePt(FEnts[K].B, F.S, 1E-6))) then
     begin
       if Trim then TrimFillet(F);
       Exit(True);
@@ -5744,7 +5843,9 @@ begin
   if Sides > 0 then SetArcSides(Arc, Sides);
 
   if Trim then TrimFillet(F);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := True;
 end;
 
@@ -5753,33 +5854,35 @@ end;
   corner can be partly rubbed out to leave a fillet.  Only loose lines and
   arcs take part, and only pairs where one was drawn since FirstNew.  An arc
   is walked as its drawn segments, and a piece keeps its share of the sides. }
-function TWorkDoc.SplitCrossings(FirstNew: Integer): Integer;
+function TWorkDoc.SplitCrossings(FirstNew: integer): integer;
 const
   TOL = 1E-6;      { how close two edges pass before they count as meeting }
 type
   TWalk = record
-    Ent: Integer;
-    Fresh: Boolean;
-    Len: Double;
+    Ent: integer;
+    Fresh: boolean;
+    Len: double;
     Pts: TP3Array;
-    Cut: array of Double;
+    Cut: array of double;
   end;
 var
   W: array of TWalk;
   Made: array of TWorkEnt;
-  Doom: array of Boolean;
-  NW, NMade: Integer;
-  I, J, K, A, B, Steps: Integer;
-  S, T, D, Tmp, LA, LB: Double;
+  Doom: array of boolean;
+  NW, NMade: integer;
+  I, J, K, A, B, Steps: integer;
+  S, T, D, Tmp, LA, LB: double;
 
   { The nearest approach of two segments, and where along each.  Near-parallel
     is left alone: overlapping runs are AddLineSplit's business. }
-  procedure Nearest(const P1, P2, Q1, Q2: TP3; out SS, TT, DD: Double);
+  procedure Nearest(const P1, P2, Q1, Q2: TP3; out SS, TT, DD: double);
   var
     D1, D2, R, C1, C2: TP3;
-    Aa, Bb, Cc, Ee, Ff, Den: Double;
+    Aa, Bb, Cc, Ee, Ff, Den: double;
   begin
-    SS := 0; TT := 0; DD := 1E30;
+    SS := 0;
+    TT := 0;
+    DD := 1E30;
     D1 := Sub3(P2, P1);
     D2 := Sub3(Q2, Q1);
     R := Sub3(P1, Q1);
@@ -5792,7 +5895,8 @@ var
     Den := Aa * Ee - Bb * Bb;
     if Den <= 1E-12 * Aa * Ee then Exit;
     SS := (Bb * Ff - Cc * Ee) / Den;
-    if SS < 0 then SS := 0 else if SS > 1 then SS := 1;
+    if SS < 0 then SS := 0
+    else if SS > 1 then SS := 1;
     TT := (Bb * SS + Ff) / Ee;
     if TT < 0 then
     begin
@@ -5804,7 +5908,8 @@ var
       TT := 1;
       SS := (Bb - Cc) / Aa;
     end;
-    if SS < 0 then SS := 0 else if SS > 1 then SS := 1;
+    if SS < 0 then SS := 0
+    else if SS > 1 then SS := 1;
     C1 := P3(P1.X + D1.X * SS, P1.Y + D1.Y * SS, P1.Z + D1.Z * SS);
     C2 := P3(Q1.X + D2.X * TT, Q1.Y + D2.Y * TT, Q1.Z + D2.Z * TT);
     DD := Dist(C1, C2);
@@ -5812,10 +5917,10 @@ var
 
   { A cut at either end is no cut.  Measured along the edge, not in its
     parameter, so a hair of an edge is never left behind. }
-  procedure Note(Which: Integer; U: Double);
+  procedure Note(Which: integer; U: double);
   var
-    Q, N: Integer;
-    L: Double;
+    Q, N: integer;
+    L: double;
   begin
     L := W[Which].Len;
     if L < TOL then Exit;
@@ -5827,21 +5932,17 @@ var
     W[Which].Cut[N] := U;
   end;
 
-  procedure Piece(const E: TWorkEnt; U0, U1: Double);
+  procedure Piece(const E: TWorkEnt; U0, U1: double);
   var
     N: TWorkEnt;
-    Sd: Integer;
+    Sd: integer;
   begin
     if U1 <= U0 then Exit;
     N := E;
     if E.Kind = ekLine then
     begin
-      N.A := P3(E.A.X + (E.B.X - E.A.X) * U0,
-                E.A.Y + (E.B.Y - E.A.Y) * U0,
-                E.A.Z + (E.B.Z - E.A.Z) * U0);
-      N.B := P3(E.A.X + (E.B.X - E.A.X) * U1,
-                E.A.Y + (E.B.Y - E.A.Y) * U1,
-                E.A.Z + (E.B.Z - E.A.Z) * U1);
+      N.A := P3(E.A.X + (E.B.X - E.A.X) * U0, E.A.Y + (E.B.Y - E.A.Y) * U0, E.A.Z + (E.B.Z - E.A.Z) * U0);
+      N.B := P3(E.A.X + (E.B.X - E.A.X) * U1, E.A.Y + (E.B.Y - E.A.Y) * U1, E.A.Z + (E.B.Z - E.A.Z) * U1);
       if Dist(N.A, N.B) < TOL then Exit;
     end
     else
@@ -5877,9 +5978,7 @@ begin
       Steps := ArcSteps(FEnts[I]);
       SetLength(W[NW].Pts, Steps + 1);
       for K := 0 to Steps do
-        W[NW].Pts[K] := ArcPoint(FEnts[I].C, FEnts[I].R,
-          FEnts[I].A0 + FEnts[I].Sweep * K / Steps,
-          FEnts[I].Plane, FEnts[I].Nm);
+        W[NW].Pts[K] := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
     end
     else
     begin
@@ -5901,7 +6000,7 @@ begin
         for B := 0 to High(W[J].Pts) - 1 do
         begin
           Nearest(W[I].Pts[A], W[I].Pts[A + 1],
-                  W[J].Pts[B], W[J].Pts[B + 1], S, T, D);
+            W[J].Pts[B], W[J].Pts[B + 1], S, T, D);
           if D > TOL then Continue;
           { A tangent hit lands a whisker off an arc corner; snap it onto the
             corner so the pieces sit on the whole arc and a second pass finds
@@ -5953,30 +6052,32 @@ begin
     FEnts[FLive] := CopyEnt(Made[I]);
     Inc(FLive);
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 { Cut one face along a segment that crosses it.  If the segment enters and
   leaves exactly once, the boundary is walked each way between the crossings
   for the two halves.  Anything else is left alone - half a cut is worse than
   none. }
-function TWorkDoc.SplitFace(Index: Integer; const A, B: TP3): Boolean;
+function TWorkDoc.SplitFace(Index: integer; const A, B: TP3): boolean;
 const
   EPS = 1E-9;
 var
-  N, I, J, K, NHit, C1, C2: Integer;
+  N, I, J, K, NHit, C1, C2: integer;
   Nm, U, V, Org, W: TP3;
-  PX, PY: array of Double;
-  AX, AY, BX, BY: Double;
-  EX, EY, RX, RY, Den, T, Q: Double;
-  CutEdge: array[0..1] of Integer;
+  PX, PY: array of double;
+  AX, AY, BX, BY: double;
+  EX, EY, RX, RY, Den, T, Q: double;
+  CutEdge: array[0..1] of integer;
   HitP: array[0..1] of TP3;
   Src, H1, H2: TP3Array;
   Ink: TColor;
-  WasSolid: Boolean;
-  WasGrp: Integer;
+  WasSolid: boolean;
+  WasGrp: integer;
 
-  function Same(const P, R: TP3): Boolean;
+  function Same(const P, R: TP3): boolean;
   begin
     Result := Dist(P, R) < 1E-7;
   end;
@@ -6015,9 +6116,11 @@ begin
     PY[I] := Dot3(W, V);
   end;
   W := Sub3(A, Org);
-  AX := Dot3(W, U); AY := Dot3(W, V);
+  AX := Dot3(W, U);
+  AY := Dot3(W, V);
   W := Sub3(B, Org);
-  BX := Dot3(W, U); BY := Dot3(W, V);
+  BX := Dot3(W, U);
+  BY := Dot3(W, V);
 
   RX := BX - AX;
   RY := BY - AY;
@@ -6039,9 +6142,7 @@ begin
     if (Q < -1E-9) or (Q > 1 - 1E-9) then Continue;
     if NHit >= 2 then Exit;                 // more than a clean pair
     CutEdge[NHit] := I;
-    HitP[NHit] := P3(Src[I].X + (Src[J].X - Src[I].X) * Q,
-                     Src[I].Y + (Src[J].Y - Src[I].Y) * Q,
-                     Src[I].Z + (Src[J].Z - Src[I].Z) * Q);
+    HitP[NHit] := P3(Src[I].X + (Src[J].X - Src[I].X) * Q, Src[I].Y + (Src[J].Y - Src[I].Y) * Q, Src[I].Z + (Src[J].Z - Src[I].Z) * Q);
     Inc(NHit);
   end;
 
@@ -6054,31 +6155,37 @@ begin
   { one half: crossing 0, round the boundary, crossing 1 }
   SetLength(H1, N + 4);
   C1 := 0;
-  H1[C1] := HitP[0]; Inc(C1);
+  H1[C1] := HitP[0];
+  Inc(C1);
   I := CutEdge[0];
   repeat
     I := (I + 1) mod N;
     if not Same(Src[I], HitP[0]) and not Same(Src[I], HitP[1]) then
     begin
-      H1[C1] := Src[I]; Inc(C1);
+      H1[C1] := Src[I];
+      Inc(C1);
     end;
   until I = CutEdge[1];
-  H1[C1] := HitP[1]; Inc(C1);
+  H1[C1] := HitP[1];
+  Inc(C1);
   SetLength(H1, C1);
 
   { the other half: crossing 1, round the rest, crossing 0 }
   SetLength(H2, N + 4);
   C2 := 0;
-  H2[C2] := HitP[1]; Inc(C2);
+  H2[C2] := HitP[1];
+  Inc(C2);
   K := CutEdge[1];
   repeat
     K := (K + 1) mod N;
     if not Same(Src[K], HitP[0]) and not Same(Src[K], HitP[1]) then
     begin
-      H2[C2] := Src[K]; Inc(C2);
+      H2[C2] := Src[K];
+      Inc(C2);
     end;
   until K = CutEdge[0];
-  H2[C2] := HitP[0]; Inc(C2);
+  H2[C2] := HitP[0];
+  Inc(C2);
   SetLength(H2, C2);
 
   if (C1 < 3) or (C2 < 3) then Exit;
@@ -6103,17 +6210,19 @@ begin
   end
   else
     AddFace(H2, Ink, False);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := True;
 end;
 
-function TWorkDoc.IsPatch(Index: Integer): Boolean;
+function TWorkDoc.IsPatch(Index: integer): boolean;
 const
   TOL = 1E-6;
 var
-  I, Q, K, N, M, RB: Integer;
+  I, Q, K, N, M, RB: integer;
   Nm: TP3;
-  PlaneD: Double;
+  PlaneD: double;
   A, B: TP3Array;
 begin
   Result := False;
@@ -6137,29 +6246,29 @@ begin
     N := Length(A);
     for RB := 0 to Length(FEnts[I].Holes) do
     begin
-      if RB = 0 then B := FEnts[I].Poly else B := FEnts[I].Holes[RB - 1];
+      if RB = 0 then B := FEnts[I].Poly
+      else
+        B := FEnts[I].Holes[RB - 1];
       M := Length(B);
       if M < 3 then Continue;
       for Q := 0 to N - 1 do
         for K := 0 to M - 1 do
-          if ((Dist(A[Q], B[K]) < TOL) and
-              (Dist(A[(Q + 1) mod N], B[(K + 1) mod M]) < TOL)) or
-             ((Dist(A[Q], B[(K + 1) mod M]) < TOL) and
-              (Dist(A[(Q + 1) mod N], B[K]) < TOL)) then
+          if ((Dist(A[Q], B[K]) < TOL) and (Dist(A[(Q + 1) mod N], B[(K + 1) mod M]) < TOL)) or
+            ((Dist(A[Q], B[(K + 1) mod M]) < TOL) and (Dist(A[(Q + 1) mod N], B[K]) < TOL)) then
             Exit(True);
     end;
   end;
 end;
 
 
-function TWorkDoc.WallsSquareTo(Index: Integer): Boolean;
+function TWorkDoc.WallsSquareTo(Index: integer): boolean;
 const
   TOL = 1E-6;
 var
-  I, Q, K, N, M: Integer;
+  I, Q, K, N, M: integer;
   Nm, ONm: TP3;
   A, B: TP3Array;
-  Shares: Boolean;
+  Shares: boolean;
 begin
   Result := True;
   if (Index < 0) or (Index >= FLive) or (FEnts[Index].Kind <> ekFace) then Exit;
@@ -6178,8 +6287,8 @@ begin
     for Q := 0 to N - 1 do
     begin
       for K := 0 to M - 1 do
-        if ((Dist(A[Q], B[K]) < TOL) and (Dist(A[(Q + 1) mod N], B[(K + 1) mod M]) < TOL)) or
-           ((Dist(A[Q], B[(K + 1) mod M]) < TOL) and (Dist(A[(Q + 1) mod N], B[K]) < TOL)) then
+        if ((Dist(A[Q], B[K]) < TOL) and (Dist(A[(Q + 1) mod N], B[(K + 1) mod M]) < TOL)) or ((Dist(A[Q], B[(K + 1) mod M]) < TOL) and
+          (Dist(A[(Q + 1) mod N], B[K]) < TOL)) then
         begin
           Shares := True;
           Break;
@@ -6199,16 +6308,16 @@ begin
   end;
 end;
 
-function LoopContains(const P: TP3; const Loop: TP3Array; const N: TP3): Boolean; forward;
+function LoopContains(const P: TP3; const Loop: TP3Array; const N: TP3): boolean; forward;
 
-function TWorkDoc.FaceHolding(const P: TP3): Integer;
+function TWorkDoc.FaceHolding(const P: TP3): integer;
 const
   TOL = 1E-6;
 var
-  I, H: Integer;
+  I, H: integer;
   Nm, W: TP3;
-  A, Best: Double;
-  InHole: Boolean;
+  A, Best: double;
+  InHole: boolean;
 begin
   Result := -1;
   Best := 0;
@@ -6221,7 +6330,11 @@ begin
     if not LoopContains(P, FEnts[I].Poly, Nm) then Continue;
     InHole := False;
     for H := 0 to High(FEnts[I].Holes) do
-      if LoopContains(P, FEnts[I].Holes[H], Nm) then begin InHole := True; Break; end;
+      if LoopContains(P, FEnts[I].Holes[H], Nm) then
+      begin
+        InHole := True;
+        Break;
+      end;
     if InHole then Continue;
     A := FaceArea(I);
     if (Result < 0) or (A < Best) then
@@ -6234,11 +6347,11 @@ end;
 
 { Which flat face a point sits on.  A box corner belongs to three; the first
   found will do, since any of them is a plane a new shape could be drawn in. }
-function TWorkDoc.FaceThrough(const P: TP3): Integer;
+function TWorkDoc.FaceThrough(const P: TP3): integer;
 const
   TOL = 1E-6;
 var
-  I, K: Integer;
+  I, K: integer;
   Nm, W: TP3;
 begin
   Result := -1;
@@ -6254,9 +6367,9 @@ begin
   end;
 end;
 
-function TWorkDoc.SplitFacesWith(const A, B: TP3): Integer;
+function TWorkDoc.SplitFacesWith(const A, B: TP3): integer;
 var
-  I, Was: Integer;
+  I, Was: integer;
 begin
   Result := 0;
   Was := FLive;                { only faces that were there before the cut }
@@ -6267,24 +6380,24 @@ end;
 { Move a face and take the geometry attached to it, so pushing a face of a
   solid resizes it.  Vertices are matched against where the face was before
   the move, so nothing moves twice. }
-procedure TWorkDoc.MoveFaceWith(Index: Integer; const D: TP3);
+procedure TWorkDoc.MoveFaceWith(Index: integer; const D: TP3);
 const
   TOL = 1E-6;
 var
   Was: TP3Array;
-  I, J, K, N, G: Integer;
+  I, J, K, N, G: integer;
   Nm, BU, BV: TP3;
-  PlaneD: Double;
+  PlaneD: double;
 
   { Does this point sit anywhere on the face, edges included - not only at
     its corners? }
-  function OnFace(const P: TP3): Boolean;
+  function OnFace(const P: TP3): boolean;
   var
-    J, M: Integer;
-    Inside: Boolean;
-    PU, PV, AU, AV, BU2, BV2, DU, DV, L2, T: Double;
+    J, M: integer;
+    Inside: boolean;
+    PU, PV, AU, AV, BU2, BV2, DU, DV, L2, T: double;
 
-    procedure Flat(const R: TP3; out CU, CV: Double);
+    procedure Flat(const R: TP3; out CU, CV: double);
     var
       W: TP3;
     begin
@@ -6322,8 +6435,7 @@ var
     for J := 0 to M - 1 do
     begin
       Flat(Was[J], BU2, BV2);
-      if ((BV2 > PV) <> (AV > PV)) and
-         (PU < (AU - BU2) * (PV - BV2) / (AV - BV2) + BU2) then
+      if ((BV2 > PV) <> (AV > PV)) and (PU < (AU - BU2) * (PV - BV2) / (AV - BV2) + BU2) then
         Inside := not Inside;
       AU := BU2;
       AV := BV2;
@@ -6366,15 +6478,17 @@ begin
       for K := 0 to High(FEnts[I].Holes[J]) do
         Shift(FEnts[I].Holes[J][K]);
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-function SharesRun(const P1, Q1, P2, Q2: TP3): Boolean;
+function SharesRun(const P1, Q1, P2, Q2: TP3): boolean;
 const
   TOL = 1E-6;
 var
   U, W, F: TP3;
-  L, TA, TB, Off, Lo, Hi: Double;
+  L, TA, TB, Off, Lo, Hi: double;
 begin
   Result := False;
   L := Dist(P1, Q1);
@@ -6401,20 +6515,19 @@ end;
 { A guide point goes with the guide line it lies on - the tape lays them
   together.  Worked out from position, so it works on old drawings too; a
   point on two lines goes with whichever is erased first. }
-function TWorkDoc.PointsOnGuides(const Idx: array of Integer;
-  out Pts: TIntArrayW): Integer;
+function TWorkDoc.PointsOnGuides(const Idx: array of integer; out Pts: TIntArrayW): integer;
 const
   TOL = 1E-6;
 var
-  I, J, K, N: Integer;
-  Marked: array of Boolean;
-  Lines: array of Integer;
+  I, J, K, N: integer;
+  Marked: array of boolean;
+  Lines: array of integer;
 
-  function OnOne(const P: TP3): Boolean;
+  function OnOne(const P: TP3): boolean;
   var
-    M: Integer;
+    M: integer;
     A, B, W, U, F: TP3;
-    L, T, Off: Double;
+    L, T, Off: double;
   begin
     Result := True;
     for M := 0 to N - 1 do
@@ -6471,32 +6584,36 @@ end;
   run of edges encloses, so erasing an edge takes its faces - a solid's too,
   which are kept as made.  Only the edges being erased are asked about;
   auditing the whole drawing would take faces that never had edges. }
-function TWorkDoc.FacesOnEdges(const Idx: array of Integer;
-  out Faces: TIntArrayW): Integer;
+function TWorkDoc.FacesOnEdges(const Idx: array of integer; out Faces: TIntArrayW): integer;
 const
   TOL = 1E-6;
 type
-  TRun = record A, B: TP3; Part: Integer; end;
+  TRun = record
+    A, B: TP3;
+    Part: integer;
+  end;
 var
   Runs: array of TRun;
-  NR, I, J, K, H, Steps: Integer;
-  Ang: Double;
+  NR, I, J, K, H, Steps: integer;
+  Ang: double;
   P, Q: TP3;
-  Marked: array of Boolean;
+  Marked: array of boolean;
 
-  procedure PutRun(const A, B: TP3; Part: Integer);
+  procedure PutRun(const A, B: TP3; Part: integer);
   begin
     if Dist(A, B) < TOL then Exit;
     if NR >= Length(Runs) then SetLength(Runs, Max(16, NR * 2));
-    Runs[NR].A := A; Runs[NR].B := B; Runs[NR].Part := Part;
+    Runs[NR].A := A;
+    Runs[NR].B := B;
+    Runs[NR].Part := Part;
     Inc(NR);
   end;
 
   { An edge holds up the faces of its own group only, so erasing stairs does
     not take the wall whose top their board lies along. }
-  function UsesARun(const A, B: TP3; Part: Integer): Boolean;
+  function UsesARun(const A, B: TP3; Part: integer): boolean;
   var
-    M: Integer;
+    M: integer;
   begin
     Result := True;
     for M := 0 to NR - 1 do
@@ -6517,17 +6634,17 @@ begin
     case FEnts[J].Kind of
       ekLine: if not FEnts[J].Dim then PutRun(FEnts[J].A, FEnts[J].B, FEnts[J].Part);
       ekArc:
+      begin
+        Steps := ArcSteps(FEnts[J]);
+        for K := 0 to Steps - 1 do
         begin
-          Steps := ArcSteps(FEnts[J]);
-          for K := 0 to Steps - 1 do
-          begin
-            Ang := FEnts[J].A0 + FEnts[J].Sweep * K / Steps;
-            P := ArcPoint(FEnts[J].C, FEnts[J].R, Ang, FEnts[J].Plane, FEnts[J].Nm);
-            Ang := FEnts[J].A0 + FEnts[J].Sweep * (K + 1) / Steps;
-            Q := ArcPoint(FEnts[J].C, FEnts[J].R, Ang, FEnts[J].Plane, FEnts[J].Nm);
-            PutRun(P, Q, FEnts[J].Part);
-          end;
+          Ang := FEnts[J].A0 + FEnts[J].Sweep * K / Steps;
+          P := ArcPoint(FEnts[J].C, FEnts[J].R, Ang, FEnts[J].Plane, FEnts[J].Nm);
+          Ang := FEnts[J].A0 + FEnts[J].Sweep * (K + 1) / Steps;
+          Q := ArcPoint(FEnts[J].C, FEnts[J].R, Ang, FEnts[J].Plane, FEnts[J].Nm);
+          PutRun(P, Q, FEnts[J].Part);
         end;
+      end;
     end;
   end;
   if NR = 0 then Exit;
@@ -6576,9 +6693,9 @@ begin
   end;
 end;
 
-procedure TWorkDoc.VertsOf(const Idx: array of Integer; out Pts: TP3Array);
+procedure TWorkDoc.VertsOf(const Idx: array of integer; out Pts: TP3Array);
 var
-  I, J, K, N: Integer;
+  I, J, K, N: integer;
 
   procedure Put(const P: TP3);
   begin
@@ -6607,17 +6724,16 @@ end;
 { The edges that lean over to follow a move, matched the same way the move
   matches them, so the preview shows the sides that stretch along instead of
   one side flying off alone. }
-procedure TWorkDoc.StretchPreview(const Pts: TP3Array; const D: TP3;
-  const Skip: array of Integer; out Segs: TP3Array);
+procedure TWorkDoc.StretchPreview(const Pts: TP3Array; const D: TP3; const Skip: array of integer; out Segs: TP3Array);
 const
   TOL = 1E-7;
 var
   Moving: TPointSet;
-  I, J, N: Integer;
-  Held, MA, MB: Boolean;
+  I, J, N: integer;
+  Held, MA, MB: boolean;
   A, B: TP3;
 
-  function Shifted(const P: TP3; out Moved: Boolean): TP3;
+  function Shifted(const P: TP3; out Moved: boolean): TP3;
   begin
     Moved := Moving.Has(P, TOL);
     if Moved then
@@ -6650,7 +6766,8 @@ begin
         drawn by the selection's ghost }
       if MA = MB then Continue;
       if N + 2 > Length(Segs) then SetLength(Segs, Max(16, (N + 2) * 2));
-      Segs[N] := A; Segs[N + 1] := B;
+      Segs[N] := A;
+      Segs[N + 1] := B;
       Inc(N, 2);
     end;
   finally
@@ -6663,10 +6780,10 @@ procedure TWorkDoc.MoveVerts(const Pts: TP3Array; const D: TP3);
 const
   TOL = 1E-7;
 var
-  I, J, K, H, NR: Integer;
+  I, J, K, H, NR: integer;
   Moving: TPointSet;
-  Ride: array of Integer;
-  RideA: array of Boolean;
+  Ride: array of integer;
+  RideA: array of boolean;
 
   procedure Shift(var P: TP3);
   begin
@@ -6679,18 +6796,16 @@ var
   end;
 
   { is Q on the segment from E to F, within a hair }
-  function OnSeg(const Q, E, F: TP3): Boolean;
+  function OnSeg(const Q, E, F: TP3): boolean;
   var
-    L2, T: Double;
+    L2, T: double;
     R: TP3;
   begin
     L2 := Sqr(F.X - E.X) + Sqr(F.Y - E.Y) + Sqr(F.Z - E.Z);
     if L2 < 1E-18 then Exit(Dist(Q, E) < 1E-6);
-    T := ((Q.X - E.X) * (F.X - E.X) + (Q.Y - E.Y) * (F.Y - E.Y) +
-          (Q.Z - E.Z) * (F.Z - E.Z)) / L2;
+    T := ((Q.X - E.X) * (F.X - E.X) + (Q.Y - E.Y) * (F.Y - E.Y) + (Q.Z - E.Z) * (F.Z - E.Z)) / L2;
     if (T < -1E-6) or (T > 1 + 1E-6) then Exit(False);
-    R := P3(E.X + (F.X - E.X) * T, E.Y + (F.Y - E.Y) * T,
-            E.Z + (F.Z - E.Z) * T);
+    R := P3(E.X + (F.X - E.X) * T, E.Y + (F.Y - E.Y) * T, E.Z + (F.Z - E.Z) * T);
     Result := Dist(Q, R) < 1E-6;
   end;
 
@@ -6701,64 +6816,65 @@ begin
   { A note's leader points at a place, not a thing.  If the whole line it
     points at is moving, the note comes too.  Worked out before anything
     shifts, since afterwards there is no telling what was on what. }
-  NR := 0;
-  SetLength(Ride, 0);
-  SetLength(RideA, 0);
-  for I := 0 to FLive - 1 do
-  begin
-    if FEnts[I].Part <> FContext then Continue;
-    if FEnts[I].Kind <> ekText then Continue;
-    if Moving.Has(FEnts[I].B, TOL) then Continue;      { going anyway }
-    if Dist(FEnts[I].A, FEnts[I].B) < 1E-9 then Continue;  { no leader }
-    for J := 0 to FLive - 1 do
+    NR := 0;
+    SetLength(Ride, 0);
+    SetLength(RideA, 0);
+    for I := 0 to FLive - 1 do
     begin
-      if not (FEnts[J].Kind in [ekLine, ekArc]) then Continue;
-      if FEnts[J].Part <> FContext then Continue;
-      if not (Moving.Has(FEnts[J].A, TOL) and
-              Moving.Has(FEnts[J].B, TOL)) then Continue;
-      if OnSeg(FEnts[I].B, FEnts[J].A, FEnts[J].B) then
+      if FEnts[I].Part <> FContext then Continue;
+      if FEnts[I].Kind <> ekText then Continue;
+      if Moving.Has(FEnts[I].B, TOL) then Continue;      { going anyway }
+      if Dist(FEnts[I].A, FEnts[I].B) < 1E-9 then Continue;  { no leader }
+      for J := 0 to FLive - 1 do
       begin
-        SetLength(Ride, NR + 1);
-        SetLength(RideA, NR + 1);
-        Ride[NR] := I;
+        if not (FEnts[J].Kind in [ekLine, ekArc]) then Continue;
+        if FEnts[J].Part <> FContext then Continue;
+        if not (Moving.Has(FEnts[J].A, TOL) and Moving.Has(FEnts[J].B, TOL)) then Continue;
+        if OnSeg(FEnts[I].B, FEnts[J].A, FEnts[J].B) then
+        begin
+          SetLength(Ride, NR + 1);
+          SetLength(RideA, NR + 1);
+          Ride[NR] := I;
         { the words travel with the arrow unless they are already on
           something that is moving, which would carry them twice }
-        RideA[NR] := not Moving.Has(FEnts[I].A, TOL);
-        Inc(NR);
-        Break;
+          RideA[NR] := not Moving.Has(FEnts[I].A, TOL);
+          Inc(NR);
+          Break;
+        end;
       end;
     end;
-  end;
 
-  for I := 0 to FLive - 1 do
-  begin
-    if FEnts[I].Part <> FContext then Continue;
-    Shift(FEnts[I].A);
-    Shift(FEnts[I].B);
-    if FEnts[I].Kind = ekArc then Shift(FEnts[I].C);
-    for K := 0 to High(FEnts[I].Poly) do
-      Shift(FEnts[I].Poly[K]);
-    for H := 0 to High(FEnts[I].Holes) do
-      for K := 0 to High(FEnts[I].Holes[H]) do
-        Shift(FEnts[I].Holes[H][K]);
-  end;
+    for I := 0 to FLive - 1 do
+    begin
+      if FEnts[I].Part <> FContext then Continue;
+      Shift(FEnts[I].A);
+      Shift(FEnts[I].B);
+      if FEnts[I].Kind = ekArc then Shift(FEnts[I].C);
+      for K := 0 to High(FEnts[I].Poly) do
+        Shift(FEnts[I].Poly[K]);
+      for H := 0 to High(FEnts[I].Holes) do
+        for K := 0 to High(FEnts[I].Holes[H]) do
+          Shift(FEnts[I].Holes[H][K]);
+    end;
 
-  for I := 0 to NR - 1 do
-  begin
-    Bump(FEnts[Ride[I]].B);
-    if RideA[I] then Bump(FEnts[Ride[I]].A);
-  end;
+    for I := 0 to NR - 1 do
+    begin
+      Bump(FEnts[Ride[I]].B);
+      if RideA[I] then Bump(FEnts[Ride[I]].A);
+    end;
   finally
     Moving.Free;
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 procedure TWorkDoc.VertsBeyond(const Base, Dir: TP3; out Pts: TP3Array);
 const
   TOL = 1E-7;
 var
-  I, K, H, N: Integer;
+  I, K, H, N: integer;
 
   procedure Put(const P: TP3);
   begin
@@ -6787,13 +6903,12 @@ end;
   outline about a line beside it; an axis through the middle sweeps the
   halves into each other.  Corners on both sides of the axis, in the
   outline's plane, mean it splits it; corners on the axis count for neither. }
-function TWorkDoc.AxisSplitsFace(Face: Integer; const AxisP, AxisDir: TP3;
-  out RLo, RHi: Double): Boolean;
+function TWorkDoc.AxisSplitsFace(Face: integer; const AxisP, AxisDir: TP3; out RLo, RHi: double): boolean;
 var
-  K: Integer;
+  K: integer;
   Nf, D, E, Perp: TP3;
-  S, R: Double;
-  Pos, Neg: Boolean;
+  S, R: double;
+  Pos, Neg: boolean;
 begin
   Result := False;
   RLo := 0;
@@ -6811,8 +6926,7 @@ begin
   begin
     E := Sub3(FEnts[Face].Poly[K], AxisP);
     { how far off the axis, square to it - the radius this corner sweeps }
-    Perp := P3(E.X - D.X * Dot3(E, D), E.Y - D.Y * Dot3(E, D),
-               E.Z - D.Z * Dot3(E, D));
+    Perp := P3(E.X - D.X * Dot3(E, D), E.Y - D.Y * Dot3(E, D), E.Z - D.Z * Dot3(E, D));
     R := Dist(Perp, P3(0, 0, 0));
     if R < RLo then RLo := R;
     if R > RHi then RHi := R;
@@ -6830,11 +6944,10 @@ end;
   at or past the plane through the moving end, square to the run, moves: a
   rectangle stays a rectangle and anything between the ends stays put.  An
   arc only partly past the plane comes out wrong, as with the move tool. }
-function TWorkDoc.ResizeDim(Index: Integer; NewLen: Double;
-  MoveB: Boolean): Boolean;
+function TWorkDoc.ResizeDim(Index: integer; NewLen: double; MoveB: boolean): boolean;
 var
   A, B, D, Delta: TP3;
-  L, Grow: Double;
+  L, Grow: double;
   Pts: TP3Array;
 begin
   Result := False;
@@ -6868,17 +6981,16 @@ end;
 { Rotation has to know what an arc is: it turns whole onto a free plane whose
   normal is the old one turned, and the start angle is measured again in the
   new plane's basis. }
-procedure TWorkDoc.RotateEnt(I: Integer; const Pts: TP3Array;
-  const C, Axis: TP3; Ang: Double; All: Boolean);
+procedure TWorkDoc.RotateEnt(I: integer; const Pts: TP3Array; const C, Axis: TP3; Ang: double; All: boolean);
 const
   TOL = 1E-7;
 var
-  K, H: Integer;
+  K, H: integer;
   AU, AV, N, D: TP3;
 
-  function OnSet(const P: TP3): Boolean;
+  function OnSet(const P: TP3): boolean;
   var
-    J: Integer;
+    J: integer;
   begin
     if All then Exit(True);
     Result := True;
@@ -6928,28 +7040,31 @@ begin
       Turn(FEnts[I].Holes[H][K]);
 end;
 
-procedure TWorkDoc.RotateVerts(const Pts: TP3Array; const C, Axis: TP3; Ang: Double);
+procedure TWorkDoc.RotateVerts(const Pts: TP3Array; const C, Axis: TP3; Ang: double);
 var
-  I: Integer;
+  I: integer;
 begin
   if (Length(Pts) = 0) or (Abs(Ang) < 1E-12) then Exit;
   for I := 0 to FLive - 1 do
     if FEnts[I].Part = FContext then       { another group's corners stay put }
       RotateEnt(I, Pts, C, Axis, Ang, False);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.ArrayMove(const Src: array of Integer; const D: TP3; N: Integer;
-  Divide: Boolean; out Made: TIntArrayW);
+procedure TWorkDoc.ArrayMove(const Src: array of integer; const D: TP3; N: integer; Divide: boolean; out Made: TIntArrayW);
 var
-  K, I, Base, M: Integer;
-  F: Double;
+  K, I, Base, M: integer;
+  F: double;
 begin
   Made := nil;
   if (N < 1) or (Length(Src) = 0) then Exit;
   for K := 1 to N do
   begin
-    if Divide then F := K / N else F := K;
+    if Divide then F := K / N
+    else
+      F := K;
     Base := FLive;
     Duplicate(Src, Mul3(D, F));
     M := Length(Made);
@@ -6958,18 +7073,19 @@ begin
   end;
 end;
 
-procedure TWorkDoc.ArrayRotate(const Src: array of Integer; const C, Axis: TP3;
-  Ang: Double; N: Integer; Divide: Boolean; out Made: TIntArrayW);
+procedure TWorkDoc.ArrayRotate(const Src: array of integer; const C, Axis: TP3; Ang: double; N: integer; Divide: boolean; out Made: TIntArrayW);
 var
-  K, I, Base, M: Integer;
-  F: Double;
+  K, I, Base, M: integer;
+  F: double;
   Fresh: TIntArrayW;
 begin
   Made := nil;
   if (N < 1) or (Length(Src) = 0) then Exit;
   for K := 1 to N do
   begin
-    if Divide then F := K / N else F := K;
+    if Divide then F := K / N
+    else
+      F := K;
     Base := FLive;
     Duplicate(Src, P3(0, 0, 0));
     SetLength(Fresh, FLive - Base);
@@ -6981,7 +7097,7 @@ begin
   end;
 end;
 
-function TWorkDoc.MiddleOf(const Idx: array of Integer; out Mid: TP3): Boolean;
+function TWorkDoc.MiddleOf(const Idx: array of integer; out Mid: TP3): boolean;
 var
   Lo, Hi: TP3;
 begin
@@ -6992,10 +7108,10 @@ begin
     Mid := P3(0, 0, 0);
 end;
 
-function TWorkDoc.SpanOf(const Idx: array of Integer; out Lo, Hi: TP3): Boolean;
+function TWorkDoc.SpanOf(const Idx: array of integer; out Lo, Hi: TP3): boolean;
 var
-  I, J, K: Integer;
-  Any: Boolean;
+  I, J, K: integer;
+  Any: boolean;
 
   procedure Grow(const P: TP3);
   begin
@@ -7006,28 +7122,30 @@ var
       Any := True;
       Exit;
     end;
-    Lo.X := Min(Lo.X, P.X); Lo.Y := Min(Lo.Y, P.Y); Lo.Z := Min(Lo.Z, P.Z);
-    Hi.X := Max(Hi.X, P.X); Hi.Y := Max(Hi.Y, P.Y); Hi.Z := Max(Hi.Z, P.Z);
+    Lo.X := Min(Lo.X, P.X);
+    Lo.Y := Min(Lo.Y, P.Y);
+    Lo.Z := Min(Lo.Z, P.Z);
+    Hi.X := Max(Hi.X, P.X);
+    Hi.Y := Max(Hi.Y, P.Y);
+    Hi.Z := Max(Hi.Z, P.Z);
   end;
 
-  procedure Take(I: Integer);
+  procedure Take(I: integer);
   var
-    M: Integer;
+    M: integer;
   begin
     if (I < 0) or (I >= FLive) then Exit;
     case FEnts[I].Kind of
       ekArc:
-        begin
-          Grow(P3(FEnts[I].C.X - FEnts[I].R, FEnts[I].C.Y - FEnts[I].R,
-                  FEnts[I].C.Z - FEnts[I].R));
-          Grow(P3(FEnts[I].C.X + FEnts[I].R, FEnts[I].C.Y + FEnts[I].R,
-                  FEnts[I].C.Z + FEnts[I].R));
-        end;
+      begin
+        Grow(P3(FEnts[I].C.X - FEnts[I].R, FEnts[I].C.Y - FEnts[I].R, FEnts[I].C.Z - FEnts[I].R));
+        Grow(P3(FEnts[I].C.X + FEnts[I].R, FEnts[I].C.Y + FEnts[I].R, FEnts[I].C.Z + FEnts[I].R));
+      end;
       ekFace:
         for M := 0 to High(FEnts[I].Poly) do Grow(FEnts[I].Poly[M]);
-    else
-      Grow(FEnts[I].A);
-      Grow(FEnts[I].B);
+      else
+        Grow(FEnts[I].A);
+        Grow(FEnts[I].B);
     end;
   end;
 
@@ -7042,9 +7160,9 @@ begin
   Result := Any;
 end;
 
-procedure TWorkDoc.TranslateEnts(const Idx: array of Integer; const D: TP3);
+procedure TWorkDoc.TranslateEnts(const Idx: array of integer; const D: TP3);
 var
-  J, I, K, H: Integer;
+  J, I, K, H: integer;
 
   function Sh(const P: TP3): TP3;
   begin
@@ -7066,66 +7184,69 @@ begin
     for H := 0 to High(FEnts[I].Holes) do
       for K := 0 to High(FEnts[I].Holes[H]) do FEnts[I].Holes[H][K] := Sh(FEnts[I].Holes[H][K]);
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-procedure TWorkDoc.RotateEnts(const Idx: array of Integer; const C, Axis: TP3; Ang: Double);
+procedure TWorkDoc.RotateEnts(const Idx: array of integer; const C, Axis: TP3; Ang: double);
 var
-  J: Integer;
+  J: integer;
 begin
   for J := 0 to High(Idx) do
     if (Idx[J] >= 0) and (Idx[J] < FLive) then
       RotateEnt(Idx[J], nil, C, Axis, Ang, True);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-function TWorkDoc.OutlineWorld(I: Integer): TP3Array;
+function TWorkDoc.OutlineWorld(I: integer): TP3Array;
 var
-  K, Steps: Integer;
+  K, Steps: integer;
 begin
   Result := nil;
   if (I < 0) or (I >= FLive) then Exit;
   case FEnts[I].Kind of
     ekArc:
-      begin
-        Steps := ArcSteps(FEnts[I]);
-        SetLength(Result, Steps + 1);
-        for K := 0 to Steps do
-          Result[K] := ArcPoint(FEnts[I].C, FEnts[I].R,
-            FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
-      end;
+    begin
+      Steps := ArcSteps(FEnts[I]);
+      SetLength(Result, Steps + 1);
+      for K := 0 to Steps do
+        Result[K] := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
+    end;
     ekFace:
-      begin
-        SetLength(Result, Length(FEnts[I].Poly) + 1);
-        for K := 0 to High(FEnts[I].Poly) do
-          Result[K] := FEnts[I].Poly[K];
-        if Length(FEnts[I].Poly) > 0 then
-          Result[High(Result)] := Result[0];
-      end;
+    begin
+      SetLength(Result, Length(FEnts[I].Poly) + 1);
+      for K := 0 to High(FEnts[I].Poly) do
+        Result[K] := FEnts[I].Poly[K];
+      if Length(FEnts[I].Poly) > 0 then
+        Result[High(Result)] := Result[0];
+    end;
     ekText:
-      begin
-        SetLength(Result, 1);
-        Result[0] := FEnts[I].A;
-      end;
+    begin
+      SetLength(Result, 1);
+      Result[0] := FEnts[I].A;
+    end;
     ekBore: ;
-  else
-    SetLength(Result, 2);
-    Result[0] := FEnts[I].A;
-    Result[1] := FEnts[I].B;
+    else
+      SetLength(Result, 2);
+      Result[0] := FEnts[I].A;
+      Result[1] := FEnts[I].B;
   end;
 end;
 
-procedure TWorkDoc.Duplicate(const Idx: array of Integer; const D: TP3);
+procedure TWorkDoc.Duplicate(const Idx: array of integer; const D: TP3);
 var
-  J, I, K, H, Base, G: Integer;
-  Src, Dst: array of Integer;    { old group id -> the new one it becomes }
-  PSrc, PDst, Copied: array of Integer;   { the same for groups }
+  J, I, K, H, Base, G: integer;
+  Src, Dst: array of integer;    { old group id -> the new one it becomes }
+  PSrc, PDst, Copied: array of integer;   { the same for groups }
 
   { Solids are told apart by group id, so a copy needs a new one or push/pull
     on one deforms the other. }
-  function Remap(Old: Integer): Integer;
+  function Remap(Old: integer): integer;
   var
-    N: Integer;
+    N: integer;
   begin
     if Old = 0 then Exit(0);
     for N := 0 to High(Src) do
@@ -7140,10 +7261,10 @@ var
 
   { Groups likewise, but only those whose record is being copied; a member
     copied without its record stays in its group. }
-  function RemapPart(Old: Integer): Integer;
+  function RemapPart(Old: integer): integer;
   var
-    N: Integer;
-    Known: Boolean;
+    N: integer;
+    Known: boolean;
   begin
     if Old = 0 then Exit(0);
     for N := 0 to High(PSrc) do
@@ -7198,19 +7319,22 @@ begin
     FEnts[FLive].C := Add3(FEnts[I].C, D);
     { a record's Grp is its group id, not a solid's }
     if FEnts[I].Kind = ekPart then G := RemapPart(FEnts[I].Grp)
-    else G := Remap(FEnts[I].Grp);
+    else
+      G := Remap(FEnts[I].Grp);
     FEnts[FLive].Grp := G;
     FEnts[FLive].Part := RemapPart(FEnts[I].Part);
     Inc(FLive);
   end;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
 { A deep copy of these entities with nothing pointing back at the document,
   so it survives a switch to another sheet. }
-function TWorkDoc.CopyOut(const Idx: array of Integer): TWorkEntArray;
+function TWorkDoc.CopyOut(const Idx: array of integer): TWorkEntArray;
 var
-  J, I, N: Integer;
+  J, I, N: integer;
 begin
   Result := nil;
   SetLength(Result, Length(Idx));
@@ -7228,16 +7352,15 @@ end;
 { Put a copy back in, offset by D, and say which ones went in.  Group ids are
   remapped as in Duplicate, which another sheet needs anyway since each sheet
   numbers its own.  Bores are dropped; they mean nothing beside a copy. }
-function TWorkDoc.PasteIn(const Ents: TWorkEntArray; const D: TP3;
-  out First, Last: Integer): Integer;
+function TWorkDoc.PasteIn(const Ents: TWorkEntArray; const D: TP3; out First, Last: integer): integer;
 var
-  J, K, H: Integer;
-  Src, Dst: array of Integer;
-  PSrc, PDst, Copied: array of Integer;   { the same for groups - see Duplicate }
+  J, K, H: integer;
+  Src, Dst: array of integer;
+  PSrc, PDst, Copied: array of integer;   { the same for groups - see Duplicate }
 
-  function Remap(Old: Integer): Integer;
+  function Remap(Old: integer): integer;
   var
-    N: Integer;
+    N: integer;
   begin
     if Old = 0 then Exit(0);
     for N := 0 to High(Src) do
@@ -7250,10 +7373,10 @@ var
     Result := FNextGrp;
   end;
 
-  function RemapPart(Old: Integer): Integer;
+  function RemapPart(Old: integer): integer;
   var
-    N: Integer;
-    Known: Boolean;
+    N: integer;
+    Known: boolean;
   begin
     if Old = 0 then Exit(0);
     for N := 0 to High(PSrc) do
@@ -7263,7 +7386,9 @@ var
       if Copied[N] = Old then Known := True;
     { pasted into a sheet that has no such group, a member goes in loose }
     if not Known then
-      if PartEnt(Old) >= 0 then Exit(Old) else Exit(0);
+      if PartEnt(Old) >= 0 then Exit(Old)
+      else
+        Exit(0);
     Inc(FNextPart);
     SetLength(PSrc, Length(PSrc) + 1);
     SetLength(PDst, Length(PDst) + 1);
@@ -7306,26 +7431,30 @@ begin
     for H := 0 to High(FEnts[FLive].Holes) do
       for K := 0 to High(FEnts[FLive].Holes[H]) do Shift(FEnts[FLive].Holes[H][K]);
     if Ents[J].Kind = ekPart then FEnts[FLive].Grp := RemapPart(Ents[J].Grp)
-    else FEnts[FLive].Grp := Remap(Ents[J].Grp);
+    else
+      FEnts[FLive].Grp := Remap(Ents[J].Grp);
     { into the open group here, unless it came with a group of its own }
     if Ents[J].Part = 0 then FEnts[FLive].Part := FStamp
-    else FEnts[FLive].Part := RemapPart(Ents[J].Part);
+    else
+      FEnts[FLive].Part := RemapPart(Ents[J].Part);
     Last := FLive;
     Inc(FLive);
     Inc(Result);
   end;
   if Result > 0 then
   begin
-    FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+    FSnapDirty := True;
+    FOnFaceOK := False;
+    Inc(FEditSeq);
   end;
 end;
 
 { Two screen segments, do they cross?  Used by the selection box. }
-function SegsCross(AX, AY, BX, BY, CX, CY, DX_, DY_: Double): Boolean;
+function SegsCross(AX, AY, BX, BY, CX, CY, DX_, DY_: double): boolean;
 var
-  R1, R2, R3, R4: Double;
+  R1, R2, R3, R4: double;
 
-  function Side(PX, PY, QX, QY, RX, RY: Double): Double;
+  function Side(PX, PY, QX, QY, RX, RY: double): double;
   begin
     Result := (QX - PX) * (RY - PY) - (QY - PY) * (RX - PX);
   end;
@@ -7339,35 +7468,29 @@ begin
 end;
 
 { Does this screen segment meet the box at all? }
-function SegHitsRect(AX, AY, BX, BY, X0, Y0, X1, Y1: Double): Boolean;
+function SegHitsRect(AX, AY, BX, BY, X0, Y0, X1, Y1: double): boolean;
 begin
   { an end inside is the common case and answers without any arithmetic }
-  if ((AX >= X0) and (AX <= X1) and (AY >= Y0) and (AY <= Y1)) or
-     ((BX >= X0) and (BX <= X1) and (BY >= Y0) and (BY <= Y1)) then
+  if ((AX >= X0) and (AX <= X1) and (AY >= Y0) and (AY <= Y1)) or ((BX >= X0) and (BX <= X1) and (BY >= Y0) and (BY <= Y1)) then
     Exit(True);
   { wholly off one side }
-  if (Max(AX, BX) < X0) or (Min(AX, BX) > X1) or
-     (Max(AY, BY) < Y0) or (Min(AY, BY) > Y1) then
+  if (Max(AX, BX) < X0) or (Min(AX, BX) > X1) or (Max(AY, BY) < Y0) or (Min(AY, BY) > Y1) then
     Exit(False);
-  Result := SegsCross(AX, AY, BX, BY, X0, Y0, X1, Y0) or
-            SegsCross(AX, AY, BX, BY, X1, Y0, X1, Y1) or
-            SegsCross(AX, AY, BX, BY, X1, Y1, X0, Y1) or
-            SegsCross(AX, AY, BX, BY, X0, Y1, X0, Y0);
+  Result := SegsCross(AX, AY, BX, BY, X0, Y0, X1, Y0) or SegsCross(AX, AY, BX, BY, X1, Y0, X1, Y1) or SegsCross(AX,
+    AY, BX, BY, X1, Y1, X0, Y1) or SegsCross(AX, AY, BX, BY, X0, Y1, X0, Y0);
 end;
 
 { Is this screen point inside the projected loop?  Even-odd, the same rule
   the face fill uses. }
-function LoopHasPt(const Pts: array of TPointF; SX, SY: Double): Boolean;
+function LoopHasPt(const Pts: array of TPointF; SX, SY: double): boolean;
 var
-  I, J: Integer;
+  I, J: integer;
 begin
   Result := False;
   J := High(Pts);
   for I := 0 to High(Pts) do
   begin
-    if ((Pts[I].Y > SY) <> (Pts[J].Y > SY)) and
-       (SX < (Pts[J].X - Pts[I].X) * (SY - Pts[I].Y) /
-             (Pts[J].Y - Pts[I].Y) + Pts[I].X) then
+    if ((Pts[I].Y > SY) <> (Pts[J].Y > SY)) and (SX < (Pts[J].X - Pts[I].X) * (SY - Pts[I].Y) / (Pts[J].Y - Pts[I].Y) + Pts[I].X) then
       Result := not Result;
     J := I;
   end;
@@ -7375,10 +7498,9 @@ end;
 
 { Guides come along only when the box caught nothing else - one runs through
   almost any box, and a guide is not part of the drawing. }
-function TWorkDoc.BoxPick(const V: TProjector; X0, Y0, X1, Y1: Double;
-  Crossing: Boolean): TIntArrayW;
+function TWorkDoc.BoxPick(const V: TProjector; X0, Y0, X1, Y1: double; Crossing: boolean): TIntArrayW;
 var
-  I, N, G: Integer;
+  I, N, G: integer;
   Guides: TIntArrayW;
 begin
   Result := nil;
@@ -7415,18 +7537,17 @@ end;
   crossing box (right to left) takes what it touches - the drawn segments,
   and a face's inside.  Guides answer the crossing question either way, bores
   are never taken, and hidden faces are taken too: a box sweeps an area. }
-function TWorkDoc.BoxTakes(const V: TProjector; I: Integer;
-  X0, Y0, X1, Y1: Double; Crossing: Boolean): Boolean;
+function TWorkDoc.BoxTakes(const V: TProjector; I: integer; X0, Y0, X1, Y1: double; Crossing: boolean): boolean;
 var
-  K, H, N: Integer;
-  T: Double;
-  BX0, BY0, BX1, BY1: Double;
+  K, H, N: integer;
+  T: double;
+  BX0, BY0, BX1, BY1: double;
   PA, PB: TPointF;
   QA, QB: TP3;
   Scr: array of TPointF;
   DG: TDimGeom;
 
-  function Hits(const MA, MB: TP3): Boolean;
+  function Hits(const MA, MB: TP3): boolean;
   var
     SA, SB: TPointF;
   begin
@@ -7438,8 +7559,18 @@ var
 begin
   Result := False;
   if (I < 0) or (I >= FLive) then Exit;
-  if X1 < X0 then begin T := X0; X0 := X1; X1 := T; end;
-  if Y1 < Y0 then begin T := Y0; Y0 := Y1; Y1 := T; end;
+  if X1 < X0 then
+  begin
+    T := X0;
+    X0 := X1;
+    X1 := T;
+  end;
+  if Y1 < Y0 then
+  begin
+    T := Y0;
+    Y0 := Y1;
+    Y1 := T;
+  end;
   if FEnts[I].Kind = ekBore then Exit;
   if not InSlice(I) then Exit;
   if (FEnts[I].Kind = ekGuide) and FGuidesHidden then Exit;
@@ -7451,12 +7582,10 @@ begin
     PA := Project(V, FEnts[I].A);
     PB := Project(V, FEnts[I].B);
     { out along its own direction, far enough to cross any view of it }
-    QA := P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 5000,
-             FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) * 5000,
-             FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 5000);
-    QB := P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 5000,
-             FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) * 5000,
-             FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 5000);
+    QA := P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 5000, FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) * 5000,
+      FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 5000);
+    QB := P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 5000, FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) * 5000,
+      FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 5000);
     Exit(Hits(QA, QB));
   end;
 
@@ -7471,41 +7600,36 @@ begin
 
   case FEnts[I].Kind of
     ekArc:
+    begin
+      QA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm);
+      for K := 1 to 24 do
       begin
-        QA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0,
-                       FEnts[I].Plane, FEnts[I].Nm);
-        for K := 1 to 24 do
-        begin
-          QB := ArcPoint(FEnts[I].C, FEnts[I].R,
-                  FEnts[I].A0 + FEnts[I].Sweep * K / 24,
-                  FEnts[I].Plane, FEnts[I].Nm);
-          if Hits(QA, QB) then Exit(True);
-          QA := QB;
-        end;
+        QB := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / 24, FEnts[I].Plane, FEnts[I].Nm);
+        if Hits(QA, QB) then Exit(True);
+        QA := QB;
       end;
+    end;
     ekFace:
-      begin
-        N := Length(FEnts[I].Poly);
-        if N < 3 then Exit;
-        for K := 0 to N - 1 do
-          if Hits(FEnts[I].Poly[K], FEnts[I].Poly[(K + 1) mod N]) then Exit(True);
-        for H := 0 to High(FEnts[I].Holes) do
-          if Length(FEnts[I].Holes[H]) >= 3 then
-            for K := 0 to High(FEnts[I].Holes[H]) do
-              if Hits(FEnts[I].Holes[H][K],
-                      FEnts[I].Holes[H][(K + 1) mod Length(FEnts[I].Holes[H])]) then
-                Exit(True);
+    begin
+      N := Length(FEnts[I].Poly);
+      if N < 3 then Exit;
+      for K := 0 to N - 1 do
+        if Hits(FEnts[I].Poly[K], FEnts[I].Poly[(K + 1) mod N]) then Exit(True);
+      for H := 0 to High(FEnts[I].Holes) do
+        if Length(FEnts[I].Holes[H]) >= 3 then
+          for K := 0 to High(FEnts[I].Holes[H]) do
+            if Hits(FEnts[I].Holes[H][K], FEnts[I].Holes[H][(K + 1) mod Length(FEnts[I].Holes[H])]) then
+              Exit(True);
         { a box wholly inside the face is on the face, which is as much a
           touch as crossing its edge }
-        SetLength(Scr, N);
-        for K := 0 to N - 1 do Scr[K] := Project(V, FEnts[I].Poly[K]);
-        Result := LoopHasPt(Scr, (X0 + X1) / 2, (Y0 + Y1) / 2);
-      end;
+      SetLength(Scr, N);
+      for K := 0 to N - 1 do Scr[K] := Project(V, FEnts[I].Poly[K]);
+      Result := LoopHasPt(Scr, (X0 + X1) / 2, (Y0 + Y1) / 2);
+    end;
     ekText:
       { the words are the note - the same box the cursor is tested against }
       if FEnts[I].BoxR > FEnts[I].BoxL then
-        Result := (FEnts[I].BoxR >= X0) and (FEnts[I].BoxL <= X1) and
-                  (FEnts[I].BoxB >= Y0) and (FEnts[I].BoxT <= Y1)
+        Result := (FEnts[I].BoxR >= X0) and (FEnts[I].BoxL <= X1) and (FEnts[I].BoxB >= Y0) and (FEnts[I].BoxT <= Y1)
       else
       begin
         PA := Project(V, FEnts[I].A);
@@ -7514,21 +7638,18 @@ begin
     ekDim:
       { the drawn line and its witness lines, which is what a dimension looks
         like - not the chord through the geometry it measures }
-      if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG,
-           FEnts[I].Txt) then
-        Result := SegHitsRect(DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y, X0, Y0, X1, Y1) or
-                  SegHitsRect(DG.A.X, DG.A.Y, DG.W1.X, DG.W1.Y, X0, Y0, X1, Y1) or
-                  SegHitsRect(DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y, X0, Y0, X1, Y1);
-  else
-    { a line, and a guide point, which is a guide with no length }
-    Result := Hits(FEnts[I].A, FEnts[I].B);
+      if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG, FEnts[I].Txt) then
+        Result := SegHitsRect(DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y, X0, Y0, X1, Y1) or SegHitsRect(DG.A.X, DG.A.Y, DG.W1.X,
+          DG.W1.Y, X0, Y0, X1, Y1) or SegHitsRect(DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y, X0, Y0, X1, Y1);
+    else
+      { a line, and a guide point, which is a guide with no length }
+      Result := Hits(FEnts[I].A, FEnts[I].B);
   end;
 end;
 
-procedure TWorkDoc.ScreenBounds(const V: TProjector; I: Integer;
-  out X0, Y0, X1, Y1: Double);
+procedure TWorkDoc.ScreenBounds(const V: TProjector; I: integer; out X0, Y0, X1, Y1: double);
 var
-  K: Integer;
+  K: integer;
   P: TPointF;
 
   procedure Grow(const Q: TP3);
@@ -7536,12 +7657,17 @@ var
     S: TPointF;
   begin
     S := Project(V, Q);
-    X0 := Min(X0, S.X); X1 := Max(X1, S.X);
-    Y0 := Min(Y0, S.Y); Y1 := Max(Y1, S.Y);
+    X0 := Min(X0, S.X);
+    X1 := Max(X1, S.X);
+    Y0 := Min(Y0, S.Y);
+    Y1 := Max(Y1, S.Y);
   end;
 
 begin
-  X0 := 1E30; Y0 := 1E30; X1 := -1E30; Y1 := -1E30;
+  X0 := 1E30;
+  Y0 := 1E30;
+  X1 := -1E30;
+  Y1 := -1E30;
   if (I < 0) or (I >= FLive) then Exit;
   Grow(FEnts[I].A);
   Grow(FEnts[I].B);
@@ -7557,17 +7683,16 @@ begin
     Grow(FEnts[I].Poly[K]);
 end;
 
-function TWorkDoc.EdgeWeight(const A, B: TP3): Single;
+function TWorkDoc.EdgeWeight(const A, B: TP3): single;
 const
   TOL = 1E-7;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := 0 to FLive - 1 do
     if FEnts[I].Kind = ekLine then
-      if (SamePt(FEnts[I].A, A, TOL) and SamePt(FEnts[I].B, B, TOL)) or
-         (SamePt(FEnts[I].A, B, TOL) and SamePt(FEnts[I].B, A, TOL)) then
+      if (SamePt(FEnts[I].A, A, TOL) and SamePt(FEnts[I].B, B, TOL)) or (SamePt(FEnts[I].A, B, TOL) and SamePt(FEnts[I].B, A, TOL)) then
         Exit(FEnts[I].Weight);
 end;
 
@@ -7575,11 +7700,11 @@ end;
   the outline's pen and not the face's color.  An exact outline piece first,
   then any line or arc ending on a corner, since a side cut by a crossing no
   longer runs corner to corner. }
-function TWorkDoc.OutlineInk(Face: Integer; Default: TColor): TColor;
+function TWorkDoc.OutlineInk(Face: integer; Default: TColor): TColor;
 const
   TOL = 1E-7;
 var
-  I, K, N: Integer;
+  I, K, N: integer;
   A, B: TP3;
 begin
   Result := Default;
@@ -7591,8 +7716,7 @@ begin
     B := FEnts[Face].Poly[(K + 1) mod N];
     for I := 0 to FLive - 1 do
       if FEnts[I].Kind = ekLine then
-        if (SamePt(FEnts[I].A, A, TOL) and SamePt(FEnts[I].B, B, TOL)) or
-           (SamePt(FEnts[I].A, B, TOL) and SamePt(FEnts[I].B, A, TOL)) then
+        if (SamePt(FEnts[I].A, A, TOL) and SamePt(FEnts[I].B, B, TOL)) or (SamePt(FEnts[I].A, B, TOL) and SamePt(FEnts[I].B, A, TOL)) then
           Exit(FEnts[I].Ink);
   end;
   for K := 0 to N - 1 do
@@ -7608,20 +7732,20 @@ end;
 { Hand every edge lying along this face's outline to the given group.  An
   edge counts when every point that defines it sits on the outline - both
   ends of a line, or a handful of samples round an arc. }
-procedure TWorkDoc.ClaimOutline(Face, G: Integer);
+procedure TWorkDoc.ClaimOutline(Face, G: integer);
 const
   TOL = 1E-6;
   ARC_SAMPLES = 12;
 var
-  I, K, N, J: Integer;
+  I, K, N, J: integer;
   Poly: TP3Array;
 
-  function OnOutline(const P: TP3): Boolean;
+  function OnOutline(const P: TP3): boolean;
   var
-    Q: Integer;
-    T, Off: Double;
+    Q: integer;
+    T, Off: double;
     A, B, D: TP3;
-    L2: Double;
+    L2: double;
   begin
     Result := True;
     for Q := 0 to N - 1 do
@@ -7651,14 +7775,13 @@ begin
         if OnOutline(FEnts[I].A) and OnOutline(FEnts[I].B) then
           FEnts[I].Grp := G;
       ekArc:
-        begin
-          J := 0;
-          for K := 0 to ARC_SAMPLES do
-            if OnOutline(ArcPoint(FEnts[I].C, FEnts[I].R,
-                 FEnts[I].A0 + FEnts[I].Sweep * K / ARC_SAMPLES,
-                 FEnts[I].Plane, FEnts[I].Nm)) then Inc(J);
-          if J = ARC_SAMPLES + 1 then FEnts[I].Grp := G;
-        end;
+      begin
+        J := 0;
+        for K := 0 to ARC_SAMPLES do
+          if OnOutline(ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / ARC_SAMPLES, FEnts[I].Plane, FEnts[I].Nm)) then
+            Inc(J);
+        if J = ARC_SAMPLES + 1 then FEnts[I].Grp := G;
+      end;
     end;
   end;
 end;
@@ -7666,11 +7789,11 @@ end;
 { Is P inside the flat loop, both taken in the loop's plane?  Even-odd, on
   the loop's own two axes.  hsFaceFinder has the general one; this unit cannot
   use hsFaceFinder, which uses it. }
-function LoopContains(const P: TP3; const Loop: TP3Array; const N: TP3): Boolean;
+function LoopContains(const P: TP3; const Loop: TP3Array; const N: TP3): boolean;
 var
   AU, AV: TP3;
-  I, J: Integer;
-  PX, PY, AX, AY, BX, BY: Double;
+  I, J: integer;
+  PX, PY, AX, AY, BX, BY: double;
 begin
   Result := False;
   AxesFromNormal(N, AU, AV);
@@ -7679,27 +7802,27 @@ begin
   J := High(Loop);
   for I := 0 to High(Loop) do
   begin
-    AX := Dot3(Loop[I], AU); AY := Dot3(Loop[I], AV);
-    BX := Dot3(Loop[J], AU); BY := Dot3(Loop[J], AV);
-    if ((AY > PY) <> (BY > PY)) and
-       (PX < (BX - AX) * (PY - AY) / (BY - AY) + AX) then
+    AX := Dot3(Loop[I], AU);
+    AY := Dot3(Loop[I], AV);
+    BX := Dot3(Loop[J], AU);
+    BY := Dot3(Loop[J], AV);
+    if ((AY > PY) <> (BY > PY)) and (PX < (BX - AX) * (PY - AY) / (BY - AY) + AX) then
       Result := not Result;
     J := I;
   end;
 end;
 
-function TWorkDoc.TunnelThrough(Index: Integer; const Top: TP3Array;
-  const Nm: TP3; Dist: Double): Boolean;
+function TWorkDoc.TunnelThrough(Index: integer; const Top: TP3Array; const Nm: TP3; Dist: double): boolean;
 var
-  F, I, J, K, N, G, Far: Integer;
+  F, I, J, K, N, G, Far: integer;
   FN, Mid: TP3;
-  Size, Tol: Double;
+  Size, Tol: double;
   Quad: array[0..3] of TP3;
   Ink, LineInk: TColor;
-  Wt: Single;
+  Wt: single;
   Holes: array of TP3Array;
-  Near: Integer;
-  Opened, Pocket: Boolean;
+  Near: integer;
+  Opened, Pocket: boolean;
 begin
   Result := False;
   Near := -1;
@@ -7719,8 +7842,7 @@ begin
     Mid := P3(Mid.X / I, Mid.Y / I, Mid.Z / I);
     for F := 0 to FLive - 1 do
     begin
-      if (F = Index) or (FEnts[F].Kind <> ekFace) or not FEnts[F].Solid or
-         (FEnts[F].Grp = 0) or (Length(FEnts[F].Poly) < 3) then Continue;
+      if (F = Index) or (FEnts[F].Kind <> ekFace) or not FEnts[F].Solid or (FEnts[F].Grp = 0) or (Length(FEnts[F].Poly) < 3) then Continue;
       FN := FaceNormal(F);
       if Abs(Abs(Dot3(FN, Nm)) - 1) > 1E-6 then Continue;
       if Abs(Dot3(FN, Sub3(Mid, FEnts[F].Poly[0]))) > 1E-6 then Continue;
@@ -7736,8 +7858,7 @@ begin
   Size := 0;
   { Dist is the push here, so the spread is worked out by hand }
   for I := 0 to N - 1 do
-    Size := Max(Size, Sqrt(Sqr(Top[I].X - Top[0].X) + Sqr(Top[I].Y - Top[0].Y) +
-                           Sqr(Top[I].Z - Top[0].Z)));
+    Size := Max(Size, Sqrt(Sqr(Top[I].X - Top[0].X) + Sqr(Top[I].Y - Top[0].Y) + Sqr(Top[I].Z - Top[0].Z)));
   Tol := 1E-6 * (1 + Size + Abs(Dist));
 
   { the face the push lands on: same solid, parallel, in the plane the far
@@ -7765,8 +7886,7 @@ begin
   { No far face: the push stops inside the solid.  Pushed inward, a plug
     makes a pocket - a tunnel with a floor where the opening would have
     been.  Pushed outward, or not a plug, it is an extrusion for the caller. }
-  Pocket := (Far < 0) and (Dist < 0) and FEnts[Index].Solid and
-            (IsPatch(Index) or not WallsSquareTo(Index));
+  Pocket := (Far < 0) and (Dist < 0) and FEnts[Index].Solid and (IsPatch(Index) or not WallsSquareTo(Index));
   if (Far < 0) and not Pocket then Exit;
 
   Ink := FEnts[Index].Ink;
@@ -7825,16 +7945,19 @@ begin
   for I := 0 to N - 1 do
   begin
     J := (I + 1) mod N;
-    Quad[0] := FEnts[Index].Poly[I]; Quad[1] := FEnts[Index].Poly[J];
-    Quad[2] := Top[J];              Quad[3] := Top[I];
+    Quad[0] := FEnts[Index].Poly[I];
+    Quad[1] := FEnts[Index].Poly[J];
+    Quad[2] := Top[J];
+    Quad[3] := Top[I];
     { wound to look into the tunnel, whichever way the push went and the
       opening was drawn }
-    FN := Cross3(Sub3(Quad[1], Quad[0]),
-                 Sub3(Quad[3], Quad[0]));
+    FN := Cross3(Sub3(Quad[1], Quad[0]), Sub3(Quad[3], Quad[0]));
     if Dot3(FN, Sub3(Mid, Quad[0])) < 0 then
     begin
-      Quad[1] := FEnts[Index].Poly[I]; Quad[0] := FEnts[Index].Poly[J];
-      Quad[3] := Top[J];              Quad[2] := Top[I];
+      Quad[1] := FEnts[Index].Poly[I];
+      Quad[0] := FEnts[Index].Poly[J];
+      Quad[3] := Top[J];
+      Quad[2] := Top[I];
     end;
     AddFaceRaw(Quad, Ink, True);
     FEnts[FLive - 1].Grp := G;
@@ -7854,7 +7977,9 @@ begin
   { and the pushed face is the hole now }
   Delete(Index);
   if not Pocket then Dec(FLastBore);
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := True;
 end;
 
@@ -7862,32 +7987,31 @@ end;
   plane of the face it comes out of, or TunnelThrough finds no far face and
   builds a plug instead.  Nobody can drag to a millionth, so this works it
   out by the same rule TunnelThrough uses. }
-function TWorkDoc.ThroughDistance(Face: Integer; Want: Double): Double;
+function TWorkDoc.ThroughDistance(Face: integer; Want: double): double;
 var
-  F, I, N, G: Integer;
+  F, I, N, G: integer;
   Nm, FN, Mid, Q: TP3;
-  D, Best, Sgn, Size, Tol: Double;
-  All: Boolean;
+  D, Best, Sgn, Size, Tol: double;
+  All: boolean;
 begin
   Result := Want;
   if (Face < 0) or (Face >= FLive) or (FEnts[Face].Kind <> ekFace) then Exit;
   N := Length(FEnts[Face].Poly);
   if (N < 3) or (Abs(Want) < 1E-9) then Exit;
   Nm := FaceNormal(Face);
-  if Want < 0 then Sgn := -1 else Sgn := 1;
+  if Want < 0 then Sgn := -1
+  else
+    Sgn := 1;
 
   { which solid - the face's own group, or the one whose wall it sits on }
   G := FEnts[Face].Grp;
   Mid := P3(0, 0, 0);
   for I := 0 to N - 1 do
-    Mid := P3(Mid.X + FEnts[Face].Poly[I].X / N,
-              Mid.Y + FEnts[Face].Poly[I].Y / N,
-              Mid.Z + FEnts[Face].Poly[I].Z / N);
+    Mid := P3(Mid.X + FEnts[Face].Poly[I].X / N, Mid.Y + FEnts[Face].Poly[I].Y / N, Mid.Z + FEnts[Face].Poly[I].Z / N);
   if G = 0 then
     for F := 0 to FLive - 1 do
     begin
-      if (F = Face) or (FEnts[F].Kind <> ekFace) or not FEnts[F].Solid or
-         (FEnts[F].Grp = 0) or (Length(FEnts[F].Poly) < 3) then Continue;
+      if (F = Face) or (FEnts[F].Kind <> ekFace) or not FEnts[F].Solid or (FEnts[F].Grp = 0) or (Length(FEnts[F].Poly) < 3) then Continue;
       FN := FaceNormal(F);
       if Abs(Abs(Dot3(FN, Nm)) - 1) > 1E-6 then Continue;
       if Abs(Dot3(FN, Sub3(Mid, FEnts[F].Poly[0]))) > 1E-6 then Continue;
@@ -7919,8 +8043,7 @@ begin
     All := True;
     for I := 0 to N - 1 do
     begin
-      Q := P3(FEnts[Face].Poly[I].X + Nm.X * D, FEnts[Face].Poly[I].Y + Nm.Y * D,
-              FEnts[Face].Poly[I].Z + Nm.Z * D);
+      Q := P3(FEnts[Face].Poly[I].X + Nm.X * D, FEnts[Face].Poly[I].Y + Nm.Y * D, FEnts[Face].Poly[I].Z + Nm.Z * D);
       if not LoopContains(Q, FEnts[F].Poly, FN) then
       begin
         All := False;
@@ -7941,20 +8064,19 @@ end;
   of the solid is flat or in the moved face's plane, the extrusion goes and
   the pushed face stays loose with its paint, as in SketchUp.  Otherwise only
   the zero-area walls and doubled edges go. }
-function TWorkDoc.FlattenedAway(Index: Integer): Boolean;
+function TWorkDoc.FlattenedAway(Index: integer): boolean;
 const
   TOL = 1E-6;
 var
-  Doomed: array of Boolean;
-  I, J, K, G, Part_, NOther: Integer;
+  Doomed: array of boolean;
+  I, J, K, G, Part_, NOther: integer;
   Nm: TP3;
-  D: Double;
-  AllFlat, InPlane: Boolean;
+  D: double;
+  AllFlat, InPlane: boolean;
 
-  function SameP(const P, Q: TP3): Boolean;
+  function SameP(const P, Q: TP3): boolean;
   begin
-    Result := (Abs(P.X - Q.X) < TOL) and (Abs(P.Y - Q.Y) < TOL) and
-              (Abs(P.Z - Q.Z) < TOL);
+    Result := (Abs(P.X - Q.X) < TOL) and (Abs(P.Y - Q.Y) < TOL) and (Abs(P.Z - Q.Z) < TOL);
   end;
 
 begin
@@ -7973,8 +8095,7 @@ begin
   AllFlat := True;
   NOther := 0;
   for I := 0 to FLive - 1 do
-    if (I <> Index) and (FEnts[I].Kind = ekFace) and (FEnts[I].Grp = G) and
-       (FEnts[I].Part = Part_) then
+    if (I <> Index) and (FEnts[I].Kind = ekFace) and (FEnts[I].Grp = G) and (FEnts[I].Part = Part_) then
     begin
       Inc(NOther);
       if FaceArea(I) < TOL * TOL then
@@ -7992,16 +8113,14 @@ begin
     under it, and it goes too }
   if AllFlat then
     for I := 0 to FLive - 1 do
-      if (I <> Index) and (FEnts[I].Kind = ekFace) and (FEnts[I].Grp = G) and
-         (FEnts[I].Part = Part_) then
+      if (I <> Index) and (FEnts[I].Kind = ekFace) and (FEnts[I].Grp = G) and (FEnts[I].Part = Part_) then
         Doomed[I] := True;
 
   { the edges: one with no length was a wall's upright, and of two that lie
     on top of each other the later one is the ring that came down to meet
     the first }
   for I := 0 to FLive - 1 do
-    if (FEnts[I].Kind = ekLine) and (FEnts[I].Grp = G) and
-       (FEnts[I].Part = Part_) and not FEnts[I].Dim then
+    if (FEnts[I].Kind = ekLine) and (FEnts[I].Grp = G) and (FEnts[I].Part = Part_) and not FEnts[I].Dim then
     begin
       if SameP(FEnts[I].A, FEnts[I].B) then
       begin
@@ -8009,10 +8128,8 @@ begin
         Continue;
       end;
       for K := 0 to I - 1 do
-        if (FEnts[K].Kind = ekLine) and (FEnts[K].Grp = G) and
-           (FEnts[K].Part = Part_) and not Doomed[K] and
-           ((SameP(FEnts[K].A, FEnts[I].A) and SameP(FEnts[K].B, FEnts[I].B)) or
-            (SameP(FEnts[K].A, FEnts[I].B) and SameP(FEnts[K].B, FEnts[I].A))) then
+        if (FEnts[K].Kind = ekLine) and (FEnts[K].Grp = G) and (FEnts[K].Part = Part_) and not Doomed[K] and
+          ((SameP(FEnts[K].A, FEnts[I].A) and SameP(FEnts[K].B, FEnts[I].B)) or (SameP(FEnts[K].A, FEnts[I].B) and SameP(FEnts[K].B, FEnts[I].A))) then
         begin
           Doomed[I] := True;
           Break;
@@ -8027,8 +8144,7 @@ begin
   { what is left of a solid pressed flat is loose drawing again }
   if AllFlat then
     for I := 0 to FLive - 1 do
-      if (FEnts[I].Kind in [ekFace, ekLine, ekArc]) and (FEnts[I].Grp = G) and
-         (FEnts[I].Part = Part_) and not Doomed[I] then
+      if (FEnts[I].Kind in [ekFace, ekLine, ekArc]) and (FEnts[I].Grp = G) and (FEnts[I].Part = Part_) and not Doomed[I] then
       begin
         FEnts[I].Grp := 0;
         if FEnts[I].Kind = ekFace then FEnts[I].Solid := False;
@@ -8038,18 +8154,18 @@ begin
   Result := AllFlat;
 end;
 
-function TWorkDoc.PushPull(Index: Integer; Dist: Double): Boolean;
+function TWorkDoc.PushPull(Index: integer; Dist: double): boolean;
 var
-  I, J, N, G: Integer;
+  I, J, N, G: integer;
   Nm: TP3;
   Base, Top, Rev: TP3Array;
   HBase, HTop, RevH: array of TP3Array;
-  H, M: Integer;
+  H, M: integer;
   Quad: array[0..3] of TP3;
   Ink, LineInk: TColor;
-  Wt: Single;
-  Plug, Same: Boolean;
-  Turn, Far_: Double;
+  Wt: single;
+  Plug, Same: boolean;
+  Turn, Far_: double;
 begin
   Result := False;
   FLastBore := -1;
@@ -8091,9 +8207,7 @@ begin
   for I := 0 to N - 1 do
   begin
     Base[I] := FEnts[Index].Poly[I];
-    Top[I] := P3(Base[I].X + Nm.X * Dist,
-                 Base[I].Y + Nm.Y * Dist,
-                 Base[I].Z + Nm.Z * Dist);
+    Top[I] := P3(Base[I].X + Nm.X * Dist, Base[I].Y + Nm.Y * Dist, Base[I].Z + Nm.Z * Dist);
   end;
 
   { Pushed clean through its own solid, the shape is a hole: the far face
@@ -8114,8 +8228,7 @@ begin
       outline turns positively by definition, so an opening should not }
     Turn := 0;
     for I := 0 to M - 1 do
-      Turn := Turn + Dot3(Nm, Cross3(FEnts[Index].Holes[H][I],
-        FEnts[Index].Holes[H][(I + 1) mod M]));
+      Turn := Turn + Dot3(Nm, Cross3(FEnts[Index].Holes[H][I], FEnts[Index].Holes[H][(I + 1) mod M]));
     Same := Turn > 0;
     for I := 0 to M - 1 do
     begin
@@ -8123,9 +8236,7 @@ begin
         HBase[H][I] := FEnts[Index].Holes[H][M - 1 - I]
       else
         HBase[H][I] := FEnts[Index].Holes[H][I];
-      HTop[H][I] := P3(HBase[H][I].X + Nm.X * Dist,
-                       HBase[H][I].Y + Nm.Y * Dist,
-                       HBase[H][I].Z + Nm.Z * Dist);
+      HTop[H][I] := P3(HBase[H][I].X + Nm.X * Dist, HBase[H][I].Y + Nm.Y * Dist, HBase[H][I].Z + Nm.Z * Dist);
     end;
   end;
 
@@ -8202,13 +8313,17 @@ begin
     { the walls turn the same way round as the caps }
     if Dist >= 0 then
     begin
-      Quad[0] := Base[I]; Quad[1] := Base[J];
-      Quad[2] := Top[J];  Quad[3] := Top[I];
+      Quad[0] := Base[I];
+      Quad[1] := Base[J];
+      Quad[2] := Top[J];
+      Quad[3] := Top[I];
     end
     else
     begin
-      Quad[0] := Base[J]; Quad[1] := Base[I];
-      Quad[2] := Top[I];  Quad[3] := Top[J];
+      Quad[0] := Base[J];
+      Quad[1] := Base[I];
+      Quad[2] := Top[I];
+      Quad[3] := Top[J];
     end;
     AddFaceRaw(Quad, Ink, True);
     if FEnts[Index].MatSet then SetMaterial(FLive - 1, FEnts[Index].Mat);
@@ -8235,13 +8350,17 @@ begin
       J := (I + 1) mod M;
       if Dist >= 0 then
       begin
-        Quad[0] := HBase[H][I]; Quad[1] := HBase[H][J];
-        Quad[2] := HTop[H][J];  Quad[3] := HTop[H][I];
+        Quad[0] := HBase[H][I];
+        Quad[1] := HBase[H][J];
+        Quad[2] := HTop[H][J];
+        Quad[3] := HTop[H][I];
       end
       else
       begin
-        Quad[0] := HBase[H][J]; Quad[1] := HBase[H][I];
-        Quad[2] := HTop[H][I];  Quad[3] := HTop[H][J];
+        Quad[0] := HBase[H][J];
+        Quad[1] := HBase[H][I];
+        Quad[2] := HTop[H][I];
+        Quad[3] := HTop[H][J];
       end;
       AddFaceRaw(Quad, Ink, True);
       if FEnts[Index].MatSet then SetMaterial(FLive - 1, FEnts[Index].Mat);
@@ -8254,22 +8373,23 @@ begin
     end;
   end;
 
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   Result := True;
 end;
 
-function Lerp3(const A, B: TP3; T: Double): TP3;
+function Lerp3(const A, B: TP3; T: double): TP3;
 begin
-  Result := P3(A.X + (B.X - A.X) * T, A.Y + (B.Y - A.Y) * T,
-               A.Z + (B.Z - A.Z) * T);
+  Result := P3(A.X + (B.X - A.X) * T, A.Y + (B.Y - A.Y) * T, A.Z + (B.Z - A.Z) * T);
 end;
 
 { Where a point sits along a segment, when strictly inside it.  A line drawn
   from the middle of another makes a T, not a cross, but still cuts it in
   two, and each half wants its own middle. }
-function PointOnSeg(const P, A, B: TP3; out T: Double): Boolean;
+function PointOnSeg(const P, A, B: TP3; out T: double): boolean;
 var
-  DX, DY, DZ, L2: Double;
+  DX, DY, DZ, L2: double;
   Q: TP3;
 begin
   Result := False;
@@ -8287,11 +8407,10 @@ end;
 
 { Where two segments come closest; a crossing only if the gap is negligible
   and the point is properly inside both. }
-function SegCross(const A1, A2, B1, B2: TP3; out P: TP3;
-  out TA, TB: Double): Boolean;
+function SegCross(const A1, A2, B1, B2: TP3; out P: TP3; out TA, TB: double): boolean;
 var
-  UX, UY, UZ, VX, VY, VZ, WX, WY, WZ: Double;
-  A, B, C, D, E, Den, Scale: Double;
+  UX, UY, UZ, VX, VY, VZ, WX, WY, WZ: double;
+  A, B, C, D, E, Den, Scale: double;
   PA, PB: TP3;
 begin
   Result := False;
@@ -8299,9 +8418,15 @@ begin
   TB := 0;
   P := A1;
 
-  UX := A2.X - A1.X; UY := A2.Y - A1.Y; UZ := A2.Z - A1.Z;
-  VX := B2.X - B1.X; VY := B2.Y - B1.Y; VZ := B2.Z - B1.Z;
-  WX := A1.X - B1.X; WY := A1.Y - B1.Y; WZ := A1.Z - B1.Z;
+  UX := A2.X - A1.X;
+  UY := A2.Y - A1.Y;
+  UZ := A2.Z - A1.Z;
+  VX := B2.X - B1.X;
+  VY := B2.Y - B1.Y;
+  VZ := B2.Z - B1.Z;
+  WX := A1.X - B1.X;
+  WY := A1.Y - B1.Y;
+  WZ := A1.Z - B1.Z;
 
   A := UX * UX + UY * UY + UZ * UZ;
   B := UX * VX + UY * VY + UZ * VZ;
@@ -8335,14 +8460,14 @@ const
 var
   GLo, GHi: array of TP3;
   BLo, BHi, GDir: TP3;
-  Reach: Double;
-  I, J, N, LineCount, NGuide: Integer;
+  Reach: double;
+  I, J, N, LineCount, NGuide: integer;
   P: TP3;
-  TA, TB: Double;
-  Cuts: array of array of Double;
-  Idx, GIdx: array of Integer;
-  Tmp: Double;
-  K, M, H: Integer;
+  TA, TB: double;
+  Cuts: array of array of double;
+  Idx, GIdx: array of integer;
+  Tmp: double;
+  K, M, H: integer;
   MidKind: TSnapKind;
   Seen: TFPHashList;
   Key: string;
@@ -8361,9 +8486,9 @@ var
   end;
 
   { Note that something crosses line Which at parameter T, once. }
-  procedure AddCut(Which: Integer; T: Double);
+  procedure AddCut(Which: integer; T: double);
   var
-    Q: Integer;
+    Q: integer;
   begin
     for Q := 0 to High(Cuts[Which]) do
       if Abs(Cuts[Which][Q] - T) < 1E-9 then Exit;
@@ -8382,13 +8507,13 @@ begin
 
   for I := 0 to FLive - 1 do
     if not EntHidden(I) then
-    case FEnts[I].Kind of
-      ekLine:
+      case FEnts[I].Kind of
+        ekLine:
         begin
           Put(FEnts[I].A, snEndpoint);
           Put(FEnts[I].B, snEndpoint);
         end;
-      ekArc:
+        ekArc:
         begin
           Put(FEnts[I].A, snEndpoint);
           Put(FEnts[I].B, snEndpoint);
@@ -8396,28 +8521,28 @@ begin
         end;
       { The middle of a face, for drawing a circle from the center of a
         square.  One per face, so it is not noise. }
-      ekFace:
-        if Length(FEnts[I].Poly) >= 3 then
-        begin
-          P := P3(0, 0, 0);
-          for K := 0 to High(FEnts[I].Poly) do
+        ekFace:
+          if Length(FEnts[I].Poly) >= 3 then
           begin
-            P.X := P.X + FEnts[I].Poly[K].X;
-            P.Y := P.Y + FEnts[I].Poly[K].Y;
-            P.Z := P.Z + FEnts[I].Poly[K].Z;
+            P := P3(0, 0, 0);
+            for K := 0 to High(FEnts[I].Poly) do
+            begin
+              P.X := P.X + FEnts[I].Poly[K].X;
+              P.Y := P.Y + FEnts[I].Poly[K].Y;
+              P.Z := P.Z + FEnts[I].Poly[K].Z;
+            end;
+            K := Length(FEnts[I].Poly);
+            Put(P3(P.X / K, P.Y / K, P.Z / K), snCenter);
           end;
-          K := Length(FEnts[I].Poly);
-          Put(P3(P.X / K, P.Y / K, P.Z / K), snCenter);
-        end;
 
-      { a guide point is meant to be aimed at - unless guides are hidden }
-      ekGuide:
-        if (not FGuidesHidden) and (Dist(FEnts[I].A, FEnts[I].B) < 1E-9) then
-          Put(FEnts[I].A, snEndpoint);
+        { a guide point is meant to be aimed at - unless guides are hidden }
+        ekGuide:
+          if (not FGuidesHidden) and (Dist(FEnts[I].A, FEnts[I].B) < 1E-9) then
+            Put(FEnts[I].A, snEndpoint);
 
-      { annotation is never snapped to; it is only in the way }
-      ekDim, ekText: ;
-    end;
+        { annotation is never snapped to; it is only in the way }
+        ekDim, ekText: ;
+      end;
 
   { The corners of a face, where no line already put one.  A face from a
     revolve, an import or a generator has no lines, and would otherwise offer
@@ -8467,8 +8592,7 @@ begin
   if LineCount <= MAX_LINES then
     for I := 0 to LineCount - 2 do
       for J := I + 1 to LineCount - 1 do
-        if SegCross(FEnts[Idx[I]].A, FEnts[Idx[I]].B,
-                    FEnts[Idx[J]].A, FEnts[Idx[J]].B, P, TA, TB) then
+        if SegCross(FEnts[Idx[I]].A, FEnts[Idx[I]].B, FEnts[Idx[J]].A, FEnts[Idx[J]].B, P, TA, TB) then
         begin
           Put(P, snCross);
           AddCut(I, TA);
@@ -8495,8 +8619,7 @@ begin
   NGuide := 0;
   if not FGuidesHidden then
     for I := 0 to FLive - 1 do
-      if (FEnts[I].Kind = ekGuide) and
-         (Dist(FEnts[I].A, FEnts[I].B) > 1E-9) then
+      if (FEnts[I].Kind = ekGuide) and (Dist(FEnts[I].A, FEnts[I].B) > 1E-9) then
       begin
         GIdx[NGuide] := I;
         Inc(NGuide);
@@ -8516,18 +8639,13 @@ begin
     for I := 0 to NGuide - 1 do
     begin
       GDir := Norm3(Sub3(FEnts[GIdx[I]].B, FEnts[GIdx[I]].A));
-      GLo[I] := P3(FEnts[GIdx[I]].A.X - GDir.X * Reach,
-                   FEnts[GIdx[I]].A.Y - GDir.Y * Reach,
-                   FEnts[GIdx[I]].A.Z - GDir.Z * Reach);
-      GHi[I] := P3(FEnts[GIdx[I]].A.X + GDir.X * Reach,
-                   FEnts[GIdx[I]].A.Y + GDir.Y * Reach,
-                   FEnts[GIdx[I]].A.Z + GDir.Z * Reach);
+      GLo[I] := P3(FEnts[GIdx[I]].A.X - GDir.X * Reach, FEnts[GIdx[I]].A.Y - GDir.Y * Reach, FEnts[GIdx[I]].A.Z - GDir.Z * Reach);
+      GHi[I] := P3(FEnts[GIdx[I]].A.X + GDir.X * Reach, FEnts[GIdx[I]].A.Y + GDir.Y * Reach, FEnts[GIdx[I]].A.Z + GDir.Z * Reach);
     end;
     for I := 0 to NGuide - 1 do
     begin
       for J := 0 to LineCount - 1 do
-        if SegCross(GLo[I], GHi[I],
-                    FEnts[Idx[J]].A, FEnts[Idx[J]].B, P, TA, TB) then
+        if SegCross(GLo[I], GHi[I], FEnts[Idx[J]].A, FEnts[Idx[J]].B, P, TA, TB) then
           Put(P, snCross);
       for J := I + 1 to NGuide - 1 do
         if SegCross(GLo[I], GHi[I], GLo[J], GHi[J], P, TA, TB) then
@@ -8555,15 +8673,16 @@ begin
     end;
     { an uncrossed line has one piece, and its middle is the real midpoint;
       anything else is a piece of a line and ranks well below it }
-    if Length(Cuts[I]) > 2 then MidKind := snSubMid else MidKind := snMidpoint;
+    if Length(Cuts[I]) > 2 then MidKind := snSubMid
+    else
+      MidKind := snMidpoint;
     for K := 0 to High(Cuts[I]) - 1 do
     begin
       Tmp := (Cuts[I][K] + Cuts[I][K + 1]) / 2;
       if Cuts[I][K + 1] - Cuts[I][K] < 1E-6 then Continue;
-      Put(P3(FEnts[Idx[I]].A.X + (FEnts[Idx[I]].B.X - FEnts[Idx[I]].A.X) * Tmp,
-             FEnts[Idx[I]].A.Y + (FEnts[Idx[I]].B.Y - FEnts[Idx[I]].A.Y) * Tmp,
-             FEnts[Idx[I]].A.Z + (FEnts[Idx[I]].B.Z - FEnts[Idx[I]].A.Z) * Tmp),
-          MidKind);
+      Put(P3(FEnts[Idx[I]].A.X + (FEnts[Idx[I]].B.X - FEnts[Idx[I]].A.X) * Tmp, FEnts[Idx[I]].A.Y + (FEnts[Idx[I]].B.Y - FEnts[Idx[I]].A.Y) *
+        Tmp, FEnts[Idx[I]].A.Z + (FEnts[Idx[I]].B.Z - FEnts[Idx[I]].A.Z) * Tmp),
+        MidKind);
     end;
   end;
 
@@ -8579,14 +8698,14 @@ end;
 { A group's crate - the box round it - as snap points: eight corners, edge
   middles, side centers and the center, like SketchUp's inference grips.
   Only groups sitting directly in the open context. }
-procedure TWorkDoc.CrateSnaps(var N: Integer);
+procedure TWorkDoc.CrateSnaps(var N: integer);
 var
-  I: Integer;
+  I: integer;
   Lo, Hi, C: TP3;
-  X: array[0..2] of Double;
-  Y: array[0..2] of Double;
-  Z: array[0..2] of Double;
-  IX, IY, IZ, NX, NY, NZ, Odd: Integer;
+  X: array[0..2] of double;
+  Y: array[0..2] of double;
+  Z: array[0..2] of double;
+  IX, IY, IZ, NX, NY, NZ, Odd: integer;
 
   procedure Put(const Q: TP3; Kind: TSnapKind);
   begin
@@ -8605,12 +8724,20 @@ begin
     if FEnts[I].Part <> FContext then Continue;
     if EntHidden(I) then Continue;
     if not PartBounds(FEnts[I].Grp, Lo, Hi) then Continue;
-    X[0] := Lo.X; X[1] := (Lo.X + Hi.X) / 2; X[2] := Hi.X;
-    Y[0] := Lo.Y; Y[1] := (Lo.Y + Hi.Y) / 2; Y[2] := Hi.Y;
-    Z[0] := Lo.Z; Z[1] := (Lo.Z + Hi.Z) / 2; Z[2] := Hi.Z;
+    X[0] := Lo.X;
+    X[1] := (Lo.X + Hi.X) / 2;
+    X[2] := Hi.X;
+    Y[0] := Lo.Y;
+    Y[1] := (Lo.Y + Hi.Y) / 2;
+    Y[2] := Hi.Y;
+    Z[0] := Lo.Z;
+    Z[1] := (Lo.Z + Hi.Z) / 2;
+    Z[2] := Hi.Z;
     { an axis the box has no extent along - a flat group - has one
       coordinate, not three: walked once, and its middle is not a middle }
-    NX := 2; NY := 2; NZ := 2;
+    NX := 2;
+    NY := 2;
+    NZ := 2;
     if Hi.X - Lo.X < 1E-7 then NX := 0;
     if Hi.Y - Lo.Y < 1E-7 then NY := 0;
     if Hi.Z - Lo.Z < 1E-7 then NZ := 0;
@@ -8626,8 +8753,8 @@ begin
           case Odd of
             0: Put(C, snEndpoint);
             1: Put(C, snMidpoint);
-          else
-            Put(C, snCenter);
+            else
+              Put(C, snCenter);
           end;
         end;
   end;
@@ -8636,15 +8763,15 @@ end;
 { An arc's own snap points: quadrants, crossings with other arcs, and the
   middles of the pieces those leave.  Angles run from A0 along the sweep, so
   either direction reads the same. }
-procedure TWorkDoc.ArcSnaps(var N: Integer);
+procedure TWorkDoc.ArcSnaps(var N: integer);
 const
   MAX_ARCS = 300;
 var
-  I, J, K, Q, G, ArcCount: Integer;
-  Idx: array of Integer;
-  Cuts: array of array of Double;
+  I, J, K, Q, G, ArcCount: integer;
+  Idx: array of integer;
+  Cuts: array of array of double;
   AU, AV, Nm, P, U, Wv, GDir: TP3;
-  Ang, Tmp: Double;
+  Ang, Tmp: double;
 
   procedure Put(const Pt: TP3; Kind: TSnapKind);
   begin
@@ -8669,23 +8796,26 @@ var
   end;
 
   { the point at absolute angle A on the arc's circle }
-  function At(const E: TWorkEnt; A: Double): TP3;
+  function At(const E: TWorkEnt; A: double): TP3;
   begin
     if E.Plane = plFree then Result := ArcPoint(E.C, E.R, A, E.Plane, E.Nm)
-    else Result := ArcPoint(E.C, E.R, A, E.Plane);
+    else
+      Result := ArcPoint(E.C, E.R, A, E.Plane);
   end;
 
   { how far along the arc, from A0 in the direction of the sweep, an
     absolute angle sits: 0 .. 2pi }
-  function Along(const E: TWorkEnt; A: Double): Double;
+  function Along(const E: TWorkEnt; A: double): double;
   begin
-    if E.Sweep >= 0 then Result := A - E.A0 else Result := E.A0 - A;
+    if E.Sweep >= 0 then Result := A - E.A0
+    else
+      Result := E.A0 - A;
     Result := Result - 2 * Pi * Floor(Result / (2 * Pi));
   end;
 
-  function OnArc(const E: TWorkEnt; A: Double): Boolean;
+  function OnArc(const E: TWorkEnt; A: double): boolean;
   var
-    L: Double;
+    L: double;
   begin
     if Abs(E.Sweep) >= 2 * Pi - 1E-9 then Exit(True);
     L := Along(E, A);
@@ -8693,7 +8823,7 @@ var
   end;
 
   { the absolute angle of a point on (or near) the arc's circle }
-  function AngleOf(const E: TWorkEnt; const Pt: TP3): Double;
+  function AngleOf(const E: TWorkEnt; const Pt: TP3): double;
   var
     U, V, Nrm, D: TP3;
   begin
@@ -8702,9 +8832,9 @@ var
     Result := ArcTan2(Dot3(D, V), Dot3(D, U));
   end;
 
-  procedure AddCut(Which: Integer; Rel: Double);
+  procedure AddCut(Which: integer; Rel: double);
   var
-    M: Integer;
+    M: integer;
   begin
     for M := 0 to High(Cuts[Which]) do
       if Abs(Cuts[Which][M] - Rel) < 1E-7 then Exit;
@@ -8713,9 +8843,9 @@ var
   end;
 
   { a point that is on both arcs is a crossing: noted once, cut into both }
-  procedure Crossing(const Pt: TP3; AI, AJ: Integer);
+  procedure Crossing(const Pt: TP3; AI, AJ: integer);
   var
-    A1, A2: Double;
+    A1, A2: double;
   begin
     A1 := AngleOf(FEnts[Idx[AI]], Pt);
     A2 := AngleOf(FEnts[Idx[AJ]], Pt);
@@ -8727,11 +8857,11 @@ var
 
   { where the circle of arc J meets the plane of arc I: solve for the angles
     on J where the point lies in I's plane, then keep those on I's circle }
-  procedure CrossPlane(AI, AJ: Integer);
+  procedure CrossPlane(AI, AJ: integer);
   var
     UI, VI, NI, UJ, VJ, NJ, Pt: TP3;
-    A, B, Cc, Rr, Phi, Th: Double;
-    S: Integer;
+    A, B, Cc, Rr, Phi, Th: double;
+    S: integer;
   begin
     Axes(FEnts[Idx[AI]], UI, VI, NI);
     Axes(FEnts[Idx[AJ]], UJ, VJ, NJ);
@@ -8752,14 +8882,15 @@ var
   end;
 
   { two arcs in one plane: the two points where their circles meet }
-  procedure CrossCoplanar(AI, AJ: Integer);
+  procedure CrossCoplanar(AI, AJ: integer);
   var
     UI, VI, NI, Pt: TP3;
-    D, A, H, RI, RJ: Double;
-    S: Integer;
+    D, A, H, RI, RJ: double;
+    S: integer;
   begin
     Axes(FEnts[Idx[AI]], UI, VI, NI);
-    RI := FEnts[Idx[AI]].R; RJ := FEnts[Idx[AJ]].R;
+    RI := FEnts[Idx[AI]].R;
+    RJ := FEnts[Idx[AJ]].R;
     D := Dist(FEnts[Idx[AI]].C, FEnts[Idx[AJ]].C);
     if (D < 1E-9) or (D > RI + RJ + 1E-9) or (D < Abs(RI - RJ) - 1E-9) then Exit;
     U := Norm3(Sub3(FEnts[Idx[AJ]].C, FEnts[Idx[AI]].C));
@@ -8770,20 +8901,18 @@ var
     begin
       if (S = 0) and (H > 1E-9) then Continue;
       if (S <> 0) and (H <= 1E-9) then Continue;
-      Pt := P3(FEnts[Idx[AI]].C.X + U.X * A + Wv.X * H * S,
-               FEnts[Idx[AI]].C.Y + U.Y * A + Wv.Y * H * S,
-               FEnts[Idx[AI]].C.Z + U.Z * A + Wv.Z * H * S);
+      Pt := P3(FEnts[Idx[AI]].C.X + U.X * A + Wv.X * H * S, FEnts[Idx[AI]].C.Y + U.Y * A + Wv.Y * H * S, FEnts[Idx[AI]].C.Z + U.Z * A + Wv.Z * H * S);
       Crossing(Pt, AI, AJ);
     end;
   end;
 
   { an infinite line through LA along LD, against arc AI }
-  procedure GuideMeetsArc(const LA, LD: TP3; AI: Integer);
+  procedure GuideMeetsArc(const LA, LD: TP3; AI: integer);
   var
     U, V, Nrm, W, Pt: TP3;
     E: TWorkEnt;
-    Dn, Off, Bq, Cq, Disc, T, Tol: Double;
-    S: Integer;
+    Dn, Off, Bq, Cq, Disc, T, Tol: double;
+    S: integer;
 
     procedure Offer(const Q: TP3);
     begin
@@ -8823,14 +8952,13 @@ var
     end;
   end;
 
-  function Coplanar(AI, AJ: Integer): Boolean;
+  function Coplanar(AI, AJ: integer): boolean;
   var
     UI, VI, NI, UJ, VJ, NJ: TP3;
   begin
     Axes(FEnts[Idx[AI]], UI, VI, NI);
     Axes(FEnts[Idx[AJ]], UJ, VJ, NJ);
-    Result := (Abs(Abs(Dot3(NI, NJ)) - 1) < 1E-9) and
-      (Abs(Dot3(NI, Sub3(FEnts[Idx[AJ]].C, FEnts[Idx[AI]].C))) < 1E-9);
+    Result := (Abs(Abs(Dot3(NI, NJ)) - 1) < 1E-9) and (Abs(Dot3(NI, Sub3(FEnts[Idx[AJ]].C, FEnts[Idx[AI]].C))) < 1E-9);
   end;
 
 begin
@@ -8866,8 +8994,7 @@ begin
   if (not FGuidesHidden) and (ArcCount <= MAX_ARCS) then
     for G := 0 to FLive - 1 do
     begin
-      if (FEnts[G].Kind <> ekGuide) or
-         (Dist(FEnts[G].A, FEnts[G].B) < 1E-9) then Continue;
+      if (FEnts[G].Kind <> ekGuide) or (Dist(FEnts[G].A, FEnts[G].B) < 1E-9) then Continue;
       GDir := Norm3(Sub3(FEnts[G].B, FEnts[G].A));
       for I := 0 to ArcCount - 1 do
         GuideMeetsArc(FEnts[G].A, GDir, I);
@@ -8895,7 +9022,9 @@ begin
       for Q := 0 to High(Cuts[I]) - 1 - K do
         if Cuts[I][Q] > Cuts[I][Q + 1] then
         begin
-          Tmp := Cuts[I][Q]; Cuts[I][Q] := Cuts[I][Q + 1]; Cuts[I][Q + 1] := Tmp;
+          Tmp := Cuts[I][Q];
+          Cuts[I][Q] := Cuts[I][Q + 1];
+          Cuts[I][Q + 1] := Tmp;
         end;
     for K := 0 to High(Cuts[I]) do
     begin
@@ -8906,7 +9035,8 @@ begin
         Continue;
       if Tmp >= 2 * Pi then Tmp := Tmp - 2 * Pi;
       if FEnts[Idx[I]].Sweep >= 0 then Ang := FEnts[Idx[I]].A0 + Tmp
-      else Ang := FEnts[Idx[I]].A0 - Tmp;
+      else
+        Ang := FEnts[Idx[I]].A0 - Tmp;
       Put(At(FEnts[Idx[I]], Ang), snSubMid);
     end;
   end;
@@ -8925,7 +9055,7 @@ end;
 
 procedure ForgetDoc(D: TWorkDoc);
 var
-  I, J: Integer;
+  I, J: integer;
 begin
   for I := 0 to High(GDocs) do
     if GDocs[I] = D then
@@ -8941,7 +9071,7 @@ end;
   in each exporter that makes its own surface. }
 procedure SurfaceGone(S: TArtSurface);
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(GDocs) do
     if GDocs[I].LastSurf = S then
@@ -8959,7 +9089,9 @@ begin
     712 faces, and coarser let lines bleed through face edges while orbiting }
   QuickSteps := LINE_STEPS;
   QuickBisect := 6;
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
   NoteDoc(Self);
 end;
 
@@ -8979,7 +9111,7 @@ end;
 
 procedure TWorkDoc.SnapPoints(out Pts: TP3Array);
 var
-  I: Integer;
+  I: integer;
 begin
   if FSnapDirty then RebuildSnapCache;
   SetLength(Pts, Length(FSnapCache));
@@ -8987,66 +9119,68 @@ begin
     Pts[I] := FSnapCache[I].P;
 end;
 
-function TWorkDoc.Outline(const V: TProjector; I: Integer): TPointFArray;
+function TWorkDoc.Outline(const V: TProjector; I: integer): TPointFArray;
 var
-  K, Steps: Integer;
-  Ang: Double;
+  K, Steps: integer;
+  Ang: double;
   DG: TDimGeom;
 begin
   Result := nil;
   if (I < 0) or (I >= FLive) then Exit;
   case FEnts[I].Kind of
     ekArc:
+    begin
+      Steps := ArcSteps(FEnts[I]);
+      SetLength(Result, Steps + 1);
+      for K := 0 to Steps do
       begin
-        Steps := ArcSteps(FEnts[I]);
-        SetLength(Result, Steps + 1);
-        for K := 0 to Steps do
-        begin
-          Ang := FEnts[I].A0 + FEnts[I].Sweep * K / Steps;
-          Result[K] := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, Ang, FEnts[I].Plane, FEnts[I].Nm));
-        end;
+        Ang := FEnts[I].A0 + FEnts[I].Sweep * K / Steps;
+        Result[K] := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, Ang, FEnts[I].Plane, FEnts[I].Nm));
       end;
+    end;
     ekFace:
-      begin
-        SetLength(Result, Length(FEnts[I].Poly) + 1);
-        for K := 0 to High(FEnts[I].Poly) do
-          Result[K] := Project(V, FEnts[I].Poly[K]);
-        if Length(FEnts[I].Poly) > 0 then
-          Result[High(Result)] := Result[0];
-      end;
+    begin
+      SetLength(Result, Length(FEnts[I].Poly) + 1);
+      for K := 0 to High(FEnts[I].Poly) do
+        Result[K] := Project(V, FEnts[I].Poly[K]);
+      if Length(FEnts[I].Poly) > 0 then
+        Result[High(Result)] := Result[0];
+    end;
     ekBore: ;
     ekGuide:
+    begin
+      SetLength(Result, 2);
+      if Dist(FEnts[I].A, FEnts[I].B) < 1E-9 then
       begin
-        SetLength(Result, 2);
-        if Dist(FEnts[I].A, FEnts[I].B) < 1E-9 then
-        begin
-          Result[0] := Project(V, FEnts[I].A);
-          Result[1] := Result[0];
-        end
-        else
-        begin
-          DG.A := Project(V, FEnts[I].A);
-          Result[0] := DG.A;
-          Result[1] := Project(V, FEnts[I].B);
-        end;
+        Result[0] := Project(V, FEnts[I].A);
+        Result[1] := Result[0];
+      end
+      else
+      begin
+        DG.A := Project(V, FEnts[I].A);
+        Result[0] := DG.A;
+        Result[1] := Project(V, FEnts[I].B);
       end;
+    end;
     ekDim:
-      begin
+    begin
         { the drawn line and its two witness lines, so highlighting a
           dimension marks where it actually is }
-        if not DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C,
-             usImperial, DG, FEnts[I].Txt) then Exit;
-        SetLength(Result, 6);
-        Result[0] := DG.A;   Result[1] := DG.W1;
-        Result[2] := DG.LA;  Result[3] := DG.LB;
-        Result[4] := DG.W2;  Result[5] := DG.B;
-      end;
+      if not DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG, FEnts[I].Txt) then Exit;
+      SetLength(Result, 6);
+      Result[0] := DG.A;
+      Result[1] := DG.W1;
+      Result[2] := DG.LA;
+      Result[3] := DG.LB;
+      Result[4] := DG.W2;
+      Result[5] := DG.B;
+    end;
     ekText:
-      begin
-        SetLength(Result, 1);
-        Result[0] := Project(V, FEnts[I].A);
-      end;
-  else
+    begin
+      SetLength(Result, 1);
+      Result[0] := Project(V, FEnts[I].A);
+    end;
+    else
     begin
       SetLength(Result, 2);
       Result[0] := Project(V, FEnts[I].A);
@@ -9059,12 +9193,11 @@ end;
   The bounding circle is checked first (a projected point is never further
   from the center than R * Ppu), which drops every circle but the one pointed
   at before any chords are walked. }
-function ArcNearestAt(const PC: TProjCache; const E: TWorkEnt;
-  SX, SY: Double; out P: TP3; TolPx: Double = 1E30): Double;
+function ArcNearestAt(const PC: TProjCache; const E: TWorkEnt; SX, SY: double; out P: TP3; TolPx: double = 1E30): double;
 var
-  STEPS: Integer;
-  K: Integer;
-  Ang, RPx, D: Double;
+  STEPS: integer;
+  K: integer;
+  Ang, RPx, D: double;
   PA, PB, PCen: TPointF;
   A3, B3: TP3;
 begin
@@ -9093,20 +9226,18 @@ begin
   end;
 end;
 
-function ArcScreenDistAt(const PC: TProjCache; const E: TWorkEnt;
-  SX, SY: Double; TolPx: Double = 1E30): Double;
+function ArcScreenDistAt(const PC: TProjCache; const E: TWorkEnt; SX, SY: double; TolPx: double = 1E30): double;
 var
   Ignored: TP3;
 begin
   Result := ArcNearestAt(PC, E, SX, SY, Ignored, TolPx);
 end;
 
-function AxisSnap(const V: TProjector; SX, SY, TolPx: Double;
-  out P: TP3; out Axis: Integer): Boolean;
+function AxisSnap(const V: TProjector; SX, SY, TolPx: double; out P: TP3; out Axis: integer): boolean;
 var
-  K: Integer;
+  K: integer;
   O, U: TPointF;
-  D, T, Len, Best: Double;
+  D, T, Len, Best: double;
   Dir, Q: TP3;
 begin
   Result := False;
@@ -9121,7 +9252,8 @@ begin
     case K of
       0: Dir := P3(1, 0, 0);
       1: Dir := P3(0, 1, 0);
-    else Dir := P3(0, 0, 1);
+      else
+        Dir := P3(0, 0, 1);
     end;
     U := Project(V, Dir);
     U := PtF(U.X - O.X, U.Y - O.Y);
@@ -9144,29 +9276,27 @@ begin
   end;
 end;
 
-function TWorkDoc.SnapCacheCount: Integer;
+function TWorkDoc.SnapCacheCount: integer;
 begin
   if FSnapDirty then RebuildSnapCache;
   Result := Length(FSnapCache);
 end;
 
-function TWorkDoc.EdgeSnap(const V: TProjector; SX, SY, TolPx: Double;
-  out P: TP3; out Ent: Integer): Boolean;
+function TWorkDoc.EdgeSnap(const V: TProjector; SX, SY, TolPx: double; out P: TP3; out Ent: integer): boolean;
 var
   A, B: TP3;
 begin
   Result := EdgeUnder(V, SX, SY, TolPx, P, A, B, Ent);
 end;
 
-function TWorkDoc.EdgeUnder(const V: TProjector; SX, SY, TolPx: Double;
-  out P, A, B: TP3; out Ent: Integer): Boolean;
+function TWorkDoc.EdgeUnder(const V: TProjector; SX, SY, TolPx: double; out P, A, B: TP3; out Ent: integer): boolean;
 const
   { how close on screen counts as "the same place", for preferring the one
     nearer the eye }
   TIE_PX = 1.0;
 var
-  I, K, H: Integer;
-  Best, BestZ: Double;
+  I, K, H: integer;
+  Best, BestZ: double;
   QA, QB, Look: TP3;
   PC: TProjCache;
 
@@ -9176,7 +9306,7 @@ var
   procedure Try_(const MA, MB: TP3);
   var
     PA, PB: TPointF;
-    DX, DY, L2, T, D, QZ: Double;
+    DX, DY, L2, T, D, QZ: double;
     Q: TP3;
   begin
     PA := ProjectAt(PC, MA);
@@ -9187,8 +9317,7 @@ var
     if L2 < 1E-12 then Exit;
     T := EnsureRange(((SX - PA.X) * DX + (SY - PA.Y) * DY) / L2, 0, 1);
     D := Sqrt(Sqr(SX - (PA.X + DX * T)) + Sqr(SY - (PA.Y + DY * T)));
-    Q := P3(MA.X + (MB.X - MA.X) * T, MA.Y + (MB.Y - MA.Y) * T,
-            MA.Z + (MB.Z - MA.Z) * T);
+    Q := P3(MA.X + (MB.X - MA.X) * T, MA.Y + (MB.Y - MA.Y) * T, MA.Z + (MB.Z - MA.Z) * T);
     QZ := Dot3(Q, Look);
 
     { Within reach, nearer on screen wins; a tie inside a pixel goes to
@@ -9196,8 +9325,7 @@ var
       by drawing order.  The reach is checked on its own so the first
       candidate is not held to a pixel short of TolPx. }
     if D > TolPx then Exit;
-    if (Ent < 0) or (D < Best - TIE_PX) or
-       ((D < Best + TIE_PX) and (QZ > BestZ + 1E-9)) then
+    if (Ent < 0) or (D < Best - TIE_PX) or ((D < Best + TIE_PX) and (QZ > BestZ + 1E-9)) then
     begin
       { An edge behind a solid is not being aimed at, or measuring along a
         box's front edge jumps to the back one.  An edge on the face it
@@ -9216,13 +9344,13 @@ var
   { Is this loop nowhere near the cursor?  The projected bounding box
     contains the projected loop, so eight corners can rule out every side.
     Only worth it with seven or more sides. }
-  function LoopFar(const Pts: TP3Array): Boolean;
+  function LoopFar(const Pts: TP3Array): boolean;
   var
-    J: Integer;
+    J: integer;
     Lo, Hi: TP3;
     Q: TPointF;
-    MnX, MnY, MxX, MxY: Double;
-    CX, CY, CZ: Integer;
+    MnX, MnY, MxX, MxY: double;
+    CX, CY, CZ: integer;
   begin
     Result := False;
     if Length(Pts) < 7 then Exit;
@@ -9230,23 +9358,29 @@ var
     Hi := Pts[0];
     for J := 1 to High(Pts) do
     begin
-      Lo.X := Min(Lo.X, Pts[J].X); Hi.X := Max(Hi.X, Pts[J].X);
-      Lo.Y := Min(Lo.Y, Pts[J].Y); Hi.Y := Max(Hi.Y, Pts[J].Y);
-      Lo.Z := Min(Lo.Z, Pts[J].Z); Hi.Z := Max(Hi.Z, Pts[J].Z);
+      Lo.X := Min(Lo.X, Pts[J].X);
+      Hi.X := Max(Hi.X, Pts[J].X);
+      Lo.Y := Min(Lo.Y, Pts[J].Y);
+      Hi.Y := Max(Hi.Y, Pts[J].Y);
+      Lo.Z := Min(Lo.Z, Pts[J].Z);
+      Hi.Z := Max(Hi.Z, Pts[J].Z);
     end;
-    MnX := 1E30; MnY := 1E30; MxX := -1E30; MxY := -1E30;
+    MnX := 1E30;
+    MnY := 1E30;
+    MxX := -1E30;
+    MxY := -1E30;
     for CX := 0 to 1 do
       for CY := 0 to 1 do
         for CZ := 0 to 1 do
         begin
-          Q := ProjectAt(PC, P3(specialize IfThen<Double>(CX = 0, Lo.X, Hi.X),
-                                specialize IfThen<Double>(CY = 0, Lo.Y, Hi.Y),
-                                specialize IfThen<Double>(CZ = 0, Lo.Z, Hi.Z)));
-          MnX := Min(MnX, Q.X); MxX := Max(MxX, Q.X);
-          MnY := Min(MnY, Q.Y); MxY := Max(MxY, Q.Y);
+          Q := ProjectAt(PC, P3(specialize IfThen<double>(CX = 0, Lo.X, Hi.X), specialize IfThen<double>(CY = 0, Lo.Y, Hi.Y),
+            specialize IfThen<double>(CZ = 0, Lo.Z, Hi.Z)));
+          MnX := Min(MnX, Q.X);
+          MxX := Max(MxX, Q.X);
+          MnY := Min(MnY, Q.Y);
+          MxY := Max(MxY, Q.Y);
         end;
-    Result := (SX < MnX - TolPx) or (SX > MxX + TolPx) or
-              (SY < MnY - TolPx) or (SY > MxY + TolPx);
+    Result := (SX < MnX - TolPx) or (SX > MxX + TolPx) or (SY < MnY - TolPx) or (SY > MxY + TolPx);
   end;
 
 begin
@@ -9269,40 +9403,36 @@ begin
         they are put away, and then it does not }
       ekGuide:
         if (not FGuidesHidden) and (Dist(FEnts[I].A, FEnts[I].B) > 1E-9) then
-          Try_(P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 2000,
-                  FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) * 2000,
-                  FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 2000),
-               P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 2000,
-                  FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) * 2000,
-                  FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 2000));
+          Try_(P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 2000, FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) *
+            2000, FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 2000),
+            P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 2000, FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) *
+            2000, FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 2000));
       { The outline of a face is visible geometry, so the cursor can run
         along it - faces from a revolve or an import have no lines.  A face
         that does gets found twice, for the same answer. }
       ekFace:
-        begin
-          if not LoopFar(FEnts[I].Poly) then
-            for K := 0 to High(FEnts[I].Poly) do
-              Try_(FEnts[I].Poly[K],
-                   FEnts[I].Poly[(K + 1) mod Length(FEnts[I].Poly)]);
-          { and what is cut out of it, which is just as much an edge }
-          for H := 0 to High(FEnts[I].Holes) do
-            if (Length(FEnts[I].Holes[H]) >= 3) and
-               not LoopFar(FEnts[I].Holes[H]) then
-              for K := 0 to High(FEnts[I].Holes[H]) do
-                Try_(FEnts[I].Holes[H][K],
-                     FEnts[I].Holes[H][(K + 1) mod Length(FEnts[I].Holes[H])]);
-        end;
+      begin
+        if not LoopFar(FEnts[I].Poly) then
+          for K := 0 to High(FEnts[I].Poly) do
+            Try_(FEnts[I].Poly[K],
+              FEnts[I].Poly[(K + 1) mod Length(FEnts[I].Poly)]);
+        { and what is cut out of it, which is just as much an edge }
+        for H := 0 to High(FEnts[I].Holes) do
+          if (Length(FEnts[I].Holes[H]) >= 3) and not LoopFar(FEnts[I].Holes[H]) then
+            for K := 0 to High(FEnts[I].Holes[H]) do
+              Try_(FEnts[I].Holes[H][K],
+                FEnts[I].Holes[H][(K + 1) mod Length(FEnts[I].Holes[H])]);
+      end;
       ekArc:
+      begin
+        QA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm);
+        for K := 1 to 24 do
         begin
-          QA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm);
-          for K := 1 to 24 do
-          begin
-            QB := ArcPoint(FEnts[I].C, FEnts[I].R,
-                    FEnts[I].A0 + FEnts[I].Sweep * K / 24, FEnts[I].Plane, FEnts[I].Nm);
-            Try_(QA, QB);
-            QA := QB;
-          end;
+          QB := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / 24, FEnts[I].Plane, FEnts[I].Nm);
+          Try_(QA, QB);
+          QA := QB;
         end;
+      end;
     end;
   end;
   { A line or arc reports its own two ends, so "all of it" means the whole
@@ -9318,12 +9448,11 @@ end;
 
 { How far the pointer is from a guide as it is drawn - the whole infinite
   line, not the one-unit stub that records its direction. }
-function GuideScreenDist(const V: TProjector; const E: TWorkEnt;
-  SX, SY: Double): Double;
+function GuideScreenDist(const V: TProjector; const E: TWorkEnt; SX, SY: double): double;
 var
   PA, PB: TPointF;
   D: TP3;
-  L: Double;
+  L: double;
 begin
   PA := Project(V, E.A);
   if Dist(E.A, E.B) < 1E-9 then
@@ -9334,21 +9463,18 @@ begin
   D := Sub3(E.B, E.A);
   L := Sqrt(Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z));
   if L < 1E-9 then Exit(1E30);
-  PA := Project(V, P3(E.A.X - D.X / L * 5000, E.A.Y - D.Y / L * 5000,
-                      E.A.Z - D.Z / L * 5000));
-  PB := Project(V, P3(E.A.X + D.X / L * 5000, E.A.Y + D.Y / L * 5000,
-                      E.A.Z + D.Z / L * 5000));
+  PA := Project(V, P3(E.A.X - D.X / L * 5000, E.A.Y - D.Y / L * 5000, E.A.Z - D.Z / L * 5000));
+  PB := Project(V, P3(E.A.X + D.X / L * 5000, E.A.Y + D.Y / L * 5000, E.A.Z + D.Z / L * 5000));
   Result := DistToSeg(SX, SY, PA.X, PA.Y, PB.X, PB.Y);
 end;
 
 { A guide point has to be easy to grab again.  It usually sits on the line
   it was measured along, which would win a pixel off, so it is asked first,
   with a reach that matches the size it is drawn. }
-function TWorkDoc.HitGuidePoint(const V: TProjector; SX, SY,
-  TolPx: Double): Integer;
+function TWorkDoc.HitGuidePoint(const V: TProjector; SX, SY, TolPx: double): integer;
 var
-  I: Integer;
-  D, Best: Double;
+  I: integer;
+  D, Best: double;
   PA: TPointF;
 begin
   Result := -1;
@@ -9369,19 +9495,19 @@ begin
   end;
 end;
 
-function TWorkDoc.RunsAlongEdge(const A, B: TP3): Boolean;
+function TWorkDoc.RunsAlongEdge(const A, B: TP3): boolean;
 const
   TOL = 1E-6;
 var
-  I: Integer;
+  I: integer;
   Run, E, X: TP3;
-  L, T: Double;
+  L, T: double;
 
-  { A is on this line, at an end or along it }
-  function Touches(const P, Q: TP3): Boolean;
+{ A is on this line, at an end or along it }
+  function Touches(const P, Q: TP3): boolean;
   var
     D: TP3;
-    LL: Double;
+    LL: double;
   begin
     if (Dist(A, P) < TOL) or (Dist(A, Q) < TOL) then Exit(True);
     D := Sub3(Q, P);
@@ -9412,10 +9538,10 @@ begin
   end;
 end;
 
-function TWorkDoc.HitGuideLine(const V: TProjector; SX, SY, TolPx: Double): Integer;
+function TWorkDoc.HitGuideLine(const V: TProjector; SX, SY, TolPx: double): integer;
 var
-  I: Integer;
-  D, Best: Double;
+  I: integer;
+  D, Best: double;
 begin
   Result := -1;
   if FGuidesHidden then Exit;
@@ -9435,16 +9561,15 @@ begin
   end;
 end;
 
-function TWorkDoc.HitEdge(const V: TProjector; SX, SY, TolPx: Double;
-  GuideTolPx: Double): Integer;
+function TWorkDoc.HitEdge(const V: TProjector; SX, SY, TolPx: double; GuideTolPx: double): integer;
 var
-  I: Integer;
-  D, Best: Double;
+  I: integer;
+  D, Best: double;
   PA, PB: TPointF;
   DG: TDimGeom;
   PC: TProjCache;
   NearPt: TP3;
-  VisHere, BestVis, Take: Boolean;
+  VisHere, BestVis, Take: boolean;
 begin
   Result := -1;
   Best := TolPx;
@@ -9473,19 +9598,16 @@ begin
     begin
       { A dimension is drawn off to the side of what it measures, so test
         the drawn lines, not the measured points. }
-      if not DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG,
-           FEnts[I].Txt) then Continue;
-      D := Min(DistToSeg(SX, SY, DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y),
-           Min(DistToSeg(SX, SY, DG.A.X, DG.A.Y, DG.W1.X, DG.W1.Y),
-               DistToSeg(SX, SY, DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y)));
+      if not DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG, FEnts[I].Txt) then Continue;
+      D := Min(DistToSeg(SX, SY, DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y), Min(DistToSeg(SX, SY, DG.A.X, DG.A.Y, DG.W1.X, DG.W1.Y),
+        DistToSeg(SX, SY, DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y)));
     end
     else
     begin
       PA := ProjectAt(PC, FEnts[I].A);
       PB := ProjectAt(PC, FEnts[I].B);
       D := DistToSeg(SX, SY, PA.X, PA.Y, PB.X, PB.Y);
-      NearPt := Lerp3(FEnts[I].A, FEnts[I].B,
-        SegParam(SX, SY, PA.X, PA.Y, PB.X, PB.Y));
+      NearPt := Lerp3(FEnts[I].A, FEnts[I].B, SegParam(SX, SY, PA.X, PA.Y, PB.X, PB.Y));
     end;
     if not (D < TolPx) then Continue;
 
@@ -9498,10 +9620,8 @@ begin
     if FEnts[I].Kind in [ekLine, ekArc] then
     begin
       VisHere := not HiddenAt(V, NearPt);
-      if (not VisHere) and
-         HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.5)) and
-         HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.2)) and
-         HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.8)) then Continue;
+      if (not VisHere) and HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.5)) and HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.2)) and
+        HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.8)) then Continue;
     end;
 
     Take := Result < 0;
@@ -9520,22 +9640,26 @@ end;
 { Which faces each line, arc, dimension or note lies on, within the face's
   extent.  Pure - reads the entities given and writes the lists - so it can
   run on a worker. }
-procedure ComputeOnFace(const Ents: array of TWorkEnt; Count: Integer; out Lists: TIntArrayWArray);
+procedure ComputeOnFace(const Ents: array of TWorkEnt; Count: integer; out Lists: TIntArrayWArray);
 const
   SLACK = 1E-3;
 var
-  F, I, K: Integer;
+  F, I, K: integer;
   N, P0, Lo, Hi, A, B: TP3;
-  D: Double;
+  D: double;
   ELo, EHi: array of TP3;
 
   procedure Grow(var L, H: TP3; const P: TP3);
   begin
-    if P.X < L.X then L.X := P.X; if P.Y < L.Y then L.Y := P.Y; if P.Z < L.Z then L.Z := P.Z;
-    if P.X > H.X then H.X := P.X; if P.Y > H.Y then H.Y := P.Y; if P.Z > H.Z then H.Z := P.Z;
+    if P.X < L.X then L.X := P.X;
+    if P.Y < L.Y then L.Y := P.Y;
+    if P.Z < L.Z then L.Z := P.Z;
+    if P.X > H.X then H.X := P.X;
+    if P.Y > H.Y then H.Y := P.Y;
+    if P.Z > H.Z then H.Z := P.Z;
   end;
 
-  function OnPlane(const P: TP3): Boolean;
+  function OnPlane(const P: TP3): boolean;
   begin
     Result := Abs(Dot3(N, P) - D) < 1E-6;
   end;
@@ -9543,7 +9667,7 @@ var
   { Newell's normal of the outline; the same reading FaceNormal gives }
   function NormalOf(const E: TWorkEnt): TP3;
   var
-    I, J, M: Integer;
+    I, J, M: integer;
     Acc: TP3;
   begin
     M := Length(E.Poly);
@@ -9568,15 +9692,16 @@ begin
     { the extent of each thing that could lie on a face }
     case Ents[I].Kind of
       ekLine, ekDim, ekText:
-        begin
-          ELo[I] := Ents[I].A; EHi[I] := Ents[I].A;
-          Grow(ELo[I], EHi[I], Ents[I].B);
-        end;
+      begin
+        ELo[I] := Ents[I].A;
+        EHi[I] := Ents[I].A;
+        Grow(ELo[I], EHi[I], Ents[I].B);
+      end;
       ekArc:
-        begin
-          ELo[I] := P3(Ents[I].C.X - Ents[I].R, Ents[I].C.Y - Ents[I].R, Ents[I].C.Z - Ents[I].R);
-          EHi[I] := P3(Ents[I].C.X + Ents[I].R, Ents[I].C.Y + Ents[I].R, Ents[I].C.Z + Ents[I].R);
-        end;
+      begin
+        ELo[I] := P3(Ents[I].C.X - Ents[I].R, Ents[I].C.Y - Ents[I].R, Ents[I].C.Z - Ents[I].R);
+        EHi[I] := P3(Ents[I].C.X + Ents[I].R, Ents[I].C.Y + Ents[I].R, Ents[I].C.Z + Ents[I].R);
+      end;
     end;
   end;
   for F := 0 to Count - 1 do
@@ -9585,7 +9710,8 @@ begin
     N := NormalOf(Ents[F]);
     P0 := Ents[F].Poly[0];
     D := Dot3(N, P0);
-    Lo := P0; Hi := P0;
+    Lo := P0;
+    Hi := P0;
     for K := 1 to High(Ents[F].Poly) do Grow(Lo, Hi, Ents[F].Poly[K]);
     Lo := P3(Lo.X - SLACK, Lo.Y - SLACK, Lo.Z - SLACK);
     Hi := P3(Hi.X + SLACK, Hi.Y + SLACK, Hi.Z + SLACK);
@@ -9593,8 +9719,7 @@ begin
     begin
       if not (Ents[I].Kind in [ekLine, ekArc, ekDim, ekText]) then Continue;
       { only what reaches over the face at all }
-      if (EHi[I].X < Lo.X) or (ELo[I].X > Hi.X) or (EHi[I].Y < Lo.Y) or (ELo[I].Y > Hi.Y) or
-         (EHi[I].Z < Lo.Z) or (ELo[I].Z > Hi.Z) then Continue;
+      if (EHi[I].X < Lo.X) or (ELo[I].X > Hi.X) or (EHi[I].Y < Lo.Y) or (ELo[I].Y > Hi.Y) or (EHi[I].Z < Lo.Z) or (ELo[I].Z > Hi.Z) then Continue;
       if Ents[I].Kind = ekArc then
       begin
         A := Ents[I].C;
@@ -9622,12 +9747,12 @@ type
   TOnFaceWorker = class(TThread)
   public
     Doc: TWorkDoc;
-    Seq: Integer;
+    Seq: integer;
     Ents: array of TWorkEnt;
     Lists: TIntArrayWArray;
-    Ms: Double;
+    Ms: double;
     DoneAt: QWord;
-    Failed: Boolean;
+    Failed: boolean;
     procedure Execute; override;
   end;
 
@@ -9671,7 +9796,7 @@ begin
   W.Free;
 end;
 
-function TWorkDoc.OnFaceReady: Boolean;
+function TWorkDoc.OnFaceReady: boolean;
 begin
   Result := FOnFaceOK and (Length(FOnFace) = FLive);
 end;
@@ -9679,7 +9804,7 @@ end;
 procedure TWorkDoc.EnsureOnFace;
 var
   W: TOnFaceWorker;
-  I: Integer;
+  I: integer;
   T0: QWord;
 begin
   if OnFaceReady then Exit;
@@ -9720,17 +9845,18 @@ begin
   W.Start;
 end;
 
-function TWorkDoc.DepthPointNear(SX, SY, Radius: Integer; out P: TP3): Boolean;
+function TWorkDoc.DepthPointNear(SX, SY, Radius: integer; out P: TP3): boolean;
 var
-  R, DX, DY, BX, BY: Integer;
-  Z, Best, D2: Double;
+  R, DX, DY, BX, BY: integer;
+  Z, Best, D2: double;
   Q0, Look: TP3;
 begin
   Result := False;
   P := P3(0, 0, 0);
   if (LastSurf = nil) or not LastSurf.DepthOn then Exit;
   Best := 1E30;
-  BX := 0; BY := 0;
+  BX := 0;
+  BY := 0;
   { the nearest drawn pixel to the point, within Radius - a straight scan
     of the frame, a few milliseconds, once per press }
   for DY := Max(0, SY - Radius) to Min(LastSurf.Height - 1, SY + Radius) do
@@ -9740,7 +9866,9 @@ begin
       if D2 >= Best then Continue;
       Z := LastSurf.DepthAt(DX, DY);
       if Z < -1E29 then Continue;
-      Best := D2; BX := DX; BY := DY;
+      Best := D2;
+      BX := DX;
+      BY := DY;
     end;
   if Best >= 1E29 then Exit;
   R := 0;
@@ -9750,17 +9878,15 @@ begin
   Look := ViewDir(LastV);
   Q0 := Unproject(LastV, BX, BY, plXY, P3(0, 0, 0));
   if IsNan(Q0.X) or IsNan(Q0.Y) or IsNan(Q0.Z) then Exit;
-  P := P3(Q0.X + Look.X * (Z - Dot3(Q0, Look)),
-          Q0.Y + Look.Y * (Z - Dot3(Q0, Look)),
-          Q0.Z + Look.Z * (Z - Dot3(Q0, Look)));
+  P := P3(Q0.X + Look.X * (Z - Dot3(Q0, Look)), Q0.Y + Look.Y * (Z - Dot3(Q0, Look)), Q0.Z + Look.Z * (Z - Dot3(Q0, Look)));
   Result := True;
 end;
 
-function TWorkDoc.DepthHidden(const P: TP3): Boolean;
+function TWorkDoc.DepthHidden(const P: TP3): boolean;
 var
   SP: TPointF;
-  D, Zb, Zx, Zy, Zn, Grad: Double;
-  DX, DY: Integer;
+  D, Zb, Zx, Zy, Zn, Grad: double;
+  DX, DY: integer;
   Look: TP3;
 begin
   Result := False;
@@ -9777,8 +9903,12 @@ begin
   Zy := LastSurf.DepthAt(Round(SP.X), Round(SP.Y) + 1);
   if Zy < -1E29 then Zy := LastSurf.DepthAt(Round(SP.X), Round(SP.Y) - 1);
   Grad := 0;
-  if Zx > -1E29 then Grad := Grad + 0.5 * Abs(Zx - Zb) else Grad := Grad + 0.5 / Max(1E-9, LastV.Ppu);
-  if Zy > -1E29 then Grad := Grad + 0.5 * Abs(Zy - Zb) else Grad := Grad + 0.5 / Max(1E-9, LastV.Ppu);
+  if Zx > -1E29 then Grad := Grad + 0.5 * Abs(Zx - Zb)
+  else
+    Grad := Grad + 0.5 / Max(1E-9, LastV.Ppu);
+  if Zy > -1E29 then Grad := Grad + 0.5 * Abs(Zy - Zb)
+  else
+    Grad := Grad + 0.5 / Max(1E-9, LastV.Ppu);
   Grad := Min(Grad, 6 / Max(1E-9, LastV.Ppu));
   Result := Zb > D + Grad + 2E-4 * (1 + Abs(D)) + 0.02 / Max(1E-9, LastV.Ppu);
   if not Result then Exit;
@@ -9791,21 +9921,20 @@ begin
     begin
       if (DX = 0) and (DY = 0) then Continue;
       Zn := LastSurf.DepthAt(Round(SP.X) + DX, Round(SP.Y) + DY);
-      if (Zn < -1E29) or
-         (Zn <= D + Grad + 2E-4 * (1 + Abs(D)) + 0.02 / Max(1E-9, LastV.Ppu)) then
+      if (Zn < -1E29) or (Zn <= D + Grad + 2E-4 * (1 + Abs(D)) + 0.02 / Max(1E-9, LastV.Ppu)) then
         Exit(False);
     end;
 end;
 
 { Is this point hidden behind a face?  A filled face is opaque, so what is
   behind it cannot be picked through it. }
-function TWorkDoc.HiddenAt(const V: TProjector; const P: TP3): Boolean;
+function TWorkDoc.HiddenAt(const V: TProjector; const P: TP3): boolean;
 var
-  I, A, B, N, H, M: Integer;
+  I, A, B, N, H, M: integer;
   SP: TPointF;
-  Inside: Boolean;
+  Inside: boolean;
   Nm, Look: TP3;
-  Den, T: Double;
+  Den, T: double;
   Poly, HP: array of TPointF;
 begin
   Result := False;
@@ -9839,9 +9968,7 @@ begin
     B := N - 1;
     for A := 0 to N - 1 do
     begin
-      if ((Poly[A].Y > SP.Y) <> (Poly[B].Y > SP.Y)) and
-         (SP.X < (Poly[B].X - Poly[A].X) * (SP.Y - Poly[A].Y) /
-                 (Poly[B].Y - Poly[A].Y) + Poly[A].X) then
+      if ((Poly[A].Y > SP.Y) <> (Poly[B].Y > SP.Y)) and (SP.X < (Poly[B].X - Poly[A].X) * (SP.Y - Poly[A].Y) / (Poly[B].Y - Poly[A].Y) + Poly[A].X) then
         Inside := not Inside;
       B := A;
     end;
@@ -9857,9 +9984,7 @@ begin
         B := M - 1;
         for A := 0 to M - 1 do
         begin
-          if ((HP[A].Y > SP.Y) <> (HP[B].Y > SP.Y)) and
-             (SP.X < (HP[B].X - HP[A].X) * (SP.Y - HP[A].Y) /
-                     (HP[B].Y - HP[A].Y) + HP[A].X) then
+          if ((HP[A].Y > SP.Y) <> (HP[B].Y > SP.Y)) and (SP.X < (HP[B].X - HP[A].X) * (SP.Y - HP[A].Y) / (HP[B].Y - HP[A].Y) + HP[A].X) then
             Inside := not Inside;
           B := A;
         end;
@@ -9868,25 +9993,24 @@ begin
   end;
 end;
 
-procedure TWorkDoc.MoveNote(Index: Integer; const From, ToPt, Grab: TP3);
+procedure TWorkDoc.MoveNote(Index: integer; const From, ToPt, Grab: TP3);
 begin
   if (Index < 0) or (Index >= FLive) then Exit;
   if FEnts[Index].Kind <> ekText then Exit;
-  FEnts[Index].A := P3(From.X + (ToPt.X - Grab.X),
-                       From.Y + (ToPt.Y - Grab.Y),
-                       From.Z + (ToPt.Z - Grab.Z));
-  FSnapDirty := True; FOnFaceOK := False; Inc(FEditSeq);
+  FEnts[Index].A := P3(From.X + (ToPt.X - Grab.X), From.Y + (ToPt.Y - Grab.Y), From.Z + (ToPt.Z - Grab.Z));
+  FSnapDirty := True;
+  FOnFaceOK := False;
+  Inc(FEditSeq);
 end;
 
-function TWorkDoc.HitNote(SX, SY: Double): Integer;
+function TWorkDoc.HitNote(SX, SY: double): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   { Last drawn wins, which is the one on top. }
   for I := FLive - 1 downto 0 do
-    if (FEnts[I].Kind = ekText) and not EntHidden(I) and (FEnts[I].BoxR > FEnts[I].BoxL) and
-       (SX >= FEnts[I].BoxL) and (SX <= FEnts[I].BoxR) and
-       (SY >= FEnts[I].BoxT) and (SY <= FEnts[I].BoxB) then
+    if (FEnts[I].Kind = ekText) and not EntHidden(I) and (FEnts[I].BoxR > FEnts[I].BoxL) and (SX >= FEnts[I].BoxL) and (SX <= FEnts[I].BoxR) and
+      (SY >= FEnts[I].BoxT) and (SY <= FEnts[I].BoxB) then
       Exit(I);
   Result := -1;
 end;
@@ -9895,12 +10019,12 @@ end;
   wins, not the newest; a tie within a pixel goes to the one nearer the eye,
   as in EdgeUnder.  The full walk is affordable because PickAt asks only
   after HitEdge and HitFace found nothing. }
-function TWorkDoc.HitTest(const V: TProjector; SX, SY, TolPx: Double; Guides: Boolean): Integer;
+function TWorkDoc.HitTest(const V: TProjector; SX, SY, TolPx: double; Guides: boolean): integer;
 const
   TIE_PX = 1.0;
 var
-  I: Integer;
-  D, Best, Z, BestZ: Double;
+  I: integer;
+  D, Best, Z, BestZ: double;
   PA, PB: TPointF;
   DG: TDimGeom;
   Look, Mid: TP3;
@@ -9921,19 +10045,17 @@ begin
       ekArc:
         D := ArcScreenDistAt(PC, FEnts[I], SX, SY, TolPx);
       ekText:
-        begin
+      begin
           { The words are the note: inside the box counts as on it.  Outside,
             the anchor still counts, for a note whose box is not drawn yet. }
-          if (SX >= FEnts[I].BoxL) and (SX <= FEnts[I].BoxR) and
-             (SY >= FEnts[I].BoxT) and (SY <= FEnts[I].BoxB) and
-             (FEnts[I].BoxR > FEnts[I].BoxL) then
-            D := 0
-          else
-          begin
-            PA := ProjectAt(PC, FEnts[I].A);
-            D := Sqrt(Sqr(SX - PA.X) + Sqr(SY - PA.Y));
-          end;
+        if (SX >= FEnts[I].BoxL) and (SX <= FEnts[I].BoxR) and (SY >= FEnts[I].BoxT) and (SY <= FEnts[I].BoxB) and (FEnts[I].BoxR > FEnts[I].BoxL) then
+          D := 0
+        else
+        begin
+          PA := ProjectAt(PC, FEnts[I].A);
+          D := Sqrt(Sqr(SX - PA.X) + Sqr(SY - PA.Y));
         end;
+      end;
       ekGuide:
         D := GuideScreenDist(V, FEnts[I], SX, SY);
       ekBore, ekFace:
@@ -9941,14 +10063,12 @@ begin
       ekDim:
         { the drawn line and its witness lines, not the invisible chord
           through the geometry - that is where the eraser is aimed }
-        if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG,
-             FEnts[I].Txt) then
-          D := Min(DistToSeg(SX, SY, DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y),
-               Min(DistToSeg(SX, SY, DG.A.X, DG.A.Y, DG.W1.X, DG.W1.Y),
-                   DistToSeg(SX, SY, DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y)))
+        if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG, FEnts[I].Txt) then
+          D := Min(DistToSeg(SX, SY, DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y), Min(DistToSeg(SX, SY, DG.A.X, DG.A.Y, DG.W1.X, DG.W1.Y),
+            DistToSeg(SX, SY, DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y)))
         else
           D := 1E30;
-    else
+      else
       begin
         PA := ProjectAt(PC, FEnts[I].A);
         PB := ProjectAt(PC, FEnts[I].B);
@@ -9960,16 +10080,13 @@ begin
     if D > TolPx then Continue;
     Mid := Lerp3(FEnts[I].A, FEnts[I].B, 0.5);
     Z := Dot3(Mid, Look);
-    if (Result < 0) or (D < Best - TIE_PX) or
-       ((D < Best + TIE_PX) and (Z > BestZ + 1E-9)) then
+    if (Result < 0) or (D < Best - TIE_PX) or ((D < Best + TIE_PX) and (Z > BestZ + 1E-9)) then
     begin
       { An edge behind a panel is not what was meant; notes and dimensions
         are drawn on top and stay pickable.  Only a would-be winner is asked. }
       if FEnts[I].Kind in [ekLine, ekArc] then
       begin
-        if HiddenAt(V, Mid) and
-           HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.25)) and
-           HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.75)) then
+        if HiddenAt(V, Mid) and HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.25)) and HiddenAt(V, Lerp3(FEnts[I].A, FEnts[I].B, 0.75)) then
           Continue;
       end;
       if D < Best then Best := D;
@@ -9982,24 +10099,22 @@ end;
 { One list feeds both snapping and inference, so a crossing and the
   midpoints it creates are just as snappable as an original endpoint.  A
   small bias keeps the more definite kinds winning a close contest. }
-function TWorkDoc.BestSnap(const V: TProjector; SX, SY, TolPx: Double;
-  out Hit: TSnapHit): Boolean;
+function TWorkDoc.BestSnap(const V: TProjector; SX, SY, TolPx: double; out Hit: TSnapHit): boolean;
 const
   { snOnEdge and snOnFace are found separately; their entries only keep the
     array the right length.  The origin sits just under an endpoint: a
     landmark, but a drawn corner near it is more likely the target. }
-  BIAS: array[TSnapKind] of Double =
+  BIAS: array[TSnapKind] of double =
     (0, 0, 3.5, 1.0, 2.0, 1.5, 0.25, 0, 0, 3.0, 0, 2.0);   { snOnFace: found separately too }
 var
-  I: Integer;
+  I: integer;
   P: TPointF;
-  D, Best: Double;
+  D, Best: double;
   PC: TProjCache;
 begin
   if FSnapDirty then RebuildSnapCache;
 
-  if (not FSnapScreenOK) or (Length(FSnapScreen) <> Length(FSnapCache)) or
-     (not SameProjector(V, FSnapScreenV)) then
+  if (not FSnapScreenOK) or (Length(FSnapScreen) <> Length(FSnapCache)) or (not SameProjector(V, FSnapScreenV)) then
   begin
     SetLength(FSnapScreen, Length(FSnapCache));
     { thousands of points, and the camera worked out once for the lot }
@@ -10035,14 +10150,18 @@ begin
   Result := Hit.Kind <> snNone;
 end;
 
-function TWorkDoc.Bounds(out Lo, Hi: TP3): Boolean;
+function TWorkDoc.Bounds(out Lo, Hi: TP3): boolean;
 var
-  I, K: Integer;
+  I, K: integer;
 
   procedure Grow(const P: TP3);
   begin
-    Lo.X := Min(Lo.X, P.X); Lo.Y := Min(Lo.Y, P.Y); Lo.Z := Min(Lo.Z, P.Z);
-    Hi.X := Max(Hi.X, P.X); Hi.Y := Max(Hi.Y, P.Y); Hi.Z := Max(Hi.Z, P.Z);
+    Lo.X := Min(Lo.X, P.X);
+    Lo.Y := Min(Lo.Y, P.Y);
+    Lo.Z := Min(Lo.Z, P.Z);
+    Hi.X := Max(Hi.X, P.X);
+    Hi.Y := Max(Hi.Y, P.Y);
+    Hi.Z := Max(Hi.Z, P.Z);
   end;
 
 begin
@@ -10052,16 +10171,14 @@ begin
   for I := 0 to FLive - 1 do
     case FEnts[I].Kind of
       ekArc:
-        begin
-          Grow(P3(FEnts[I].C.X - FEnts[I].R, FEnts[I].C.Y - FEnts[I].R,
-                  FEnts[I].C.Z - FEnts[I].R));
-          Grow(P3(FEnts[I].C.X + FEnts[I].R, FEnts[I].C.Y + FEnts[I].R,
-                  FEnts[I].C.Z + FEnts[I].R));
-        end;
+      begin
+        Grow(P3(FEnts[I].C.X - FEnts[I].R, FEnts[I].C.Y - FEnts[I].R, FEnts[I].C.Z - FEnts[I].R));
+        Grow(P3(FEnts[I].C.X + FEnts[I].R, FEnts[I].C.Y + FEnts[I].R, FEnts[I].C.Z + FEnts[I].R));
+      end;
       ekFace:
         for K := 0 to High(FEnts[I].Poly) do
           Grow(FEnts[I].Poly[K]);
-    else
+      else
       begin
         Grow(FEnts[I].A);
         Grow(FEnts[I].B);
@@ -10079,57 +10196,79 @@ const
     far less than any gap anybody drew }
   HEAL_TOL = 1E-3;
 type
-  TEnd = record X: Double; P: TP3; Ent: Integer; end;
+  TEnd = record
+    X: double;
+    P: TP3;
+    Ent: integer;
+  end;
 var
   Ends: array of TEnd;
-  NE, I, Pass: Integer;
+  NE, I, Pass: integer;
   AU, AV, Ps, Pe, Ts, Te, C2: TP3;
-  SU, SV, EU, EV, MU, MV, DU, DV, NU, NV, L, T, CU, CV, R2, A0, A1, Sw: Double;
-  Moved: Boolean;
+  SU, SV, EU, EV, MU, MV, DU, DV, NU, NV, L, T, CU, CV, R2, A0, A1, Sw: double;
+  Moved: boolean;
 
-  procedure AddEnd(const P: TP3; Ent: Integer);
+  procedure AddEnd(const P: TP3; Ent: integer);
   begin
     if NE >= Length(Ends) then SetLength(Ends, Max(64, NE * 2));
-    Ends[NE].X := P.X; Ends[NE].P := P; Ends[NE].Ent := Ent;
+    Ends[NE].X := P.X;
+    Ends[NE].P := P;
+    Ends[NE].Ent := Ent;
     Inc(NE);
   end;
 
-  procedure SortEnds(Lo, Hi: Integer);
+  procedure SortEnds(Lo, Hi: integer);
   var
-    A, B: Integer;
-    Piv: Double;
+    A, B: integer;
+    Piv: double;
     Tmp: TEnd;
   begin
     while Lo < Hi do
     begin
-      A := Lo; B := Hi; Piv := Ends[(Lo + Hi) div 2].X;
+      A := Lo;
+      B := Hi;
+      Piv := Ends[(Lo + Hi) div 2].X;
       repeat
         while Ends[A].X < Piv do Inc(A);
         while Ends[B].X > Piv do Dec(B);
         if A <= B then
         begin
-          Tmp := Ends[A]; Ends[A] := Ends[B]; Ends[B] := Tmp;
-          Inc(A); Dec(B);
+          Tmp := Ends[A];
+          Ends[A] := Ends[B];
+          Ends[B] := Tmp;
+          Inc(A);
+          Dec(B);
         end;
       until A > B;
-      if B - Lo < Hi - A then begin SortEnds(Lo, B); Lo := A; end
-      else begin SortEnds(A, Hi); Hi := B; end;
+      if B - Lo < Hi - A then
+      begin
+        SortEnds(Lo, B);
+        Lo := A;
+      end
+      else
+      begin
+        SortEnds(A, Hi);
+        Hi := B;
+      end;
     end;
   end;
 
   { the nearest end of something else within the tolerance, or P itself }
-  function Nearest(const P: TP3; Self_: Integer): TP3;
+  function Nearest(const P: TP3; Self_: integer): TP3;
   var
-    Lo, Hi, Mid, K: Integer;
-    D, Best: Double;
+    Lo, Hi, Mid, K: integer;
+    D, Best: double;
   begin
     Result := P;
     Best := HEAL_TOL;
-    Lo := 0; Hi := NE;
+    Lo := 0;
+    Hi := NE;
     while Lo < Hi do
     begin
       Mid := (Lo + Hi) div 2;
-      if Ends[Mid].X < P.X - HEAL_TOL then Lo := Mid + 1 else Hi := Mid;
+      if Ends[Mid].X < P.X - HEAL_TOL then Lo := Mid + 1
+      else
+        Hi := Mid;
     end;
     K := Lo;
     while (K < NE) and (Ends[K].X <= P.X + HEAL_TOL) do
@@ -10137,7 +10276,11 @@ var
       if Ends[K].Ent <> Self_ then
       begin
         D := Dist(P, Ends[K].P);
-        if D < Best then begin Best := D; Result := Ends[K].P; end;
+        if D < Best then
+        begin
+          Best := D;
+          Result := Ends[K].P;
+        end;
       end;
       Inc(K);
     end;
@@ -10154,13 +10297,14 @@ begin
         ekLine:
           if not FEnts[I].Dim then
           begin
-            AddEnd(FEnts[I].A, I); AddEnd(FEnts[I].B, I);
+            AddEnd(FEnts[I].A, I);
+            AddEnd(FEnts[I].B, I);
           end;
         ekArc:
-          begin
-            AddEnd(ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm), I);
-            AddEnd(ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep, FEnts[I].Plane, FEnts[I].Nm), I);
-          end;
+        begin
+          AddEnd(ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm), I);
+          AddEnd(ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep, FEnts[I].Plane, FEnts[I].Nm), I);
+        end;
       end;
     if NE = 0 then Exit;
     SortEnds(0, NE - 1);
@@ -10172,10 +10316,12 @@ begin
       if Abs(Abs(FEnts[I].Sweep) - 2 * Pi) < 1E-6 then Continue;
       Ps := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm);
       Pe := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep, FEnts[I].Plane, FEnts[I].Nm);
-      Ts := Nearest(Ps, I); Te := Nearest(Pe, I);
+      Ts := Nearest(Ps, I);
+      Te := Nearest(Pe, I);
       if (Dist(Ts, Ps) < 1E-12) and (Dist(Te, Pe) < 1E-12) then Continue;
       if FEnts[I].Plane = plFree then AxesFromNormal(FEnts[I].Nm, AU, AV)
-      else PlaneAxes(FEnts[I].Plane, AU, AV);
+      else
+        PlaneAxes(FEnts[I].Plane, AU, AV);
       { in the arc's own plane, from its old center }
       SU := Dot3(Sub3(Ts, FEnts[I].C), AU);
       SV := Dot3(Sub3(Ts, FEnts[I].C), AV);
@@ -10183,13 +10329,17 @@ begin
       EV := Dot3(Sub3(Te, FEnts[I].C), AV);
       { the circle through both ends whose center is nearest the old one:
         on the line halfway between them, square to the chord }
-      MU := (SU + EU) / 2; MV := (SV + EV) / 2;
-      DU := EU - SU; DV := EV - SV;
+      MU := (SU + EU) / 2;
+      MV := (SV + EV) / 2;
+      DU := EU - SU;
+      DV := EV - SV;
       L := Hypot(DU, DV);
       if L < 1E-9 then Continue;
-      NU := -DV / L; NV := DU / L;
+      NU := -DV / L;
+      NV := DU / L;
       T := -(MU * NU + MV * NV);
-      CU := MU + NU * T; CV := MV + NV * T;
+      CU := MU + NU * T;
+      CV := MV + NV * T;
       R2 := Hypot(SU - CU, SV - CV);
       { nothing but rounding to put right, or leave it be }
       if (Hypot(CU, CV) > HEAL_TOL) or (Abs(R2 - FEnts[I].R) > HEAL_TOL) then Continue;
@@ -10198,8 +10348,7 @@ begin
       Sw := A1 - A0;
       while Sw - FEnts[I].Sweep > Pi do Sw := Sw - 2 * Pi;
       while FEnts[I].Sweep - Sw > Pi do Sw := Sw + 2 * Pi;
-      C2 := P3(FEnts[I].C.X + AU.X * CU + AV.X * CV, FEnts[I].C.Y + AU.Y * CU + AV.Y * CV,
-        FEnts[I].C.Z + AU.Z * CU + AV.Z * CV);
+      C2 := P3(FEnts[I].C.X + AU.X * CU + AV.X * CV, FEnts[I].C.Y + AU.Y * CU + AV.Y * CV, FEnts[I].C.Z + AU.Z * CU + AV.Z * CV);
       FEnts[I].C := C2;
       FEnts[I].R := R2;
       FEnts[I].A0 := A0;
@@ -10212,12 +10361,11 @@ begin
   end;
 end;
 
-function TWorkDoc.WriteSCAD(L: TStrings; U: TUnitSystem;
-  out Solids: Integer; out Closed: Boolean; AtOrigin: Boolean): Integer;
+function TWorkDoc.WriteSCAD(L: TStrings; U: TUnitSystem; out Solids: integer; out Closed: boolean; AtOrigin: boolean): integer;
 var
-  Scale: Double;
+  Scale: double;
   Mid, BLo, BHi: TP3;
-  Grp, Top, I, J, K, NPt, NTri, Slot: Integer;
+  Grp, Top, I, J, K, NPt, NTri, Slot: integer;
   Tris: TTriList;
   Corners: TP3Array;
   Nm, A, B, C, Cr, E1, E2: TP3;
@@ -10226,15 +10374,14 @@ var
   Pts: TP3Array;
   Names: TStringList;
   Row: string;
-  Open_: Boolean;
-  Made: Boolean;
+  Open_: boolean;
+  Made: boolean;
 
   { A point's slot in this solid's list, added if new.  A polyhedron shares
     corners between faces, and a duplicate leaves a seam CGAL will not close. }
-  function SlotOf(const P: TP3): Integer;
+  function SlotOf(const P: TP3): integer;
   begin
-    Key := Format('%d,%d,%d', [Round(P.X * 1E6), Round(P.Y * 1E6),
-                               Round(P.Z * 1E6)]);
+    Key := Format('%d,%d,%d', [Round(P.X * 1E6), Round(P.Y * 1E6), Round(P.Z * 1E6)]);
     Result := Ix.FindIndexOf(Key);
     if Result >= 0 then
     begin
@@ -10258,11 +10405,12 @@ begin
   begin
     if FEnts[I].Kind <> ekFace then Continue;
     if Length(FEnts[I].Poly) < 3 then Continue;
-    if FEnts[I].Solid and (FEnts[I].Grp > 0) and
-       not GroupClosed(FEnts[I].Grp) then Closed := False;
+    if FEnts[I].Solid and (FEnts[I].Grp > 0) and not GroupClosed(FEnts[I].Grp) then Closed := False;
     if not FEnts[I].Solid then Closed := False;
   end;
-  if U = usMetric then Scale := 1000 else Scale := 304.8;
+  if U = usMetric then Scale := 1000
+  else
+    Scale := 304.8;
   { Centered across the bed and standing on it, as in WriteSTL. }
   Mid := P3(0, 0, 0);
   if AtOrigin and Bounds(BLo, BHi) then
@@ -10304,11 +10452,10 @@ begin
           Nm := FaceNormal(I);
           for J := 0 to (Length(Tris) div 3) - 1 do
           begin
-            if (Tris[J*3] >= Length(Corners)) or (Tris[J*3+1] >= Length(Corners))
-              or (Tris[J*3+2] >= Length(Corners)) then Continue;
-            A := Corners[Tris[J*3]];
-            B := Corners[Tris[J*3+1]];
-            C := Corners[Tris[J*3+2]];
+            if (Tris[J * 3] >= Length(Corners)) or (Tris[J * 3 + 1] >= Length(Corners)) or (Tris[J * 3 + 2] >= Length(Corners)) then Continue;
+            A := Corners[Tris[J * 3]];
+            B := Corners[Tris[J * 3 + 1]];
+            C := Corners[Tris[J * 3 + 2]];
             E1 := Sub3(B, A);
             E2 := Sub3(C, A);
             Cr := Cross3(E1, E2);
@@ -10323,8 +10470,7 @@ begin
               C := Cr;
             end;
             if Row <> '' then Row := Row + ', ';
-            Row := Row + Format('[%d,%d,%d]',
-              [SlotOf(C), SlotOf(B), SlotOf(A)]);
+            Row := Row + Format('[%d,%d,%d]', [SlotOf(C), SlotOf(B), SlotOf(A)]);
             Inc(NTri);
             if Length(Row) > 1200 then
             begin
@@ -10340,10 +10486,10 @@ begin
         begin
           Open_ := (Grp = 0) or not GroupClosed(Grp);
           if Grp = 0 then Key := 'hs_loose'
-          else Key := Format('hs_solid_%d', [Grp]);
+          else
+            Key := Format('hs_solid_%d', [Grp]);
           if Open_ then
-            L.Add(Format('// %s - %d triangles.  NOT a closed solid; OpenSCAD',
-              [Key, NTri]))
+            L.Add(Format('// %s - %d triangles.  NOT a closed solid; OpenSCAD', [Key, NTri]))
           else
             L.Add(Format('// %s - %d triangles, closed.', [Key, NTri]));
           if Open_ then
@@ -10355,9 +10501,7 @@ begin
           for K := 0 to NPt - 1 do
           begin
             if Row <> '' then Row := Row + ', ';
-            Row := Row + Format('[%.4f,%.4f,%.4f]',
-              [(Pts[K].X - Mid.X) * Scale, (Pts[K].Y - Mid.Y) * Scale,
-               (Pts[K].Z - Mid.Z) * Scale], DotFS);
+            Row := Row + Format('[%.4f,%.4f,%.4f]', [(Pts[K].X - Mid.X) * Scale, (Pts[K].Y - Mid.Y) * Scale, (Pts[K].Z - Mid.Z) * Scale], DotFS);
             if Length(Row) > 1200 then
             begin
               L.Add('      ' + Row + ',');
@@ -10369,7 +10513,8 @@ begin
           L.Add('    faces=[');
           for K := 0 to Names.Count - 1 do
             if K < Names.Count - 1 then L.Add('  ' + Names[K] + ',')
-            else L.Add('  ' + Names[K]);
+            else
+              L.Add('  ' + Names[K]);
           L.Add('    ],');
           { convexity is a hint of how many times a ray can cross the
             surface; the preview draws concave shapes wrong without it }
@@ -10379,8 +10524,10 @@ begin
           Names.Clear;
           Inc(Solids);
           Inc(Result, NTri);
-          if Grp = 0 then Slot := 0 else Slot := Grp;
-          if Slot >= 0 then ;
+          if Grp = 0 then Slot := 0
+          else
+            Slot := Grp;
+          if Slot >= 0 then;
         end
         else
           Names.Clear;
@@ -10401,15 +10548,15 @@ begin
     begin
       Made := False;
       for I := 0 to FLive - 1 do
-        if (FEnts[I].Kind = ekFace) and (FEnts[I].Grp = Grp) and
-           (Length(FaceCut(I)) >= 3) then
+        if (FEnts[I].Kind = ekFace) and (FEnts[I].Grp = Grp) and (Length(FaceCut(I)) >= 3) then
         begin
           Made := True;
           Break;
         end;
       if not Made then Continue;
       if Grp = 0 then L.Add('    hs_loose();')
-      else L.Add(Format('    hs_solid_%d();', [Grp]));
+      else
+        L.Add(Format('    hs_solid_%d();', [Grp]));
     end;
     L.Add('  }');
     L.Add('}');
@@ -10429,24 +10576,23 @@ begin
   end;
 end;
 
-function TWorkDoc.WriteSTL(St: TStream; U: TUnitSystem;
-  out Closed: Boolean; AtOrigin: Boolean): Integer;
+function TWorkDoc.WriteSTL(St: TStream; U: TUnitSystem; out Closed: boolean; AtOrigin: boolean): integer;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
   Mid, BLo, BHi: TP3;
   Tris: TTriList;
   Corners: TP3Array;
   Nm, A, B, C, E1, E2, Cr, Tmp: TP3;
-  Scale, L2: Double;
-  Head: array[0..79] of Byte;
-  Cnt: LongWord;
-  Attr: Word;
-  Lbl: AnsiString;
+  Scale, L2: double;
+  Head: array[0..79] of byte;
+  Cnt: longword;
+  Attr: word;
+  Lbl: ansistring;
 
-  { a corner, in millimeters, measured from the middle of the model }
+{ a corner, in millimeters, measured from the middle of the model }
   procedure PutP(const P: TP3);
   var
-    F: array[0..2] of Single;
+    F: array[0..2] of single;
   begin
     F[0] := (P.X - Mid.X) * Scale;
     F[1] := (P.Y - Mid.Y) * Scale;
@@ -10458,7 +10604,7 @@ var
     long is not a normal }
   procedure PutN(const P: TP3);
   var
-    F: array[0..2] of Single;
+    F: array[0..2] of single;
   begin
     F[0] := P.X;
     F[1] := P.Y;
@@ -10469,7 +10615,9 @@ var
 begin
   Result := 0;
   Closed := True;
-  if U = usMetric then Scale := 1000 else Scale := 304.8;
+  if U = usMetric then Scale := 1000
+  else
+    Scale := 304.8;
   { Centered across the bed and standing ON it.  Centering Z too puts half
     the model under the build plate. }
   Mid := P3(0, 0, 0);
@@ -10507,10 +10655,10 @@ begin
 
     for J := 0 to (Length(Tris) div 3) - 1 do
     begin
-      if (Tris[J*3] >= N) or (Tris[J*3+1] >= N) or (Tris[J*3+2] >= N) then Continue;
-      A := Corners[Tris[J*3]];
-      B := Corners[Tris[J*3+1]];
-      C := Corners[Tris[J*3+2]];
+      if (Tris[J * 3] >= N) or (Tris[J * 3 + 1] >= N) or (Tris[J * 3 + 2] >= N) then Continue;
+      A := Corners[Tris[J * 3]];
+      B := Corners[Tris[J * 3 + 1]];
+      C := Corners[Tris[J * 3 + 2]];
       E1 := Sub3(B, A);
       E2 := Sub3(C, A);
       Cr := Cross3(E1, E2);
@@ -10550,18 +10698,17 @@ begin
   St.Position := St.Size;
 end;
 
-procedure TWorkDoc.WriteDXF(L: TStrings; const V: TProjector; U: TUnitSystem;
-  ThreeD: Boolean; AtOrigin: Boolean = False);
+procedure TWorkDoc.WriteDXF(L: TStrings; const V: TProjector; U: TUnitSystem; ThreeD: boolean; AtOrigin: boolean = False);
 var
   W: TDxfWriter;
-  I, K, Steps, N: Integer;
-  Sc, TX, TY, TZ, AX1, AY1, BX1, BY1: Double;
-  XS, YS, ZS: array of Double;
+  I, K, Steps, N: integer;
+  Sc, TX, TY, TZ, AX1, AY1, BX1, BY1: double;
+  XS, YS, ZS: array of double;
   G: TDimGeom;
   Mid, BLo, BHi: TP3;
 
-  { one point, in the file's units, flat or not }
-  procedure At(const P: TP3; out X, Y, Z: Double);
+{ one point, in the file's units, flat or not }
+  procedure At(const P: TP3; out X, Y, Z: double);
   var
     S: TPointF;
   begin
@@ -10585,7 +10732,7 @@ var
 
   procedure Seg(const Lay: string; const A, B: TP3);
   var
-    X1, Y1, Z1, X2, Y2, Z2: Double;
+    X1, Y1, Z1, X2, Y2, Z2: double;
   begin
     At(A, X1, Y1, Z1);
     At(B, X2, Y2, Z2);
@@ -10593,14 +10740,16 @@ var
   end;
 
   { a screen point of a dimension, in the file's units }
-  procedure Flat(const S: TPointF; out X, Y: Double);
+  procedure Flat(const S: TPointF; out X, Y: double);
   begin
     X := (S.X - V.OX) / V.Ppu * Sc;
     Y := -(S.Y - V.OY) / V.Ppu * Sc;
   end;
 
 begin
-  if U = usImperial then Sc := 12 else Sc := 1000;
+  if U = usImperial then Sc := 12
+  else
+    Sc := 1000;
   { only in three dimensions: a flat view is already framed on its own
     middle by the projection it came through }
   Mid := P3(0, 0, 0);
@@ -10619,27 +10768,28 @@ begin
         ekLine:
           Seg('GEOMETRY', FEnts[I].A, FEnts[I].B);
         ekArc:
-          begin
+        begin
             { An arc goes out as short lines: a DXF ARC needs its own
               extrusion direction, and every CAD reads a chain of lines the
               same way. }
-            if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
-            else Steps := Max(12, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * 24));
-            Steps := Min(Steps, 360);
-            for K := 0 to Steps - 1 do
-              Seg('GEOMETRY',
-                ArcPoint(FEnts[I].C, FEnts[I].R,
-                  FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm),
-                ArcPoint(FEnts[I].C, FEnts[I].R,
-                  FEnts[I].A0 + FEnts[I].Sweep * (K + 1) / Steps, FEnts[I].Plane, FEnts[I].Nm));
-          end;
+          if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
+          else
+            Steps := Max(12, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * 24));
+          Steps := Min(Steps, 360);
+          for K := 0 to Steps - 1 do
+            Seg('GEOMETRY',
+              ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm),
+              ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * (K + 1) / Steps, FEnts[I].Plane, FEnts[I].Nm));
+        end;
         ekFace:
           if ThreeD then
           begin
             { the model's faces, for handing over the thing itself; flat, the
               outline is already there as lines }
             N := Length(FEnts[I].Poly);
-            SetLength(XS, N); SetLength(YS, N); SetLength(ZS, N);
+            SetLength(XS, N);
+            SetLength(YS, N);
+            SetLength(ZS, N);
             for K := 0 to N - 1 do At(FEnts[I].Poly[K], XS[K], YS[K], ZS[K]);
             W.Face3D('FACES', XS, YS, ZS);
           end;
@@ -10647,21 +10797,24 @@ begin
           if Dist(FEnts[I].A, FEnts[I].B) > 1E-9 then
             Seg('GUIDES', FEnts[I].A, FEnts[I].B);
         ekText:
-          begin
-            At(FEnts[I].A, TX, TY, TZ);
-            W.Text('NOTES', TX, TY, TZ, 0.25 * Sc * NoteSize(I), FEnts[I].Txt);
-          end;
+        begin
+          At(FEnts[I].A, TX, TY, TZ);
+          W.Text('NOTES', TX, TY, TZ, 0.25 * Sc * NoteSize(I), FEnts[I].Txt);
+        end;
         ekDim:
           if not ThreeD then
             if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, U, G, FEnts[I].Txt) then
             begin
               { the drawn dimension - line, witness lines and figure - as it
                 sits on this view }
-              Flat(G.A, AX1, AY1);  Flat(G.W1, BX1, BY1);
+              Flat(G.A, AX1, AY1);
+              Flat(G.W1, BX1, BY1);
               W.Line('DIMENSIONS', AX1, AY1, 0, BX1, BY1, 0);
-              Flat(G.B, AX1, AY1);  Flat(G.W2, BX1, BY1);
+              Flat(G.B, AX1, AY1);
+              Flat(G.W2, BX1, BY1);
               W.Line('DIMENSIONS', AX1, AY1, 0, BX1, BY1, 0);
-              Flat(G.LA, AX1, AY1); Flat(G.LB, BX1, BY1);
+              Flat(G.LA, AX1, AY1);
+              Flat(G.LB, BX1, BY1);
               W.Line('DIMENSIONS', AX1, AY1, 0, BX1, BY1, 0);
               Flat(G.Mid, AX1, AY1);
               W.Text('DIMENSIONS', AX1, AY1 + 0.1 * Sc, 0, 0.25 * Sc, G.Txt);
@@ -10675,13 +10828,12 @@ end;
 
 { Both formats consume these same projected entities, in the same order.
   Like SVG, this exports geometry rather than the screen's hidden-line pass. }
-procedure TWorkDoc.WriteVectors(Writer: TVectorWriter; const V: TProjector;
-  U: TUnitSystem; EdgeW: Single);
+procedure TWorkDoc.WriteVectors(Writer: TVectorWriter; const V: TProjector; U: TUnitSystem; EdgeW: single);
 var
-  I, K, H, Steps: Integer;
+  I, K, H, Steps: integer;
   Loops: TVectorLoops;
   PA, PB: TPointF;
-  Ang: Double;
+  Ang: double;
   LabelText: string;
 begin
   for I := 0 to FLive - 1 do
@@ -10689,93 +10841,109 @@ begin
     Loops := nil;
     case FEnts[I].Kind of
       ekFace:
+      begin
+        SetLength(Loops, 1 + Length(FEnts[I].Holes));
+        SetLength(Loops[0], Length(FEnts[I].Poly));
+        for K := 0 to High(FEnts[I].Poly) do
+          Loops[0][K] := Project(V, FEnts[I].Poly[K]);
+        for H := 0 to High(FEnts[I].Holes) do
         begin
-          SetLength(Loops, 1 + Length(FEnts[I].Holes));
-          SetLength(Loops[0], Length(FEnts[I].Poly));
-          for K := 0 to High(FEnts[I].Poly) do
-            Loops[0][K] := Project(V, FEnts[I].Poly[K]);
-          for H := 0 to High(FEnts[I].Holes) do
-          begin
-            SetLength(Loops[H + 1], Length(FEnts[I].Holes[H]));
-            for K := 0 to High(FEnts[I].Holes[H]) do
-              Loops[H + 1][K] := Project(V, FEnts[I].Holes[H][K]);
-          end;
-          Writer.Path(Loops, FEnts[I].Ink, 1, True);
+          SetLength(Loops[H + 1], Length(FEnts[I].Holes[H]));
+          for K := 0 to High(FEnts[I].Holes[H]) do
+            Loops[H + 1][K] := Project(V, FEnts[I].Holes[H][K]);
         end;
+        Writer.Path(Loops, FEnts[I].Ink, 1, True);
+      end;
       ekArc:
+      begin
+        if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
+        else
+          Steps := 64;
+        SetLength(Loops, 1);
+        SetLength(Loops[0], Steps + 1);
+        for K := 0 to Steps do
         begin
-          if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides else Steps := 64;
-          SetLength(Loops, 1);
-          SetLength(Loops[0], Steps + 1);
-          for K := 0 to Steps do
-          begin
-            Ang := FEnts[I].A0 + FEnts[I].Sweep * K / Steps;
-            Loops[0][K] := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R,
-              Ang, FEnts[I].Plane, FEnts[I].Nm));
-          end;
-          Writer.Path(Loops, FEnts[I].Ink, EdgeW, False);
+          Ang := FEnts[I].A0 + FEnts[I].Sweep * K / Steps;
+          Loops[0][K] := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, Ang, FEnts[I].Plane, FEnts[I].Nm));
         end;
+        Writer.Path(Loops, FEnts[I].Ink, EdgeW, False);
+      end;
       ekText:
-        begin
-          PA := Project(V, FEnts[I].A);
-          PA.X := PA.X + 5; PA.Y := PA.Y - 4;
-          Writer.Text(PA, FEnts[I].Txt, FEnts[I].Ink, 12, False);
-        end;
+      begin
+        PA := Project(V, FEnts[I].A);
+        PA.X := PA.X + 5;
+        PA.Y := PA.Y - 4;
+        Writer.Text(PA, FEnts[I].Txt, FEnts[I].Ink, 12, False);
+      end;
       ekLine, ekDim:
+      begin
+        PA := Project(V, FEnts[I].A);
+        PB := Project(V, FEnts[I].B);
+        SetLength(Loops, 1);
+        SetLength(Loops[0], 2);
+        Loops[0][0] := PA;
+        Loops[0][1] := PB;
+        Writer.Path(Loops, FEnts[I].Ink, EdgeW, False);
+        if FEnts[I].Dim then
         begin
-          PA := Project(V, FEnts[I].A);
-          PB := Project(V, FEnts[I].B);
-          SetLength(Loops, 1);
-          SetLength(Loops[0], 2);
-          Loops[0][0] := PA; Loops[0][1] := PB;
-          Writer.Path(Loops, FEnts[I].Ink, EdgeW, False);
-          if FEnts[I].Dim then
-          begin
-            LabelText := FEnts[I].Txt;
-            if LabelText = '' then LabelText := FormatLen(Dist(FEnts[I].A, FEnts[I].B), U);
-            PA.X := (PA.X + PB.X) / 2;
-            PA.Y := (PA.Y + PB.Y) / 2 - 6;
-            Writer.Text(PA, LabelText, FEnts[I].Ink, 11, True);
-          end;
+          LabelText := FEnts[I].Txt;
+          if LabelText = '' then LabelText := FormatLen(Dist(FEnts[I].A, FEnts[I].B), U);
+          PA.X := (PA.X + PB.X) / 2;
+          PA.Y := (PA.Y + PB.Y) / 2 - 6;
+          Writer.Text(PA, LabelText, FEnts[I].Ink, 11, True);
         end;
+      end;
     end;
   end;
 end;
 
 { SVG export - real vectors, so it opens in Inkscape or CAD at the size it
   prints. }
-procedure TWorkDoc.WriteSVG(L: TStrings; const V: TProjector; U: TUnitSystem;
-  EdgeW: Single);
+procedure TWorkDoc.WriteSVG(L: TStrings; const V: TProjector; U: TUnitSystem; EdgeW: single);
 var
-  I, K: Integer;
+  I, K: integer;
   Writer: TSVGWriter;
-  MinX, MinY, MaxX, MaxY: Double;
-  PW, PH, WUnit: Double;
+  MinX, MinY, MaxX, MaxY: double;
+  PW, PH, WUnit: double;
   Un: string;
 
   procedure Grow(const P: TPointF);
   begin
-    MinX := Min(MinX, P.X); MinY := Min(MinY, P.Y);
-    MaxX := Max(MaxX, P.X); MaxY := Max(MaxY, P.Y);
+    MinX := Min(MinX, P.X);
+    MinY := Min(MinY, P.Y);
+    MaxX := Max(MaxX, P.X);
+    MaxY := Max(MaxY, P.Y);
   end;
-
 
 begin
-  MinX := 1E30; MinY := 1E30; MaxX := -1E30; MaxY := -1E30;
+  MinX := 1E30;
+  MinY := 1E30;
+  MaxX := -1E30;
+  MaxY := -1E30;
   for I := 0 to FLive - 1 do
     for K := 0 to 1 do
-      if K = 0 then Grow(Project(V, FEnts[I].A)) else Grow(Project(V, FEnts[I].B));
+      if K = 0 then Grow(Project(V, FEnts[I].A))
+      else
+        Grow(Project(V, FEnts[I].B));
   if MinX > MaxX then
   begin
-    MinX := 0; MinY := 0; MaxX := 100; MaxY := 100;
+    MinX := 0;
+    MinY := 0;
+    MaxX := 100;
+    MaxY := 100;
   end;
-  MinX := MinX - 30; MinY := MinY - 30; MaxX := MaxX + 30; MaxY := MaxY + 30;
+  MinX := MinX - 30;
+  MinY := MinY - 30;
+  MaxX := MaxX + 30;
+  MaxY := MaxY + 30;
 
   { The real size, written down.  The viewBox stays in screen pixels and
     width and height give the size in real units: Ppu is pixels per foot, so
     the picture is (MaxX - MinX) / Ppu feet across.  That is the size of this
     view - of the thing itself when seen square-on. }
-  if V.Ppu > 1E-9 then WUnit := V.Ppu else WUnit := 1;
+  if V.Ppu > 1E-9 then WUnit := V.Ppu
+  else
+    WUnit := 1;
   if U = usImperial then
   begin
     PW := (MaxX - MinX) / WUnit * 12;      { feet to inches }
@@ -10790,8 +10958,7 @@ begin
   end;
 
   L.Add('<?xml version="1.0" encoding="UTF-8"?>');
-  L.Add(Format('<svg xmlns="http://www.w3.org/2000/svg" ' +
-    'width="%.3f%s" height="%.3f%s" viewBox="%.2f %.2f %.2f %.2f">',
+  L.Add(Format('<svg xmlns="http://www.w3.org/2000/svg" ' + 'width="%.3f%s" height="%.3f%s" viewBox="%.2f %.2f %.2f %.2f">',
     [PW, Un, PH, Un, MinX, MinY, MaxX - MinX, MaxY - MinY], DotFS));
 
   Writer := TSVGWriter.Create(L);
@@ -10809,12 +10976,16 @@ end;
   of a frame. }
 function EdgeKey(const A, B: TP3): string;
 var
-  P, Q: array[0..2] of Int64;
-  Swap: Boolean;
-  I: Integer;
+  P, Q: array[0..2] of int64;
+  Swap: boolean;
+  I: integer;
 begin
-  P[0] := Round(A.X * 1E6); P[1] := Round(A.Y * 1E6); P[2] := Round(A.Z * 1E6);
-  Q[0] := Round(B.X * 1E6); Q[1] := Round(B.Y * 1E6); Q[2] := Round(B.Z * 1E6);
+  P[0] := Round(A.X * 1E6);
+  P[1] := Round(A.Y * 1E6);
+  P[2] := Round(A.Z * 1E6);
+  Q[0] := Round(B.X * 1E6);
+  Q[1] := Round(B.Y * 1E6);
+  Q[2] := Round(B.Z * 1E6);
   Swap := False;
   for I := 0 to 2 do
     if P[I] <> Q[I] then
@@ -10837,41 +11008,65 @@ end;
 
 { Faces farthest first by depth, with faces level to within rounding
   ordered bigger first, so a small face on a big one lands on top of it. }
-procedure SortFaces(var Order: array of Integer; var Depth, Area: array of Double; N: Integer);
+procedure SortFaces(var Order: array of integer; var Depth, Area: array of double; N: integer);
 var
-  TmpO: array of Integer;
-  TmpD, TmpA: array of Double;
-  I, J, K, RunEnd: Integer;
-  Sh: Double;
+  TmpO: array of integer;
+  TmpD, TmpA: array of double;
+  I, J, K, RunEnd: integer;
+  Sh: double;
 
-  procedure Merge(Lo, Mid, Hi: Integer);
+  procedure Merge(Lo, Mid, Hi: integer);
   var
-    A, B, C: Integer;
+    A, B, C: integer;
   begin
-    A := Lo; B := Mid; C := Lo;
+    A := Lo;
+    B := Mid;
+    C := Lo;
     while (A < Mid) and (B < Hi) do
     begin
       if Depth[B] > Depth[A] then
       begin
-        TmpO[C] := Order[B]; TmpD[C] := Depth[B]; TmpA[C] := Area[B]; Inc(B);
+        TmpO[C] := Order[B];
+        TmpD[C] := Depth[B];
+        TmpA[C] := Area[B];
+        Inc(B);
       end
       else
       begin
-        TmpO[C] := Order[A]; TmpD[C] := Depth[A]; TmpA[C] := Area[A]; Inc(A);
+        TmpO[C] := Order[A];
+        TmpD[C] := Depth[A];
+        TmpA[C] := Area[A];
+        Inc(A);
       end;
       Inc(C);
     end;
-    while A < Mid do begin TmpO[C] := Order[A]; TmpD[C] := Depth[A]; TmpA[C] := Area[A]; Inc(A); Inc(C); end;
-    while B < Hi do begin TmpO[C] := Order[B]; TmpD[C] := Depth[B]; TmpA[C] := Area[B]; Inc(B); Inc(C); end;
+    while A < Mid do
+    begin
+      TmpO[C] := Order[A];
+      TmpD[C] := Depth[A];
+      TmpA[C] := Area[A];
+      Inc(A);
+      Inc(C);
+    end;
+    while B < Hi do
+    begin
+      TmpO[C] := Order[B];
+      TmpD[C] := Depth[B];
+      TmpA[C] := Area[B];
+      Inc(B);
+      Inc(C);
+    end;
     for C := Lo to Hi - 1 do
     begin
-      Order[C] := TmpO[C]; Depth[C] := TmpD[C]; Area[C] := TmpA[C];
+      Order[C] := TmpO[C];
+      Depth[C] := TmpD[C];
+      Area[C] := TmpA[C];
     end;
   end;
 
-  procedure Sort(Lo, Hi: Integer);
+  procedure Sort(Lo, Hi: integer);
   var
-    Mid: Integer;
+    Mid: integer;
   begin
     if Hi - Lo < 2 then Exit;
     Mid := (Lo + Hi) div 2;
@@ -10882,7 +11077,9 @@ var
 
 begin
   if N < 2 then Exit;
-  SetLength(TmpO, N); SetLength(TmpD, N); SetLength(TmpA, N);
+  SetLength(TmpO, N);
+  SetLength(TmpD, N);
+  SetLength(TmpA, N);
   Sort(0, N);
   { within a run of level faces, bigger first: the runs are short, so an
     insertion sort inside each is the right tool }
@@ -10894,80 +11091,84 @@ begin
       Inc(RunEnd);
     for J := I + 1 to RunEnd do
     begin
-      K := Order[J]; Sh := Depth[J];
+      K := Order[J];
+      Sh := Depth[J];
       { area is the key; depth rides along }
       TmpD[0] := Area[J];
       TmpO[0] := J - 1;
       while (TmpO[0] >= I) and (Area[TmpO[0]] < TmpD[0]) do
       begin
-        Order[TmpO[0] + 1] := Order[TmpO[0]]; Depth[TmpO[0] + 1] := Depth[TmpO[0]]; Area[TmpO[0] + 1] := Area[TmpO[0]];
+        Order[TmpO[0] + 1] := Order[TmpO[0]];
+        Depth[TmpO[0] + 1] := Depth[TmpO[0]];
+        Area[TmpO[0] + 1] := Area[TmpO[0]];
         Dec(TmpO[0]);
       end;
-      Order[TmpO[0] + 1] := K; Depth[TmpO[0] + 1] := Sh; Area[TmpO[0] + 1] := TmpD[0];
+      Order[TmpO[0] + 1] := K;
+      Depth[TmpO[0] + 1] := Sh;
+      Area[TmpO[0] + 1] := TmpD[0];
     end;
     I := RunEnd + 1;
   end;
 end;
 
-procedure TWorkDoc.Render(S: TArtSurface; const V: TProjector;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  Half: TArtSurface; Phase: TRenderPhase);
+procedure TWorkDoc.Render(S: TArtSurface; const V: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single; Half: TArtSurface; Phase: TRenderPhase);
 var
   VH: TProjector;
-  LSteps, Bisect: Integer;
+  LSteps, Bisect: integer;
   DG: TDimGeom;
   DA, DB: TP3;
   DSz: TSize;
   DTP: TPoint;
   Cand, AllFaces: TIntArrayW;
-  OnFaceOK: Boolean;
-  SlotOf: array of Integer;
-  JJ: Integer;
+  OnFaceOK: boolean;
+  SlotOf: array of integer;
+  JJ: integer;
   PlaneN: array of TP3;
-  PlaneD: array of Double;
+  PlaneD: array of double;
   PT: QWord;
-  ZA, ZB, ZC, ZD1, ZD2, ZD3, ZDet, ZD, ZBest, ZDen: Double;
-  Sxx, Sxy, Syy, Sx, Sy, Sn, Sdx, Sdy, Sd: Double;
-  ZI2, ZI3, ZJ: Integer;
+  ZA, ZB, ZC, ZD1, ZD2, ZD3, ZDet, ZD, ZBest, ZDen: double;
+  Sxx, Sxy, Syy, Sx, Sy, Sn, Sdx, Sdy, Sd: double;
+  ZI2, ZI3, ZJ: integer;
   { cutting a face that is not flat into triangles, so its depth is exact }
   TriPts: array of TPointF;
-  TriZ: array of Double;
+  TriZ: array of double;
   Tris: TTriList;
   TriRing: TIndexRing;
   TriHoles: TIndexRings;
   Mesh: TDepthTris;
-  TriDev, TriSize, TriDet, TDx, TDy: Double;
-  MN, MI: Integer;
-  ZOK, Drew: Boolean;  I, J, K, N, Steps, NFace: Integer;
+  TriDev, TriSize, TriDet, TDx, TDy: double;
+  MN, MI: integer;
+  ZOK, Drew: boolean;
+  I, J, K, N, Steps, NFace: integer;
   PA, PB: TPointF;
-  Ang, Sh: Double;
+  Ang, Sh: double;
   Col, Face: TPix;
   Look, Lamp, Cen, Nm: TP3;
-  Order: array of Integer;
-  Depth, Area: array of Double;
-  Ar: Double;
+  Order: array of integer;
+  Depth, Area: array of double;
+  Ar: double;
   Flat: array of TPointF;
   Loops: array of TPtFLoop;
   EdgeIx: TFPHashList;
   EK: string;
-  HK, HJ: Integer;
+  HK, HJ: integer;
   GuideCol: TPix;
-  M, Run0: Integer;
-  T0, T1: Double;
+  M, Run0: integer;
+  T0, T1: double;
 
   { the stretch being tested for cover: a line's two ends, or an arc }
   CurA, CurB: TP3;
-  CurArc: Integer;
-  RunT0, RunT1: Double;
-  Vis: Boolean;
+  CurArc: integer;
+  RunT0, RunT1: double;
+  Vis: boolean;
 
   { Is this point hidden behind something?  One lookup in the depth buffer
     the faces have already written.  A point on its own surface reads its own
     depth back, so the tolerance must be loose enough to call that visible. }
-  function Covered(const P: TP3; Slot: Integer): Boolean;
+  function Covered(const P: TP3; Slot: integer): boolean;
   var
     SP: TPointF;
-    D, Zb, Zx, Zy, Grad: Double;
+    D, Zb, Zx, Zy, Grad: double;
   begin
     Result := False;
     if not S.DepthOn then Exit;
@@ -10988,8 +11189,12 @@ var
     { half a step in each direction, since the point can be half a pixel
       from the center both ways at once }
     Grad := 0;
-    if Zx > -1E29 then Grad := Grad + 0.5 * Abs(Zx - Zb) else Grad := Grad + 0.5 / Max(1E-9, V.Ppu);
-    if Zy > -1E29 then Grad := Grad + 0.5 * Abs(Zy - Zb) else Grad := Grad + 0.5 / Max(1E-9, V.Ppu);
+    if Zx > -1E29 then Grad := Grad + 0.5 * Abs(Zx - Zb)
+    else
+      Grad := Grad + 0.5 / Max(1E-9, V.Ppu);
+    if Zy > -1E29 then Grad := Grad + 0.5 * Abs(Zy - Zb)
+    else
+      Grad := Grad + 0.5 / Max(1E-9, V.Ppu);
 
     { Half a step, not a whole one: a whole step let a line behind a nearly
       edge-on face bleed past its edge.  Capped at about an eighty degree
@@ -11004,11 +11209,10 @@ var
   end;
 
   { the point at T along the stretch being tested }
-  function PtAt(T: Double): TP3;
+  function PtAt(T: double): TP3;
   begin
     if CurArc >= 0 then
-      Result := ArcPoint(FEnts[CurArc].C, FEnts[CurArc].R,
-        FEnts[CurArc].A0 + FEnts[CurArc].Sweep * T, FEnts[CurArc].Plane, FEnts[CurArc].Nm)
+      Result := ArcPoint(FEnts[CurArc].C, FEnts[CurArc].R, FEnts[CurArc].A0 + FEnts[CurArc].Sweep * T, FEnts[CurArc].Plane, FEnts[CurArc].Nm)
     else
       Result := Lerp3(CurA, CurB, T);
   end;
@@ -11016,31 +11220,32 @@ var
   { Where along a stretch the cover begins: TVis is seen and TCov is not, as
     fractions of the stretch.  Bisected, so a visible run does not end a
     whole sample past the face that hides it. }
-  function Boundary(TVis, TCov: Double; Slot: Integer): Double;
+  function Boundary(TVis, TCov: double; Slot: integer): double;
   var
-    N: Integer;
-    TM: Double;
+    N: integer;
+    TM: double;
   begin
     for N := 1 to Bisect do
     begin
       TM := (TVis + TCov) / 2;
-      if Covered(PtAt(TM), Slot) then TCov := TM else TVis := TM;
+      if Covered(PtAt(TM), Slot) then TCov := TM
+      else
+        TVis := TM;
     end;
     Result := (TVis + TCov) / 2;
   end;
 
   { A note: a box of text up and to the right of its anchor, with a leader
     out to Target.  Target = At means no leader - a plain label. }
-  procedure Note(Which: Integer; const At, Target: TP3; const Txt: string;
-    const Col: TPix);
+  procedure Note(Which: integer; const At, Target: TP3; const Txt: string; const Col: TPix);
   const
     PADX = 5;
     PADY = 3;
   var
     Lines: TStringList;
     PA, PB: TPointF;
-    LH, W, H, BX, BY, K, WasH: Integer;
-    AX, AY: Double;
+    LH, W, H, BX, BY, K, WasH: integer;
+    AX, AY: double;
     Sz: TSize;
   begin
     if Txt = '' then Exit;
@@ -11050,8 +11255,7 @@ var
     { the font is shared with every other label on the drawing, so its size
       is changed for this note and put back afterwards }
     WasH := AFont.Height;
-    if (Which >= 0) and (Which < FLive) and (FEnts[Which].Size > 0) and
-       (Abs(FEnts[Which].Size - 1) > 1E-6) then
+    if (Which >= 0) and (Which < FLive) and (FEnts[Which].Size > 0) and (Abs(FEnts[Which].Size - 1) > 1E-6) then
       AFont.Height := Round(WasH * FEnts[Which].Size);
 
     Lines := TStringList.Create;
@@ -11081,9 +11285,7 @@ var
       end;
       S.FillRect(Rect(BX, BY, BX + W + 2 * PADX, BY + H + 2 * PADY),
         Pix(255, 255, 255), 0.82);
-      S.Poly([PtF(BX, BY), PtF(BX + W + 2 * PADX, BY),
-              PtF(BX + W + 2 * PADX, BY + H + 2 * PADY),
-              PtF(BX, BY + H + 2 * PADY)], 1.0, Col, True, 0.75);
+      S.Poly([PtF(BX, BY), PtF(BX + W + 2 * PADX, BY), PtF(BX + W + 2 * PADX, BY + H + 2 * PADY), PtF(BX, BY + H + 2 * PADY)], 1.0, Col, True, 0.75);
       for K := 0 to Lines.Count - 1 do
         S.TextOut(BX + PADX, BY + PADY + K * LH, Lines[K], AFont, Col);
 
@@ -11129,23 +11331,24 @@ var
     only one visible face runs along it.  The count comes from an index built
     once per render; counting per line against every face made orbiting
     sluggish.  A face turned away does not count. }
-  function EdgeFaces(const A, B: TP3): Integer;
+  function EdgeFaces(const A, B: TP3): integer;
   var
-    Ix: Integer;
+    Ix: integer;
   begin
     Ix := EdgeIx.FindIndexOf(EdgeKey(A, B));
-    if Ix < 0 then Result := 0 else Result := PtrInt(EdgeIx.Items[Ix]);
+    if Ix < 0 then Result := 0
+    else
+      Result := PtrInt(EdgeIx.Items[Ix]);
   end;
 
   { A soft crease shows only where it is the outline of the surface; anywhere
     else it is hidden, and the shading alone says the surface is curved. }
-  function Hidden(Ent: Integer): Boolean;
+  function Hidden(Ent: integer): boolean;
   begin
-    Result := FEnts[Ent].Soft and
-      (EdgeFaces(FEnts[Ent].A, FEnts[Ent].B) <> 1);
+    Result := FEnts[Ent].Soft and (EdgeFaces(FEnts[Ent].A, FEnts[Ent].B) <> 1);
   end;
 
-  function LineW(Ent: Integer): Single;
+  function LineW(Ent: integer): single;
   begin
     Result := EdgeW;
     { SketchUp draws profiles one pixel heavier than edges, not twice as
@@ -11156,28 +11359,33 @@ var
 
   { Wholly off screen, by a margin covering line width and anti-aliasing, so
     it is left out of the frame. }
-  function OffScreen(const PA, PB: TPointF): Boolean;
+  function OffScreen(const PA, PB: TPointF): boolean;
   const
     M = 8;
   begin
-    Result := ((PA.X < -M) and (PB.X < -M)) or ((PA.X > S.Width + M) and (PB.X > S.Width + M)) or
-              ((PA.Y < -M) and (PB.Y < -M)) or ((PA.Y > S.Height + M) and (PB.Y > S.Height + M));
+    Result := ((PA.X < -M) and (PB.X < -M)) or ((PA.X > S.Width + M) and (PB.X > S.Width + M)) or ((PA.Y < -M) and (PB.Y < -M)) or
+      ((PA.Y > S.Height + M) and (PB.Y > S.Height + M));
   end;
 
-  function PolyOffScreen(const Poly: TP3Array): Boolean;
+  function PolyOffScreen(const Poly: TP3Array): boolean;
   const
     M = 8;
   var
-    K: Integer;
+    K: integer;
     Q: TPointF;
-    MinX, MaxX, MinY, MaxY: Double;
+    MinX, MaxX, MinY, MaxY: double;
   begin
-    MinX := 1E30; MaxX := -1E30; MinY := 1E30; MaxY := -1E30;
+    MinX := 1E30;
+    MaxX := -1E30;
+    MinY := 1E30;
+    MaxY := -1E30;
     for K := 0 to High(Poly) do
     begin
       Q := Project(V, Poly[K]);
-      if Q.X < MinX then MinX := Q.X; if Q.X > MaxX then MaxX := Q.X;
-      if Q.Y < MinY then MinY := Q.Y; if Q.Y > MaxY then MaxY := Q.Y;
+      if Q.X < MinX then MinX := Q.X;
+      if Q.X > MaxX then MaxX := Q.X;
+      if Q.Y < MinY then MinY := Q.Y;
+      if Q.Y > MaxY then MaxY := Q.Y;
     end;
     Result := (MaxX < -M) or (MinX > S.Width + M) or (MaxY < -M) or (MinY > S.Height + M);
   end;
@@ -11185,11 +11393,11 @@ var
   { The visible stretches of any world segment against face Slot, sampled
     like a line in the runs pass.  A dimension's three lines use it so the
     parts behind a wall do not show through. }
-  procedure RunSeg(const WA, WB: TP3; W, Alpha: Single; const Col: TPix; Slot: Integer);
+  procedure RunSeg(const WA, WB: TP3; W, Alpha: single; const Col: TPix; Slot: integer);
   var
-    M, Run0: Integer;
-    Vis: Boolean;
-    RunT0, RunT1: Double;
+    M, Run0: integer;
+    Vis: boolean;
+    RunT0, RunT1: double;
     PA, PB: TPointF;
   begin
     Run0 := -1;
@@ -11207,12 +11415,14 @@ var
       begin
         Run0 := M;
         if M = 0 then RunT0 := 0
-        else RunT0 := Boundary((M + 0.5) / LSteps, (M - 0.5) / LSteps, Slot);
+        else
+          RunT0 := Boundary((M + 0.5) / LSteps, (M - 0.5) / LSteps, Slot);
       end;
       if (not Vis) and (Run0 >= 0) then
       begin
         if M = LSteps then RunT1 := 1
-        else RunT1 := Boundary((M - 0.5) / LSteps, (M + 0.5) / LSteps, Slot);
+        else
+          RunT1 := Boundary((M - 0.5) / LSteps, (M + 0.5) / LSteps, Slot);
         PA := Project(V, Lerp3(WA, WB, RunT0));
         PB := Project(V, Lerp3(WA, WB, RunT1));
         S.Line(PA.X, PA.Y, PB.X, PB.Y, W, Col, Alpha);
@@ -11221,7 +11431,7 @@ var
     end;
   end;
 
-  procedure Mark(K: Integer);
+  procedure Mark(K: integer);
   begin
     ProfMs[K] := ProfMs[K] + (GetTickCount64 - PT);
     PT := GetTickCount64;
@@ -11252,10 +11462,16 @@ begin
 
   if Quick then
   begin
-    LSteps := QuickSteps; if LSteps < 2 then LSteps := 8;
-    Bisect := QuickBisect; if Bisect < 0 then Bisect := 1;
+    LSteps := QuickSteps;
+    if LSteps < 2 then LSteps := 8;
+    Bisect := QuickBisect;
+    if Bisect < 0 then Bisect := 1;
   end
-  else begin LSteps := LINE_STEPS; Bisect := 6; end;
+  else
+  begin
+    LSteps := LINE_STEPS;
+    Bisect := 6;
+  end;
   PT := GetTickCount64;
   { the edge index, once, before anything asks it a question: a hash of edge
     keys to how many visible faces run along each }
@@ -11273,492 +11489,494 @@ begin
         EK := EdgeKey(FEnts[I].Poly[J], FEnts[I].Poly[(J + 1) mod N]);
         K := EdgeIx.FindIndexOf(EK);
         if K < 0 then EdgeIx.Add(EK, Pointer(PtrInt(1)))
-        else EdgeIx.Items[K] := Pointer(PtrInt(EdgeIx.Items[K]) + 1);
+        else
+          EdgeIx.Items[K] := Pointer(PtrInt(EdgeIx.Items[K]) + 1);
       end;
     end;
 
   { the second half of a half-resolution frame has the edges already, blown
     up from the first half; it draws only what lies on faces }
-  if Phase <> rpLines then
-  for I := 0 to FLive - 1 do
-  begin
-    { out of the slice is out of the drawing, in every pass }
-    if not InSlice(I) then Continue;
-    Col := InkPix(I);
-    case FEnts[I].Kind of
-      ekFace: ;   // already painted
-      ekLine:
-        begin
-          if Hidden(I) then Continue;
-          PA := Project(V, FEnts[I].A);
-          PB := Project(V, FEnts[I].B);
-          if OffScreen(PA, PB) then Continue;
-          S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), Col);
-        end;
-
-      ekArc:
-        begin
-          if FEnts[I].Soft then Continue;   { a seam of a spun or swept surface }
-          if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
-          else Steps := Max(10, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 4));
-          Steps := Min(Steps, 1500);
-          PA := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm));
-          for K := 1 to Steps do
+    if Phase <> rpLines then
+      for I := 0 to FLive - 1 do
+      begin
+        { out of the slice is out of the drawing, in every pass }
+        if not InSlice(I) then Continue;
+        Col := InkPix(I);
+        case FEnts[I].Kind of
+          ekFace: ;   // already painted
+          ekLine:
           begin
-            Ang := FEnts[I].A0 + FEnts[I].Sweep * K / Steps;
-            PB := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, Ang, FEnts[I].Plane, FEnts[I].Nm));
-            S.Line(PA.X, PA.Y, PB.X, PB.Y, EdgeW, Col);
-            PA := PB;
+            if Hidden(I) then Continue;
+            PA := Project(V, FEnts[I].A);
+            PB := Project(V, FEnts[I].B);
+            if OffScreen(PA, PB) then Continue;
+            S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), Col);
           end;
-        end;
+
+          ekArc:
+          begin
+            if FEnts[I].Soft then Continue;   { a seam of a spun or swept surface }
+            if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
+            else
+              Steps := Max(10, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 4));
+            Steps := Min(Steps, 1500);
+            PA := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm));
+            for K := 1 to Steps do
+            begin
+              Ang := FEnts[I].A0 + FEnts[I].Sweep * K / Steps;
+              PB := Project(V, ArcPoint(FEnts[I].C, FEnts[I].R, Ang, FEnts[I].Plane, FEnts[I].Nm));
+              S.Line(PA.X, PA.Y, PB.X, PB.Y, EdgeW, Col);
+              PA := PB;
+            end;
+          end;
 
       { Labels and dimensions go before the faces, so a solid in front hides
         them as in SketchUp.  Those lying on a face that faces us are put
         back after the face pass. }
-      ekText:
-        Note(I, FEnts[I].A, FEnts[I].B, FEnts[I].Txt, Col);
-      ekDim:
-        Dimension(FEnts[I].A, FEnts[I].B, FEnts[I].C, FEnts[I].Txt);
+          ekText:
+            Note(I, FEnts[I].A, FEnts[I].B, FEnts[I].Txt, Col);
+          ekDim:
+            Dimension(FEnts[I].A, FEnts[I].B, FEnts[I].C, FEnts[I].Txt);
 
       { Dashed, and run out far enough each way to cross any view.  Drawn
         with the other annotation, so a solid in front hides it. }
-      ekGuide:
-        if not FGuidesHidden then
-        begin
-          PA := Project(V, FEnts[I].A);
-          if Dist(FEnts[I].A, FEnts[I].B) < 1E-9 then
-          begin
+          ekGuide:
+            if not FGuidesHidden then
+            begin
+              PA := Project(V, FEnts[I].A);
+              if Dist(FEnts[I].A, FEnts[I].B) < 1E-9 then
+              begin
             { A guide point is drawn last, on top, amber and larger than the
               snap marks - see the last pass. }
-          end
-          else
-          begin
-            PB := Project(V, FEnts[I].B);
-            Ang := Sqrt(Sqr(PB.X - PA.X) + Sqr(PB.Y - PA.Y));
-            if Ang > 1E-6 then
-            begin
-              Sh := (S.Width + S.Height) * 1.5;
-              PB := PtF((PB.X - PA.X) / Ang, (PB.Y - PA.Y) / Ang);
-              K := 0;
-              while K * 12 < Sh do
+              end
+              else
               begin
-                S.Line(PA.X + PB.X * (K * 12 - Sh / 2),
-                       PA.Y + PB.Y * (K * 12 - Sh / 2),
-                       PA.X + PB.X * (K * 12 + 6 - Sh / 2),
-                       PA.Y + PB.Y * (K * 12 + 6 - Sh / 2),
-                       1.0, GuideCol, 0.85);
-                Inc(K);
+                PB := Project(V, FEnts[I].B);
+                Ang := Sqrt(Sqr(PB.X - PA.X) + Sqr(PB.Y - PA.Y));
+                if Ang > 1E-6 then
+                begin
+                  Sh := (S.Width + S.Height) * 1.5;
+                  PB := PtF((PB.X - PA.X) / Ang, (PB.Y - PA.Y) / Ang);
+                  K := 0;
+                  while K * 12 < Sh do
+                  begin
+                    S.Line(PA.X + PB.X * (K * 12 - Sh / 2),
+                      PA.Y + PB.Y * (K * 12 - Sh / 2),
+                      PA.X + PB.X * (K * 12 + 6 - Sh / 2),
+                      PA.Y + PB.Y * (K * 12 + 6 - Sh / 2),
+                      1.0, GuideCol, 0.85);
+                    Inc(K);
+                  end;
+                end;
               end;
             end;
-          end;
         end;
-    end;
-  end;
+      end;
 
 
-  Mark(0);
-  { --- solid faces, drawn after the edges so they hide what is behind --- }
-  NFace := 0;
-  SetLength(Order, FLive);
-  SetLength(Depth, FLive);
-  SetLength(Area, FLive);
-  Look := ViewDir(V);
+    Mark(0);
+    { --- solid faces, drawn after the edges so they hide what is behind --- }
+    NFace := 0;
+    SetLength(Order, FLive);
+    SetLength(Depth, FLive);
+    SetLength(Area, FLive);
+    Look := ViewDir(V);
   { The lamp rides on the camera, a little above it and to its left, so the
     face being looked at is the lit one and turning the model shows its
     shape.  The offset keeps the three faces of a box in iso from coming out
     the same tone. }
-  if not CameraLamp then
-    Lamp := Norm3(P3(0.35, -0.55, 0.75))
-  else
-  Lamp := Norm3(P3(
-    Look.X + ViewUp(V).X * LAMP_UP - ViewRight(V).X * LAMP_LEFT,
-    Look.Y + ViewUp(V).Y * LAMP_UP - ViewRight(V).Y * LAMP_LEFT,
-    Look.Z + ViewUp(V).Z * LAMP_UP - ViewRight(V).Z * LAMP_LEFT));
-  for I := 0 to FLive - 1 do
-    if (FEnts[I].Kind = ekFace) and (Length(FEnts[I].Poly) >= 3) and
-       InSlice(I) and
-       not (FEnts[I].Solid and GroupClosed(FEnts[I].Grp) and
-            (Dot3(FaceNormal(I), Look) <= 0)) then
-    begin
+    if not CameraLamp then
+      Lamp := Norm3(P3(0.35, -0.55, 0.75))
+    else
+      Lamp := Norm3(P3(Look.X + ViewUp(V).X * LAMP_UP - ViewRight(V).X * LAMP_LEFT, Look.Y + ViewUp(V).Y * LAMP_UP - ViewRight(V).Y *
+        LAMP_LEFT, Look.Z + ViewUp(V).Z * LAMP_UP - ViewRight(V).Z * LAMP_LEFT));
+    for I := 0 to FLive - 1 do
+      if (FEnts[I].Kind = ekFace) and (Length(FEnts[I].Poly) >= 3) and InSlice(I) and not (FEnts[I].Solid and GroupClosed(FEnts[I].Grp) and
+        (Dot3(FaceNormal(I), Look) <= 0)) then
+      begin
       { Every face is drawn and the depth buffer decides what shows, so a
         window in a box shows the inside of the far wall.  The exception is
         the back of a closed solid: it can never be seen, and a warped face's
         fitted depth can let it paint over the near side in pale blue.  An
         open shell keeps its backs. }
 
-      Cen := P3(0, 0, 0);
-      for K := 0 to High(FEnts[I].Poly) do
-      begin
-        Cen.X := Cen.X + FEnts[I].Poly[K].X;
-        Cen.Y := Cen.Y + FEnts[I].Poly[K].Y;
-        Cen.Z := Cen.Z + FEnts[I].Poly[K].Z;
+        Cen := P3(0, 0, 0);
+        for K := 0 to High(FEnts[I].Poly) do
+        begin
+          Cen.X := Cen.X + FEnts[I].Poly[K].X;
+          Cen.Y := Cen.Y + FEnts[I].Poly[K].Y;
+          Cen.Z := Cen.Z + FEnts[I].Poly[K].Z;
+        end;
+        K := Length(FEnts[I].Poly);
+        Cen := P3(Cen.X / K, Cen.Y / K, Cen.Z / K);
+        if PolyOffScreen(FEnts[I].Poly) then Continue;
+        Order[NFace] := I;
+        Depth[NFace] := Dot3(Cen, Look);
+        Area[NFace] := FaceArea(I);
+        Inc(NFace);
       end;
-      K := Length(FEnts[I].Poly);
-      Cen := P3(Cen.X / K, Cen.Y / K, Cen.Z / K);
-      if PolyOffScreen(FEnts[I].Poly) then Continue;
-      Order[NFace] := I;
-      Depth[NFace] := Dot3(Cen, Look);
-      Area[NFace] := FaceArea(I);
-      Inc(NFace);
-    end;
 
-  Mark(1);
+    Mark(1);
   { Farthest first; faces level to within rounding go bigger first, so a
     circle on a slab lands on top.  A merge sort, since insertion sort was
     most of a frame at five thousand faces. }
-  SortFaces(Order, Depth, Area, NFace);
+    SortFaces(Order, Depth, Area, NFace);
 
-  { every face's plane, once, for the lines-on-faces pass }
-  SetLength(PlaneN, NFace);
-  SetLength(PlaneD, NFace);
-  SetLength(SlotOf, FLive);
-  for I := 0 to FLive - 1 do SlotOf[I] := -1;
-  for I := 0 to NFace - 1 do
-  begin
-    PlaneN[I] := FaceNormal(Order[I]);
-    PlaneD[I] := Dot3(PlaneN[I], FEnts[Order[I]].Poly[0]);
-    SlotOf[Order[I]] := I;
-  end;
-  EnsureOnFace;
-  OnFaceOK := OnFaceReady;
-  if not OnFaceOK then
-  begin
-    SetLength(AllFaces, NFace);
-    for I := 0 to NFace - 1 do AllFaces[I] := Order[I];
-    Inc(OnFaceFallbacks);
-  end;
+    { every face's plane, once, for the lines-on-faces pass }
+    SetLength(PlaneN, NFace);
+    SetLength(PlaneD, NFace);
+    SetLength(SlotOf, FLive);
+    for I := 0 to FLive - 1 do SlotOf[I] := -1;
+    for I := 0 to NFace - 1 do
+    begin
+      PlaneN[I] := FaceNormal(Order[I]);
+      PlaneD[I] := Dot3(PlaneN[I], FEnts[Order[I]].Poly[0]);
+      SlotOf[Order[I]] := I;
+    end;
+    EnsureOnFace;
+    OnFaceOK := OnFaceReady;
+    if not OnFaceOK then
+    begin
+      SetLength(AllFaces, NFace);
+      for I := 0 to NFace - 1 do AllFaces[I] := Order[I];
+      Inc(OnFaceFallbacks);
+    end;
   { and the faces likewise: painted in the first half, their depth blown
     up with them, so the second half must not begin a fresh depth pass }
-  if Phase <> rpLines then S.DepthBegin;
-  if Phase <> rpLines then
-  for I := 0 to NFace - 1 do
-  begin
-    K := Order[I];
-    SetLength(Flat, Length(FEnts[K].Poly));
-    for J := 0 to High(FEnts[K].Poly) do
-      Flat[J] := Project(V, FEnts[K].Poly[J]);
-    Nm := FaceNormal(K);
-    Col := InkPix(K);
+    if Phase <> rpLines then S.DepthBegin;
+    if Phase <> rpLines then
+      for I := 0 to NFace - 1 do
+      begin
+        K := Order[I];
+        SetLength(Flat, Length(FEnts[K].Poly));
+        for J := 0 to High(FEnts[K].Poly) do
+          Flat[J] := Project(V, FEnts[K].Poly[J]);
+        Nm := FaceNormal(K);
+        Col := InkPix(K);
     { A painted face shows its material at full strength; an unpainted one is
       the near-white default with a hint of the pen. }
-    if FEnts[K].MatSet then
-      Face := ColorToPix(FEnts[K].Mat)
-    else
-      Face := MixPix(Col, FACE_MATERIAL, 0.92);
+        if FEnts[K].MatSet then
+          Face := ColorToPix(FEnts[K].Mat)
+        else
+          Face := MixPix(Col, FACE_MATERIAL, 0.92);
     { The plane this face lies in, in screen terms: depth as a linear function
       of x and y, which is all a parallel projection gives. }
-    ZOK := False;
-    if Length(Flat) >= 3 then
-    begin
+        ZOK := False;
+        if Length(Flat) >= 3 then
+        begin
       { Three corners that make a well-shaped triangle on screen: the one
         furthest from the first, then the one furthest from the line between
         them.  The first three of a long thin gore are nearly in line, and
         dividing by their area gives a nonsense depth plane. }
-      ZI2 := 0;
-      ZBest := 0;
-      for ZJ := 1 to High(Flat) do
-      begin
-        ZD := Sqr(Flat[ZJ].X - Flat[0].X) + Sqr(Flat[ZJ].Y - Flat[0].Y);
-        if ZD > ZBest then begin ZBest := ZD; ZI2 := ZJ; end;
-      end;
-      ZI3 := 0;
-      ZBest := 0;
-      if ZI2 > 0 then
-        for ZJ := 1 to High(Flat) do
-          if ZJ <> ZI2 then
+          ZI2 := 0;
+          ZBest := 0;
+          for ZJ := 1 to High(Flat) do
           begin
-            ZD := Abs((Flat[ZI2].X - Flat[0].X) * (Flat[ZJ].Y - Flat[0].Y) -
-                      (Flat[ZJ].X - Flat[0].X) * (Flat[ZI2].Y - Flat[0].Y));
-            if ZD > ZBest then begin ZBest := ZD; ZI3 := ZJ; end;
+            ZD := Sqr(Flat[ZJ].X - Flat[0].X) + Sqr(Flat[ZJ].Y - Flat[0].Y);
+            if ZD > ZBest then
+            begin
+              ZBest := ZD;
+              ZI2 := ZJ;
+            end;
           end;
+          ZI3 := 0;
+          ZBest := 0;
+          if ZI2 > 0 then
+            for ZJ := 1 to High(Flat) do
+              if ZJ <> ZI2 then
+              begin
+                ZD := Abs((Flat[ZI2].X - Flat[0].X) * (Flat[ZJ].Y - Flat[0].Y) - (Flat[ZJ].X - Flat[0].X) * (Flat[ZI2].Y - Flat[0].Y));
+                if ZD > ZBest then
+                begin
+                  ZBest := ZD;
+                  ZI3 := ZJ;
+                end;
+              end;
       { Then fit the plane through ALL the corners by least squares.  A warped
         quad from a revolve has no true plane, and three corners left the
         fourth hundreds of feet out in depth.  The three corners above are the
         fallback.  Kept alongside triangle cutting: it is exact for flat faces
         and covers slivers no triangle reaches. }
-      if (ZI2 > 0) and (ZI3 > 0) then
-      begin
-        ZDet := (Flat[ZI2].X - Flat[0].X) * (Flat[ZI3].Y - Flat[0].Y) -
-                (Flat[ZI3].X - Flat[0].X) * (Flat[ZI2].Y - Flat[0].Y);
+          if (ZI2 > 0) and (ZI3 > 0) then
+          begin
+            ZDet := (Flat[ZI2].X - Flat[0].X) * (Flat[ZI3].Y - Flat[0].Y) - (Flat[ZI3].X - Flat[0].X) * (Flat[ZI2].Y - Flat[0].Y);
         { a hundredth of a square pixel: below that the face really is
           edge-on and has no depth of its own worth solving }
-        if Abs(ZDet) > 1E-2 then
-        begin
-          { the normal equations for depth = A*x + B*y + C }
-          Sxx := 0; Sxy := 0; Syy := 0; Sx := 0; Sy := 0; Sn := 0;
-          Sdx := 0; Sdy := 0; Sd := 0;
-          for ZJ := 0 to High(Flat) do
-          begin
-            ZD := Dot3(FEnts[K].Poly[ZJ], Look);
-            Sxx := Sxx + Flat[ZJ].X * Flat[ZJ].X;
-            Sxy := Sxy + Flat[ZJ].X * Flat[ZJ].Y;
-            Syy := Syy + Flat[ZJ].Y * Flat[ZJ].Y;
-            Sx  := Sx  + Flat[ZJ].X;
-            Sy  := Sy  + Flat[ZJ].Y;
-            Sdx := Sdx + ZD * Flat[ZJ].X;
-            Sdy := Sdy + ZD * Flat[ZJ].Y;
-            Sd  := Sd  + ZD;
-            Sn  := Sn  + 1;
-          end;
-          ZDen := Sxx * (Syy * Sn - Sy * Sy) - Sxy * (Sxy * Sn - Sy * Sx) +
-                  Sx * (Sxy * Sy - Syy * Sx);
-          if Abs(ZDen) > 1E-9 * (1 + Abs(Sxx) + Abs(Syy)) then
-          begin
-            ZA := (Sdx * (Syy * Sn - Sy * Sy) - Sxy * (Sdy * Sn - Sy * Sd) +
-                   Sx * (Sdy * Sy - Syy * Sd)) / ZDen;
-            ZB := (Sxx * (Sdy * Sn - Sd * Sy) - Sdx * (Sxy * Sn - Sy * Sx) +
-                   Sx * (Sxy * Sd - Sdy * Sx)) / ZDen;
-            ZC := (Sxx * (Syy * Sd - Sy * Sdy) - Sxy * (Sxy * Sd - Sdy * Sx) +
-                   Sdx * (Sxy * Sy - Syy * Sx)) / ZDen;
-            ZOK := True;
-          end;
-          if not ZOK then
-          begin
-            { three corners, the well-conditioned ones, as before }
-            ZD1 := Dot3(FEnts[K].Poly[0], Look);
-            ZD2 := Dot3(FEnts[K].Poly[ZI2], Look);
-            ZD3 := Dot3(FEnts[K].Poly[ZI3], Look);
-            ZA := ((ZD2 - ZD1) * (Flat[ZI3].Y - Flat[0].Y) -
-                   (ZD3 - ZD1) * (Flat[ZI2].Y - Flat[0].Y)) / ZDet;
-            ZB := ((ZD3 - ZD1) * (Flat[ZI2].X - Flat[0].X) -
-                   (ZD2 - ZD1) * (Flat[ZI3].X - Flat[0].X)) / ZDet;
-            ZC := ZD1 - ZA * Flat[0].X - ZB * Flat[0].Y;
-            ZOK := True;
+            if Abs(ZDet) > 1E-2 then
+            begin
+              { the normal equations for depth = A*x + B*y + C }
+              Sxx := 0;
+              Sxy := 0;
+              Syy := 0;
+              Sx := 0;
+              Sy := 0;
+              Sn := 0;
+              Sdx := 0;
+              Sdy := 0;
+              Sd := 0;
+              for ZJ := 0 to High(Flat) do
+              begin
+                ZD := Dot3(FEnts[K].Poly[ZJ], Look);
+                Sxx := Sxx + Flat[ZJ].X * Flat[ZJ].X;
+                Sxy := Sxy + Flat[ZJ].X * Flat[ZJ].Y;
+                Syy := Syy + Flat[ZJ].Y * Flat[ZJ].Y;
+                Sx := Sx + Flat[ZJ].X;
+                Sy := Sy + Flat[ZJ].Y;
+                Sdx := Sdx + ZD * Flat[ZJ].X;
+                Sdy := Sdy + ZD * Flat[ZJ].Y;
+                Sd := Sd + ZD;
+                Sn := Sn + 1;
+              end;
+              ZDen := Sxx * (Syy * Sn - Sy * Sy) - Sxy * (Sxy * Sn - Sy * Sx) + Sx * (Sxy * Sy - Syy * Sx);
+              if Abs(ZDen) > 1E-9 * (1 + Abs(Sxx) + Abs(Syy)) then
+              begin
+                ZA := (Sdx * (Syy * Sn - Sy * Sy) - Sxy * (Sdy * Sn - Sy * Sd) + Sx * (Sdy * Sy - Syy * Sd)) / ZDen;
+                ZB := (Sxx * (Sdy * Sn - Sd * Sy) - Sdx * (Sxy * Sn - Sy * Sx) + Sx * (Sxy * Sd - Sdy * Sx)) / ZDen;
+                ZC := (Sxx * (Syy * Sd - Sy * Sdy) - Sxy * (Sxy * Sd - Sdy * Sx) + Sdx * (Sxy * Sy - Syy * Sx)) / ZDen;
+                ZOK := True;
+              end;
+              if not ZOK then
+              begin
+                { three corners, the well-conditioned ones, as before }
+                ZD1 := Dot3(FEnts[K].Poly[0], Look);
+                ZD2 := Dot3(FEnts[K].Poly[ZI2], Look);
+                ZD3 := Dot3(FEnts[K].Poly[ZI3], Look);
+                ZA := ((ZD2 - ZD1) * (Flat[ZI3].Y - Flat[0].Y) - (ZD3 - ZD1) * (Flat[ZI2].Y - Flat[0].Y)) / ZDet;
+                ZB := ((ZD3 - ZD1) * (Flat[ZI2].X - Flat[0].X) - (ZD2 - ZD1) * (Flat[ZI3].X - Flat[0].X)) / ZDet;
+                ZC := ZD1 - ZA * Flat[0].X - ZB * Flat[0].Y;
+                ZOK := True;
+              end;
+            end;
           end;
         end;
-      end;
-    end;
-    if ZOK then S.DepthPlane(ZA, ZB, ZC)
-    else S.DepthPlane(0, 0, -1E30);
+        if ZOK then S.DepthPlane(ZA, ZB, ZC)
+        else
+          S.DepthPlane(0, 0, -1E30);
 
     { Ambient plus lamp comes to more than one on purpose: a face square to
       the lamp burns out to the full material and ShadePix clips it.  The
       normal is taken on the eye's side, so a face seen from behind is lit as
       the surface being looked at. }
-    if not CameraLamp then
-      Sh := Min(1, 0.62 + 0.50 * Abs(Dot3(Nm, Lamp)))
-    else if Dot3(Nm, Look) < 0 then
-      Sh := LAMP_AMBIENT + LAMP_DIFFUSE * Max(0, -Dot3(Nm, Lamp))
-    else
-      Sh := LAMP_AMBIENT + LAMP_DIFFUSE * Max(0, Dot3(Nm, Lamp));
+        if not CameraLamp then
+          Sh := Min(1, 0.62 + 0.50 * Abs(Dot3(Nm, Lamp)))
+        else if Dot3(Nm, Look) < 0 then
+          Sh := LAMP_AMBIENT + LAMP_DIFFUSE * Max(0, -Dot3(Nm, Lamp))
+        else
+          Sh := LAMP_AMBIENT + LAMP_DIFFUSE * Max(0, Dot3(Nm, Lamp));
     { A plan is a drawing, not a photograph: no shading, so the lines carry
       the information. }
-    if V.Kind = vkPlan then Sh := 1;
+        if V.Kind = vkPlan then Sh := 1;
     { The outline and its holes go to the fill together, so a window is where
       the wall is not, and you can see through it. }
-    SetLength(Loops, 1 + Length(FEnts[K].Holes));
-    SetLength(Loops[0], Length(Flat));
-    for HJ := 0 to High(Flat) do Loops[0][HJ] := Flat[HJ];
-    for HK := 0 to High(FEnts[K].Holes) do
-    begin
-      SetLength(Loops[HK + 1], Length(FEnts[K].Holes[HK]));
-      for HJ := 0 to High(FEnts[K].Holes[HK]) do
-        Loops[HK + 1][HJ] := Project(V, FEnts[K].Holes[HK][HJ]);
-    end;
+        SetLength(Loops, 1 + Length(FEnts[K].Holes));
+        SetLength(Loops[0], Length(Flat));
+        for HJ := 0 to High(Flat) do Loops[0][HJ] := Flat[HJ];
+        for HK := 0 to High(FEnts[K].Holes) do
+        begin
+          SetLength(Loops[HK + 1], Length(FEnts[K].Holes[HK]));
+          for HJ := 0 to High(FEnts[K].Holes[HK]) do
+            Loops[HK + 1][HJ] := Project(V, FEnts[K].Holes[HK][HJ]);
+        end;
     { --- an exact depth for a face that is not flat --------------------
           One plane is only a guess for a warped face, so cut it into
           triangles, each with exactly one plane.  The fill is still one call
           (see DepthMesh); this only sets each pixel's depth.  Flat faces
           skip it. }
-    if ZOK and (Length(FEnts[K].Poly) > 3) then
-    begin
-      TriDev := 0;
-      TriSize := 1;
-      for ZJ := 1 to High(FEnts[K].Poly) do
-      begin
-        TDx := Abs(Nm.X * (FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) +
-                   Nm.Y * (FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) +
-                   Nm.Z * (FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
-        if TDx > TriDev then TriDev := TDx;
-        TDy := Sqrt(Sqr(FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) +
-                    Sqr(FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) +
-                    Sqr(FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
-        if TDy > TriSize then TriSize := TDy;
-      end;
-      { a millionth of the face's own size out of flat is rounding, not warp }
-      if TriDev > 1E-6 * TriSize then
-      begin
+        if ZOK and (Length(FEnts[K].Poly) > 3) then
+        begin
+          TriDev := 0;
+          TriSize := 1;
+          for ZJ := 1 to High(FEnts[K].Poly) do
+          begin
+            TDx := Abs(Nm.X * (FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) + Nm.Y * (FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) +
+              Nm.Z * (FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
+            if TDx > TriDev then TriDev := TDx;
+            TDy := Sqrt(Sqr(FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) + Sqr(FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) +
+              Sqr(FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
+            if TDy > TriSize then TriSize := TDy;
+          end;
+          { a millionth of the face's own size out of flat is rounding, not warp }
+          if TriDev > 1E-6 * TriSize then
+          begin
         { Cut against what the camera shows, every frame.  Keeping a cut made
           in the face's own plane saved about one percent, and for a warped
           face it folded over a quarter of the time once projected.  FaceCut
           stays for STL, which is model-space by nature. }
-        SetLength(TriRing, Length(Loops[0]));
-        for HJ := 0 to High(Loops[0]) do TriRing[HJ] := HJ;
-        SetLength(TriHoles, Length(Loops) - 1);
-        MN := Length(Loops[0]);
-        for HK := 0 to High(FEnts[K].Holes) do
-        begin
-          SetLength(TriHoles[HK], Length(FEnts[K].Holes[HK]));
-          for HJ := 0 to High(FEnts[K].Holes[HK]) do
-          begin
-            TriHoles[HK][HJ] := MN;
-            Inc(MN);
-          end;
-        end;
+            SetLength(TriRing, Length(Loops[0]));
+            for HJ := 0 to High(Loops[0]) do TriRing[HJ] := HJ;
+            SetLength(TriHoles, Length(Loops) - 1);
+            MN := Length(Loops[0]);
+            for HK := 0 to High(FEnts[K].Holes) do
+            begin
+              SetLength(TriHoles[HK], Length(FEnts[K].Holes[HK]));
+              for HJ := 0 to High(FEnts[K].Holes[HK]) do
+              begin
+                TriHoles[HK][HJ] := MN;
+                Inc(MN);
+              end;
+            end;
 
-        SetLength(TriPts, MN);
-        SetLength(TriZ, MN);
-        MN := 0;
-        for HJ := 0 to High(Loops[0]) do
-        begin
-          TriPts[MN] := Loops[0][HJ];
-          TriZ[MN] := Dot3(FEnts[K].Poly[HJ], Look);
-          Inc(MN);
-        end;
-        for HK := 0 to High(FEnts[K].Holes) do
-          for HJ := 0 to High(FEnts[K].Holes[HK]) do
-          begin
-            TriPts[MN] := Loops[HK + 1][HJ];
-            TriZ[MN] := Dot3(FEnts[K].Holes[HK][HJ], Look);
-            Inc(MN);
-          end;
+            SetLength(TriPts, MN);
+            SetLength(TriZ, MN);
+            MN := 0;
+            for HJ := 0 to High(Loops[0]) do
+            begin
+              TriPts[MN] := Loops[0][HJ];
+              TriZ[MN] := Dot3(FEnts[K].Poly[HJ], Look);
+              Inc(MN);
+            end;
+            for HK := 0 to High(FEnts[K].Holes) do
+              for HJ := 0 to High(FEnts[K].Holes[HK]) do
+              begin
+                TriPts[MN] := Loops[HK + 1][HJ];
+                TriZ[MN] := Dot3(FEnts[K].Holes[HK][HJ], Look);
+                Inc(MN);
+              end;
 
-        if Triangulate(TriPts, TriRing, TriHoles, Tris) then
-        begin
-          SetLength(Mesh, Length(Tris) div 3);
-          MN := 0;
-          for MI := 0 to (Length(Tris) div 3) - 1 do
-          begin
-            ZI2 := Tris[MI * 3];
-            ZI3 := Tris[MI * 3 + 1];
-            ZJ := Tris[MI * 3 + 2];
-            if (ZI2 >= Length(TriPts)) or (ZI3 >= Length(TriPts)) or
-               (ZJ >= Length(TriPts)) then Continue;
-            TriDet := (Double(TriPts[ZI3].X) - TriPts[ZI2].X) *
-                        (Double(TriPts[ZJ].Y) - TriPts[ZI2].Y) -
-                      (Double(TriPts[ZJ].X) - TriPts[ZI2].X) *
-                        (Double(TriPts[ZI3].Y) - TriPts[ZI2].Y);
+            if Triangulate(TriPts, TriRing, TriHoles, Tris) then
+            begin
+              SetLength(Mesh, Length(Tris) div 3);
+              MN := 0;
+              for MI := 0 to (Length(Tris) div 3) - 1 do
+              begin
+                ZI2 := Tris[MI * 3];
+                ZI3 := Tris[MI * 3 + 1];
+                ZJ := Tris[MI * 3 + 2];
+                if (ZI2 >= Length(TriPts)) or (ZI3 >= Length(TriPts)) or (ZJ >= Length(TriPts)) then Continue;
+                TriDet := (double(TriPts[ZI3].X) - TriPts[ZI2].X) * (double(TriPts[ZJ].Y) - TriPts[ZI2].Y) -
+                  (double(TriPts[ZJ].X) - TriPts[ZI2].X) * (double(TriPts[ZI3].Y) - TriPts[ZI2].Y);
             { a hundredth of a square pixel: below that it is an edge-on
               sliver with no depth of its own to give, and the fitted plane
               is left to cover the pixel or two it might have owned }
-            if Abs(TriDet) < 1E-2 then Continue;
-            Mesh[MN].AX := TriPts[ZI2].X;  Mesh[MN].AY := TriPts[ZI2].Y;
-            Mesh[MN].BX := TriPts[ZI3].X;  Mesh[MN].BY := TriPts[ZI3].Y;
-            Mesh[MN].CX := TriPts[ZJ].X;   Mesh[MN].CY := TriPts[ZJ].Y;
-            Mesh[MN].ZA :=
-              ((TriZ[ZI3] - TriZ[ZI2]) * (Double(TriPts[ZJ].Y) - TriPts[ZI2].Y) -
-               (TriZ[ZJ] - TriZ[ZI2]) * (Double(TriPts[ZI3].Y) - TriPts[ZI2].Y)) / TriDet;
-            Mesh[MN].ZB :=
-              ((TriZ[ZJ] - TriZ[ZI2]) * (Double(TriPts[ZI3].X) - TriPts[ZI2].X) -
-               (TriZ[ZI3] - TriZ[ZI2]) * (Double(TriPts[ZJ].X) - TriPts[ZI2].X)) / TriDet;
-            Mesh[MN].ZC := TriZ[ZI2] - Mesh[MN].ZA * TriPts[ZI2].X -
-                                       Mesh[MN].ZB * TriPts[ZI2].Y;
-            Mesh[MN].ZLo := Min(TriZ[ZI2], Min(TriZ[ZI3], TriZ[ZJ]));
-            Mesh[MN].ZHi := Max(TriZ[ZI2], Max(TriZ[ZI3], TriZ[ZJ]));
-            Inc(MN);
+                if Abs(TriDet) < 1E-2 then Continue;
+                Mesh[MN].AX := TriPts[ZI2].X;
+                Mesh[MN].AY := TriPts[ZI2].Y;
+                Mesh[MN].BX := TriPts[ZI3].X;
+                Mesh[MN].BY := TriPts[ZI3].Y;
+                Mesh[MN].CX := TriPts[ZJ].X;
+                Mesh[MN].CY := TriPts[ZJ].Y;
+                Mesh[MN].ZA :=
+                  ((TriZ[ZI3] - TriZ[ZI2]) * (double(TriPts[ZJ].Y) - TriPts[ZI2].Y) - (TriZ[ZJ] - TriZ[ZI2]) * (double(TriPts[ZI3].Y) - TriPts[ZI2].Y)) / TriDet;
+                Mesh[MN].ZB :=
+                  ((TriZ[ZJ] - TriZ[ZI2]) * (double(TriPts[ZI3].X) - TriPts[ZI2].X) - (TriZ[ZI3] - TriZ[ZI2]) * (double(TriPts[ZJ].X) - TriPts[ZI2].X)) / TriDet;
+                Mesh[MN].ZC := TriZ[ZI2] - Mesh[MN].ZA * TriPts[ZI2].X - Mesh[MN].ZB * TriPts[ZI2].Y;
+                Mesh[MN].ZLo := Min(TriZ[ZI2], Min(TriZ[ZI3], TriZ[ZJ]));
+                Mesh[MN].ZHi := Max(TriZ[ZI2], Max(TriZ[ZI3], TriZ[ZJ]));
+                Inc(MN);
+              end;
+              SetLength(Mesh, MN);
+              if MN > 0 then S.DepthMesh(Mesh);
+            end;
           end;
-          SetLength(Mesh, MN);
-          if MN > 0 then S.DepthMesh(Mesh);
         end;
-      end;
-    end;
 
     { The back of a face gets its own color.  A closed solid never shows one,
       so this only appears on loose geometry, where being inside out
       matters. }
-    if (Dot3(Nm, ViewDir(V)) < 0) and (V.Kind <> vkPlan) then
-      S.FillLoops(Loops, DimIf(K, ShadePix(FACE_BACK, Sh)), 1.0)
-    else if V.Kind = vkPlan then
+        if (Dot3(Nm, ViewDir(V)) < 0) and (V.Kind <> vkPlan) then
+          S.FillLoops(Loops, DimIf(K, ShadePix(FACE_BACK, Sh)), 1.0)
+        else if V.Kind = vkPlan then
       { Paler in plan so the fill does not compete with the lines, front and
         back alike.  A painted face still shows its paint. }
-      if FEnts[K].MatSet then
-        S.FillLoops(Loops, DimIf(K, Face), 1.0)
-      else
-        S.FillLoops(Loops, DimIf(K, MixPix(Face, Pix(255, 255, 255), 0.55)), 1.0)
-    else
-      S.FillLoops(Loops, DimIf(K, ShadePix(Face, Sh)), 1.0);
+          if FEnts[K].MatSet then
+            S.FillLoops(Loops, DimIf(K, Face), 1.0)
+          else
+            S.FillLoops(Loops, DimIf(K, MixPix(Face, Pix(255, 255, 255), 0.55)), 1.0)
+        else
+          S.FillLoops(Loops, DimIf(K, ShadePix(Face, Sh)), 1.0);
     { No outline: every boundary is a real edge and drawn as one, and
       stroking the polygon too doubled it. }
-  end;
+      end;
 
   { the first half of a half-resolution frame stops here; the rest is
     drawn at full size on the other surface }
-  if Phase = rpFaces then Exit;
+    if Phase = rpFaces then Exit;
 
-  Mark(2);
+    Mark(2);
   { --- lines that live on a visible face -------------------------------
         The faces bury lines drawn ON them, so those are put back here: a
         line counts if both ends lie in the plane of a face that was drawn. }
-  for I := 0 to FLive - 1 do
-  begin
-    if not (FEnts[I].Kind in [ekLine, ekArc, ekDim, ekText]) then Continue;
-    if not InSlice(I) then Continue;
+    for I := 0 to FLive - 1 do
+    begin
+      if not (FEnts[I].Kind in [ekLine, ekArc, ekDim, ekText]) then Continue;
+      if not InSlice(I) then Continue;
     { a softened crease that is not an outline stays hidden whatever face
       it lies on - said once here, not once per face }
-    if (FEnts[I].Kind = ekLine) and Hidden(I) then Continue;
-    if (FEnts[I].Kind in [ekLine, ekDim]) and
-       OffScreen(Project(V, FEnts[I].A), Project(V, FEnts[I].B)) then Continue;
+      if (FEnts[I].Kind = ekLine) and Hidden(I) then Continue;
+      if (FEnts[I].Kind in [ekLine, ekDim]) and OffScreen(Project(V, FEnts[I].A), Project(V, FEnts[I].B)) then Continue;
     { the faces this thing lies on, from the cache; every face while the
       cache is still being built on its worker }
-    Drew := False;
-    if OnFaceOK then Cand := FOnFace[I] else Cand := AllFaces;
-    for JJ := 0 to High(Cand) do
-    begin
-      K := Cand[JJ];
-      J := SlotOf[K];
-      if J < 0 then Continue;
-      Nm := PlaneN[J];
-      Sh := PlaneD[J];
-      if FEnts[I].Kind = ekArc then
+      Drew := False;
+      if OnFaceOK then Cand := FOnFace[I]
+      else
+        Cand := AllFaces;
+      for JJ := 0 to High(Cand) do
       begin
-        { an arc lies in a face when its middle and its rim do }
-        if Abs(Dot3(Nm, FEnts[I].C) - Sh) >= 1E-6 then Continue;
-        if Abs(Dot3(Nm, ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0,
-             FEnts[I].Plane, FEnts[I].Nm)) - Sh) >= 1E-6 then Continue;
-      end
-      else if (Abs(Dot3(Nm, FEnts[I].A) - Sh) >= 1E-6) or
-              (Abs(Dot3(Nm, FEnts[I].B) - Sh) >= 1E-6) then Continue;
-      Col := InkPix(I);
-      case FEnts[I].Kind of
-        ekLine:
-          if Hidden(I) then
+        K := Cand[JJ];
+        J := SlotOf[K];
+        if J < 0 then Continue;
+        Nm := PlaneN[J];
+        Sh := PlaneD[J];
+        if FEnts[I].Kind = ekArc then
+        begin
+          { an arc lies in a face when its middle and its rim do }
+          if Abs(Dot3(Nm, FEnts[I].C) - Sh) >= 1E-6 then Continue;
+          if Abs(Dot3(Nm, ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm)) - Sh) >= 1E-6 then Continue;
+        end
+        else if (Abs(Dot3(Nm, FEnts[I].A) - Sh) >= 1E-6) or (Abs(Dot3(Nm, FEnts[I].B) - Sh) >= 1E-6) then Continue;
+        Col := InkPix(I);
+        case FEnts[I].Kind of
+          ekLine:
+            if Hidden(I) then
             { a softened crease stays hidden here too }
-          else
+            else
           { Only the stretches nothing stands in front of, so a grid's lines
             do not run through towers pushed up out of it.  Consecutive
             visible pieces are drawn as one line, or the joins show as notches
             at heavy weights. }
-          begin
-          Run0 := -1;
-          CurA := FEnts[I].A;
-          CurB := FEnts[I].B;
-          CurArc := -1;
-          for M := 0 to LSteps do
-          begin
-            if M < LSteps then
             begin
-              T0 := M / LSteps;
-              T1 := (M + 1) / LSteps;
-              Vis := not Covered(Lerp3(FEnts[I].A, FEnts[I].B,
-                (T0 + T1) / 2), J);
-            end
-            else
-              Vis := False;
-            if Vis and (Run0 < 0) then
-            begin
-              Run0 := M;
-              { the run starts where the cover ends, not at the sample }
-              if M = 0 then RunT0 := 0
-              else RunT0 := Boundary((M + 0.5) / LSteps, (M - 0.5) / LSteps, J);
-            end;
-            if (not Vis) and (Run0 >= 0) then
-            begin
-              if M = LSteps then RunT1 := 1
-              else RunT1 := Boundary((M - 0.5) / LSteps, (M + 0.5) / LSteps, J);
-              PA := Project(V, Lerp3(FEnts[I].A, FEnts[I].B, RunT0));
-              PB := Project(V, Lerp3(FEnts[I].A, FEnts[I].B, RunT1));
-              S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), Col);
               Run0 := -1;
+              CurA := FEnts[I].A;
+              CurB := FEnts[I].B;
+              CurArc := -1;
+              for M := 0 to LSteps do
+              begin
+                if M < LSteps then
+                begin
+                  T0 := M / LSteps;
+                  T1 := (M + 1) / LSteps;
+                  Vis := not Covered(Lerp3(FEnts[I].A, FEnts[I].B, (T0 + T1) / 2), J);
+                end
+                else
+                  Vis := False;
+                if Vis and (Run0 < 0) then
+                begin
+                  Run0 := M;
+                  { the run starts where the cover ends, not at the sample }
+                  if M = 0 then RunT0 := 0
+                  else
+                    RunT0 := Boundary((M + 0.5) / LSteps, (M - 0.5) / LSteps, J);
+                end;
+                if (not Vis) and (Run0 >= 0) then
+                begin
+                  if M = LSteps then RunT1 := 1
+                  else
+                    RunT1 := Boundary((M - 0.5) / LSteps, (M + 0.5) / LSteps, J);
+                  PA := Project(V, Lerp3(FEnts[I].A, FEnts[I].B, RunT0));
+                  PB := Project(V, Lerp3(FEnts[I].A, FEnts[I].B, RunT1));
+                  S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), Col);
+                  Run0 := -1;
+                end;
+              end;
             end;
-          end;
-          end;
-        ekArc:
+          ekArc:
           { the same, walked round the curve, so a circle on the side of a
             box is not painted over by the box }
           begin
-          if FEnts[I].Soft then Continue;   { a seam of a spun or swept surface }
+            if FEnts[I].Soft then Continue;   { a seam of a spun or swept surface }
             if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
-            else Steps := Max(24, Min(180, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 6)));
+            else
+              Steps := Max(24, Min(180, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 6)));
             Run0 := -1;
             CurArc := I;
             for M := 0 to Steps do
@@ -11766,8 +11984,7 @@ begin
               if M < Steps then
               begin
                 Ang := FEnts[I].A0 + FEnts[I].Sweep * (M + 0.5) / Steps;
-                Vis := not Covered(ArcPoint(FEnts[I].C, FEnts[I].R, Ang,
-                  FEnts[I].Plane, FEnts[I].Nm), J);
+                Vis := not Covered(ArcPoint(FEnts[I].C, FEnts[I].R, Ang, FEnts[I].Plane, FEnts[I].Nm), J);
               end
               else
                 Vis := False;
@@ -11775,12 +11992,14 @@ begin
               begin
                 Run0 := M;
                 if M = 0 then RunT0 := 0
-                else RunT0 := Boundary((M + 0.5) / Steps, (M - 0.5) / Steps, J);
+                else
+                  RunT0 := Boundary((M + 0.5) / Steps, (M - 0.5) / Steps, J);
               end;
               if (not Vis) and (Run0 >= 0) then
               begin
                 if M = Steps then RunT1 := 1
-                else RunT1 := Boundary((M - 0.5) / Steps, (M + 0.5) / Steps, J);
+                else
+                  RunT1 := Boundary((M - 0.5) / Steps, (M + 0.5) / Steps, J);
                 { from the refined start, through the corners between, to
                   the refined end - a faceted circle keeps its corners }
                 PA := Project(V, PtAt(RunT0));
@@ -11797,148 +12016,141 @@ begin
               end;
             end;
           end;
-        ekDim:
+          ekDim:
           { like a line: the stretches of its three lines that nothing
             stands in front of, the ticks and the figure where their place
             is clear }
-          if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, U, DG, FEnts[I].Txt) then
-          begin
-            DA := Add3(FEnts[I].A, FEnts[I].C);
-            DB := Add3(FEnts[I].B, FEnts[I].C);
-            RunSeg(FEnts[I].A, DA, 1.0, 0.5, LabelCol, J);
-            RunSeg(FEnts[I].B, DB, 1.0, 0.5, LabelCol, J);
-            RunSeg(DA, DB, 1.2, 0.85, LabelCol, J);
-            if not Covered(DA, J) then
-              S.Line(DG.S1A.X, DG.S1A.Y, DG.S1B.X, DG.S1B.Y, 1.4, LabelCol, 0.9);
-            if not Covered(DB, J) then
-              S.Line(DG.S2A.X, DG.S2A.Y, DG.S2B.X, DG.S2B.Y, 1.4, LabelCol, 0.9);
-            if not Covered(Lerp3(DA, DB, 0.5), J) then
+            if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, U, DG, FEnts[I].Txt) then
             begin
-              DSz := S.TextExtent(DG.Txt, AFont);
-              DTP := DimTextTopLeft(DG, DSz.cx, DSz.cy);
-              S.TextOut(DTP.X, DTP.Y, DG.Txt, AFont, LabelCol);
+              DA := Add3(FEnts[I].A, FEnts[I].C);
+              DB := Add3(FEnts[I].B, FEnts[I].C);
+              RunSeg(FEnts[I].A, DA, 1.0, 0.5, LabelCol, J);
+              RunSeg(FEnts[I].B, DB, 1.0, 0.5, LabelCol, J);
+              RunSeg(DA, DB, 1.2, 0.85, LabelCol, J);
+              if not Covered(DA, J) then
+                S.Line(DG.S1A.X, DG.S1A.Y, DG.S1B.X, DG.S1B.Y, 1.4, LabelCol, 0.9);
+              if not Covered(DB, J) then
+                S.Line(DG.S2A.X, DG.S2A.Y, DG.S2B.X, DG.S2B.Y, 1.4, LabelCol, 0.9);
+              if not Covered(Lerp3(DA, DB, 0.5), J) then
+              begin
+                DSz := S.TextExtent(DG.Txt, AFont);
+                DTP := DimTextTopLeft(DG, DSz.cx, DSz.cy);
+                S.TextOut(DTP.X, DTP.Y, DG.Txt, AFont, LabelCol);
+              end;
             end;
-          end;
-        ekText:
-          if not Covered(FEnts[I].A, J) then
-            Note(I, FEnts[I].A, FEnts[I].B, FEnts[I].Txt, Col);
+          ekText:
+            if not Covered(FEnts[I].A, J) then
+              Note(I, FEnts[I].A, FEnts[I].B, FEnts[I].Txt, Col);
+        end;
+        Drew := True;
+        Break;
       end;
-      Drew := True;
-      Break;
-    end;
 
     { --- and the ones that lie on no face at all ----------------------
       A line in mid air - a roof ridge - lies in no face's plane, so the
       faces painted over it.  Draw it through the depth buffer, which knows
       per pixel which parts are really behind something. }
-    if not Drew then
-    begin
-      S.DepthTest(True);
-      case FEnts[I].Kind of
-        ekLine:
+      if not Drew then
+      begin
+        S.DepthTest(True);
+        case FEnts[I].Kind of
+          ekLine:
           begin
             PA := Project(V, FEnts[I].A);
             PB := Project(V, FEnts[I].B);
             S.DepthAlong(PA.X, PA.Y, Dot3(FEnts[I].A, Look),
-                         PB.X, PB.Y, Dot3(FEnts[I].B, Look));
+              PB.X, PB.Y, Dot3(FEnts[I].B, Look));
             S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), InkPix(I));
           end;
-        ekArc:
-          if not FEnts[I].Soft then
-          begin
-            if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
-            else Steps := Max(24, Min(180,
-              Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 6)));
-            DA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0,
-                           FEnts[I].Plane, FEnts[I].Nm);
-            PA := Project(V, DA);
-            for K := 1 to Steps do
+          ekArc:
+            if not FEnts[I].Soft then
             begin
-              DB := ArcPoint(FEnts[I].C, FEnts[I].R,
-                FEnts[I].A0 + FEnts[I].Sweep * K / Steps,
-                FEnts[I].Plane, FEnts[I].Nm);
-              PB := Project(V, DB);
-              S.DepthAlong(PA.X, PA.Y, Dot3(DA, Look),
-                           PB.X, PB.Y, Dot3(DB, Look));
-              S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), InkPix(I));
-              PA := PB;
-              DA := DB;
+              if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
+              else
+                Steps := Max(24, Min(180, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 6)));
+              DA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm);
+              PA := Project(V, DA);
+              for K := 1 to Steps do
+              begin
+                DB := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
+                PB := Project(V, DB);
+                S.DepthAlong(PA.X, PA.Y, Dot3(DA, Look),
+                  PB.X, PB.Y, Dot3(DB, Look));
+                S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I), InkPix(I));
+                PA := PB;
+                DA := DB;
+              end;
             end;
-          end;
+        end;
+        S.DepthTest(False);
       end;
-      S.DepthTest(False);
     end;
-  end;
 
   { --- and what a plan cannot see, dashed ------------------------------
     A drawing shows what is underneath: a beam over a door, a footing under
     a wall.  Plan only - in 3D it would lay the far side of every box over
     the near side.  The depth test is turned round so only the hidden
     stretches are drawn, faint. }
-  if (V.Kind = vkPlan) and S.DepthOn then
-  begin
-    S.DepthTest(True);
-    S.DepthBehind(True);
-    for I := 0 to FLive - 1 do
+    if (V.Kind = vkPlan) and S.DepthOn then
     begin
-      if not InSlice(I) then Continue;
-      case FEnts[I].Kind of
-        ekLine:
+      S.DepthTest(True);
+      S.DepthBehind(True);
+      for I := 0 to FLive - 1 do
+      begin
+        if not InSlice(I) then Continue;
+        case FEnts[I].Kind of
+          ekLine:
           begin
             if Hidden(I) then Continue;
             PA := Project(V, FEnts[I].A);
             PB := Project(V, FEnts[I].B);
             if OffScreen(PA, PB) then Continue;
             S.DepthAlong(PA.X, PA.Y, Dot3(FEnts[I].A, Look),
-                         PB.X, PB.Y, Dot3(FEnts[I].B, Look));
+              PB.X, PB.Y, Dot3(FEnts[I].B, Look));
             S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I),
-                   MixPix(InkPix(I), Pix(255, 255, 255), 0.45));
+              MixPix(InkPix(I), Pix(255, 255, 255), 0.45));
           end;
-        ekArc:
+          ekArc:
           begin
             if FEnts[I].Soft then Continue;
             if FEnts[I].Sides >= 3 then Steps := FEnts[I].Sides
-            else Steps := Max(24, Min(180,
-              Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 6)));
-            DA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0,
-                           FEnts[I].Plane, FEnts[I].Nm);
+            else
+              Steps := Max(24, Min(180, Round(Abs(FEnts[I].Sweep) * FEnts[I].R * V.Ppu / 6)));
+            DA := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0, FEnts[I].Plane, FEnts[I].Nm);
             PA := Project(V, DA);
             for K := 1 to Steps do
             begin
-              DB := ArcPoint(FEnts[I].C, FEnts[I].R,
-                FEnts[I].A0 + FEnts[I].Sweep * K / Steps,
-                FEnts[I].Plane, FEnts[I].Nm);
+              DB := ArcPoint(FEnts[I].C, FEnts[I].R, FEnts[I].A0 + FEnts[I].Sweep * K / Steps, FEnts[I].Plane, FEnts[I].Nm);
               PB := Project(V, DB);
               S.DepthAlong(PA.X, PA.Y, Dot3(DA, Look),
-                           PB.X, PB.Y, Dot3(DB, Look));
+                PB.X, PB.Y, Dot3(DB, Look));
               S.Line(PA.X, PA.Y, PB.X, PB.Y, LineW(I),
-                     MixPix(InkPix(I), Pix(255, 255, 255), 0.45));
+                MixPix(InkPix(I), Pix(255, 255, 255), 0.45));
               PA := PB;
               DA := DB;
             end;
           end;
+        end;
       end;
+      S.DepthBehind(False);
+      S.DepthTest(False);
     end;
-    S.DepthBehind(False);
-    S.DepthTest(False);
-  end;
 
-  if not OnFaceOK then OnFaceFallbackMs := GetTickCount64 - PT;
-  Mark(3);
+    if not OnFaceOK then OnFaceFallbackMs := GetTickCount64 - PT;
+    Mark(3);
   { --- guide points, last of all ---------------------------------------
     A guide point is no use buried under the panel it was placed on, so it
     is drawn on top - unless something really is in front of it. }
-  for I := 0 to FLive - 1 do
-    if (FEnts[I].Kind = ekGuide) and not FGuidesHidden and
-       (Dist(FEnts[I].A, FEnts[I].B) < 1E-9) then
-    begin
-      if Covered(FEnts[I].A, -1) then Continue;
-      PA := Project(V, FEnts[I].A);
-      S.Disc(PA.X, PA.Y, 4.5, Pix(20, 20, 24), 0.55);
-      S.Disc(PA.X, PA.Y, 3.4, GUIDE_POINT, 1.0);
-      S.Line(PA.X - 8, PA.Y, PA.X + 8, PA.Y, 1.4, GUIDE_POINT, 0.95);
-      S.Line(PA.X, PA.Y - 8, PA.X, PA.Y + 8, 1.4, GUIDE_POINT, 0.95);
-    end;
+    for I := 0 to FLive - 1 do
+      if (FEnts[I].Kind = ekGuide) and not FGuidesHidden and (Dist(FEnts[I].A, FEnts[I].B) < 1E-9) then
+      begin
+        if Covered(FEnts[I].A, -1) then Continue;
+        PA := Project(V, FEnts[I].A);
+        S.Disc(PA.X, PA.Y, 4.5, Pix(20, 20, 24), 0.55);
+        S.Disc(PA.X, PA.Y, 3.4, GUIDE_POINT, 1.0);
+        S.Line(PA.X - 8, PA.Y, PA.X + 8, PA.Y, 1.4, GUIDE_POINT, 0.95);
+        S.Line(PA.X, PA.Y - 8, PA.X, PA.Y + 8, 1.4, GUIDE_POINT, 0.95);
+      end;
   finally
     EdgeIx.Free;
   end;

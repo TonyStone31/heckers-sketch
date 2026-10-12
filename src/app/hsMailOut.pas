@@ -9,8 +9,7 @@ unit hsMailOut;
 interface
 
 { False with Err when no mail program could be reached. }
-function SendByEmail(const Subject, Body: string; const Files: array of string;
-  out Err: string): Boolean;
+function SendByEmail(const Subject, Body: string; const Files: array of string; out Err: string): boolean;
 
 implementation
 
@@ -109,11 +108,11 @@ begin
   end;
 end;
 {$ELSE}
-function SendByEmail(const Subject, Body: string; const Files: array of string;
-  out Err: string): Boolean;
+
+function SendByEmail(const Subject, Body: string; const Files: array of string; out Err: string): boolean;
 var
   P: TProcess;
-  I: Integer;
+  I: integer;
   Exe: string;
 begin
   Result := False;

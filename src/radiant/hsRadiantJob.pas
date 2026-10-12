@@ -20,12 +20,12 @@ const
 { a name for a new job, unlikely to be any other's }
 function NewRadiantJobId: string;
 { zone Z's group's data }
-function RadiantJobData(const Job: TRadiantJob; Z: Integer; const JobId: string): string;
+function RadiantJobData(const Job: TRadiantJob; Z: integer; const JobId: string): string;
 { Is this a radiant zone's data - and which job, which zone? }
-function IsRadiantData(const Data: string; out JobId: string; out Zone: Integer): Boolean;
+function IsRadiantData(const Data: string; out JobId: string; out Zone: integer): boolean;
 { the job rebuilt from its zones' group data, in any order, any missing
   (those come back unsearched). False when none of it reads as a radiant job. }
-function RadiantJobFromData(const Datas: array of string; out Job: TRadiantJob): Boolean;
+function RadiantJobFromData(const Datas: array of string; out Job: TRadiantJob): boolean;
 
 implementation
 
@@ -38,14 +38,14 @@ end;
 
 procedure PutHoles(W: TDataWriter; const Holes: TRadiantHoles);
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(Holes) do W.Pts('hole', Holes[I]);
 end;
 
 function HolesOf(N: TDataNode): TRadiantHoles;
 var
-  I: Integer;
+  I: integer;
   One: TDataNode;
 begin
   SetLength(Result, 0);
@@ -65,8 +65,8 @@ end;
 
 procedure PutSpec(W: TDataWriter; const Name: string; const S: TRadiantSpec);
 var
-  I: Integer;
-  Ports: array of Double;
+  I: integer;
+  Ports: array of double;
 begin
   W.Open(Name);
   W.Int('tube', Ord(S.Tube));
@@ -103,7 +103,7 @@ end;
 function SpecOf(N: TDataNode): TRadiantSpec;
 var
   V: TDataNums;
-  I: Integer;
+  I: integer;
   E: TDataNode;
 begin
   Result := DefaultRadiantSpec;
@@ -129,7 +129,7 @@ begin
   Result.Inch := N.Num('inch', Result.Inch);
   Result.GoalCoverPct := N.Num('goalcover', 0);
   Result.GoalEvenPct := N.Num('goaleven', 0);
-  Result.SearchSeed := Cardinal(Round(EnsureRange(N.Num('seed', 0), 0, High(Cardinal))));
+  Result.SearchSeed := cardinal(Round(EnsureRange(N.Num('seed', 0), 0, High(cardinal))));
   Result.MaxPorts := N.Int('maxports', Result.MaxPorts);
   Result.PinManifold := N.Bool('pin');
   Result.LessFriendly := N.Bool('lessfriendly');
@@ -138,9 +138,9 @@ begin
 end;
 
 { a layout - WithPaths, every loop's path as well as its record }
-procedure PutResult(W: TDataWriter; const Name: string; const R: TRadiantResult; WithPaths: Boolean);
+procedure PutResult(W: TDataWriter; const Name: string; const R: TRadiantResult; WithPaths: boolean);
 var
-  I: Integer;
+  I: integer;
 begin
   W.Open(Name);
   W.Bool('ok', R.Ok);
@@ -189,8 +189,7 @@ begin
     W.Int('manifold', R.Loops[I].Manifold);
     if R.Loops[I].Couple <> 0 then W.Int('couple', R.Loops[I].Couple);
     if (Length(R.LoopFriendly) = Length(R.Loops)) then
-      W.Nums('friendly', [R.LoopFriendly[I].Measures, R.LoopFriendly[I].ExtraBends,
-        R.LoopFriendly[I].Compact, R.LoopFriendly[I].Score]);
+      W.Nums('friendly', [R.LoopFriendly[I].Measures, R.LoopFriendly[I].ExtraBends, R.LoopFriendly[I].Compact, R.LoopFriendly[I].Score]);
     if WithPaths then W.Pts('path', R.Loops[I].Pts);
     W.Close;
   end;
@@ -199,11 +198,11 @@ end;
 
 function ResultOf(N: TDataNode): TRadiantResult;
 var
-  I, M, L: Integer;
+  I, M, L: integer;
   K, Log: TDataNode;
   V: TDataNums;
   At: TP3Array;
-  AllFriendly: Boolean;
+  AllFriendly: boolean;
 begin
   Result := Default(TRadiantResult);
   Result.Friendly := -1;
@@ -218,7 +217,9 @@ begin
   V := N.Nums('turn');
   if Length(V) >= 3 then
   begin
-    Result.TurnActualIn := V[0]; Result.TurnMinIn := V[1]; Result.TurnMinPexAIn := V[2];
+    Result.TurnActualIn := V[0];
+    Result.TurnMinIn := V[1];
+    Result.TurnMinPexAIn := V[2];
   end;
   Result.Crossings := N.Int('crossings');
   Result.CellCount := N.Int('cells');
@@ -244,7 +245,8 @@ begin
         Result.SearchLog[High(Result.SearchLog)] := DataUnquote(Log.Kid(I).Value);
       end;
   AllFriendly := True;
-  M := 0; L := 0;
+  M := 0;
+  L := 0;
   for I := 0 to N.Count - 1 do
   begin
     K := N.Kid(I);
@@ -276,7 +278,8 @@ begin
         Result.LoopFriendly[L].Compact := V[2];
         Result.LoopFriendly[L].Score := V[3];
       end
-      else AllFriendly := False;
+      else
+        AllFriendly := False;
       Inc(L);
     end;
   end;
@@ -296,10 +299,10 @@ begin
   Result.Holes := HolesOf(N);
 end;
 
-function RadiantJobData(const Job: TRadiantJob; Z: Integer; const JobId: string): string;
+function RadiantJobData(const Job: TRadiantJob; Z: integer; const JobId: string): string;
 var
   W: TDataWriter;
-  K, I: Integer;
+  K, I: integer;
 begin
   W := TDataWriter.Create;
   try
@@ -309,7 +312,9 @@ begin
     W.Text('title', Job.Title);
     W.Text('when', FormatDateTime('yyyy-mm-dd hh:nn:ss', Job.When));
     W.Text('made', Job.Made);
-    if Job.Units = usMetric then W.Text('units', 'metric') else W.Text('units', 'imperial');
+    if Job.Units = usMetric then W.Text('units', 'metric')
+    else
+      W.Text('units', 'imperial');
     PutSpec(W, 'spec', Job.Spec);
     W.Open('heat');
     W.Text('job', HeatJobToText(Job.Heat));
@@ -349,7 +354,7 @@ begin
   end;
 end;
 
-function IsRadiantData(const Data: string; out JobId: string; out Zone: Integer): Boolean;
+function IsRadiantData(const Data: string; out JobId: string; out Zone: integer): boolean;
 var
   N: TDataNode;
 begin
@@ -367,10 +372,10 @@ begin
   end;
 end;
 
-function RadiantJobFromData(const Datas: array of string; out Job: TRadiantJob): Boolean;
+function RadiantJobFromData(const Datas: array of string; out Job: TRadiantJob): boolean;
 var
   Nodes: array of TDataNode;
-  I, K, Z, NZ, First: Integer;
+  I, K, Z, NZ, First: integer;
   N, H, Sols: TDataNode;
   Dt: TDateTime;
   Hz: TStringArray;
@@ -397,7 +402,9 @@ begin
     end;
     Job.When := Dt;
     Job.Made := N.Text('made');
-    if N.Text('units') = 'metric' then Job.Units := usMetric else Job.Units := usImperial;
+    if N.Text('units') = 'metric' then Job.Units := usMetric
+    else
+      Job.Units := usImperial;
     Job.Spec := SpecOf(N.Find('spec'));
     Job.Heat := HeatDefaultJob;
     H := N.Find('heat');
@@ -417,10 +424,15 @@ begin
     NZ := 0;
     for I := 0 to N.Count - 1 do
       if N.Kid(I).Block and (N.Kid(I).Key = 'floor') then Inc(NZ);
-    SetLength(Job.Zones, NZ); SetLength(Job.ZoneSpecs, NZ); SetLength(Job.ZoneNames, NZ);
-    SetLength(Job.Angles, NZ); SetLength(Job.Pins, NZ);
-    SetLength(Job.Searched, NZ); SetLength(Job.Layouts, NZ);
-    SetLength(Job.Solutions, NZ); SetLength(Job.Picked, NZ);
+    SetLength(Job.Zones, NZ);
+    SetLength(Job.ZoneSpecs, NZ);
+    SetLength(Job.ZoneNames, NZ);
+    SetLength(Job.Angles, NZ);
+    SetLength(Job.Pins, NZ);
+    SetLength(Job.Searched, NZ);
+    SetLength(Job.Layouts, NZ);
+    SetLength(Job.Solutions, NZ);
+    SetLength(Job.Picked, NZ);
     Z := 0;
     for I := 0 to N.Count - 1 do
       if N.Kid(I).Block and (N.Kid(I).Key = 'floor') then

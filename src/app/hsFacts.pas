@@ -21,11 +21,11 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormPaint(Sender: TObject);
     procedure FormClick(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
   private
     FSkin: TArtSurface;
     FTheme: TTheme;
-    FScale: Single;
+    FScale: single;
     FTitle: string;
     FLines: TStringList;
   end;
@@ -45,8 +45,7 @@ begin
   try
     Box.FTitle := Title;
     Box.FLines.Text := AText;
-    while (Box.FLines.Count > 0) and
-          (Trim(Box.FLines[Box.FLines.Count - 1]) = '') do
+    while (Box.FLines.Count > 0) and (Trim(Box.FLines[Box.FLines.Count - 1]) = '') do
       Box.FLines.Delete(Box.FLines.Count - 1);
     { title, one row per line, and the note along the bottom }
     Box.ClientHeight := Round((124 + 22 * Box.FLines.Count) * Box.FScale);
@@ -73,11 +72,10 @@ end;
 
 procedure TFactsBox.FormPaint(Sender: TObject);
 var
-  I, Y, Pad, Colon: Integer;
+  I, Y, Pad, Colon: integer;
   S, K: string;
 begin
-  if (FSkin = nil) or (FSkin.Width <> ClientWidth) or
-     (FSkin.Height <> ClientHeight) then
+  if (FSkin = nil) or (FSkin.Width <> ClientWidth) or (FSkin.Height <> ClientHeight) then
   begin
     FreeAndNil(FSkin);
     FSkin := TArtSurface.Create(Max(1, ClientWidth), Max(1, ClientHeight));
@@ -91,7 +89,13 @@ begin
   FSkin.DrawTo(Canvas, 0, 0);
 
   Canvas.Brush.Style := bsClear;
-  Canvas.Font.Name := {$IFDEF WINDOWS}'Segoe UI'{$ELSE}'Sans'{$ENDIF};
+  Canvas.Font.Name :=
+  {$IFDEF WINDOWS}
+'Segoe UI'
+    {$ELSE}
+    'Sans'
+  {$ENDIF}
+  ;
   Canvas.Font.Height := -Round(18 * FScale);
   Canvas.Font.Style := [fsBold];
   Canvas.Font.Color := PixToColor(FTheme.Text);
@@ -133,8 +137,7 @@ begin
   Close;
 end;
 
-procedure TFactsBox.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFactsBox.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   Close;
   Key := 0;

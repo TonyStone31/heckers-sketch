@@ -23,9 +23,8 @@ var
   RecentWalks: string = '';
 
 { Open the recording room.  True if a clip was made and kept. }
-function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem;
-  AFont: TFont; const LabelCol: TPix; EdgeW: Single; SrcW, SrcH: Integer;
-  Axes: Boolean; const Pivot: TP3; out Cam: TCamPath): Boolean;
+function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
+  SrcW, SrcH: integer; Axes: boolean; const Pivot: TP3; out Cam: TCamPath): boolean;
 
 implementation
 
@@ -34,26 +33,24 @@ implementation
 const
   SAMPLE_HZ = 30;         { how often the camera is written down }
   { the preview is redrawn less often, since drawing the model is the slow part }
-  PAINT_MS  = 55;
+  PAINT_MS = 55;
   READY_FOR = 3;          { seconds of counting you in }
-  STRIP_N   = 16;         { snapshots along the bottom }
-  STRIP_W   = 96;
-  STRIP_H   = 72;
+  STRIP_N = 16;         { snapshots along the bottom }
+  STRIP_W = 96;
+  STRIP_H = 72;
 
 type
   { where the camera starts, before any move }
   TStartView = (svHere, svFront, svBack, svLeft, svRight, svTop,
-                svIsoFL, svIsoFR, svIsoBL, svIsoBR);
+    svIsoFL, svIsoFR, svIsoBL, svIsoBR);
 
 const
   START_NAME: array[TStartView] of string =
-    ('Where I am now', 'Front', 'Back', 'Left', 'Right', 'Top',
-     'Corner - front left', 'Corner - front right',
-     'Corner - back left', 'Corner - back right');
+    ('Where I am now', 'Front', 'Back', 'Left', 'Right', 'Top', 'Corner - front left', 'Corner - front right', 'Corner - back left', 'Corner - back right');
   { azimuth and elevation for each, in radians }
-  START_AZ: array[TStartView] of Double =
-    (0, 0, Pi, -Pi/2, Pi/2, 0, -Pi/4, Pi/4, -3*Pi/4, 3*Pi/4);
-  START_EL: array[TStartView] of Double =
+  START_AZ: array[TStartView] of double =
+    (0, 0, Pi, -Pi / 2, Pi / 2, 0, -Pi / 4, Pi / 4, -3 * Pi / 4, 3 * Pi / 4);
+  START_EL: array[TStartView] of double =
     (0, 0.08, 0.08, 0.08, 0.08, 1.45, 0.62, 0.62, 0.62, 0.62);
 
 type
@@ -86,19 +83,14 @@ type
     procedure PaintView(Sender: TObject);
     procedure PaintFilm(Sender: TObject);
     procedure Tick(Sender: TObject);
-    procedure Down(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
-      X, Y: Integer);
-    procedure Move_(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure Up(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
-      X, Y: Integer);
-    procedure Wheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer;
-      MousePos: TPoint; var Handled: Boolean);
-    procedure KeyDownH(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure BarDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure BarMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure BarUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure Down(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure Move_(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure Up(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure Wheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
+    procedure KeyDownH(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure BarDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure BarMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure BarUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure StartPicked(Sender: TObject);
     procedure DoGo(Sender: TObject);
     procedure DoStop(Sender: TObject);
@@ -111,21 +103,21 @@ type
     FUnits: TUnitSystem;
     FFont: TFont;
     FLabelCol: TPix;
-    FEdgeW: Single;
-    FSrcW, FSrcH: Integer;
-    FAxes: Boolean;
+    FEdgeW: single;
+    FSrcW, FSrcH: integer;
+    FAxes: boolean;
     FPivot: TP3;
     FHome: TProjector;        { what the drawing was showing when we opened }
 
     FView: TProjector;
     FCam: TCamPath;
-    FN: Integer;
-    FKept: Boolean;
+    FN: integer;
+    FKept: boolean;
 
     { rolling }
-    FRolling: Boolean;
-    FCount: Double;
-    FElapsed: Double;
+    FRolling: boolean;
+    FCount: double;
+    FElapsed: double;
     { Timing runs off the wall clock, not a tick count.  The timer falls
       behind on a big drawing, and counting ticks then stretches the count-in
       and stamps the wrong times on the recording, so the film comes out jumpy. }
@@ -134,54 +126,55 @@ type
     { one preview surface, kept; a new one per frame churns megabytes a
       second and makes the whole program sluggish }
     FCanvasS: TArtSurface;
-    FPlaying: Boolean;
-    FPlayT: Double;
+    FPlaying: boolean;
+    FPlayT: double;
 
     { the strip along the bottom }
     FStrip: array[0..STRIP_N - 1] of TBitmap;
-    FStripN: Integer;
+    FStripN: integer;
     { what each row of the walk list means: -1 free hand, -2 the divider,
       otherwise the ordinal of a TWalk }
-    FWalkOf: array of Integer;
+    FWalkOf: array of integer;
 
-    FDrag, FPan: Boolean;
-    FDX, FDY: Integer;
+    FDrag, FPan: boolean;
+    FDX, FDY: integer;
     { dragging the window by its top bar, since it draws its own frame }
     FWinDrag: hsDialogSkin.TFormDrag;
 
     procedure Repaint_;
     procedure FillWalks;
-    function ChosenWalk(out K: TWalk): Boolean;
+    function ChosenWalk(out K: TWalk): boolean;
     procedure Remember(K: TWalk);
     procedure Grab;
     procedure Shelve;
     procedure Refresh_;
-    function Seconds: Double;
-    function FreeHand: Boolean;
-    function Frame(W, H: Integer): TProjector;
+    function Seconds: double;
+    function FreeHand: boolean;
+    function Frame(W, H: integer): TProjector;
     { called once the fields are filled in, before the window is shown }
     procedure Setup;
   end;
 
 procedure TRecordWin.FormDestroy(Sender: TObject);
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to STRIP_N - 1 do FreeAndNil(FStrip[I]);
   FreeAndNil(FCanvasS);
 end;
 
-function TRecordWin.Seconds: Double;
+function TRecordWin.Seconds: double;
 begin
   case cbLen.ItemIndex of
     0: Result := 3;
     1: Result := 5;
     2: Result := 8;
-  else Result := 12;
+    else
+      Result := 12;
   end;
 end;
 
-function TRecordWin.FreeHand: Boolean;
+function TRecordWin.FreeHand: boolean;
 var
   K: TWalk;
 begin
@@ -190,7 +183,7 @@ end;
 
 { The view fitted to a W by H picture.  The stored view stays in the
   drawing's terms so the window and the film share one camera. }
-function TRecordWin.Frame(W, H: Integer): TProjector;
+function TRecordWin.Frame(W, H: integer): TProjector;
 begin
   Result := Fitted(FView, FSrcW, FSrcH, W, H);
 end;
@@ -198,7 +191,7 @@ end;
 procedure TRecordWin.FormCreate(Sender: TObject);
 var
   V: TStartView;
-  I: Integer;
+  I: integer;
   Field: TColor;
 begin
   hsDialogSkin.ThemeForm(Self);
@@ -225,9 +218,9 @@ procedure TRecordWin.FillWalks;
 var
   K: TWalk;
   L: TStringList;
-  I, N: Integer;
+  I, N: integer;
 
-  procedure Row(const Cap: string; Means: Integer);
+  procedure Row(const Cap: string; Means: integer);
   begin
     cbWalk.Items.Add(Cap);
     SetLength(FWalkOf, Length(FWalkOf) + 1);
@@ -246,8 +239,7 @@ begin
     for I := 0 to L.Count - 1 do
     begin
       if N >= 3 then Break;
-      if (StrToIntDef(L[I], -1) < 0) or
-         (StrToIntDef(L[I], -1) > Ord(High(TWalk))) then Continue;
+      if (StrToIntDef(L[I], -1) < 0) or (StrToIntDef(L[I], -1) > Ord(High(TWalk))) then Continue;
       Row(WALK_NAME[TWalk(StrToInt(L[I]))], StrToInt(L[I]));
       Inc(N);
     end;
@@ -259,12 +251,13 @@ begin
   for K := Low(TWalk) to High(TWalk) do Row(WALK_NAME[K], Ord(K));
   { select the first real move, which is the most recent one if any }
   if Length(FWalkOf) > 1 then cbWalk.ItemIndex := 1
-  else cbWalk.ItemIndex := 0;
+  else
+    cbWalk.ItemIndex := 0;
 end;
 
-function TRecordWin.ChosenWalk(out K: TWalk): Boolean;
+function TRecordWin.ChosenWalk(out K: TWalk): boolean;
 var
-  I, M: Integer;
+  I, M: integer;
 begin
   Result := False;
   I := cbWalk.ItemIndex;
@@ -280,7 +273,7 @@ end;
 procedure TRecordWin.Remember(K: TWalk);
 var
   L, Out_: TStringList;
-  I: Integer;
+  I: integer;
 begin
   L := TStringList.Create;
   Out_ := TStringList.Create;
@@ -288,9 +281,7 @@ begin
     Out_.Add(IntToStr(Ord(K)));
     L.CommaText := RecentWalks;
     for I := 0 to L.Count - 1 do
-      if (StrToIntDef(L[I], -1) <> Ord(K)) and (Out_.Count < 6) and
-         (StrToIntDef(L[I], -1) >= 0) and
-         (StrToIntDef(L[I], -1) <= Ord(High(TWalk))) then
+      if (StrToIntDef(L[I], -1) <> Ord(K)) and (Out_.Count < 6) and (StrToIntDef(L[I], -1) >= 0) and (StrToIntDef(L[I], -1) <= Ord(High(TWalk))) then
         Out_.Add(L[I]);
     RecentWalks := Out_.CommaText;
   finally
@@ -306,9 +297,7 @@ var
   V: TStartView;
 begin
   { the line between the recent ones and the rest is not a move }
-  if (Sender = cbWalk) and (cbWalk.ItemIndex >= 0) and
-     (cbWalk.ItemIndex <= High(FWalkOf)) and
-     (FWalkOf[cbWalk.ItemIndex] = -2) then
+  if (Sender = cbWalk) and (cbWalk.ItemIndex >= 0) and (cbWalk.ItemIndex <= High(FWalkOf)) and (FWalkOf[cbWalk.ItemIndex] = -2) then
   begin
     cbWalk.ItemIndex := cbWalk.ItemIndex + 1;
     if cbWalk.ItemIndex > High(FWalkOf) then cbWalk.ItemIndex := 0;
@@ -335,8 +324,7 @@ begin
   else
     lblTell.Caption := Format('%.0f seconds', [Seconds]);
   if FN >= 2 then
-    lblClip.Caption := Format('A clip of %.1f seconds.  Play it, or use it.',
-      [CamPathLength(FCam)])
+    lblClip.Caption := Format('A clip of %.1f seconds.  Play it, or use it.', [CamPathLength(FCam)])
   else if FRolling then
     lblClip.Caption := 'Recording...'
   else
@@ -349,13 +337,14 @@ begin
 end;
 
 { Seconds since a mark on the clock. }
-function Since(Mark: QWord): Double;
+function Since(Mark: QWord): double;
 var
   Now_: QWord;
 begin
   Now_ := GetTickCount64;
   if Now_ <= Mark then Result := 0
-  else Result := (Now_ - Mark) / 1000;
+  else
+    Result := (Now_ - Mark) / 1000;
 end;
 
 procedure TRecordWin.Grab;
@@ -370,13 +359,11 @@ end;
 procedure TRecordWin.Shelve;
 var
   S: TArtSurface;
-  Slot: Integer;
+  Slot: integer;
 begin
   Slot := Min(STRIP_N - 1, Trunc(FElapsed / Max(0.001, Seconds) * STRIP_N));
   if Slot < FStripN then Exit;
-  S := ShootFrame(FDoc, Fitted(FView, FSrcW, FSrcH, STRIP_W, STRIP_H),
-    STRIP_W, STRIP_H, FUnits, FFont, FLabelCol, FEdgeW, Pix(255, 255, 255),
-    True);
+  S := ShootFrame(FDoc, Fitted(FView, FSrcW, FSrcH, STRIP_W, STRIP_H), STRIP_W, STRIP_H, FUnits, FFont, FLabelCol, FEdgeW, Pix(255, 255, 255), True);
   try
     if FStrip[Slot] = nil then FStrip[Slot] := TBitmap.Create;
     FStrip[Slot].Assign(S.AsBitmap);
@@ -389,7 +376,7 @@ end;
 
 procedure TRecordWin.Tick(Sender: TObject);
 var
-  Step: Double;
+  Step: double;
   Kind: TWalk;
 begin
   if FPlaying then
@@ -429,8 +416,7 @@ begin
   FElapsed := Step;
   { a canned walk drives the camera; a free hand has already moved it }
   if ChosenWalk(Kind) then
-    FView := WalkAt(Kind, FHome, FPivot, FSrcW / 2, FSrcH / 2,
-      FElapsed / Max(0.2, Seconds));
+    FView := WalkAt(Kind, FHome, FPivot, FSrcW / 2, FSrcH / 2, FElapsed / Max(0.2, Seconds));
   Grab;
   Shelve;
   if FElapsed >= Min(Seconds, FILM_MAX_SECONDS) then
@@ -458,14 +444,12 @@ var
   Txt: string;
 begin
   if FPlaying and (FN >= 2) then
-    V := Fitted(SampleCamPath(FCam, FPlayT * CamPathLength(FCam)),
-      FSrcW, FSrcH, pbView.Width, pbView.Height)
+    V := Fitted(SampleCamPath(FCam, FPlayT * CamPathLength(FCam)), FSrcW, FSrcH, pbView.Width, pbView.Height)
   else
     V := Frame(pbView.Width, pbView.Height);
 
   { the same surface every time, unless the window has been resized }
-  if (FCanvasS <> nil) and ((FCanvasS.Width <> pbView.Width) or
-     (FCanvasS.Height <> pbView.Height)) then FreeAndNil(FCanvasS);
+  if (FCanvasS <> nil) and ((FCanvasS.Width <> pbView.Width) or (FCanvasS.Height <> pbView.Height)) then FreeAndNil(FCanvasS);
   if FCanvasS = nil then
     FCanvasS := TArtSurface.Create(Max(1, pbView.Width), Max(1, pbView.Height));
   S := FCanvasS;
@@ -497,8 +481,7 @@ begin
     C.Brush.Style := bsClear;
     C.Font.Height := -20;
     C.Font.Color := clRed;
-    C.TextOut(44, 16, Format('REC   %.1f of %.0f seconds',
-      [FElapsed, Seconds]));
+    C.TextOut(44, 16, Format('REC   %.1f of %.0f seconds', [FElapsed, Seconds]));
   end;
 end;
 
@@ -506,7 +489,7 @@ end;
   either kept or done again. }
 procedure TRecordWin.PaintFilm(Sender: TObject);
 var
-  I, X: Integer;
+  I, X: integer;
   C: TCanvas;
 begin
   C := pbFilm.Canvas;
@@ -529,8 +512,7 @@ begin
   end;
 end;
 
-procedure TRecordWin.Down(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TRecordWin.Down(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   FDrag := Button in [mbMiddle, mbRight];
   FPan := Button = mbRight;
@@ -538,9 +520,9 @@ begin
   FDY := Y;
 end;
 
-procedure TRecordWin.Move_(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TRecordWin.Move_(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  K: Double;
+  K: double;
 begin
   if not FDrag then Exit;
   K := ViewScale(FSrcW, FSrcH, pbView.Width, pbView.Height);
@@ -557,26 +539,25 @@ begin
   pbView.Invalidate;
 end;
 
-procedure TRecordWin.Up(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TRecordWin.Up(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   FDrag := False;
   FPan := False;
   pbView.Invalidate;
 end;
 
-procedure TRecordWin.Wheel(Sender: TObject; Shift: TShiftState;
-  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+procedure TRecordWin.Wheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
 var
   P: TPoint;
-  K, AX, AY: Double;
+  K, AX, AY: double;
 begin
   P := pbView.ScreenToClient(MousePos);
   K := ViewScale(FSrcW, FSrcH, pbView.Width, pbView.Height);
   AX := FSrcW / 2 + (P.X - pbView.Width / 2) / K;
   AY := FSrcH / 2 + (P.Y - pbView.Height / 2) / K;
   if WheelDelta > 0 then ZoomAt(FView, 1.15, AX, AY)
-  else ZoomAt(FView, 1 / 1.15, AX, AY);
+  else
+    ZoomAt(FView, 1 / 1.15, AX, AY);
   { the zoom you leave it at is the zoom a canned walk starts from }
   FHome.Ppu := FView.Ppu;
   FHome.OX := FView.OX;
@@ -585,33 +566,31 @@ begin
   Handled := True;
 end;
 
-procedure TRecordWin.BarDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TRecordWin.BarDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   { not while recording; a free-hand take needs the mouse on the model }
   if (Button = mbLeft) and not FRolling then
     hsDialogSkin.DragBegin(FWinDrag, Self);
 end;
 
-procedure TRecordWin.BarMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TRecordWin.BarMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 begin
   hsDialogSkin.DragTo(FWinDrag, Self);
 end;
 
-procedure TRecordWin.BarUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TRecordWin.BarUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   hsDialogSkin.DragEnd(FWinDrag);
 end;
 
-procedure TRecordWin.KeyDownH(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TRecordWin.KeyDownH(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key <> VK_ESCAPE then Exit;
   Key := 0;
   if FRolling or (FCount > 0) then DoStop(nil)
   else if FPlaying then DoPlay(nil)
-  else DoDrop(nil);
+  else
+    DoDrop(nil);
 end;
 
 procedure TRecordWin.DoGo(Sender: TObject);
@@ -655,13 +634,15 @@ begin
   FPlaying := not FPlaying;
   FPlayT := 0;
   FClock := GetTickCount64;
-  if FPlaying then btnPlay.Caption := 'Stop' else btnPlay.Caption := 'Play';
+  if FPlaying then btnPlay.Caption := 'Stop'
+  else
+    btnPlay.Caption := 'Play';
   pbView.Invalidate;
 end;
 
 procedure TRecordWin.DoClear(Sender: TObject);
 var
-  I: Integer;
+  I: integer;
 begin
   FN := 0;
   SetLength(FCam, 0);
@@ -692,9 +673,8 @@ begin
   ModalResult := mrCancel;
 end;
 
-function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem;
-  AFont: TFont; const LabelCol: TPix; EdgeW: Single; SrcW, SrcH: Integer;
-  Axes: Boolean; const Pivot: TP3; out Cam: TCamPath): Boolean;
+function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
+  SrcW, SrcH: integer; Axes: boolean; const Pivot: TP3; out Cam: TCamPath): boolean;
 var
   W: TRecordWin;
 begin

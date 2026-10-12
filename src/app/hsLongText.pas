@@ -21,12 +21,12 @@ type
     btnCopy: TBCButton;
     btnClose: TBCButton;
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnCopyClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
   public
     { Show AText under Title; True when it was copied on the way out. }
-    class function ShowText(AOwner: TComponent; const Title, AText: string): Boolean;
+    class function ShowText(AOwner: TComponent; const Title, AText: string): boolean;
   end;
 
 implementation
@@ -37,18 +37,23 @@ procedure TLongTextForm.FormCreate(Sender: TObject);
 begin
   hsDialogSkin.ThemeForm(Self);
   { fixed width so columns line up; the font name differs per system }
-  memText.Font.Name := {$IFDEF WINDOWS}'Consolas'{$ELSE}'Monospace'{$ENDIF};
+  memText.Font.Name :=
+  {$IFDEF WINDOWS}
+'Consolas'
+    {$ELSE}
+    'Monospace'
+  {$ENDIF}
+  ;
   ClientWidth := Min(ClientWidth, Screen.WorkAreaWidth - 80);
   ClientHeight := Min(ClientHeight, Screen.WorkAreaHeight - 80);
 end;
 
 { Enter and Esc both close it. }
-procedure TLongTextForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TLongTextForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (Key = VK_ESCAPE) or (Key = VK_RETURN) then
   begin
-    ModalResult := mrOK;
+    ModalResult := mrOk;
     Key := 0;
   end;
 end;
@@ -60,11 +65,10 @@ end;
 
 procedure TLongTextForm.btnCloseClick(Sender: TObject);
 begin
-  ModalResult := mrOK;
+  ModalResult := mrOk;
 end;
 
-class function TLongTextForm.ShowText(AOwner: TComponent;
-  const Title, AText: string): Boolean;
+class function TLongTextForm.ShowText(AOwner: TComponent; const Title, AText: string): boolean;
 var
   F: TLongTextForm;
 begin

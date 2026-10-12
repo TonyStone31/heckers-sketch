@@ -16,10 +16,10 @@ type
     Provider: string;      { one of PROVIDERS }
     Endpoint: string;      { '' for the provider's own }
     Model: string;
-    SendManual: Boolean;   { the manual: Writing Heck }
-    SendSheet: Boolean;    { the whole sheet as Heck }
-    SendPicked: Boolean;   { which lines are picked }
-    Think: Boolean;        { a model that reasons may first; off answers at once }
+    SendManual: boolean;   { the manual: Writing Heck }
+    SendSheet: boolean;    { the whole sheet as Heck }
+    SendPicked: boolean;   { which lines are picked }
+    Think: boolean;        { a model that reasons may first; off answers at once }
   end;
 
 const
@@ -36,7 +36,7 @@ const
 function DefaultAssistantSettings: TAssistantSettings;
 { which of PROVIDERS; a name from an older settings file asks the
   chat-completions way it did }
-function ProviderOf(const S: TAssistantSettings): Integer;
+function ProviderOf(const S: TAssistantSettings): integer;
 function LoadAssistantSettings: TAssistantSettings;
 procedure SaveAssistantSettings(const S: TAssistantSettings);
 
@@ -73,9 +73,9 @@ begin
   Result.Think := True;
 end;
 
-function ProviderOf(const S: TAssistantSettings): Integer;
+function ProviderOf(const S: TAssistantSettings): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(PROVIDERS) do
     if SameText(S.Provider, PROVIDERS[I]) then Exit(I);
@@ -180,9 +180,9 @@ end;
 
 function HtmlToText(const Html: string): string;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
   Tag, Ent, Lw: string;
-  InPre: Boolean;
+  InPre: boolean;
   Sb: TStringBuilder;
 
   procedure Gap;
@@ -223,13 +223,32 @@ begin
           Continue;
         end;
         Lw := Copy(Tag, 1, Pos(' ', Tag + ' ') - 1);
-        if Lw = 'pre' then begin Gap; InPre := True; end
-        else if Lw = '/pre' then begin InPre := False; Gap; end
-        else if (Lw = 'h1') or (Lw = 'h2') or (Lw = 'h3') then begin Gap; Sb.Append('== '); end
-        else if (Lw = '/h1') or (Lw = '/h2') or (Lw = '/h3') then begin Sb.Append(' =='); Gap; end
-        else if (Lw = 'p') or (Lw = '/p') or (Lw = 'ul') or (Lw = '/ul') or
-                (Lw = 'table') or (Lw = '/table') then Gap
-        else if Lw = 'li' then begin Brk; Sb.Append('* '); end
+        if Lw = 'pre' then
+        begin
+          Gap;
+          InPre := True;
+        end
+        else if Lw = '/pre' then
+        begin
+          InPre := False;
+          Gap;
+        end
+        else if (Lw = 'h1') or (Lw = 'h2') or (Lw = 'h3') then
+        begin
+          Gap;
+          Sb.Append('== ');
+        end
+        else if (Lw = '/h1') or (Lw = '/h2') or (Lw = '/h3') then
+        begin
+          Sb.Append(' ==');
+          Gap;
+        end
+        else if (Lw = 'p') or (Lw = '/p') or (Lw = 'ul') or (Lw = '/ul') or (Lw = 'table') or (Lw = '/table') then Gap
+        else if Lw = 'li' then
+        begin
+          Brk;
+          Sb.Append('* ');
+        end
         else if (Lw = 'br') or (Lw = 'br/') or (Lw = 'tr') then Brk
         else if (Lw = 'td') or (Lw = 'th') then Sb.Append(' | ');
         Continue;
@@ -267,7 +286,8 @@ begin
       begin
         if (Sb.Length > 0) and not (Sb.Chars[Sb.Length - 1] in [' ', #10]) then Sb.Append(' ');
       end
-      else Sb.Append(Html[I]);
+      else
+        Sb.Append(Html[I]);
       Inc(I);
     end;
     Result := Trim(Sb.ToString);
@@ -279,13 +299,15 @@ end;
 function ManualText(out Missing: string): string;
 var
   Dir, F: string;
-  I: Integer;
+  I: integer;
   L: TStringList;
 begin
   Result := '';
   Missing := '';
   F := HelpPage;
-  if F = '' then Dir := '' else Dir := ExtractFilePath(F);
+  if F = '' then Dir := ''
+  else
+    Dir := ExtractFilePath(F);
   L := TStringList.Create;
   try
     for I := 0 to High(MANUAL_PAGES) do

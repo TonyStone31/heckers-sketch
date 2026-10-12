@@ -67,37 +67,36 @@ type
     procedure btnUndoClick(Sender: TObject);
     procedure edLenKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnBuildClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure pb3DPaint(Sender: TObject);
-    procedure pbSketchMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure pbSketchMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure pbSketchMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure pbSketchMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure pbSketchPaint(Sender: TObject);
   private
     FUnits: TUnitSystem;
     FLegs: array of TSpoolLeg;
     { each leg's paper advance per step, in whole numbers to stay on the lattice }
     FAdv: array of TP3;
-    FSel: Integer;            { the leg the length box is about, or -1 }
-    FHover: Boolean;          { the leg the cursor would make }
+    FSel: integer;            { the leg the length box is about, or -1 }
+    FHover: boolean;          { the leg the cursor would make }
     FHoverAdv: TP3;
-    FHoverSteps: Integer;
-    FGrid: Integer;
-    function InchesOf(const S: string; out V: Double): Boolean;
-    function Read(out S: TSpoolSpec): Boolean;
+    FHoverSteps: integer;
+    FGrid: integer;
+    function InchesOf(const S: string; out V: double): boolean;
+    function Read(out S: TSpoolSpec): boolean;
     function Origin: TPoint;
     function Scr(const Node: TP3): TPoint;
     function EndNode: TP3;
     procedure Refresh;
-    procedure PaintSketch(C: TCanvas; W, H: Integer);
-    procedure Paint3D(C: TCanvas; W, H: Integer);
-    function ExportFiles(out Dir: string; out Files: TStringArray): Boolean;
-    procedure Select(I: Integer);
+    procedure PaintSketch(C: TCanvas; W, H: integer);
+    procedure Paint3D(C: TCanvas; W, H: integer);
+    function ExportFiles(out Dir: string; out Files: TStringArray): boolean;
+    procedure Select(I: integer);
     function SpecOf: TSpoolSpec;
   public
-    class function Ask(Units: TUnitSystem; out Spec: TSpoolSpec): Boolean;
+    class function Ask(Units: TUnitSystem; out Spec: TSpoolSpec): boolean;
   end;
 
 implementation
@@ -116,10 +115,10 @@ const
     (X: -1; Y: 0; Z: -1), (X: 0; Y: 1; Z: 1), (X: 0; Y: 1; Z: -1), (X: 0; Y: -1; Z: 1),
     (X: 0; Y: -1; Z: -1));
 
-function TSpoolForm.InchesOf(const S: string; out V: Double): Boolean;
+function TSpoolForm.InchesOf(const S: string; out V: double): boolean;
 var
   T: string;
-  F: Double;
+  F: double;
 begin
   T := Trim(S);
   V := 0;
@@ -135,7 +134,7 @@ end;
 
 procedure TSpoolForm.FormCreate(Sender: TObject);
 var
-  I: Integer;
+  I: integer;
   E: TPipeEnd;
   PF: TPipeFinish;
 begin
@@ -173,8 +172,7 @@ end;
 
 { Drawn buttons cannot be Cancel, so Escape is handled here.  Enter is left
   alone: in the boxes it means a leg length, not "build". }
-procedure TSpoolForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TSpoolForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
@@ -185,7 +183,7 @@ end;
 
 procedure TSpoolForm.btnBuildClick(Sender: TObject);
 begin
-  if btnBuild.Enabled then ModalResult := mrOK;
+  if btnBuild.Enabled then ModalResult := mrOk;
 end;
 
 procedure TSpoolForm.btnCancelClick(Sender: TObject);
@@ -216,7 +214,7 @@ begin
   Refresh;
 end;
 
-function TSpoolForm.Read(out S: TSpoolSpec): Boolean;
+function TSpoolForm.Read(out S: TSpoolSpec): boolean;
 begin
   S := Default(TSpoolSpec);
   S.Size := Max(0, cbSize.ItemIndex);
@@ -252,12 +250,11 @@ end;
 
 function TSpoolForm.EndNode: TP3;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := P3(0, 0, 0);
   for I := 0 to High(FLegs) do
-    Result := P3(Result.X + FAdv[I].X * FLegs[I].Steps, Result.Y + FAdv[I].Y * FLegs[I].Steps,
-                 Result.Z + FAdv[I].Z * FLegs[I].Steps);
+    Result := P3(Result.X + FAdv[I].X * FLegs[I].Steps, Result.Y + FAdv[I].Y * FLegs[I].Steps, Result.Z + FAdv[I].Z * FLegs[I].Steps);
 end;
 
 procedure TSpoolForm.Refresh;
@@ -268,7 +265,8 @@ begin
   Read(S);
   Err := SpoolProblem(S);
   if Length(S.Legs) = 0 then memTicket.Lines.Text := InkReport('', Err)
-  else memTicket.Lines.Text := InkReport(SpoolTicket(S), Err);
+  else
+    memTicket.Lines.Text := InkReport(SpoolTicket(S), Err);
   btnBuild.Enabled := Err = '';
   { a sketch with lengths still to come can still go to the office }
   btnEmail.Enabled := Length(S.Legs) > 0;
@@ -282,16 +280,17 @@ begin
   Refresh;
 end;
 
-procedure TSpoolForm.pbSketchMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TSpoolForm.pbSketchMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
   E, O: TPoint;
-  DX, DY, Best, Score, L: Double;
-  I: Integer;
+  DX, DY, Best, Score, L: double;
+  I: integer;
   V: TPoint;
   Cand: TP3;
 begin
   E := Scr(EndNode);
-  DX := X - E.X; DY := Y - E.Y;
+  DX := X - E.X;
+  DY := Y - E.Y;
   FHover := False;
   Best := 0;
   O := Scr(P3(0, 0, 0));
@@ -299,10 +298,13 @@ begin
     steps out }
   for I := 0 to 5 + 12 * Ord(ssShift in Shift) do
   begin
-    if I < 6 then Cand := AXES[I] else Cand := DIAG[I - 6];
+    if I < 6 then Cand := AXES[I]
+    else
+      Cand := DIAG[I - 6];
     if (ssShift in Shift) and (I < 6) then Continue;
     V := Scr(Cand);
-    V.X := V.X - O.X; V.Y := V.Y - O.Y;
+    V.X := V.X - O.X;
+    V.Y := V.Y - O.Y;
     L := Sqrt(Sqr(V.X) + Sqr(V.Y));
     if L < 1E-6 then Continue;
     Score := (DX * V.X + DY * V.Y) / L;
@@ -318,31 +320,34 @@ begin
   pbSketch.Invalidate;
 end;
 
-procedure TSpoolForm.pbSketchMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TSpoolForm.pbSketchMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  I, K, Best: Integer;
+  I, K, Best: integer;
   A, B: TPoint;
   Node: TP3;
-  D, BestD, T, L2: Double;
-  V: Double;
+  D, BestD, T, L2: double;
+  V: double;
 begin
   if Button = mbRight then
   begin
     { the leg under the click comes out, and the ones after it close up }
     Node := P3(0, 0, 0);
-    Best := -1; BestD := 9;
+    Best := -1;
+    BestD := 9;
     for I := 0 to High(FLegs) do
     begin
       A := Scr(Node);
-      Node := P3(Node.X + FAdv[I].X * FLegs[I].Steps, Node.Y + FAdv[I].Y * FLegs[I].Steps,
-                 Node.Z + FAdv[I].Z * FLegs[I].Steps);
+      Node := P3(Node.X + FAdv[I].X * FLegs[I].Steps, Node.Y + FAdv[I].Y * FLegs[I].Steps, Node.Z + FAdv[I].Z * FLegs[I].Steps);
       B := Scr(Node);
       L2 := Sqr(B.X - A.X) + Sqr(B.Y - A.Y);
       if L2 < 1 then Continue;
       T := EnsureRange(((X - A.X) * (B.X - A.X) + (Y - A.Y) * (B.Y - A.Y)) / L2, 0, 1);
       D := Sqrt(Sqr(X - (A.X + (B.X - A.X) * T)) + Sqr(Y - (A.Y + (B.Y - A.Y) * T)));
-      if D < BestD then begin BestD := D; Best := I; end;
+      if D < BestD then
+      begin
+        BestD := D;
+        Best := I;
+      end;
     end;
     if Best >= 0 then
     begin
@@ -367,12 +372,12 @@ begin
     btnLegClick(nil);
   { a click on an existing leg selects it so its length can be changed }
   Node := P3(0, 0, 0);
-  Best := -1; BestD := 14;
+  Best := -1;
+  BestD := 14;
   for I := 0 to High(FLegs) do
   begin
     A := Scr(Node);
-    Node := P3(Node.X + FAdv[I].X * FLegs[I].Steps, Node.Y + FAdv[I].Y * FLegs[I].Steps,
-               Node.Z + FAdv[I].Z * FLegs[I].Steps);
+    Node := P3(Node.X + FAdv[I].X * FLegs[I].Steps, Node.Y + FAdv[I].Y * FLegs[I].Steps, Node.Z + FAdv[I].Z * FLegs[I].Steps);
     B := Scr(Node);
     L2 := Sqr(B.X - A.X) + Sqr(B.Y - A.Y);
     if L2 < 1 then Continue;
@@ -380,7 +385,11 @@ begin
     { the far end of the last leg is where the next one starts, not a pick }
     if (I = High(FLegs)) and (T > 0.85) then Continue;
     D := Sqrt(Sqr(X - (A.X + (B.X - A.X) * T)) + Sqr(Y - (A.Y + (B.Y - A.Y) * T)));
-    if D < BestD then begin BestD := D; Best := I; end;
+    if D < BestD then
+    begin
+      BestD := D;
+      Best := I;
+    end;
   end;
   if Best >= 0 then
   begin
@@ -401,19 +410,19 @@ begin
   FHover := False;
   FSel := High(FLegs);
   edLen.Text := '';
-  lblStatus.Caption := Format('Leg %d, %s.  How long, %s?  Type it, then click where the next leg ends.',
-    [FSel + 1, DirName(FLegs[FSel].Dir), cbMeasure.Text]);
+  lblStatus.Caption := Format('Leg %d, %s.  How long, %s?  Type it, then click where the next leg ends.', [FSel + 1, DirName(FLegs[FSel].Dir), cbMeasure.Text]);
   edLen.SetFocus;
   Refresh;
 end;
 
 { the leg the length box is about: its numbers into the box }
-procedure TSpoolForm.Select(I: Integer);
+procedure TSpoolForm.Select(I: integer);
 begin
   FSel := I;
   if (I < 0) or (I > High(FLegs)) then Exit;
   if FLegs[I].Has then edLen.Text := FormatFloat('0.###', FLegs[I].Len * 12)
-  else edLen.Text := '';
+  else
+    edLen.Text := '';
   cbMeasure.OnChange := nil;
   cbMeasure.ItemIndex := Ord(FLegs[I].FromEnd) + 2 * Ord(FLegs[I].ToEnd);
   cbMeasure.OnChange := @MeasureChange;
@@ -432,7 +441,7 @@ end;
 
 procedure TSpoolForm.btnLegClick(Sender: TObject);
 var
-  V: Double;
+  V: double;
 begin
   if (FSel < 0) or (FSel > High(FLegs)) then
   begin
@@ -448,8 +457,7 @@ begin
   FLegs[FSel].Has := True;
   FLegs[FSel].FromEnd := cbMeasure.ItemIndex in [1, 3];
   FLegs[FSel].ToEnd := cbMeasure.ItemIndex in [2, 3];
-  lblStatus.Caption := Format('Leg %d: %s, %s %s.  Click where the next one ends, or Build it.',
-    [FSel + 1, DirName(FLegs[FSel].Dir), edLen.Text + '"', cbMeasure.Text]);
+  lblStatus.Caption := Format('Leg %d: %s, %s %s.  Click where the next one ends, or Build it.', [FSel + 1, DirName(FLegs[FSel].Dir), edLen.Text + '"', cbMeasure.Text]);
   if FSel = High(FLegs) then
   begin
     FSel := -1;
@@ -469,10 +477,12 @@ end;
 
 procedure TSpoolForm.btnUndoClick(Sender: TObject);
 var
-  K, Which: Integer;
+  K, Which: integer;
 begin
   if Length(FLegs) = 0 then Exit;
-  if (FSel >= 0) and (FSel <= High(FLegs)) then Which := FSel else Which := High(FLegs);
+  if (FSel >= 0) and (FSel <= High(FLegs)) then Which := FSel
+  else
+    Which := High(FLegs);
   for K := Which to High(FLegs) - 1 do
   begin
     FLegs[K] := FLegs[K + 1];
@@ -486,26 +496,28 @@ begin
   Refresh;
 end;
 
-procedure TSpoolForm.PaintSketch(C: TCanvas; W, H: Integer);
+procedure TSpoolForm.PaintSketch(C: TCanvas; W, H: integer);
 var
-  I, J, K: Integer;
+  I, J, K: integer;
   O, A, B, M: TPoint;
   Node: TP3;
   S: string;
   Sz: TSize;
 
-  procedure Label_(const A, B: TPoint; const Txt: string; Faint: Boolean);
+  procedure Label_(const A, B: TPoint; const Txt: string; Faint: boolean);
   begin
     M := Point((A.X + B.X) div 2, (A.Y + B.Y) div 2);
     Sz := C.TextExtent(Txt);
     C.Brush.Style := bsSolid;
     C.Brush.Color := clWhite;
-    if Faint then C.Font.Color := clGray else C.Font.Color := $00602000;
+    if Faint then C.Font.Color := clGray
+    else
+      C.Font.Color := $00602000;
     C.TextOut(M.X - Sz.cx div 2 + 10, M.Y - Sz.cy div 2 - 10, Txt);
     C.Brush.Style := bsClear;
   end;
 
-  procedure EndWord(const P: TPoint; E: Integer; AtStart: Boolean);
+  procedure EndWord(const P: TPoint; E: integer; AtStart: boolean);
   const
     Short: array[TPipeEnd] of string = ('bevel', 'FLANGE', 'CAP', 'thread');
   var
@@ -528,9 +540,15 @@ begin
     C.Pen.Color := $00E8CEB2;
     for I := -80 to 80 do
     begin
-      A := Scr(P3(I, -80, 0)); B := Scr(P3(I, 80, 0)); C.Line(A.X, A.Y, B.X, B.Y);
-      A := Scr(P3(-80, I, 0)); B := Scr(P3(80, I, 0)); C.Line(A.X, A.Y, B.X, B.Y);
-      A := Scr(P3(I, -I, -80)); B := Scr(P3(I, -I, 80)); C.Line(A.X, A.Y, B.X, B.Y);
+      A := Scr(P3(I, -80, 0));
+      B := Scr(P3(I, 80, 0));
+      C.Line(A.X, A.Y, B.X, B.Y);
+      A := Scr(P3(-80, I, 0));
+      B := Scr(P3(80, I, 0));
+      C.Line(A.X, A.Y, B.X, B.Y);
+      A := Scr(P3(I, -I, -80));
+      B := Scr(P3(I, -I, 80));
+      C.Line(A.X, A.Y, B.X, B.Y);
     end;
   end
   else
@@ -543,21 +561,28 @@ begin
         C.Pixels[A.X + 1, A.Y] := $00D8D8D8;
       end;
   { the three axes off the start, faintly, so the paper says which way is up }
-  C.Pen.Color := $00E0C8C8; C.Line(O.X, O.Y, Scr(P3(3, 0, 0)).X, Scr(P3(3, 0, 0)).Y);
-  C.Pen.Color := $00C8E0C8; C.Line(O.X, O.Y, Scr(P3(0, 3, 0)).X, Scr(P3(0, 3, 0)).Y);
-  C.Pen.Color := $00E0C8C8; C.Pen.Color := $00F0C0C0;
-  C.Pen.Color := $00F0D0D0; C.Line(O.X, O.Y, Scr(P3(0, 0, 3)).X, Scr(P3(0, 0, 3)).Y);
+  C.Pen.Color := $00E0C8C8;
+  C.Line(O.X, O.Y, Scr(P3(3, 0, 0)).X, Scr(P3(3, 0, 0)).Y);
+  C.Pen.Color := $00C8E0C8;
+  C.Line(O.X, O.Y, Scr(P3(0, 3, 0)).X, Scr(P3(0, 3, 0)).Y);
+  C.Pen.Color := $00E0C8C8;
+  C.Pen.Color := $00F0C0C0;
+  C.Pen.Color := $00F0D0D0;
+  C.Line(O.X, O.Y, Scr(P3(0, 0, 3)).X, Scr(P3(0, 0, 3)).Y);
   { the legs }
   Node := P3(0, 0, 0);
   C.Font.Size := 10;
   for I := 0 to High(FLegs) do
   begin
     A := Scr(Node);
-    Node := P3(Node.X + FAdv[I].X * FLegs[I].Steps, Node.Y + FAdv[I].Y * FLegs[I].Steps,
-               Node.Z + FAdv[I].Z * FLegs[I].Steps);
+    Node := P3(Node.X + FAdv[I].X * FLegs[I].Steps, Node.Y + FAdv[I].Y * FLegs[I].Steps, Node.Z + FAdv[I].Z * FLegs[I].Steps);
     B := Scr(Node);
-    if I = FSel then C.Pen.Color := $000080FF else C.Pen.Color := $00A05020;
-    if I = FSel then C.Pen.Width := 5 else C.Pen.Width := 3;
+    if I = FSel then C.Pen.Color := $000080FF
+    else
+      C.Pen.Color := $00A05020;
+    if I = FSel then C.Pen.Width := 5
+    else
+      C.Pen.Width := 3;
     C.Line(A.X, A.Y, B.X, B.Y);
     C.Pen.Width := 1;
     C.Brush.Color := $00A05020;
@@ -580,10 +605,9 @@ begin
     begin
       C.Pen.Color := $00A05020;
       C.Brush.Style := bsClear;
-      C.Polygon([Point(B.X - (B.X - A.X) div 5 - 6, B.Y - (B.Y - A.Y) div 5 - 6),
-                 Point(B.X - (B.X - A.X) div 5 + 6, B.Y - (B.Y - A.Y) div 5 + 6),
-                 Point(B.X - (B.X - A.X) div 10 + 3, B.Y - (B.Y - A.Y) div 10 + 3),
-                 Point(B.X - (B.X - A.X) div 10 - 3, B.Y - (B.Y - A.Y) div 10 - 3)]);
+      C.Polygon([Point(B.X - (B.X - A.X) div 5 - 6, B.Y - (B.Y - A.Y) div 5 - 6), Point(B.X - (B.X - A.X) div 5 + 6, B.Y -
+        (B.Y - A.Y) div 5 + 6), Point(B.X - (B.X - A.X) div 10 + 3, B.Y - (B.Y - A.Y) div 10 + 3), Point(B.X -
+        (B.X - A.X) div 10 - 3, B.Y - (B.Y - A.Y) div 10 - 3)]);
       C.Font.Color := clGray;
       C.TextOut(B.X - (B.X - A.X) div 6 + 8, B.Y - (B.Y - A.Y) div 6 + 8,
         'red. ' + NPS_NAMES[EnsureRange(FLegs[I].NewSize, 0, High(NPS_NAMES))]);
@@ -612,8 +636,7 @@ begin
   if FHover then
   begin
     A := Scr(Node);
-    B := Scr(P3(Node.X + FHoverAdv.X * FHoverSteps, Node.Y + FHoverAdv.Y * FHoverSteps,
-                Node.Z + FHoverAdv.Z * FHoverSteps));
+    B := Scr(P3(Node.X + FHoverAdv.X * FHoverSteps, Node.Y + FHoverAdv.Y * FHoverSteps, Node.Z + FHoverAdv.Z * FHoverSteps));
     C.Pen.Color := $00F09040;
     C.Pen.Style := psDash;
     C.Pen.Width := 2;
@@ -636,7 +659,7 @@ begin
   PaintSketch(pbSketch.Canvas, pbSketch.Width, pbSketch.Height);
 end;
 
-procedure TSpoolForm.Paint3D(C: TCanvas; W, H: Integer);
+procedure TSpoolForm.Paint3D(C: TCanvas; W, H: integer);
 var
   S: TSpoolSpec;
   D: TWorkDoc;
@@ -672,27 +695,27 @@ var
   S: TSpoolSpec;
 begin
   Read(S);
-  MainForm.ReportFromDialog('Fitter''s scratchpad', SpoolTicket(S) + LineEnding +
-    'problem shown: ' + SpoolProblem(S));
+  MainForm.ReportFromDialog('Fitter''s scratchpad', SpoolTicket(S) + LineEnding + 'problem shown: ' + SpoolProblem(S));
 end;
 
-function TSpoolForm.ExportFiles(out Dir: string; out Files: TStringArray): Boolean;
+function TSpoolForm.ExportFiles(out Dir: string; out Files: TStringArray): boolean;
 var
   S: TSpoolSpec;
   Bmp: TBitmap;
   Png: TPortableNetworkGraphic;
   Base, Name_: string;
   L: TStringList;
-  I: Integer;
+  I: integer;
 
-  procedure Picture(const Path: string; Iso: Boolean);
+  procedure Picture(const Path: string; Iso: boolean);
   begin
     Bmp := TBitmap.Create;
     Png := TPortableNetworkGraphic.Create;
     try
       Bmp.SetSize(1200, 900);
       if Iso then Paint3D(Bmp.Canvas, Bmp.Width, Bmp.Height)
-      else PaintSketch(Bmp.Canvas, Bmp.Width, Bmp.Height);
+      else
+        PaintSketch(Bmp.Canvas, Bmp.Width, Bmp.Height);
       Png.Assign(Bmp);
       Png.SaveToFile(Path);
     finally
@@ -729,8 +752,7 @@ begin
   end;
   L := TStringList.Create;
   try
-    L.Text := SpoolTicket(S) + LineEnding + 'Drawn with Heckers Sketch, ' +
-      FormatDateTime('yyyy-mm-dd hh:nn', Now);
+    L.Text := SpoolTicket(S) + LineEnding + 'Drawn with Heckers Sketch, ' + FormatDateTime('yyyy-mm-dd hh:nn', Now);
     L.SaveToFile(Files[High(Files)]);
   finally
     L.Free;
@@ -759,8 +781,7 @@ begin
     lblStatus.Caption := 'Handed to your mail program.  The files are in ' + Dir
   else
   begin
-    ShowMessage(Err + LineEnding + LineEnding + 'The iso, the corner view and the ticket ' +
-      'are in ' + Dir + ' - attach them by hand.');
+    ShowMessage(Err + LineEnding + LineEnding + 'The iso, the corner view and the ticket ' + 'are in ' + Dir + ' - attach them by hand.');
     SelectInFolder(Files[0]);
   end;
 end;
@@ -781,7 +802,7 @@ begin
     ShowMessage('The iso, the corner view and the ticket are in ' + Dir);
 end;
 
-class function TSpoolForm.Ask(Units: TUnitSystem; out Spec: TSpoolSpec): Boolean;
+class function TSpoolForm.Ask(Units: TUnitSystem; out Spec: TSpoolSpec): boolean;
 var
   F: TSpoolForm;
 begin
@@ -790,7 +811,7 @@ begin
   try
     F.FUnits := Units;
     F.Refresh;
-    if F.ShowModal <> mrOK then Exit;
+    if F.ShowModal <> mrOk then Exit;
     Result := F.Read(Spec) and (SpoolProblem(Spec) = '');
   finally
     F.Free;

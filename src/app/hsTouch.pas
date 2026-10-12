@@ -17,10 +17,10 @@ type
   TTouchKind = (tkBegin, tkUpdate, tkEnd, tkCancel);
   { Seq tells one finger from another while it is down; SX, SY are screen
     coordinates, so the program can ask any control where that is }
-  TTouchHandler = procedure(Kind: TTouchKind; Seq: Pointer; SX, SY: Double) of object;
+  TTouchHandler = procedure(Kind: TTouchKind; Seq: Pointer; SX, SY: double) of object;
 
 { True when the platform supports it }
-function HookTouch(Form: TCustomForm; Handler: TTouchHandler): Boolean;
+function HookTouch(Form: TCustomForm; Handler: TTouchHandler): boolean;
 
 implementation
 
@@ -68,7 +68,8 @@ begin
   Result := True;
 end;
 {$ELSE}
-function HookTouch(Form: TCustomForm; Handler: TTouchHandler): Boolean;
+
+function HookTouch(Form: TCustomForm; Handler: TTouchHandler): boolean;
 begin
   Result := False;
 end;

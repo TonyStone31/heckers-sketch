@@ -11,7 +11,7 @@ interface
 { The folder for settings, draft and scratch, ending in a path separator. }
 function AppDataDir: string;
 { True when that is the program's own folder rather than the user's home. }
-function IsPortable: Boolean;
+function IsPortable: boolean;
 { The source tree when running from its bin folder, otherwise ''. }
 function SourceTreeDir: string;
 function ConfigFile: string;
@@ -46,7 +46,7 @@ uses
 
 var
   Cached: string = '';
-  CachedPortable: Boolean = False;
+  CachedPortable: boolean = False;
 
 function AppDataDir: string;
 var
@@ -68,7 +68,7 @@ begin
   Result := Cached;
 end;
 
-function IsPortable: Boolean;
+function IsPortable: boolean;
 begin
   AppDataDir;
   Result := CachedPortable;

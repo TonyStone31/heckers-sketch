@@ -34,7 +34,7 @@ type
     btnCancel: TBCButton;
     btnSave: TBCButton;
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnPasteKeyClick(Sender: TObject);
     procedure btnForgetKeyClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
@@ -45,7 +45,7 @@ type
   end;
 
 { True when saved. }
-function EditAssistantSettings(AOwner: TComponent): Boolean;
+function EditAssistantSettings(AOwner: TComponent): boolean;
 
 implementation
 
@@ -54,13 +54,13 @@ implementation
 uses
   hsDialogSkin;
 
-function EditAssistantSettings(AOwner: TComponent): Boolean;
+function EditAssistantSettings(AOwner: TComponent): boolean;
 var
   F: TAssistantSettingsForm;
 begin
   F := TAssistantSettingsForm.Create(AOwner);
   try
-    Result := F.ShowModal = mrOK;
+    Result := F.ShowModal = mrOk;
   finally
     F.Free;
   end;
@@ -69,7 +69,7 @@ end;
 procedure TAssistantSettingsForm.FormCreate(Sender: TObject);
 var
   S: TAssistantSettings;
-  I: Integer;
+  I: integer;
 begin
   hsDialogSkin.ThemeForm(Self);
   S := LoadAssistantSettings;
@@ -80,8 +80,7 @@ begin
   edEndpoint.Text := S.Endpoint;
   edModel.Text := S.Model;
   chkThink.Checked := S.Think;
-  lblKeyWhere.Caption := DimSpan('Kept in ', False) + TextSpan(AssistantKeyFile, False, False) +
-    DimSpan(', apart from the settings, and never shown here.', False);
+  lblKeyWhere.Caption := DimSpan('Kept in ', False) + TextSpan(AssistantKeyFile, False, False) + DimSpan(', apart from the settings, and never shown here.', False);
   FKey := LoadAssistantKey;
   ShowKey;
 end;
@@ -96,7 +95,7 @@ begin
   btnForgetKey.Enabled := FKey <> '';
 end;
 
-procedure TAssistantSettingsForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TAssistantSettingsForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
@@ -142,7 +141,7 @@ begin
   S.Think := chkThink.Checked;
   SaveAssistantSettings(S);
   if FKey <> LoadAssistantKey then SaveAssistantKey(FKey);
-  ModalResult := mrOK;
+  ModalResult := mrOk;
 end;
 
 procedure TAssistantSettingsForm.btnCancelClick(Sender: TObject);

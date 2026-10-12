@@ -12,8 +12,9 @@ uses Classes, Types, Graphics, fpPDF, fpTTF, hsDrawing;
 type
   TPdfSheet = record
     Name: string;
-    W, H: Double; { millimeters, portrait }
+    W, H: double; { millimeters, portrait }
   end;
+
 const
   PDF_MARGIN = 10.0;
   PDF_FOOTER = 15.0;
@@ -53,45 +54,42 @@ type
       second section unless outlines are on. }
     FSection: TPDFSection;
     FPages: TList;
-    FW, FH: Double;
-    FFont, FBold: Integer;
+    FW, FH: double;
+    FFont, FBold: integer;
     FMetrics, FBoldMetrics: TFPFontCacheItem;
-    function Y(Y0: Double): Double;
+    function Y(Y0: double): double;
   public
-    constructor Create(const Title: string; PageW, PageH: Double);
+    constructor Create(const Title: string; PageW, PageH: double);
     destructor Destroy; override;
     { Adds a page and makes it current; returns its number, from 1. }
-    function NewPage: Integer;
+    function NewPage: integer;
     { Go back to page N (from 1), e.g. to write footers once the count is known. }
-    procedure OnPage(N: Integer);
-    function PageCount: Integer;
+    procedure OnPage(N: integer);
+    function PageCount: integer;
     { S with its baseline at Y }
-    procedure Text(X, Y0: Double; const S: string; SizePt: Double;
-      Ink: TColor = clBlack; Bold: Boolean = False);
-    function TextWidth(const S: string; SizePt: Double; Bold: Boolean = False): Double;
-    procedure Line(X1, Y1, X2, Y2: Double; Ink: TColor; WidthMM: Double);
-    procedure Poly(const Pts: array of TPointF; Closed: Boolean; Ink: TColor;
-      WidthMM: Double; Fill: TColor = clNone);
+    procedure Text(X, Y0: double; const S: string; SizePt: double; Ink: TColor = clBlack; Bold: boolean = False);
+    function TextWidth(const S: string; SizePt: double; Bold: boolean = False): double;
+    procedure Line(X1, Y1, X2, Y2: double; Ink: TColor; WidthMM: double);
+    procedure Poly(const Pts: array of TPointF; Closed: boolean; Ink: TColor; WidthMM: double; Fill: TColor = clNone);
     procedure SaveToFile(const Path: string);
-    property Width: Double read FW;
-    property Height: Double read FH;
+    property Width: double read FW;
+    property Height: double read FH;
   end;
 
-procedure PdfSheetSize(Index: Integer; Landscape: Boolean; out W, H: Double);
+procedure PdfSheetSize(Index: integer; Landscape: boolean; out W, H: double);
 { A print scale as the trade says it: 1/4" = 1'-0" for an imperial drawing
   when the scale is one, 1:100 otherwise. }
-function PdfScaleWords(Denominator: Double; U: TUnitSystem): string;
+function PdfScaleWords(Denominator: double; U: TUnitSystem): string;
 { The camera supplies the center and direction, not the printed scale. }
-procedure SaveDrawingPDF(Doc: TWorkDoc; const V: TProjector;
-  SrcW, SrcH: Integer; U: TUnitSystem; EdgeW: Single; const Path: string;
-  PageW, PageH, Denominator: Double; Axes: Boolean);
+procedure SaveDrawingPDF(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH: integer; U: TUnitSystem; EdgeW: single; const Path: string;
+  PageW, PageH, Denominator: double; Axes: boolean);
 
 implementation
 
 uses SysUtils, Math, hsSvg;
 
 { The system sans font file the export embeds, or '' when there is none. }
-function SansFontFile(Bold: Boolean): string;
+function SansFontFile(Bold: boolean): string;
 begin
   {$ifdef windows}
   if Bold then Result := 'arialbd.ttf' else Result := 'arial.ttf';
@@ -99,10 +97,12 @@ begin
   if FileExists(Result) then Exit;
   {$else}
   if Bold then Result := '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
-  else Result := '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
+  else
+    Result := '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
   if FileExists(Result) then Exit;
   if Bold then Result := '/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf'
-  else Result := '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf';
+  else
+    Result := '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf';
   if FileExists(Result) then Exit;
   {$endif}
   Result := '';
@@ -112,27 +112,26 @@ type
   TPDFVectorWriter = class(TVectorWriter)
   private
     FPage: TPDFPage;
-    FTop: Double;
-    FFont: Integer;
+    FTop: double;
+    FFont: integer;
     FFontMetrics: TFPFontCacheItem;
     function Coord(const P: TPointF): TPDFCoord;
   public
-    constructor Create(PDF: TPDFDocument; Page: TPDFPage; Top: Double);
+    constructor Create(PDF: TPDFDocument; Page: TPDFPage; Top: double);
     destructor Destroy; override;
-    procedure Path(const Loops: TVectorLoops; Ink: TColor;
-      Width: Double; Filled: Boolean); override;
-    procedure Text(const P: TPointF; const S: string; Ink: TColor;
-      Size: Double; Centered: Boolean); override;
+    procedure Path(const Loops: TVectorLoops; Ink: TColor; Width: double; Filled: boolean); override;
+    procedure Text(const P: TPointF; const S: string; Ink: TColor; Size: double; Centered: boolean); override;
   end;
 
-function PDFColor(C: TColor): LongWord;
+function PDFColor(C: TColor): longword;
 begin
   C := ColorToRGB(C);
-  Result := (LongWord(Byte(C)) shl 16) or (LongWord(Byte(C shr 8)) shl 8) or Byte(C shr 16);
+  Result := (longword(byte(C)) shl 16) or (longword(byte(C shr 8)) shl 8) or byte(C shr 16);
 end;
 
-constructor TPDFVectorWriter.Create(PDF: TPDFDocument; Page: TPDFPage; Top: Double);
-var FontPath: string;
+constructor TPDFVectorWriter.Create(PDF: TPDFDocument; Page: TPDFPage; Top: double);
+var
+  FontPath: string;
 begin
   inherited Create;
   FPage := Page;
@@ -171,10 +170,9 @@ begin
   Result.Y := FTop - P.Y * 25.4 / 96;
 end;
 
-procedure TPDFVectorWriter.Path(const Loops: TVectorLoops; Ink: TColor;
-  Width: Double; Filled: Boolean);
+procedure TPDFVectorWriter.Path(const Loops: TVectorLoops; Ink: TColor; Width: double; Filled: boolean);
 var
-  I, J: Integer;
+  I, J: integer;
   A, B: TPDFCoord;
 begin
   FPage.SetColor(PDFColor(Ink), True);
@@ -193,12 +191,15 @@ begin
     end;
     if Filled then FPage.ClosePath;
   end;
-  if Filled then FPage.FillEvenOddStrokePath else FPage.StrokePath;
+  if Filled then FPage.FillEvenOddStrokePath
+  else
+    FPage.StrokePath;
 end;
 
-procedure TPDFVectorWriter.Text(const P: TPointF; const S: string;
-  Ink: TColor; Size: Double; Centered: Boolean);
-var A: TPDFCoord; TextW: Double;
+procedure TPDFVectorWriter.Text(const P: TPointF; const S: string; Ink: TColor; Size: double; Centered: boolean);
+var
+  A: TPDFCoord;
+  TextW: double;
 begin
   A := Coord(P);
   FPage.SetColor(PDFColor(Ink), False);
@@ -207,16 +208,17 @@ begin
   begin
     if Assigned(FFontMetrics) then
       TextW := FFontMetrics.TextWidth(S, 0) / FFontMetrics.FontData.Head.UnitsPerEm * Size * 25.4 / 96
-    else TextW := Length(UTF8Decode(S)) * Size * 0.6 * 25.4 / 96;
+    else
+      TextW := Length(UTF8Decode(S)) * Size * 0.6 * 25.4 / 96;
     A.X := A.X - TextW / 2;
   end;
   FPage.WriteText(A, S);
 end;
 
-function PdfScaleWords(Denominator: Double; U: TUnitSystem): string;
+function PdfScaleWords(Denominator: double; U: TUnitSystem): string;
 var
-  Inch, Num: Double;
-  Den: Integer;
+  Inch, Num: double;
+  Den: integer;
 begin
   Result := Format('1:%g', [Denominator]);
   if (U <> usImperial) or (Denominator <= 0) then Exit;
@@ -229,51 +231,53 @@ begin
     if Abs(Num - Round(Num)) < 1E-9 then
     begin
       if Den = 1 then Result := Format('%d" = 1''-0"', [Round(Num)])
-      else Result := Format('%d/%d" = 1''-0"', [Round(Num), Den]);
+      else
+        Result := Format('%d/%d" = 1''-0"', [Round(Num), Den]);
       Exit;
     end;
     Den := Den * 2;
   end;
 end;
 
-procedure PdfSheetSize(Index: Integer; Landscape: Boolean; out W, H: Double);
+procedure PdfSheetSize(Index: integer; Landscape: boolean; out W, H: double);
 begin
   if (Index < Low(PDF_SHEETS)) or (Index > High(PDF_SHEETS)) then
     raise Exception.Create('Choose a PDF paper size');
   if Landscape then
   begin
-    W := PDF_SHEETS[Index].H; H := PDF_SHEETS[Index].W;
+    W := PDF_SHEETS[Index].H;
+    H := PDF_SHEETS[Index].W;
   end
   else
   begin
-    W := PDF_SHEETS[Index].W; H := PDF_SHEETS[Index].H;
+    W := PDF_SHEETS[Index].W;
+    H := PDF_SHEETS[Index].H;
   end;
 end;
 
-procedure SaveDrawingPDF(Doc: TWorkDoc; const V: TProjector;
-  SrcW, SrcH: Integer; U: TUnitSystem; EdgeW: Single; const Path: string;
-  PageW, PageH, Denominator: Double; Axes: Boolean);
+procedure SaveDrawingPDF(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH: integer; U: TUnitSystem; EdgeW: single; const Path: string;
+  PageW, PageH, Denominator: double; Axes: boolean);
 var
   PDF: TPDFDocument;
   Page: TPDFPage;
   Paper: TPDFPaper;
   Writer: TPDFVectorWriter;
   PV: TProjector;
-  W, H, MMUnit, Bar, BarMM, Extent: Double;
+  W, H, MMUnit, Bar, BarMM, Extent: double;
   Loops: TVectorLoops;
-  I: Integer;
+  I: integer;
   A, B: TP3;
   AxisInk: TColor;
 begin
   if Doc = nil then raise Exception.Create('No drawing for the PDF');
-  if (Denominator <= 0) or IsNan(Denominator) or IsInfinite(Denominator) or
-     (V.Ppu <= 0) then raise Exception.Create('Invalid PDF drawing scale');
-  if (PageW <= 2 * PDF_MARGIN) or
-     (PageH <= 2 * PDF_MARGIN + PDF_FOOTER) then
+  if (Denominator <= 0) or IsNan(Denominator) or IsInfinite(Denominator) or (V.Ppu <= 0) then raise Exception.Create('Invalid PDF drawing scale');
+  if (PageW <= 2 * PDF_MARGIN) or (PageH <= 2 * PDF_MARGIN + PDF_FOOTER) then
     raise Exception.Create('The PDF paper is too small');
   W := (PageW - 2 * PDF_MARGIN) * 96 / 25.4;
   H := (PageH - 2 * PDF_MARGIN - PDF_FOOTER) * 96 / 25.4;
-  if U = usImperial then MMUnit := 304.8 else MMUnit := 1000;
+  if U = usImperial then MMUnit := 304.8
+  else
+    MMUnit := 1000;
   PV := V;
   PV.Ppu := MMUnit / Denominator * 96 / 25.4;
   PV.OX := W / 2 + (V.OX - SrcW / 2) * PV.Ppu / V.Ppu;
@@ -308,17 +312,33 @@ begin
       Page.ClipPath;
       if Axes then
       begin
-        SetLength(Loops, 1); SetLength(Loops[0], 2);
+        SetLength(Loops, 1);
+        SetLength(Loops[0], 2);
         Extent := (Abs(PV.OX) + Abs(PV.OY) + W + H) / PV.Ppu * 100;
         for I := 0 to 2 do
         begin
-          A := P3(0, 0, 0); B := A;
+          A := P3(0, 0, 0);
+          B := A;
           case I of
-            0: begin A.X := -Extent; B.X := Extent; AxisInk := $8888CC; end;
-            1: begin A.Y := -Extent; B.Y := Extent; AxisInk := $88BB88; end;
-          else begin A.Z := -Extent; B.Z := Extent; AxisInk := $CC8888; end;
+            0: begin
+              A.X := -Extent;
+              B.X := Extent;
+              AxisInk := $8888CC;
+            end;
+            1: begin
+              A.Y := -Extent;
+              B.Y := Extent;
+              AxisInk := $88BB88;
+            end;
+            else
+            begin
+              A.Z := -Extent;
+              B.Z := Extent;
+              AxisInk := $CC8888;
+            end;
           end;
-          Loops[0][0] := Project(PV, A); Loops[0][1] := Project(PV, B);
+          Loops[0][0] := Project(PV, A);
+          Loops[0][1] := Project(PV, B);
           Writer.Path(Loops, AxisInk, 0.5, False);
         end;
       end;
@@ -345,12 +365,13 @@ end;
 
 { ---- TPdfBook ---- }
 
-constructor TPdfBook.Create(const Title: string; PageW, PageH: Double);
+constructor TPdfBook.Create(const Title: string; PageW, PageH: double);
 var
   F: string;
 begin
   inherited Create;
-  FW := PageW; FH := PageH;
+  FW := PageW;
+  FH := PageH;
   FPages := TList.Create;
   FPDF := TPDFDocument.Create(nil);
   FPDF.Options := [poSubsetFont, poCompressFonts];
@@ -366,7 +387,8 @@ begin
     FMetrics := TFPFontCacheItem.Create(F);
     FFont := FPDF.AddFont(F, 'BookSans');
   end
-  else FFont := FPDF.AddFont('Helvetica');
+  else
+    FFont := FPDF.AddFont('Helvetica');
   F := SansFontFile(True);
   if (F <> '') and (FMetrics <> nil) then
   begin
@@ -374,7 +396,8 @@ begin
     FBold := FPDF.AddFont(F, 'BookSansBold');
   end
   else if FMetrics = nil then FBold := FPDF.AddFont('Helvetica-Bold')
-  else FBold := FFont;
+  else
+    FBold := FFont;
 end;
 
 destructor TPdfBook.Destroy;
@@ -386,12 +409,12 @@ begin
   inherited Destroy;
 end;
 
-function TPdfBook.Y(Y0: Double): Double;
+function TPdfBook.Y(Y0: double): double;
 begin
   Result := FH - Y0;
 end;
 
-function TPdfBook.NewPage: Integer;
+function TPdfBook.NewPage: integer;
 var
   Paper: TPDFPaper;
 begin
@@ -405,44 +428,48 @@ begin
   Result := FPages.Count;
 end;
 
-procedure TPdfBook.OnPage(N: Integer);
+procedure TPdfBook.OnPage(N: integer);
 begin
   if (N >= 1) and (N <= FPages.Count) then FPage := TPDFPage(FPages[N - 1]);
 end;
 
-function TPdfBook.PageCount: Integer;
+function TPdfBook.PageCount: integer;
 begin
   Result := FPages.Count;
 end;
 
-procedure TPdfBook.Text(X, Y0: Double; const S: string; SizePt: Double; Ink: TColor; Bold: Boolean);
+procedure TPdfBook.Text(X, Y0: double; const S: string; SizePt: double; Ink: TColor; Bold: boolean);
 begin
   if (FPage = nil) or (S = '') then Exit;
   FPage.SetColor(PDFColor(Ink), False);
-  if Bold then FPage.SetFont(FBold, SizePt) else FPage.SetFont(FFont, SizePt);
+  if Bold then FPage.SetFont(FBold, SizePt)
+  else
+    FPage.SetFont(FFont, SizePt);
   FPage.WriteText(X, Y(Y0), S);
 end;
 
-function TPdfBook.TextWidth(const S: string; SizePt: Double; Bold: Boolean): Double;
+function TPdfBook.TextWidth(const S: string; SizePt: double; Bold: boolean): double;
 var
   M: TFPFontCacheItem;
 begin
-  if Bold and (FBoldMetrics <> nil) then M := FBoldMetrics else M := FMetrics;
+  if Bold and (FBoldMetrics <> nil) then M := FBoldMetrics
+  else
+    M := FMetrics;
   if M <> nil then Result := M.TextWidth(S, 0) / M.FontData.Head.UnitsPerEm * SizePt * 25.4 / 72
-  else Result := Length(UTF8Decode(S)) * SizePt * 0.55 * 25.4 / 72;
+  else
+    Result := Length(UTF8Decode(S)) * SizePt * 0.55 * 25.4 / 72;
 end;
 
-procedure TPdfBook.Line(X1, Y1, X2, Y2: Double; Ink: TColor; WidthMM: Double);
+procedure TPdfBook.Line(X1, Y1, X2, Y2: double; Ink: TColor; WidthMM: double);
 begin
   if FPage = nil then Exit;
   FPage.SetColor(PDFColor(Ink), True);
   FPage.DrawLine(X1, Y(Y1), X2, Y(Y2), WidthMM * 72 / 25.4, True);
 end;
 
-procedure TPdfBook.Poly(const Pts: array of TPointF; Closed: Boolean; Ink: TColor;
-  WidthMM: Double; Fill: TColor);
+procedure TPdfBook.Poly(const Pts: array of TPointF; Closed: boolean; Ink: TColor; WidthMM: double; Fill: TColor);
 var
-  I: Integer;
+  I: integer;
 begin
   if (FPage = nil) or (Length(Pts) < 2) then Exit;
   FPage.SetColor(PDFColor(Ink), True);
@@ -451,7 +478,9 @@ begin
   for I := 1 to High(Pts) do
     FPage.DrawLine(Pts[I - 1].X, Y(Pts[I - 1].Y), Pts[I].X, Y(Pts[I].Y), WidthMM * 72 / 25.4, False);
   if Closed then FPage.ClosePath;
-  if Fill <> clNone then FPage.FillEvenOddStrokePath else FPage.StrokePath;
+  if Fill <> clNone then FPage.FillEvenOddStrokePath
+  else
+    FPage.StrokePath;
 end;
 
 procedure TPdfBook.SaveToFile(const Path: string);

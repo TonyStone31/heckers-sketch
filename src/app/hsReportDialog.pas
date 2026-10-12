@@ -31,20 +31,19 @@ type
     btnCancel: TBCButton;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnAgainClick(Sender: TObject);
     procedure btnLaterClick(Sender: TObject);
     procedure btnDropClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
   private
-    FGrown: Boolean;
+    FGrown: boolean;
   public
     { Note and DocOn go in and come back out whatever button closed it, so
       retaking the picture loses nothing.  mrOK Send, mrCancel Cancel,
       mrRetry picture now, mrAll picture in ten seconds, mrIgnore no picture. }
-    class function Ask(AOwner: TComponent; Crashed: Boolean; NThings: Integer;
-      Shot: TBitmap; var Note: string; var DocOn: Boolean): TModalResult;
+    class function Ask(AOwner: TComponent; Crashed: boolean; NThings: integer; Shot: TBitmap; var Note: string; var DocOn: boolean): TModalResult;
   end;
 
 implementation
@@ -60,7 +59,7 @@ end;
   larger font does not cut off its last line. }
 procedure TReportDialog.FormShow(Sender: TObject);
 var
-  Grow: Integer;
+  Grow: integer;
 begin
   if FGrown then Exit;
   FGrown := True;
@@ -71,8 +70,7 @@ end;
 
 { Esc cancels.  Enter is left alone on purpose: it is a new line in the
   note, not Send. }
-procedure TReportDialog.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TReportDialog.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
@@ -98,7 +96,7 @@ end;
 
 procedure TReportDialog.btnSendClick(Sender: TObject);
 begin
-  ModalResult := mrOK;
+  ModalResult := mrOk;
 end;
 
 procedure TReportDialog.btnCancelClick(Sender: TObject);
@@ -106,19 +104,15 @@ begin
   ModalResult := mrCancel;
 end;
 
-class function TReportDialog.Ask(AOwner: TComponent; Crashed: Boolean;
-  NThings: Integer; Shot: TBitmap; var Note: string;
-  var DocOn: Boolean): TModalResult;
+class function TReportDialog.Ask(AOwner: TComponent; Crashed: boolean; NThings: integer; Shot: TBitmap; var Note: string; var DocOn: boolean): TModalResult;
 var
   F: TReportDialog;
 begin
   F := TReportDialog.Create(AOwner);
   try
     if Crashed then
-      F.lblSay.Caption := 'It crashed last time.  What were you doing when it ' +
-        'went?  A line or two is plenty - the crash report itself is ' +
-        'attached automatically, along with what the program was doing and ' +
-        'what machine this is - RAM, processor, graphics, operating system; ' +
+      F.lblSay.Caption := 'It crashed last time.  What were you doing when it ' + 'went?  A line or two is plenty - the crash report itself is ' +
+        'attached automatically, along with what the program was doing and ' + 'what machine this is - RAM, processor, graphics, operating system; ' +
         'nothing about you.';
     F.memNote.Text := Note;
 
@@ -130,8 +124,7 @@ begin
     else if NThings = 1 then
       F.cbDrawing.Caption := 'Send the drawing too - 1 thing drawn so far'
     else
-      F.cbDrawing.Caption := Format('Send the drawing too - %d things drawn so far',
-        [NThings]);
+      F.cbDrawing.Caption := Format('Send the drawing too - %d things drawn so far', [NThings]);
 
     { Use DocOn, not True: the form reopens after each retake, and the
       user's untick must survive that. }

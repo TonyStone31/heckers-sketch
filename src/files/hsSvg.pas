@@ -11,35 +11,33 @@ uses Classes, Types, Graphics;
 type
   TVectorLoop = array of TPointF;
   TVectorLoops = array of TVectorLoop;
+
   TVectorWriter = class
-    procedure Path(const Loops: TVectorLoops; Ink: TColor;
-      Width: Double; Filled: Boolean); virtual; abstract;
-    procedure Text(const P: TPointF; const S: string; Ink: TColor;
-      Size: Double; Centered: Boolean); virtual; abstract;
+    procedure Path(const Loops: TVectorLoops; Ink: TColor; Width: double; Filled: boolean); virtual; abstract;
+    procedure Text(const P: TPointF; const S: string; Ink: TColor; Size: double; Centered: boolean); virtual; abstract;
   end;
+
   TSVGWriter = class(TVectorWriter)
   private
     FLines: TStrings;
   public
     constructor Create(Lines: TStrings);
-    procedure Path(const Loops: TVectorLoops; Ink: TColor;
-      Width: Double; Filled: Boolean); override;
-    procedure Text(const P: TPointF; const S: string; Ink: TColor;
-      Size: Double; Centered: Boolean); override;
+    procedure Path(const Loops: TVectorLoops; Ink: TColor; Width: double; Filled: boolean); override;
+    procedure Text(const P: TPointF; const S: string; Ink: TColor; Size: double; Centered: boolean); override;
   end;
 
 implementation
 
 uses SysUtils, hsText;
 
-function Num(V: Double): string;
+function Num(V: double): string;
 begin
   Result := FormatFloat('0.00', V, DotFS);
 end;
 
 function Col(C: TColor): string;
 begin
-  Result := Format('#%.2x%.2x%.2x', [Byte(C), Byte(C shr 8), Byte(C shr 16)]);
+  Result := Format('#%.2x%.2x%.2x', [byte(C), byte(C shr 8), byte(C shr 16)]);
 end;
 
 constructor TSVGWriter.Create(Lines: TStrings);
@@ -48,10 +46,9 @@ begin
   FLines := Lines;
 end;
 
-procedure TSVGWriter.Path(const Loops: TVectorLoops; Ink: TColor;
-  Width: Double; Filled: Boolean);
+procedure TSVGWriter.Path(const Loops: TVectorLoops; Ink: TColor; Width: double; Filled: boolean);
 var
-  I, J: Integer;
+  I, J: integer;
   D, Fill: string;
 begin
   D := '';
@@ -60,26 +57,29 @@ begin
     if Length(Loops[I]) = 0 then Continue;
     for J := 0 to High(Loops[I]) do
     begin
-      if J = 0 then D := D + 'M ' else D := D + 'L ';
+      if J = 0 then D := D + 'M '
+      else
+        D := D + 'L ';
       D := D + Num(Loops[I][J].X) + ' ' + Num(Loops[I][J].Y) + ' ';
     end;
     if Filled then D := D + 'Z ';
   end;
   if D = '' then Exit;
-  if Filled then Fill := '#d8d8d8' else Fill := 'none';
-  FLines.Add('<path d="' + Trim(D) + '" fill="' + Fill +
-    '" fill-rule="evenodd" stroke="' + Col(Ink) +
-    '" stroke-width="' + Num(Width) + '"/>');
+  if Filled then Fill := '#d8d8d8'
+  else
+    Fill := 'none';
+  FLines.Add('<path d="' + Trim(D) + '" fill="' + Fill + '" fill-rule="evenodd" stroke="' + Col(Ink) + '" stroke-width="' + Num(Width) + '"/>');
 end;
 
-procedure TSVGWriter.Text(const P: TPointF; const S: string; Ink: TColor;
-  Size: Double; Centered: Boolean);
-var Anchor: string;
+procedure TSVGWriter.Text(const P: TPointF; const S: string; Ink: TColor; Size: double; Centered: boolean);
+var
+  Anchor: string;
 begin
-  if Centered then Anchor := 'middle' else Anchor := 'start';
-  FLines.Add('<text x="' + Num(P.X) + '" y="' + Num(P.Y) +
-    '" font-family="sans-serif" font-size="' + Num(Size) +
-    '" text-anchor="' + Anchor + '" fill="' + Col(Ink) + '">' + HtmlEsc(S) + '</text>');
+  if Centered then Anchor := 'middle'
+  else
+    Anchor := 'start';
+  FLines.Add('<text x="' + Num(P.X) + '" y="' + Num(P.Y) + '" font-family="sans-serif" font-size="' + Num(Size) + '" text-anchor="' +
+    Anchor + '" fill="' + Col(Ink) + '">' + HtmlEsc(S) + '</text>');
 end;
 
 end.

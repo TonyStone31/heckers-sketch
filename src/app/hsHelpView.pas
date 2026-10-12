@@ -41,7 +41,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnBackClick(Sender: TObject);
     procedure btnForwardClick(Sender: TObject);
     procedure btnContentsClick(Sender: TObject);
@@ -63,20 +63,20 @@ type
     procedure GoToPage(const PathOrURI: string);
   private
     FWanted: string;        { the page asked for, relative to the folder }
-    FFetching: Boolean;
+    FFetching: boolean;
     { the page theme switch setting }
     FThemeChoice: THelpTheme;
     procedure ShowPages(const Rel: string);
     procedure ShowEmpty(const Why: string);
-    procedure Notice(const S: string; Busy: Boolean);
-    procedure Fetch(Loud: Boolean);
+    procedure Notice(const S: string; Busy: boolean);
+    procedure Fetch(Loud: boolean);
     procedure UpdateButtons;
     function PageRelative: string;
     function LocalFileForWeb(const URL: string): string;
   public
     { Progress and finish of a fetch, this window's own or one the program
       started and passes on here. }
-    procedure FetchProgress(BytesReceived, TotalBytes: Int64);
+    procedure FetchProgress(BytesReceived, TotalBytes: int64);
     procedure FetchDone(Sender: TObject);
     { Rel is a page like 'tools/arc.html' with an optional #anchor; empty
       means the contents page. }
@@ -132,8 +132,7 @@ begin
   CloseAction := caHide;
 end;
 
-procedure THelpForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure THelpForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   { Esc closes the window unless the find bar is open; with KeyPreview the
     form sees Esc before the bar does }
@@ -167,7 +166,8 @@ begin
   case FThemeChoice of
     htLight: Result := 'Light';
     htDark: Result := 'Dark';
-  else Result := 'Auto';
+    else
+      Result := 'Auto';
   end;
 end;
 
@@ -206,9 +206,7 @@ end;
   substitution. }
 function THelpForm.PageWithMode(const HTML: string): string;
 begin
-  Result := StringReplace(HTML, '#theme" title="Light or dark">Theme</a>',
-    '#theme" title="Light or dark">Theme: ' + ThemeWord + '</a>',
-    [rfReplaceAll, rfIgnoreCase]);
+  Result := StringReplace(HTML, '#theme" title="Light or dark">Theme</a>', '#theme" title="Light or dark">Theme: ' + ThemeWord + '</a>', [rfReplaceAll, rfIgnoreCase]);
 end;
 
 { Every page load goes through here so each carries the light/dark mode.
@@ -218,7 +216,7 @@ var
   Path, Anchor, Src, Local: string;
 
   L: TStringList;
-  P: Integer;
+  P: integer;
 begin
   Path := PathOrURI;
   Anchor := '';
@@ -231,13 +229,15 @@ begin
   { Must be two variables.  URIToFilename's second parameter is "out",
     which FPC clears on entry, so passing Path twice wipes the URI first. }
   if LowerCase(Copy(Path, 1, 7)) = 'file://' then
-    if URIToFilename(Path, Local) then Path := Local else Path := '';
-  if (Path = '') or not FileExists(Path) or
-     (LowerCase(ExtractFileExt(Path)) <> '.html') then
+    if URIToFilename(Path, Local) then Path := Local
+    else
+      Path := '';
+  if (Path = '') or not FileExists(Path) or (LowerCase(ExtractFileExt(Path)) <> '.html') then
   begin
     { not one of ours - hand it to the renderer as it is }
     if FileExists(Path) then Page.LoadFromFile(Path)
-    else Page.LoadFromURL(PathOrURI);
+    else
+      Page.LoadFromURL(PathOrURI);
     if Anchor <> '' then Page.JumpToAnchor(Anchor);
     Exit;
   end;
@@ -253,7 +253,8 @@ begin
   case FThemeChoice of
     htLight: Page.ColorScheme := icsLight;
     htDark: Page.ColorScheme := icsDark;
-  else Page.ColorScheme := icsAuto;
+    else
+      Page.ColorScheme := icsAuto;
   end;
   Page.LoadHTML(PageWithMode(Src), FilenameToURI(ExpandFileName(Path)));
   if Anchor <> '' then Page.JumpToAnchor(Anchor);
@@ -274,7 +275,8 @@ begin
       Height := (R.Bottom - R.Top) * 9 div 10;
   end;
   if LocalHelpIndex <> '' then ShowPages(Rel)
-  else ShowEmpty('');
+  else
+    ShowEmpty('');
   Show;
   BringToFront;
   { Fetch missing or stale pages.  Opening the manual is an explicit ask,
@@ -285,7 +287,7 @@ end;
 procedure THelpForm.ShowPages(const Rel: string);
 var
   Index, Folder, Target, Anchor: string;
-  P: Integer;
+  P: integer;
 begin
   Index := LocalHelpIndex;
   if Index = '' then
@@ -322,26 +324,23 @@ begin
   if Why <> '' then
     lblEmptyText.Caption := Why
   else if NetOffline then
-    lblEmptyText.Caption := 'This copy was started with --offline, so it ' +
-      'will not download them.  They are on the web too.'
+    lblEmptyText.Caption := 'This copy was started with --offline, so it ' + 'will not download them.  They are on the web too.'
   else
-    lblEmptyText.Caption := 'They come from this version''s release on ' +
-      'GitHub, a few megabytes, and are kept in a folder called help beside ' +
-      'the program - so they are still here next time, with or without the ' +
-      'internet.';
+    lblEmptyText.Caption := 'They come from this version''s release on ' + 'GitHub, a few megabytes, and are kept in a folder called help beside ' +
+      'the program - so they are still here next time, with or without the ' + 'internet.';
   pbEmpty.Visible := FFetching;
   btnEmptyGet.Enabled := not FFetching and not NetOffline;
   UpdateButtons;
 end;
 
-procedure THelpForm.Notice(const S: string; Busy: Boolean);
+procedure THelpForm.Notice(const S: string; Busy: boolean);
 begin
   lblNotice.Caption := S;
   pbNotice.Visible := Busy;
   pnlNotice.Visible := S <> '';
 end;
 
-procedure THelpForm.Fetch(Loud: Boolean);
+procedure THelpForm.Fetch(Loud: boolean);
 begin
   if NetOffline then
   begin
@@ -362,9 +361,9 @@ begin
   if Loud then btnRefresh.Enabled := False;
 end;
 
-procedure THelpForm.FetchProgress(BytesReceived, TotalBytes: Int64);
+procedure THelpForm.FetchProgress(BytesReceived, TotalBytes: int64);
 var
-  Pct: Integer;
+  Pct: integer;
 begin
   { size unknown: keep the bar moving anyway }
   if TotalBytes > 0 then
@@ -394,8 +393,7 @@ begin
   else if LocalHelpIndex = '' then
     ShowEmpty('The help pages could not be downloaded - ' + F.Err + '.')
   else
-    Notice('Could not get newer help pages - ' + F.Err +
-      '.  Showing the ones already here.', False);
+    Notice('Could not get newer help pages - ' + F.Err + '.  Showing the ones already here.', False);
 end;
 
 { The current page relative to the help folder, so it can be found again in
@@ -410,8 +408,7 @@ begin
   if LocalHelpIndex = '' then Exit;
   Folder := ExtractFilePath(LocalHelpIndex);
   if Pos(Folder, Loc) = 1 then
-    Result := StringReplace(Copy(Loc, Length(Folder) + 1, MaxInt), PathDelim,
-      '/', [rfReplaceAll]);
+    Result := StringReplace(Copy(Loc, Length(Folder) + 1, MaxInt), PathDelim, '/', [rfReplaceAll]);
 end;
 
 { Maps a link to the manual's website back to the local copy, so it stays in
@@ -438,7 +435,8 @@ begin
   case FThemeChoice of
     htAuto: FThemeChoice := htLight;
     htLight: FThemeChoice := htDark;
-  else FThemeChoice := htAuto;
+    else
+      FThemeChoice := htAuto;
   end;
   SaveThemeChoice;
   Rel := PageRelative;
@@ -461,9 +459,7 @@ begin
     image format the manual uses, or the picture falls through to the page
     loader and shows as binary text. }
   Ext := LowerCase(ExtractFileExt(URL));
-  if (Page.ClickedLink.Image <> '') or (Ext = '.png') or
-     (Ext = '.jpg') or (Ext = '.jpeg') or (Ext = '.webp') or
-     (Ext = '.bmp') then
+  if (Page.ClickedLink.Image <> '') or (Ext = '.png') or (Ext = '.jpg') or (Ext = '.jpeg') or (Ext = '.webp') or (Ext = '.bmp') then
   begin
     if Page.ClickedLink.Image <> '' then
       OpenPictureWindow(Page.ClickedLink.Image, lblTitle.Caption)
@@ -478,8 +474,7 @@ begin
     Exit;
   end;
   { anywhere else on the internet, or an e-mail address: the real browser }
-  if (Pos('http://', URL) = 1) or (Pos('https://', URL) = 1) or
-     (Pos('mailto:', URL) = 1) then
+  if (Pos('http://', URL) = 1) or (Pos('https://', URL) = 1) or (Pos('mailto:', URL) = 1) then
   begin
     OpenURL(URL);
     Exit;
@@ -499,12 +494,13 @@ end;
 
 { Dims the text instead of disabling the button; BGRA's disabled look is a
   light gray hole on a dark bar.  The click handlers check for themselves. }
-procedure Available(B: TBCButton; On_: Boolean);
+procedure Available(B: TBCButton; On_: boolean);
 var
   C: TColor;
 begin
   if On_ then C := PixToColor(DlgTheme.Text)
-  else C := Shade(PixToColor(DlgTheme.Panel), 0.35);
+  else
+    C := Shade(PixToColor(DlgTheme.Panel), 0.35);
   B.StateNormal.FontEx.Color := C;
   B.StateHover.FontEx.Color := C;
   B.StateClicked.FontEx.Color := C;
@@ -513,7 +509,7 @@ end;
 
 procedure THelpForm.UpdateButtons;
 var
-  OnPage: Boolean;
+  OnPage: boolean;
   Ver: string;
 begin
   OnPage := Page.Visible;
@@ -523,8 +519,7 @@ begin
   Available(btnFind, OnPage);
   btnRefresh.Enabled := not FFetching and not NetOffline;
   if OnPage and (Page.DocumentTitle <> '') then
-    lblTitle.Caption := StringReplace(Page.DocumentTitle, ' - Heckers Sketch',
-      '', [])
+    lblTitle.Caption := StringReplace(Page.DocumentTitle, ' - Heckers Sketch', '', [])
   else
     lblTitle.Caption := 'Help';
   Ver := LocalHelpVersion;

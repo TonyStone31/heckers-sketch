@@ -12,7 +12,7 @@ interface
   it and the caller should say so and leave.  WaitSecs is 0 normally, so a
   double launch is told at once; an update passes a few seconds while the
   old copy exits. }
-function BecomeTheOnlyCopy(WaitSecs: Integer = 0): Boolean;
+function BecomeTheOnlyCopy(WaitSecs: integer = 0): boolean;
 procedure DropInheritedUpdateLock;
 
 { Another copy has the lock: leave it a note instead of a complaint.  The
@@ -34,7 +34,7 @@ uses
 function LeaveOpenRequest: string;
 var
   L: TStringList;
-  I: Integer;
+  I: integer;
   Note, Tmp: string;
 begin
   Result := '';
@@ -50,7 +50,8 @@ begin
       { qualified: the Windows unit is in scope here and shadows these }
       if FileExists(Note) then SysUtils.DeleteFile(Note);
       if SysUtils.RenameFile(Tmp, Note) then Result := Note
-      else SysUtils.DeleteFile(Tmp);
+      else
+        SysUtils.DeleteFile(Tmp);
     except
       { a read-only folder: the old message will have to do }
     end;

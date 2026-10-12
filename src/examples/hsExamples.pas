@@ -16,10 +16,10 @@ uses
   Classes;
 
 { How many there are, and what each is called on disk. }
-function ExampleCount: Integer;
-function ExampleFile(I: Integer): string;
+function ExampleCount: integer;
+function ExampleFile(I: integer): string;
 { The drawing itself, as the lines of a .hsk file. }
-procedure ExampleLines(I: Integer; L: TStrings);
+procedure ExampleLines(I: integer; L: TStrings);
 
 { Write one example into Dir unless the user has changed it.  Recorded is
   the checksum of what we wrote last time and comes back as the current one.
@@ -29,12 +29,10 @@ procedure ExampleLines(I: Integer; L: TStrings);
 type
   TExampleWrite = (ewWritten, ewUpToDate, ewKeptTheirs, ewFailed);
 
-function PutExample(I: Integer; const Dir: string;
-  var Recorded: string): TExampleWrite;
+function PutExample(I: integer; const Dir: string; var Recorded: string): TExampleWrite;
 
 { The same rule for any built-in file the program writes out, such as the jigs. }
-function PutCarried(const Path: string; L: TStrings;
-  var Recorded: string): TExampleWrite;
+function PutCarried(const Path: string; L: TStrings; var Recorded: string): TExampleWrite;
 
 implementation
 
@@ -46,17 +44,19 @@ const
   FILES: array[0..6] of string = ('etch-a-sketch.hsk', 'wine-glass.hsk',
     'broom.hsk', 'robot.hsk', 'ball.hsk', 'jigs.hsk', 'mannequin.hsk');
 
-function ExampleCount: Integer;
+function ExampleCount: integer;
 begin
   Result := Length(FILES);
 end;
 
-function ExampleFile(I: Integer): string;
+function ExampleFile(I: integer): string;
 begin
-  if (I < 0) or (I > High(FILES)) then Result := '' else Result := FILES[I];
+  if (I < 0) or (I > High(FILES)) then Result := ''
+  else
+    Result := FILES[I];
 end;
 
-procedure ExampleLines(I: Integer; L: TStrings);
+procedure ExampleLines(I: integer; L: TStrings);
 begin
   case I of
     0: ExampleDrawing(L);
@@ -83,8 +83,7 @@ begin
   end;
 end;
 
-function PutCarried(const Path: string; L: TStrings;
-  var Recorded: string): TExampleWrite;
+function PutCarried(const Path: string; L: TStrings; var Recorded: string): TExampleWrite;
 var
   Sum: string;
 begin
@@ -110,8 +109,7 @@ begin
   end;
 end;
 
-function PutExample(I: Integer; const Dir: string;
-  var Recorded: string): TExampleWrite;
+function PutExample(I: integer; const Dir: string; var Recorded: string): TExampleWrite;
 var
   L: TStringList;
 begin

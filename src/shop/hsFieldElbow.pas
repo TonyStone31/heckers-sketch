@@ -40,19 +40,19 @@ type
     procedure AnyChange(Sender: TObject);
     procedure pbSketchPaint(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnOKClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
   private
     FSpec: TTransitionSpec;    { the elbow so far: opening, throat, turn }
     FUnits: TUnitSystem;
-    function InchesOf(const S: string; out V: Double): Boolean;
+    function InchesOf(const S: string; out V: double): boolean;
     { the measurements read and solved into FSpec; '' or what is wrong }
     function Solve: string;
   public
     { Spec comes in with the opening, throat radius and turn, and goes out
       with the angle and legs.  True when OK was pressed with a solution. }
-    class function Ask(Units: TUnitSystem; var Spec: TTransitionSpec): Boolean;
+    class function Ask(Units: TUnitSystem; var Spec: TTransitionSpec): boolean;
   end;
 
 implementation
@@ -66,26 +66,25 @@ end;
 
 { Drawn buttons cannot be Default or Cancel, so Enter and Escape are handled
   here.  Enter only works while there is a solution. }
-procedure TFieldElbowForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFieldElbowForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   case Key of
     VK_RETURN:
-      begin
-        if btnOK.Enabled then ModalResult := mrOK;
-        Key := 0;
-      end;
+    begin
+      if btnOK.Enabled then ModalResult := mrOk;
+      Key := 0;
+    end;
     VK_ESCAPE:
-      begin
-        ModalResult := mrCancel;
-        Key := 0;
-      end;
+    begin
+      ModalResult := mrCancel;
+      Key := 0;
+    end;
   end;
 end;
 
 procedure TFieldElbowForm.btnOKClick(Sender: TObject);
 begin
-  if btnOK.Enabled then ModalResult := mrOK;
+  if btnOK.Enabled then ModalResult := mrOk;
 end;
 
 procedure TFieldElbowForm.btnCancelClick(Sender: TObject);
@@ -93,10 +92,10 @@ begin
   ModalResult := mrCancel;
 end;
 
-function TFieldElbowForm.InchesOf(const S: string; out V: Double): Boolean;
+function TFieldElbowForm.InchesOf(const S: string; out V: double): boolean;
 var
   T: string;
-  F: Double;
+  F: double;
 begin
   T := Trim(S);
   V := 0;
@@ -112,7 +111,7 @@ end;
 
 function TFieldElbowForm.Solve: string;
 var
-  Fwd, Over, Fwd2, Over2, Deg, Theta, L0, L1: Double;
+  Fwd, Over, Fwd2, Over2, Deg, Theta, L0, L1: double;
 begin
   if not (InchesOf(edFwd.Text, Fwd) and InchesOf(edOver.Text, Over)) then
     Exit('The near corner needs both numbers.');
@@ -147,9 +146,8 @@ begin
   if Err = '' then
   begin
     lblResult.Font.Color := Font.Color;
-    lblResult.Caption := Format('%s degrees.  Entry leg %s, exit leg %s.',
-      [FormatFloat('0.#', RadToDeg(FSpec.Angle)), FormatLen(FSpec.Leg0, FUnits),
-       FormatLen(FSpec.Leg1, FUnits)]);
+    lblResult.Caption := Format('%s degrees.  Entry leg %s, exit leg %s.', [FormatFloat('0.#', RadToDeg(FSpec.Angle)),
+      FormatLen(FSpec.Leg0, FUnits), FormatLen(FSpec.Leg1, FUnits)]);
   end
   else
   begin
@@ -167,14 +165,24 @@ var
   C: TCanvas;
   Pts: TP3Array;
   P: array of TPoint;
-  I, W, H, Margin: Integer;
-  MinX, MaxX, MinY, MaxY, Sc, A, Fwd, Over: Double;
+  I, W, H, Margin: integer;
+  MinX, MaxX, MinY, MaxY, Sc, A, Fwd, Over: double;
   Dir: TP3;
-  function SX(X: Double): Integer; begin Result := Round(Margin + (X - MinX) * Sc); end;
-  function SY(Y: Double): Integer; begin Result := Round(H - Margin - (Y - MinY) * Sc); end;
+
+  function SX(X: double): integer;
+  begin
+    Result := Round(Margin + (X - MinX) * Sc);
+  end;
+
+  function SY(Y: double): integer;
+  begin
+    Result := Round(H - Margin - (Y - MinY) * Sc);
+  end;
+
 begin
   C := pbSketch.Canvas;
-  W := pbSketch.Width; H := pbSketch.Height;
+  W := pbSketch.Width;
+  H := pbSketch.Height;
   C.Brush.Color := clWhite;
   C.FillRect(0, 0, W, H);
   C.Pen.Color := clSilver;
@@ -183,11 +191,16 @@ begin
   ElbowCheek(FSpec, Pts);
   if Length(Pts) < 3 then Exit;
   Margin := 40;
-  MinX := 1E30; MaxX := -1E30; MinY := 1E30; MaxY := -1E30;
+  MinX := 1E30;
+  MaxX := -1E30;
+  MinY := 1E30;
+  MaxY := -1E30;
   for I := 0 to High(Pts) do
   begin
-    MinX := Min(MinX, Pts[I].X); MaxX := Max(MaxX, Pts[I].X);
-    MinY := Min(MinY, Pts[I].Y); MaxY := Max(MaxY, Pts[I].Y);
+    MinX := Min(MinX, Pts[I].X);
+    MaxX := Max(MaxX, Pts[I].X);
+    MinY := Min(MinY, Pts[I].Y);
+    MaxY := Max(MaxY, Pts[I].Y);
   end;
   Sc := Min((W - 2 * Margin) / Max(MaxX - MinX, 1E-9), (H - 2 * Margin) / Max(MaxY - MinY, 1E-9));
   SetLength(P, Length(Pts));
@@ -198,8 +211,11 @@ begin
   C.Polygon(P);
   C.Pen.Width := 1;
   { the far duct's inside edge, on through where the elbow lands }
-  if FSpec.Turn in [tuUp, tuDown] then A := FSpec.H0 else A := FSpec.W0;
-  InchesOf(edFwd.Text, Fwd); InchesOf(edOver.Text, Over);
+  if FSpec.Turn in [tuUp, tuDown] then A := FSpec.H0
+  else
+    A := FSpec.W0;
+  InchesOf(edFwd.Text, Fwd);
+  InchesOf(edOver.Text, Over);
   Dir := P3(Sin(FSpec.Angle), Cos(FSpec.Angle), 0);
   C.Pen.Color := $00A06030;
   C.Pen.Style := psDash;
@@ -218,7 +234,7 @@ begin
   C.TextOut(8, H - 20, 'seen from above, turning ' + LowerCase(TURN_NAMES[FSpec.Turn]));
 end;
 
-class function TFieldElbowForm.Ask(Units: TUnitSystem; var Spec: TTransitionSpec): Boolean;
+class function TFieldElbowForm.Ask(Units: TUnitSystem; var Spec: TTransitionSpec): boolean;
 var
   F: TFieldElbowForm;
 begin
@@ -228,7 +244,7 @@ begin
     F.FUnits := Units;
     F.FSpec := Spec;
     F.AnyChange(nil);
-    if F.ShowModal <> mrOK then Exit;
+    if F.ShowModal <> mrOk then Exit;
     if F.Solve <> '' then Exit;
     Spec := F.FSpec;
     Result := True;

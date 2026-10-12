@@ -24,12 +24,12 @@ type
     Sep: string;       { the x between two sizes }
   end;
 
-{ the no-break space, as the character itself: a run that must not wrap }
+  { the no-break space, as the character itself: a run that must not wrap }
 const
   NBSP = #$C2#$A0;
 
 { S in a color, bold if asked }
-function Painted(const Col, S: string; Bold: Boolean = False): string;
+function Painted(const Col, S: string; Bold: boolean = False): string;
 { a message, with its names, lengths, commands and keys picked out }
 function MarkMessage(const S: string; const P: TCmdPalette): string;
 { what is being typed: a command and its words, or a length and its sum }
@@ -45,36 +45,35 @@ const
     'Escape', 'Enter', 'Return', 'Tab', 'Delete', 'Backspace', 'Space',
     'Home', 'End', 'PgUp', 'PgDn');
 
-function Painted(const Col, S: string; Bold: Boolean): string;
+function Painted(const Col, S: string; Bold: boolean): string;
 begin
   if S = '' then Exit('');
   Result := '<font color="' + Col + '">' + HtmlEsc(S) + '</font>';
   if Bold then Result := '<b>' + Result + '</b>';
 end;
 
-function IsDigit(C: Char): Boolean; inline;
+function IsDigit(C: char): boolean; inline;
 begin
   Result := C in ['0'..'9'];
 end;
 
-function IsLetter(C: Char): Boolean; inline;
+function IsLetter(C: char): boolean; inline;
 begin
   Result := C in ['a'..'z', 'A'..'Z'];
 end;
 
 { True at the start of a word, so "v2026" and "x3" are not lengths and
   "and/or" is not a command }
-function WordStart(const S: string; I: Integer): Boolean;
+function WordStart(const S: string; I: integer): boolean;
 begin
-  Result := (I = 1) or not (IsLetter(S[I - 1]) or IsDigit(S[I - 1]) or
-    (S[I - 1] in ['_', '.']));
+  Result := (I = 1) or not (IsLetter(S[I - 1]) or IsDigit(S[I - 1]) or (S[I - 1] in ['_', '.']));
 end;
 
 { A length as the trade writes it, starting at I: 12'-6", 8' 10 1/2", 3/4",
   1200mm, 45°, 5.0s, 13 ms.  Returns its length in bytes, or 0. }
-function LengthAt(const S: string; I: Integer): Integer;
+function LengthAt(const S: string; I: integer): integer;
 var
-  J, K: Integer;
+  J, K: integer;
 begin
   Result := 0;
   if not IsDigit(S[I]) or not WordStart(S, I) then Exit;
@@ -85,38 +84,32 @@ begin
     { the degree sign, two bytes in UTF-8 }
     else if (S[J] = #$C2) and (J < Length(S)) and (S[J + 1] = #$B0) then Inc(J, 2)
     { 12'-6": a dash after the feet and before a figure }
-    else if (S[J] = '-') and (J > I) and (S[J - 1] = '''') and
-            (J < Length(S)) and IsDigit(S[J + 1]) then Inc(J)
+    else if (S[J] = '-') and (J > I) and (S[J - 1] = '''') and (J < Length(S)) and IsDigit(S[J + 1]) then Inc(J)
     { 8' 10 1/2": a space between figures after the feet, or before a
       fraction }
-    else if (S[J] = ' ') and (J < Length(S)) and IsDigit(S[J + 1]) and
-            ((Pos('''', Copy(S, I, J - I)) > 0) or
-             ((J + 2 <= Length(S)) and (Pos('/', Copy(S, J + 1, 4)) > 0) and
-              (Pos(' ', Copy(S, J + 1, 4)) = 0))) then Inc(J)
-    else Break;
+    else if (S[J] = ' ') and (J < Length(S)) and IsDigit(S[J + 1]) and ((Pos('''', Copy(S, I, J - I)) > 0) or
+      ((J + 2 <= Length(S)) and (Pos('/', Copy(S, J + 1, 4)) > 0) and (Pos(' ', Copy(S, J + 1, 4)) = 0))) then Inc(J)
+    else
+      Break;
   end;
   { a fraction's slash or a trailing dot is not the end of a length }
   while (J > I) and (S[J - 1] in ['.', '/', '-']) do Dec(J);
   { a unit written on - mm, ms, ft, in, px - or after one space }
   K := J;
   if (K <= Length(S)) and (S[K] = ' ') then Inc(K);
-  if (K + 1 <= Length(S)) and
-     (((LowerCase(Copy(S, K, 2)) = 'mm') or (LowerCase(Copy(S, K, 2)) = 'ms') or
-       (LowerCase(Copy(S, K, 2)) = 'ft') or (LowerCase(Copy(S, K, 2)) = 'px') or
-       (LowerCase(Copy(S, K, 2)) = 'in')) and
-      ((K + 2 > Length(S)) or not IsLetter(S[K + 2]))) then
+  if (K + 1 <= Length(S)) and (((LowerCase(Copy(S, K, 2)) = 'mm') or (LowerCase(Copy(S, K, 2)) = 'ms') or (LowerCase(Copy(S, K, 2)) = 'ft') or
+    (LowerCase(Copy(S, K, 2)) = 'px') or (LowerCase(Copy(S, K, 2)) = 'in')) and ((K + 2 > Length(S)) or not IsLetter(S[K + 2]))) then
     J := K + 2
-  else if (K <= Length(S)) and (K = J) and (S[K] in ['s', 'm']) and
-          ((K + 1 > Length(S)) or not IsLetter(S[K + 1])) then
+  else if (K <= Length(S)) and (K = J) and (S[K] in ['s', 'm']) and ((K + 1 > Length(S)) or not IsLetter(S[K + 1])) then
     J := K + 1;
   Result := J - I;
 end;
 
 { a key, or keys joined by +: Ctrl+Shift+Z, Esc, F1 }
-function KeyAt(const S: string; I: Integer): Integer;
+function KeyAt(const S: string; I: integer): integer;
 var
-  J, K, L: Integer;
-  Hit: Boolean;
+  J, K, L: integer;
+  Hit: boolean;
 begin
   Result := 0;
   if not WordStart(S, I) then Exit;
@@ -126,8 +119,7 @@ begin
     for K := 0 to High(KEY_WORDS) do
     begin
       L := Length(KEY_WORDS[K]);
-      if (Copy(S, J, L) = KEY_WORDS[K]) and
-         ((J + L > Length(S)) or not IsLetter(S[J + L])) then
+      if (Copy(S, J, L) = KEY_WORDS[K]) and ((J + L > Length(S)) or not IsLetter(S[J + L])) then
       begin
         Inc(J, L);
         Hit := True;
@@ -142,23 +134,23 @@ begin
       Hit := True;
     end;
     { after a +, one letter or figure is a key too: the Z of Ctrl+Z }
-    if not Hit and (J > I) and (J <= Length(S)) and
-       (IsLetter(S[J]) or IsDigit(S[J])) and
-       ((J + 1 > Length(S)) or not (IsLetter(S[J + 1]) or IsDigit(S[J + 1]))) then
+    if not Hit and (J > I) and (J <= Length(S)) and (IsLetter(S[J]) or IsDigit(S[J])) and ((J + 1 > Length(S)) or not (IsLetter(S[J + 1]) or IsDigit(S[J + 1]))) then
     begin
       Inc(J);
       Hit := True;
     end;
     if not Hit then Break;
     Result := J - I;
-    if (J <= Length(S)) and (S[J] = '+') then Inc(J) else Break;
+    if (J <= Length(S)) and (S[J] = '+') then Inc(J)
+    else
+      Break;
   until False;
 end;
 
 { /a-command, at the start of a word }
-function CommandAt(const S: string; I: Integer): Integer;
+function CommandAt(const S: string; I: integer): integer;
 var
-  J: Integer;
+  J: integer;
 begin
   Result := 0;
   if (S[I] <> '/') or (I = Length(S)) or not IsLetter(S[I + 1]) then Exit;
@@ -170,7 +162,7 @@ end;
 
 function MarkMessage(const S: string; const P: TCmdPalette): string;
 var
-  I, N, J: Integer;
+  I, N, J: integer;
   Plain: string;
 
   procedure Flush;
@@ -210,8 +202,7 @@ begin
     if N > 0 then
     begin
       Flush;
-      Result := Result + '<font color="' + P.Key + '" bgcolor="' + P.KeyBack +
-        '" pad="1 3" radius="5">' + HtmlEsc(Copy(S, I, N)) + '</font>';
+      Result := Result + '<font color="' + P.Key + '" bgcolor="' + P.KeyBack + '" pad="1 3" radius="5">' + HtmlEsc(Copy(S, I, N)) + '</font>';
       Inc(I, N);
       Continue;
     end;
@@ -242,7 +233,7 @@ end;
 
 function MarkTyped(const S: string; const P: TCmdPalette): string;
 var
-  I, J: Integer;
+  I, J: integer;
   W: string;
 begin
   Result := '';
@@ -263,8 +254,7 @@ begin
     if IsDigit(S[I]) or ((S[I] = '.') and (I < Length(S)) and IsDigit(S[I + 1])) then
     begin
       J := I;
-      while (J <= Length(S)) and (IsDigit(S[J]) or (S[J] = '.') or
-        ((S[J] = '/') and (J > I) and (J < Length(S)) and IsDigit(S[J + 1]))) do Inc(J);
+      while (J <= Length(S)) and (IsDigit(S[J]) or (S[J] = '.') or ((S[J] = '/') and (J > I) and (J < Length(S)) and IsDigit(S[J + 1]))) do Inc(J);
       Result := Result + Painted(P.Number, Copy(S, I, J - I), True);
       I := J;
     end
@@ -290,7 +280,8 @@ begin
     else if S[I] = '-' then
     begin
       if Trim(Copy(S, 1, I - 1)) = '' then Result := Result + Painted(P.Op, '-', True)
-      else Result := Result + Painted(P.Units, '-', True);
+      else
+        Result := Result + Painted(P.Units, '-', True);
       Inc(I);
     end
     else if S[I] in ['+', '*', '/', '(', ')', '='] then
@@ -310,10 +301,10 @@ begin
       W := LowerCase(Copy(S, I, J - I));
       { the x of 8x10 - and of 3x, the count of an array }
       if W = 'x' then Result := Result + Painted(P.Sep, Copy(S, I, J - I), True)
-      else if (W = 'ft') or (W = 'in') or (W = 'mm') or (W = 'cm') or (W = 'm') or
-              (W = 'deg') or (W = 's') then
+      else if (W = 'ft') or (W = 'in') or (W = 'mm') or (W = 'cm') or (W = 'm') or (W = 'deg') or (W = 's') then
         Result := Result + Painted(P.Units, Copy(S, I, J - I), True)
-      else Result := Result + Painted(P.Text, Copy(S, I, J - I));
+      else
+        Result := Result + Painted(P.Text, Copy(S, I, J - I));
       I := J;
     end
     else

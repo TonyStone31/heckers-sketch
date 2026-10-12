@@ -43,52 +43,47 @@ type
     ikTOffset, ikTRotate, ikTProtractor, ikTDrill, ikTFollow,
     { the shop door: a spanner, so it is not mistaken for the plain chevron }
     ikShop
-  );
+    );
 
 const
   { both with white paper, so the screen matches what prints }
   THEME_COUNT = 2;
   THEME_LIGHT = 0;
-  THEME_DARK  = 1;
+  THEME_DARK = 1;
 
 var
   Themes: array[0..THEME_COUNT - 1] of TTheme;
 
 { the index of the theme with this name, or -1 }
-function ThemeNamed(const AName: string): Integer;
+function ThemeNamed(const AName: string): integer;
 
 { Chassis parts. }
 procedure PaintShell(S: TArtSurface; const T: TTheme);
-procedure PaintBezel(S: TArtSurface; const R: TRect; const T: TTheme;
-  Radius: Single = 22);
-procedure PaintPanel(S: TArtSurface; const R: TRect; const T: TTheme; Radius: Single = 14);
-procedure PaintPill(S: TArtSurface; const R: TRect; Radius: Single;
-  const C1, C2, Edge: TPix; Alpha: Single = 1.0);
-procedure PaintSwatch(S: TArtSurface; const R: TRect; const C: TPix;
-  Selected, Hot: Boolean; const T: TTheme);
-procedure PaintIcon(S: TArtSurface; Kind: TIconKind; const R: TRect;
-  const C: TPix; Alpha: Single = 1.0);
+procedure PaintBezel(S: TArtSurface; const R: TRect; const T: TTheme; Radius: single = 22);
+procedure PaintPanel(S: TArtSurface; const R: TRect; const T: TTheme; Radius: single = 14);
+procedure PaintPill(S: TArtSurface; const R: TRect; Radius: single; const C1, C2, Edge: TPix; Alpha: single = 1.0);
+procedure PaintSwatch(S: TArtSurface; const R: TRect; const C: TPix; Selected, Hot: boolean; const T: TTheme);
+procedure PaintIcon(S: TArtSurface; Kind: TIconKind; const R: TRect; const C: TPix; Alpha: single = 1.0);
 procedure PaintScreenPaper(S: TArtSurface; const T: TTheme);
-procedure PaintScreenWell(S: TArtSurface; const R: TRect; Radius: Single);
-procedure PaintMeasuredGrid(S: TArtSurface; const T: TTheme;
-  Ppu, OX, OY: Double; MajorEvery: Integer);
+procedure PaintScreenWell(S: TArtSurface; const R: TRect; Radius: single);
+procedure PaintMeasuredGrid(S: TArtSurface; const T: TTheme; Ppu, OX, OY: double; MajorEvery: integer);
 
 { The model axes, in SketchUp's colors: X red, Y green, Z blue.  Index is
   0 X, 1 Y, 2 Z; anything else comes back gray. }
-function AxisPix(Index: Integer): TPix;
+function AxisPix(Index: integer): TPix;
 
 implementation
 
-function ThemeNamed(const AName: string): Integer;
+function ThemeNamed(const AName: string): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to THEME_COUNT - 1 do
     if SameText(Themes[I].Name, AName) then Exit(I);
   Result := -1;
 end;
 
-function AxisPix(Index: Integer): TPix;
+function AxisPix(Index: integer): TPix;
 begin
   { Kept far apart and dark enough to read on white: the green has almost no
     blue in it and the blue almost no green, or thin Y and Z lines look alike. }
@@ -96,8 +91,8 @@ begin
     0: Result := Pix($D2, $2C, $2C);        // X, red
     1: Result := Pix($0E, $92, $32);        // Y, green, almost no blue
     2: Result := Pix($16, $46, $DC);        // Z, blue, almost no green
-  else
-    Result := Pix($78, $78, $84);
+    else
+      Result := Pix($78, $78, $84);
   end;
 end;
 
@@ -151,8 +146,8 @@ end;
 
 procedure PaintShell(S: TArtSurface; const T: TTheme);
 var
-  X, Y: Integer;
-  CX, CY, MaxD, D, V: Single;
+  X, Y: integer;
+  CX, CY, MaxD, D, V: single;
   P: PPix;
   Row: TPix;
 begin
@@ -182,10 +177,9 @@ begin
 end;
 
 { Recessed frame around the drawing screen: outer bevel, inner shadow. }
-procedure PaintBezel(S: TArtSurface; const R: TRect; const T: TTheme;
-  Radius: Single);
+procedure PaintBezel(S: TArtSurface; const R: TRect; const T: TTheme; Radius: single);
 var
-  I: Integer;
+  I: integer;
   Outer: TRect;
 begin
   S.BlendMode := bmNormal;
@@ -193,8 +187,7 @@ begin
 
   { drop shadow under the whole assembly }
   for I := 6 downto 1 do
-    S.RoundRect(Rect(Outer.Left - I, Outer.Top - I + 4, Outer.Right + I,
-      Outer.Bottom + I + 6), Radius + I, Pix(0, 0, 0), 0.05);
+    S.RoundRect(Rect(Outer.Left - I, Outer.Top - I + 4, Outer.Right + I, Outer.Bottom + I + 6), Radius + I, Pix(0, 0, 0), 0.05);
 
   S.RoundRectV(Outer, Radius, T.Bezel1, T.Bezel2);
   { top light catch }
@@ -203,7 +196,7 @@ begin
   S.RoundFrame(Outer, Radius, 1.2, Pix(0, 0, 0), 0.45);
 end;
 
-procedure PaintPanel(S: TArtSurface; const R: TRect; const T: TTheme; Radius: Single);
+procedure PaintPanel(S: TArtSurface; const R: TRect; const T: TTheme; Radius: single);
 begin
   S.BlendMode := bmNormal;
   S.RoundRect(Rect(R.Left, R.Top + 3, R.Right, R.Bottom + 4), Radius, Pix(0, 0, 0), 0.25);
@@ -211,16 +204,14 @@ begin
   S.RoundFrame(R, Radius, 1.1, Pix(255, 255, 255), 0.10);
 end;
 
-procedure PaintPill(S: TArtSurface; const R: TRect; Radius: Single;
-  const C1, C2, Edge: TPix; Alpha: Single);
+procedure PaintPill(S: TArtSurface; const R: TRect; Radius: single; const C1, C2, Edge: TPix; Alpha: single);
 begin
   S.BlendMode := bmNormal;
   S.RoundRectV(R, Radius, C1, C2, Alpha);
   S.RoundFrame(R, Radius, 1.0, Edge, Alpha * 0.85);
 end;
 
-procedure PaintSwatch(S: TArtSurface; const R: TRect; const C: TPix;
-  Selected, Hot: Boolean; const T: TTheme);
+procedure PaintSwatch(S: TArtSurface; const R: TRect; const C: TPix; Selected, Hot: boolean; const T: TTheme);
 var
   Rr: TRect;
 begin
@@ -245,19 +236,18 @@ end;
 { line icons - all stroked, so they scale and stay crisp                    }
 { ------------------------------------------------------------------------ }
 
-procedure PaintIcon(S: TArtSurface; Kind: TIconKind; const R: TRect;
-  const C: TPix; Alpha: Single);
+procedure PaintIcon(S: TArtSurface; Kind: TIconKind; const R: TRect; const C: TPix; Alpha: single);
 var
-  X, Y, W, H, U, CX, CY, LW, RR: Single;
+  X, Y, W, H, U, CX, CY, LW, RR: single;
 
-  function Px(FX, FY: Single): TPointF;
+  function Px(FX, FY: single): TPointF;
   begin
     Result := PtF(X + FX * W, Y + FY * H);
   end;
 
 var
   P: TPointF;
-  K: Integer;
+  K: integer;
 begin
   S.BlendMode := bmNormal;
   X := R.Left;
@@ -271,38 +261,37 @@ begin
 
   case Kind of
     ikTPoint:
-      begin
-        S.Ring(CX, CY, U * 0.17, LW, C, Alpha);
-        S.Disc(CX, CY, LW * 0.7, C, Alpha);
-      end;
+    begin
+      S.Ring(CX, CY, U * 0.17, LW, C, Alpha);
+      S.Disc(CX, CY, LW * 0.7, C, Alpha);
+    end;
 
     { the usual arrow, pointing up and to the left }
     ikTSelect:
-      S.Poly([Px(0.30, 0.16), Px(0.30, 0.80), Px(0.46, 0.64), Px(0.57, 0.86),
-              Px(0.67, 0.80), Px(0.56, 0.60), Px(0.74, 0.58)],
+      S.Poly([Px(0.30, 0.16), Px(0.30, 0.80), Px(0.46, 0.64), Px(0.57, 0.86), Px(0.67, 0.80), Px(0.56, 0.60), Px(0.74, 0.58)],
         LW, C, True, Alpha);
 
     { four arrowheads on a cross - move in any direction }
     ikTMove:
-      begin
-        S.Line(CX, Y + H * 0.18, CX, Y + H * 0.82, LW, C, Alpha);
-        S.Line(X + W * 0.18, CY, X + W * 0.82, CY, LW, C, Alpha);
-        S.Line(CX, Y + H * 0.18, CX - U * 0.11, Y + H * 0.30, LW, C, Alpha);
-        S.Line(CX, Y + H * 0.18, CX + U * 0.11, Y + H * 0.30, LW, C, Alpha);
-        S.Line(CX, Y + H * 0.82, CX - U * 0.11, Y + H * 0.70, LW, C, Alpha);
-        S.Line(CX, Y + H * 0.82, CX + U * 0.11, Y + H * 0.70, LW, C, Alpha);
-        S.Line(X + W * 0.18, CY, X + W * 0.30, CY - U * 0.11, LW, C, Alpha);
-        S.Line(X + W * 0.18, CY, X + W * 0.30, CY + U * 0.11, LW, C, Alpha);
-        S.Line(X + W * 0.82, CY, X + W * 0.70, CY - U * 0.11, LW, C, Alpha);
-        S.Line(X + W * 0.82, CY, X + W * 0.70, CY + U * 0.11, LW, C, Alpha);
-      end;
+    begin
+      S.Line(CX, Y + H * 0.18, CX, Y + H * 0.82, LW, C, Alpha);
+      S.Line(X + W * 0.18, CY, X + W * 0.82, CY, LW, C, Alpha);
+      S.Line(CX, Y + H * 0.18, CX - U * 0.11, Y + H * 0.30, LW, C, Alpha);
+      S.Line(CX, Y + H * 0.18, CX + U * 0.11, Y + H * 0.30, LW, C, Alpha);
+      S.Line(CX, Y + H * 0.82, CX - U * 0.11, Y + H * 0.70, LW, C, Alpha);
+      S.Line(CX, Y + H * 0.82, CX + U * 0.11, Y + H * 0.70, LW, C, Alpha);
+      S.Line(X + W * 0.18, CY, X + W * 0.30, CY - U * 0.11, LW, C, Alpha);
+      S.Line(X + W * 0.18, CY, X + W * 0.30, CY + U * 0.11, LW, C, Alpha);
+      S.Line(X + W * 0.82, CY, X + W * 0.70, CY - U * 0.11, LW, C, Alpha);
+      S.Line(X + W * 0.82, CY, X + W * 0.70, CY + U * 0.11, LW, C, Alpha);
+    end;
 
     ikTLine:
-      begin
-        S.Line(X + W * 0.22, Y + H * 0.74, X + W * 0.78, Y + H * 0.26, LW, C, Alpha);
-        S.Disc(X + W * 0.22, Y + H * 0.74, LW * 0.9, C, Alpha);
-        S.Disc(X + W * 0.78, Y + H * 0.26, LW * 0.9, C, Alpha);
-      end;
+    begin
+      S.Line(X + W * 0.22, Y + H * 0.74, X + W * 0.78, Y + H * 0.26, LW, C, Alpha);
+      S.Disc(X + W * 0.22, Y + H * 0.74, LW * 0.9, C, Alpha);
+      S.Disc(X + W * 0.78, Y + H * 0.26, LW * 0.9, C, Alpha);
+    end;
 
     ikTRect:
       S.Poly([Px(0.20, 0.28), Px(0.80, 0.28), Px(0.80, 0.72), Px(0.20, 0.72)],
@@ -310,288 +299,274 @@ begin
 
 
     ikTRotate:
-      begin
-        { three quarters of a circle with an arrowhead on its end }
-        for K := 0 to 17 do
-          S.Line(CX + U * 0.30 * Cos(K * Pi / 12), CY + U * 0.30 * Sin(K * Pi / 12),
-                 CX + U * 0.30 * Cos((K + 1) * Pi / 12), CY + U * 0.30 * Sin((K + 1) * Pi / 12),
-                 LW, C, Alpha);
-        S.Line(CX + U * 0.30, CY, CX + U * 0.30 - U * 0.13, CY + U * 0.02, LW, C, Alpha);
-        S.Line(CX + U * 0.30, CY, CX + U * 0.30 + U * 0.11, CY + U * 0.09, LW, C, Alpha);
-      end;
+    begin
+      { three quarters of a circle with an arrowhead on its end }
+      for K := 0 to 17 do
+        S.Line(CX + U * 0.30 * Cos(K * Pi / 12), CY + U * 0.30 * Sin(K * Pi / 12),
+          CX + U * 0.30 * Cos((K + 1) * Pi / 12), CY + U * 0.30 * Sin((K + 1) * Pi / 12),
+          LW, C, Alpha);
+      S.Line(CX + U * 0.30, CY, CX + U * 0.30 - U * 0.13, CY + U * 0.02, LW, C, Alpha);
+      S.Line(CX + U * 0.30, CY, CX + U * 0.30 + U * 0.11, CY + U * 0.09, LW, C, Alpha);
+    end;
 
     ikTProtractor:
-      begin
-        { a half circle on a baseline, with its ticks }
-        for K := 0 to 11 do
-          S.Line(CX + U * 0.34 * Cos(Pi + K * Pi / 12), CY + U * 0.14 + U * 0.34 * Sin(Pi + K * Pi / 12),
-                 CX + U * 0.34 * Cos(Pi + (K + 1) * Pi / 12), CY + U * 0.14 + U * 0.34 * Sin(Pi + (K + 1) * Pi / 12),
-                 LW, C, Alpha);
-        S.Line(CX - U * 0.34, CY + U * 0.14, CX + U * 0.34, CY + U * 0.14, LW, C, Alpha);
-        for K := 1 to 5 do
-          S.Line(CX + U * 0.34 * Cos(Pi + K * Pi / 6), CY + U * 0.14 + U * 0.34 * Sin(Pi + K * Pi / 6),
-                 CX + U * 0.26 * Cos(Pi + K * Pi / 6), CY + U * 0.14 + U * 0.26 * Sin(Pi + K * Pi / 6),
-                 LW, C, Alpha);
-      end;
+    begin
+      { a half circle on a baseline, with its ticks }
+      for K := 0 to 11 do
+        S.Line(CX + U * 0.34 * Cos(Pi + K * Pi / 12), CY + U * 0.14 + U * 0.34 * Sin(Pi + K * Pi / 12),
+          CX + U * 0.34 * Cos(Pi + (K + 1) * Pi / 12), CY + U * 0.14 + U * 0.34 * Sin(Pi + (K + 1) * Pi / 12),
+          LW, C, Alpha);
+      S.Line(CX - U * 0.34, CY + U * 0.14, CX + U * 0.34, CY + U * 0.14, LW, C, Alpha);
+      for K := 1 to 5 do
+        S.Line(CX + U * 0.34 * Cos(Pi + K * Pi / 6), CY + U * 0.14 + U * 0.34 * Sin(Pi + K * Pi / 6),
+          CX + U * 0.26 * Cos(Pi + K * Pi / 6), CY + U * 0.14 + U * 0.26 * Sin(Pi + K * Pi / 6),
+          LW, C, Alpha);
+    end;
 
     ikTFollow:
-      begin
-        { a profile spun round an axis: the axis, and the belly it sweeps }
-        S.Line(CX, Y + H * 0.12, CX, Y + H * 0.88, LW, C, Alpha);
-        S.Line(CX, CY - U * 0.30, CX + U * 0.34, CY - U * 0.22, LW, C, Alpha);
-        S.Line(CX + U * 0.34, CY - U * 0.22, CX + U * 0.40, CY, LW, C, Alpha);
-        S.Line(CX + U * 0.40, CY, CX + U * 0.34, CY + U * 0.22, LW, C, Alpha);
-        S.Line(CX + U * 0.34, CY + U * 0.22, CX, CY + U * 0.30, LW, C, Alpha);
-        S.Line(CX, CY - U * 0.30, CX - U * 0.34, CY - U * 0.22, LW * 0.6, C, Alpha * 0.55);
-        S.Line(CX - U * 0.34, CY - U * 0.22, CX - U * 0.40, CY, LW * 0.6, C, Alpha * 0.55);
-        S.Line(CX - U * 0.40, CY, CX - U * 0.34, CY + U * 0.22, LW * 0.6, C, Alpha * 0.55);
-        S.Line(CX - U * 0.34, CY + U * 0.22, CX, CY + U * 0.30, LW * 0.6, C, Alpha * 0.55);
-      end;
+    begin
+      { a profile spun round an axis: the axis, and the belly it sweeps }
+      S.Line(CX, Y + H * 0.12, CX, Y + H * 0.88, LW, C, Alpha);
+      S.Line(CX, CY - U * 0.30, CX + U * 0.34, CY - U * 0.22, LW, C, Alpha);
+      S.Line(CX + U * 0.34, CY - U * 0.22, CX + U * 0.40, CY, LW, C, Alpha);
+      S.Line(CX + U * 0.40, CY, CX + U * 0.34, CY + U * 0.22, LW, C, Alpha);
+      S.Line(CX + U * 0.34, CY + U * 0.22, CX, CY + U * 0.30, LW, C, Alpha);
+      S.Line(CX, CY - U * 0.30, CX - U * 0.34, CY - U * 0.22, LW * 0.6, C, Alpha * 0.55);
+      S.Line(CX - U * 0.34, CY - U * 0.22, CX - U * 0.40, CY, LW * 0.6, C, Alpha * 0.55);
+      S.Line(CX - U * 0.40, CY, CX - U * 0.34, CY + U * 0.22, LW * 0.6, C, Alpha * 0.55);
+      S.Line(CX - U * 0.34, CY + U * 0.22, CX, CY + U * 0.30, LW * 0.6, C, Alpha * 0.55);
+    end;
 
     ikTDrill:
-      begin
-        { a bit going down through a bar: the bar is what it goes through }
-        S.Line(X + W * 0.22, CY + U * 0.02, X + W * 0.78, CY + U * 0.02, LW, C, Alpha);
-        S.Line(X + W * 0.22, CY + U * 0.14, X + W * 0.78, CY + U * 0.14, LW, C, Alpha);
-        S.Line(CX, Y + H * 0.14, CX, Y + H * 0.86, LW, C, Alpha);
-        S.Line(CX - U * 0.10, Y + H * 0.30, CX + U * 0.10, Y + H * 0.42, LW, C, Alpha);
-        S.Line(CX - U * 0.10, Y + H * 0.46, CX + U * 0.10, Y + H * 0.58, LW, C, Alpha);
-        S.Line(CX - U * 0.08, Y + H * 0.74, CX, Y + H * 0.86, LW, C, Alpha);
-        S.Line(CX + U * 0.08, Y + H * 0.74, CX, Y + H * 0.86, LW, C, Alpha);
-      end;
+    begin
+      { a bit going down through a bar: the bar is what it goes through }
+      S.Line(X + W * 0.22, CY + U * 0.02, X + W * 0.78, CY + U * 0.02, LW, C, Alpha);
+      S.Line(X + W * 0.22, CY + U * 0.14, X + W * 0.78, CY + U * 0.14, LW, C, Alpha);
+      S.Line(CX, Y + H * 0.14, CX, Y + H * 0.86, LW, C, Alpha);
+      S.Line(CX - U * 0.10, Y + H * 0.30, CX + U * 0.10, Y + H * 0.42, LW, C, Alpha);
+      S.Line(CX - U * 0.10, Y + H * 0.46, CX + U * 0.10, Y + H * 0.58, LW, C, Alpha);
+      S.Line(CX - U * 0.08, Y + H * 0.74, CX, Y + H * 0.86, LW, C, Alpha);
+      S.Line(CX + U * 0.08, Y + H * 0.74, CX, Y + H * 0.86, LW, C, Alpha);
+    end;
 
     ikTOffset:
-      begin
-        S.Poly([Px(0.32, 0.38), Px(0.68, 0.38), Px(0.68, 0.62), Px(0.32, 0.62)],
-          LW, C, True, Alpha);
-        S.Poly([Px(0.18, 0.26), Px(0.82, 0.26), Px(0.82, 0.74), Px(0.18, 0.74)],
-          LW * 0.8, C, True, Alpha * 0.55);
-      end;
+    begin
+      S.Poly([Px(0.32, 0.38), Px(0.68, 0.38), Px(0.68, 0.62), Px(0.32, 0.62)],
+        LW, C, True, Alpha);
+      S.Poly([Px(0.18, 0.26), Px(0.82, 0.26), Px(0.82, 0.74), Px(0.18, 0.74)],
+        LW * 0.8, C, True, Alpha * 0.55);
+    end;
 
     ikTArc:
-      begin
-        S.Arc(CX, Y + H * 0.78, U * 0.34, Pi, 2 * Pi, LW, C, Alpha);
-        S.Line(X + W * 0.16, Y + H * 0.78, X + W * 0.84, Y + H * 0.78,
-          LW * 0.7, C, Alpha * 0.55);
-      end;
+    begin
+      S.Arc(CX, Y + H * 0.78, U * 0.34, Pi, 2 * Pi, LW, C, Alpha);
+      S.Line(X + W * 0.16, Y + H * 0.78, X + W * 0.84, Y + H * 0.78,
+        LW * 0.7, C, Alpha * 0.55);
+    end;
 
     ikTCircle:
       S.Ring(CX, CY, U * 0.30, LW, C, Alpha);
 
     ikTPush:
-      begin
-        S.Poly([Px(0.24, 0.62), Px(0.52, 0.74), Px(0.80, 0.62), Px(0.52, 0.50)],
-          LW * 0.8, C, True, Alpha);
-        S.Line(CX, Y + H * 0.50, CX, Y + H * 0.20, LW, C, Alpha);
-        S.Poly([PtF(CX - U * 0.11, Y + H * 0.31), PtF(CX, Y + H * 0.18),
-                PtF(CX + U * 0.11, Y + H * 0.31)], LW, C, False, Alpha);
-      end;
+    begin
+      S.Poly([Px(0.24, 0.62), Px(0.52, 0.74), Px(0.80, 0.62), Px(0.52, 0.50)],
+        LW * 0.8, C, True, Alpha);
+      S.Line(CX, Y + H * 0.50, CX, Y + H * 0.20, LW, C, Alpha);
+      S.Poly([PtF(CX - U * 0.11, Y + H * 0.31), PtF(CX, Y + H * 0.18), PtF(CX + U * 0.11, Y + H * 0.31)], LW, C, False, Alpha);
+    end;
 
     ikTText:
-      begin
-        S.Line(X + W * 0.24, Y + H * 0.28, X + W * 0.76, Y + H * 0.28, LW, C, Alpha);
-        S.Line(CX, Y + H * 0.28, CX, Y + H * 0.74, LW, C, Alpha);
-      end;
+    begin
+      S.Line(X + W * 0.24, Y + H * 0.28, X + W * 0.76, Y + H * 0.28, LW, C, Alpha);
+      S.Line(CX, Y + H * 0.28, CX, Y + H * 0.74, LW, C, Alpha);
+    end;
 
     ikTErase:
-      begin
-        S.Poly([Px(0.20, 0.66), Px(0.52, 0.30), Px(0.80, 0.50), Px(0.48, 0.76)],
-          LW, C, True, Alpha);
-        S.Line(X + W * 0.30, Y + H * 0.78, X + W * 0.82, Y + H * 0.78,
-          LW * 0.8, C, Alpha * 0.6);
-      end;
+    begin
+      S.Poly([Px(0.20, 0.66), Px(0.52, 0.30), Px(0.80, 0.50), Px(0.48, 0.76)],
+        LW, C, True, Alpha);
+      S.Line(X + W * 0.30, Y + H * 0.78, X + W * 0.82, Y + H * 0.78,
+        LW * 0.8, C, Alpha * 0.6);
+    end;
 
     ikTMeasure:
-      begin
-        S.Poly([Px(0.16, 0.40), Px(0.84, 0.40), Px(0.84, 0.62), Px(0.16, 0.62)],
-          LW * 0.8, C, True, Alpha);
-        S.Line(X + W * 0.34, Y + H * 0.40, X + W * 0.34, Y + H * 0.52, LW * 0.7, C, Alpha);
-        S.Line(X + W * 0.50, Y + H * 0.40, X + W * 0.50, Y + H * 0.55, LW * 0.7, C, Alpha);
-        S.Line(X + W * 0.66, Y + H * 0.40, X + W * 0.66, Y + H * 0.52, LW * 0.7, C, Alpha);
-      end;
+    begin
+      S.Poly([Px(0.16, 0.40), Px(0.84, 0.40), Px(0.84, 0.62), Px(0.16, 0.62)],
+        LW * 0.8, C, True, Alpha);
+      S.Line(X + W * 0.34, Y + H * 0.40, X + W * 0.34, Y + H * 0.52, LW * 0.7, C, Alpha);
+      S.Line(X + W * 0.50, Y + H * 0.40, X + W * 0.50, Y + H * 0.55, LW * 0.7, C, Alpha);
+      S.Line(X + W * 0.66, Y + H * 0.40, X + W * 0.66, Y + H * 0.52, LW * 0.7, C, Alpha);
+    end;
 
     ikTOrbit:
-      begin
-        S.Ring(CX, CY, U * 0.30, LW * 0.9, C, Alpha);
-        S.Arc(CX, CY, U * 0.30, Pi * 0.15, Pi * 0.85, LW * 0.5, C, Alpha * 0.5);
-        S.Disc(CX + U * 0.30, CY, LW * 1.1, C, Alpha);
-      end;
+    begin
+      S.Ring(CX, CY, U * 0.30, LW * 0.9, C, Alpha);
+      S.Arc(CX, CY, U * 0.30, Pi * 0.15, Pi * 0.85, LW * 0.5, C, Alpha * 0.5);
+      S.Disc(CX + U * 0.30, CY, LW * 1.1, C, Alpha);
+    end;
 
     ikChevron:
-      S.Poly([PtF(CX - U * 0.16, CY - U * 0.08), PtF(CX, CY + U * 0.10),
-              PtF(CX + U * 0.16, CY - U * 0.08)], LW, C, False, Alpha);
+      S.Poly([PtF(CX - U * 0.16, CY - U * 0.08), PtF(CX, CY + U * 0.10), PtF(CX + U * 0.16, CY - U * 0.08)], LW, C, False, Alpha);
 
     { A spanner: a ring with a bite out of it at the top left and a shaft
       down to the right.  It only has to read at 16 pixels. }
     ikShop:
-      begin
-        S.Arc(CX - U * 0.16, CY - U * 0.16, U * 0.15, Pi * 0.15, Pi * 1.75,
-              LW, C, Alpha);
-        S.Line(CX - U * 0.08, CY - U * 0.06, CX + U * 0.24, CY + U * 0.26,
-               LW * 1.6, C, Alpha);
-      end;
+    begin
+      S.Arc(CX - U * 0.16, CY - U * 0.16, U * 0.15, Pi * 0.15, Pi * 1.75,
+        LW, C, Alpha);
+      S.Line(CX - U * 0.08, CY - U * 0.06, CX + U * 0.24, CY + U * 0.26,
+        LW * 1.6, C, Alpha);
+    end;
 
     ikUndo, ikRedo:
+    begin
+      if Kind = ikUndo then
       begin
-        if Kind = ikUndo then
-        begin
-          S.Arc(CX, CY + U * 0.06, U * 0.30, Pi * 1.05, Pi * 2.35, LW, C, Alpha);
-          P := PtF(CX - U * 0.30, CY - U * 0.20);
-          S.Poly([PtF(P.X - U * 0.13, P.Y + U * 0.02),
-                  P,
-                  PtF(P.X + U * 0.05, P.Y + U * 0.17)], LW, C, False, Alpha);
-        end
-        else
-        begin
-          S.Arc(CX, CY + U * 0.06, U * 0.30, Pi * 0.65, Pi * 1.95, LW, C, Alpha);
-          P := PtF(CX + U * 0.30, CY - U * 0.20);
-          S.Poly([PtF(P.X + U * 0.13, P.Y + U * 0.02),
-                  P,
-                  PtF(P.X - U * 0.05, P.Y + U * 0.17)], LW, C, False, Alpha);
-        end;
+        S.Arc(CX, CY + U * 0.06, U * 0.30, Pi * 1.05, Pi * 2.35, LW, C, Alpha);
+        P := PtF(CX - U * 0.30, CY - U * 0.20);
+        S.Poly([PtF(P.X - U * 0.13, P.Y + U * 0.02), P, PtF(P.X + U * 0.05, P.Y + U * 0.17)], LW, C, False, Alpha);
+      end
+      else
+      begin
+        S.Arc(CX, CY + U * 0.06, U * 0.30, Pi * 0.65, Pi * 1.95, LW, C, Alpha);
+        P := PtF(CX + U * 0.30, CY - U * 0.20);
+        S.Poly([PtF(P.X + U * 0.13, P.Y + U * 0.02), P, PtF(P.X - U * 0.05, P.Y + U * 0.17)], LW, C, False, Alpha);
       end;
+    end;
 
     ikSave:
-      begin
-        S.Poly([Px(0.24, 0.60), Px(0.24, 0.78), Px(0.76, 0.78), Px(0.76, 0.60)],
-          LW, C, False, Alpha);
-        S.Line(CX, Y + H * 0.20, CX, Y + H * 0.58, LW, C, Alpha);
-        S.Poly([Px(0.34, 0.44), Px(0.50, 0.60), Px(0.66, 0.44)], LW, C, False, Alpha);
-      end;
+    begin
+      S.Poly([Px(0.24, 0.60), Px(0.24, 0.78), Px(0.76, 0.78), Px(0.76, 0.60)],
+        LW, C, False, Alpha);
+      S.Line(CX, Y + H * 0.20, CX, Y + H * 0.58, LW, C, Alpha);
+      S.Poly([Px(0.34, 0.44), Px(0.50, 0.60), Px(0.66, 0.44)], LW, C, False, Alpha);
+    end;
 
     ikPrint:
-      begin
-        S.Poly([Px(0.30, 0.36), Px(0.30, 0.20), Px(0.70, 0.20), Px(0.70, 0.36)],
-          LW, C, False, Alpha);
-        S.RoundFrame(Rect(Round(X + W * 0.18), Round(Y + H * 0.36),
-                          Round(X + W * 0.82), Round(Y + H * 0.66)),
-                     U * 0.08, LW, C, Alpha);
-        S.RoundFrame(Rect(Round(X + W * 0.32), Round(Y + H * 0.60),
-                          Round(X + W * 0.68), Round(Y + H * 0.84)),
-                     U * 0.05, LW, C, Alpha);
-      end;
+    begin
+      S.Poly([Px(0.30, 0.36), Px(0.30, 0.20), Px(0.70, 0.20), Px(0.70, 0.36)],
+        LW, C, False, Alpha);
+      S.RoundFrame(Rect(Round(X + W * 0.18), Round(Y + H * 0.36), Round(X + W * 0.82), Round(Y + H * 0.66)),
+        U * 0.08, LW, C, Alpha);
+      S.RoundFrame(Rect(Round(X + W * 0.32), Round(Y + H * 0.60), Round(X + W * 0.68), Round(Y + H * 0.84)),
+        U * 0.05, LW, C, Alpha);
+    end;
 
     ikTheme:
+    begin
+      { a contrast disc: outlined circle with one half filled }
+      S.Ring(CX, CY, U * 0.32, LW, C, Alpha);
+      RR := 0;
+      while RR < U * 0.30 do
       begin
-        { a contrast disc: outlined circle with one half filled }
-        S.Ring(CX, CY, U * 0.32, LW, C, Alpha);
-        RR := 0;
-        while RR < U * 0.30 do
-        begin
-          S.Arc(CX, CY, RR, -Pi / 2, Pi / 2, 1.3, C, Alpha);
-          RR := RR + 0.6;
-        end;
+        S.Arc(CX, CY, RR, -Pi / 2, Pi / 2, 1.3, C, Alpha);
+        RR := RR + 0.6;
       end;
+    end;
 
     ikGrid:
-      begin
-        S.RoundFrame(Rect(Round(X + W * 0.22), Round(Y + H * 0.22),
-                          Round(X + W * 0.78), Round(Y + H * 0.78)),
-                     U * 0.06, LW * 0.9, C, Alpha);
-        S.Line(CX, Y + H * 0.22, CX, Y + H * 0.78, LW * 0.7, C, Alpha * 0.85);
-        S.Line(X + W * 0.22, CY, X + W * 0.78, CY, LW * 0.7, C, Alpha * 0.85);
-      end;
+    begin
+      S.RoundFrame(Rect(Round(X + W * 0.22), Round(Y + H * 0.22), Round(X + W * 0.78), Round(Y + H * 0.78)),
+        U * 0.06, LW * 0.9, C, Alpha);
+      S.Line(CX, Y + H * 0.22, CX, Y + H * 0.78, LW * 0.7, C, Alpha * 0.85);
+      S.Line(X + W * 0.22, CY, X + W * 0.78, CY, LW * 0.7, C, Alpha * 0.85);
+    end;
 
     ikHelp:
-      begin
-        S.Ring(CX, CY, U * 0.34, LW * 0.9, C, Alpha);
-        S.Arc(CX, CY - U * 0.10, U * 0.13, Pi * 0.95, Pi * 2.15, LW * 0.9, C, Alpha);
-        S.Line(CX + U * 0.005, CY - U * 0.01, CX + U * 0.005, CY + U * 0.10, LW * 0.9, C, Alpha);
-        S.Disc(CX, CY + U * 0.21, LW * 0.55, C, Alpha);
-      end;
+    begin
+      S.Ring(CX, CY, U * 0.34, LW * 0.9, C, Alpha);
+      S.Arc(CX, CY - U * 0.10, U * 0.13, Pi * 0.95, Pi * 2.15, LW * 0.9, C, Alpha);
+      S.Line(CX + U * 0.005, CY - U * 0.01, CX + U * 0.005, CY + U * 0.10, LW * 0.9, C, Alpha);
+      S.Disc(CX, CY + U * 0.21, LW * 0.55, C, Alpha);
+    end;
 
     ikUnits:
-      begin
-        { a ruler with tick marks }
-        S.RoundFrame(Rect(Round(X + W * 0.14), Round(Y + H * 0.36),
-                          Round(X + W * 0.86), Round(Y + H * 0.64)),
-                     U * 0.05, LW * 0.9, C, Alpha);
-        S.Line(X + W * 0.30, Y + H * 0.36, X + W * 0.30, Y + H * 0.52, LW * 0.7, C, Alpha);
-        S.Line(X + W * 0.44, Y + H * 0.36, X + W * 0.44, Y + H * 0.46, LW * 0.7, C, Alpha);
-        S.Line(X + W * 0.58, Y + H * 0.36, X + W * 0.58, Y + H * 0.52, LW * 0.7, C, Alpha);
-        S.Line(X + W * 0.72, Y + H * 0.36, X + W * 0.72, Y + H * 0.46, LW * 0.7, C, Alpha);
-      end;
+    begin
+      { a ruler with tick marks }
+      S.RoundFrame(Rect(Round(X + W * 0.14), Round(Y + H * 0.36), Round(X + W * 0.86), Round(Y + H * 0.64)),
+        U * 0.05, LW * 0.9, C, Alpha);
+      S.Line(X + W * 0.30, Y + H * 0.36, X + W * 0.30, Y + H * 0.52, LW * 0.7, C, Alpha);
+      S.Line(X + W * 0.44, Y + H * 0.36, X + W * 0.44, Y + H * 0.46, LW * 0.7, C, Alpha);
+      S.Line(X + W * 0.58, Y + H * 0.36, X + W * 0.58, Y + H * 0.52, LW * 0.7, C, Alpha);
+      S.Line(X + W * 0.72, Y + H * 0.36, X + W * 0.72, Y + H * 0.46, LW * 0.7, C, Alpha);
+    end;
 
     ikDim:
-      begin
-        { a dimension line between two extension lines }
-        S.Line(X + W * 0.20, Y + H * 0.22, X + W * 0.20, Y + H * 0.72, LW * 0.7, C, Alpha * 0.8);
-        S.Line(X + W * 0.80, Y + H * 0.22, X + W * 0.80, Y + H * 0.72, LW * 0.7, C, Alpha * 0.8);
-        S.Line(X + W * 0.20, Y + H * 0.60, X + W * 0.80, Y + H * 0.60, LW * 0.9, C, Alpha);
-        S.Triangle(PtF(X + W * 0.20, CY + U * 0.10),
-                   PtF(X + W * 0.34, CY + U * 0.02),
-                   PtF(X + W * 0.34, CY + U * 0.19), C, Alpha);
-        S.Triangle(PtF(X + W * 0.80, CY + U * 0.10),
-                   PtF(X + W * 0.66, CY + U * 0.02),
-                   PtF(X + W * 0.66, CY + U * 0.19), C, Alpha);
-      end;
+    begin
+      { a dimension line between two extension lines }
+      S.Line(X + W * 0.20, Y + H * 0.22, X + W * 0.20, Y + H * 0.72, LW * 0.7, C, Alpha * 0.8);
+      S.Line(X + W * 0.80, Y + H * 0.22, X + W * 0.80, Y + H * 0.72, LW * 0.7, C, Alpha * 0.8);
+      S.Line(X + W * 0.20, Y + H * 0.60, X + W * 0.80, Y + H * 0.60, LW * 0.9, C, Alpha);
+      S.Triangle(PtF(X + W * 0.20, CY + U * 0.10),
+        PtF(X + W * 0.34, CY + U * 0.02),
+        PtF(X + W * 0.34, CY + U * 0.19), C, Alpha);
+      S.Triangle(PtF(X + W * 0.80, CY + U * 0.10),
+        PtF(X + W * 0.66, CY + U * 0.02),
+        PtF(X + W * 0.66, CY + U * 0.19), C, Alpha);
+    end;
 
     ikMeasure:
-      begin
-        { calipers }
-        S.Line(X + W * 0.16, Y + H * 0.30, X + W * 0.84, Y + H * 0.30, LW, C, Alpha);
-        S.Line(X + W * 0.24, Y + H * 0.30, X + W * 0.24, Y + H * 0.78, LW, C, Alpha);
-        S.Line(X + W * 0.66, Y + H * 0.30, X + W * 0.66, Y + H * 0.66, LW, C, Alpha);
-        S.Line(X + W * 0.16, Y + H * 0.20, X + W * 0.16, Y + H * 0.40, LW * 0.8, C, Alpha);
-        S.Line(X + W * 0.84, Y + H * 0.20, X + W * 0.84, Y + H * 0.40, LW * 0.8, C, Alpha);
-      end;
+    begin
+      { calipers }
+      S.Line(X + W * 0.16, Y + H * 0.30, X + W * 0.84, Y + H * 0.30, LW, C, Alpha);
+      S.Line(X + W * 0.24, Y + H * 0.30, X + W * 0.24, Y + H * 0.78, LW, C, Alpha);
+      S.Line(X + W * 0.66, Y + H * 0.30, X + W * 0.66, Y + H * 0.66, LW, C, Alpha);
+      S.Line(X + W * 0.16, Y + H * 0.20, X + W * 0.16, Y + H * 0.40, LW * 0.8, C, Alpha);
+      S.Line(X + W * 0.84, Y + H * 0.20, X + W * 0.84, Y + H * 0.40, LW * 0.8, C, Alpha);
+    end;
 
     ikOrigin:
-      begin
-        S.Ring(CX, CY, U * 0.20, LW * 0.9, C, Alpha);
-        S.Line(CX - U * 0.38, CY, CX - U * 0.26, CY, LW * 0.9, C, Alpha);
-        S.Line(CX + U * 0.26, CY, CX + U * 0.38, CY, LW * 0.9, C, Alpha);
-        S.Line(CX, CY - U * 0.38, CX, CY - U * 0.26, LW * 0.9, C, Alpha);
-        S.Line(CX, CY + U * 0.26, CX, CY + U * 0.38, LW * 0.9, C, Alpha);
-      end;
+    begin
+      S.Ring(CX, CY, U * 0.20, LW * 0.9, C, Alpha);
+      S.Line(CX - U * 0.38, CY, CX - U * 0.26, CY, LW * 0.9, C, Alpha);
+      S.Line(CX + U * 0.26, CY, CX + U * 0.38, CY, LW * 0.9, C, Alpha);
+      S.Line(CX, CY - U * 0.38, CX, CY - U * 0.26, LW * 0.9, C, Alpha);
+      S.Line(CX, CY + U * 0.26, CX, CY + U * 0.38, LW * 0.9, C, Alpha);
+    end;
 
     ikOpen:
-      begin
-        { a folder }
-        S.Poly([Px(0.16, 0.74), Px(0.16, 0.30), Px(0.42, 0.30), Px(0.50, 0.40),
-                Px(0.84, 0.40), Px(0.84, 0.74)], LW * 0.9, C, True, Alpha);
-      end;
+    begin
+      { a folder }
+      S.Poly([Px(0.16, 0.74), Px(0.16, 0.30), Px(0.42, 0.30), Px(0.50, 0.40), Px(0.84, 0.40), Px(0.84, 0.74)], LW * 0.9, C, True, Alpha);
+    end;
 
     ikFit:
-      begin
-        S.RoundFrame(Rect(Round(X + W * 0.20), Round(Y + H * 0.24),
-                          Round(X + W * 0.80), Round(Y + H * 0.76)),
-                     U * 0.06, LW * 0.8, C, Alpha * 0.6);
-        S.Line(CX - U * 0.20, CY - U * 0.10, CX - U * 0.20, CY - U * 0.20, LW, C, Alpha);
-        S.Line(CX - U * 0.20, CY - U * 0.20, CX - U * 0.10, CY - U * 0.20, LW, C, Alpha);
-        S.Line(CX + U * 0.20, CY + U * 0.10, CX + U * 0.20, CY + U * 0.20, LW, C, Alpha);
-        S.Line(CX + U * 0.20, CY + U * 0.20, CX + U * 0.10, CY + U * 0.20, LW, C, Alpha);
-        S.Line(CX - U * 0.18, CY - U * 0.18, CX + U * 0.18, CY + U * 0.18, LW * 0.8, C, Alpha);
-      end;
+    begin
+      S.RoundFrame(Rect(Round(X + W * 0.20), Round(Y + H * 0.24), Round(X + W * 0.80), Round(Y + H * 0.76)),
+        U * 0.06, LW * 0.8, C, Alpha * 0.6);
+      S.Line(CX - U * 0.20, CY - U * 0.10, CX - U * 0.20, CY - U * 0.20, LW, C, Alpha);
+      S.Line(CX - U * 0.20, CY - U * 0.20, CX - U * 0.10, CY - U * 0.20, LW, C, Alpha);
+      S.Line(CX + U * 0.20, CY + U * 0.10, CX + U * 0.20, CY + U * 0.20, LW, C, Alpha);
+      S.Line(CX + U * 0.20, CY + U * 0.20, CX + U * 0.10, CY + U * 0.20, LW, C, Alpha);
+      S.Line(CX - U * 0.18, CY - U * 0.18, CX + U * 0.18, CY + U * 0.18, LW * 0.8, C, Alpha);
+    end;
 
     ikExport:
-      begin
-        S.Poly([Px(0.24, 0.62), Px(0.24, 0.80), Px(0.76, 0.80), Px(0.76, 0.62)],
-          LW, C, False, Alpha);
-        S.Line(CX, Y + H * 0.66, CX, Y + H * 0.24, LW, C, Alpha);
-        S.Poly([Px(0.34, 0.40), Px(0.50, 0.24), Px(0.66, 0.40)], LW, C, False, Alpha);
-      end;
+    begin
+      S.Poly([Px(0.24, 0.62), Px(0.24, 0.80), Px(0.76, 0.80), Px(0.76, 0.62)],
+        LW, C, False, Alpha);
+      S.Line(CX, Y + H * 0.66, CX, Y + H * 0.24, LW, C, Alpha);
+      S.Poly([Px(0.34, 0.40), Px(0.50, 0.24), Px(0.66, 0.40)], LW, C, False, Alpha);
+    end;
 
     ikArrow:
-      begin
-        S.Poly([Px(0.30, 0.16), Px(0.30, 0.78), Px(0.45, 0.63),
-                Px(0.56, 0.84), Px(0.66, 0.79), Px(0.55, 0.59), Px(0.74, 0.55)],
-          LW * 0.85, C, True, Alpha);
-      end;
+    begin
+      S.Poly([Px(0.30, 0.16), Px(0.30, 0.78), Px(0.45, 0.63), Px(0.56, 0.84), Px(0.66, 0.79), Px(0.55, 0.59), Px(0.74, 0.55)],
+        LW * 0.85, C, True, Alpha);
+    end;
 
     ikDroplet:
-      begin
-        S.Arc(CX, CY + U * 0.08, U * 0.26, 0, 2 * Pi, LW, C, Alpha);
-        S.Poly([PtF(CX - U * 0.185, CY - U * 0.10), PtF(CX, CY - U * 0.36),
-                PtF(CX + U * 0.185, CY - U * 0.10)], LW, C, False, Alpha);
-      end;
+    begin
+      S.Arc(CX, CY + U * 0.08, U * 0.26, 0, 2 * Pi, LW, C, Alpha);
+      S.Poly([PtF(CX - U * 0.185, CY - U * 0.10), PtF(CX, CY - U * 0.36), PtF(CX + U * 0.185, CY - U * 0.10)], LW, C, False, Alpha);
+    end;
   end;
 end;
 
 { A fresh sheet of paper. }
 procedure PaintScreenPaper(S: TArtSurface; const T: TTheme);
 var
-  X, Y: Integer;
+  X, Y: integer;
   C: TPix;
   P: PPix;
 begin
@@ -617,9 +592,9 @@ end;
 
 { The recess around the screen opening.  This is painted on the chassis, not
   on the sketch, so it never gets baked into the artwork. }
-procedure PaintScreenWell(S: TArtSurface; const R: TRect; Radius: Single);
+procedure PaintScreenWell(S: TArtSurface; const R: TRect; Radius: single);
 var
-  I: Integer;
+  I: integer;
 begin
   S.BlendMode := bmNormal;
   for I := 0 to 9 do
@@ -632,12 +607,11 @@ end;
 
 { A grid in real units, anchored to the drawing origin so the lines land on
   whole feet (or meters) no matter where the paper has been panned to. }
-procedure PaintMeasuredGrid(S: TArtSurface; const T: TTheme;
-  Ppu, OX, OY: Double; MajorEvery: Integer);
+procedure PaintMeasuredGrid(S: TArtSurface; const T: TTheme; Ppu, OX, OY: double; MajorEvery: integer);
 var
-  I, First, Last: Integer;
-  V: Double;
-  Major: Boolean;
+  I, First, Last: integer;
+  V: double;
+  Major: boolean;
 begin
   if Ppu < 3 then Exit;          // too dense to be anything but noise
   S.BlendMode := bmNormal;

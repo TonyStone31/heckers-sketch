@@ -19,20 +19,19 @@ uses
   hsHeckWriter, StrUtils, hsDialogSkin, InkEdit, InkListBox;
 
 type
-  TSourceAskState = procedure(out DocSeq, PickSeq: Int64) of object;
+  TSourceAskState = procedure(out DocSeq, PickSeq: int64) of object;
   { The sheet's text as saved.  LineThing may come back empty; it is then
     worked out from First and Last. }
-  TSourceAskSource = procedure(L, Hints, Names: TStrings;
-    out First, Last, LineThing: TIntArrayW; out SheetName: string) of object;
+  TSourceAskSource = procedure(L, Hints, Names: TStrings; out First, Last, LineThing: TIntArrayW; out SheetName: string) of object;
   TSourceAskPicked = procedure(out Picked: TIntArrayW) of object;
   TSourcePickThings = procedure(const Things: TIntArrayW) of object;
   { False with the line and reason when the text cannot become the drawing. }
-  TSourceApply = function(L: TStrings; out ErrLine: Integer; out Err: string): Boolean of object;
-  TSourceRunJigs = function: Integer of object;
+  TSourceApply = function(L: TStrings; out ErrLine: integer; out Err: string): boolean of object;
+  TSourceRunJigs = function: integer of object;
   { Runs the jig of this thing; True if it ran. }
-  TSourceRunJig = function(Thing: Integer): Boolean of object;
+  TSourceRunJig = function(Thing: integer): boolean of object;
   { Start or stop the sheet taking a point for the text. }
-  TSourcePick = procedure(On: Boolean) of object;
+  TSourcePick = procedure(On: boolean) of object;
   { Center and fit what is picked on the sheet. }
   TSourceCenter = procedure of object;
 
@@ -73,16 +72,13 @@ type
     procedure btnPickClick(Sender: TObject);
     procedure EditorChange(Sender: TObject);
     procedure btnUnfoldClick(Sender: TObject);
-    procedure edtFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure EditorSpecialLineColors(Sender: TObject; Line: integer;
-      var Special: boolean; var FG, BG: TColor);
+    procedure edtFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure EditorKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure EditorSpecialLineColors(Sender: TObject; Line: integer; var Special: boolean; var FG, BG: TColor);
     procedure EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
-    procedure EditorMouseLink(Sender: TObject; X, Y: Integer;
-      var AllowMouseLink: Boolean);
-    procedure EditorClickLink(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure EditorMouseLink(Sender: TObject; X, Y: integer; var AllowMouseLink: boolean);
+    procedure EditorClickLink(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -98,43 +94,42 @@ type
     FNames: TStringList;        { every named point: "line|name=place" }
     FHintWord: string;
     FWhat: string;
-    FEdited: Boolean;           { the text is being edited; it no longer follows the drawing }
-    FErrRow: Integer;
-    FDark: Boolean;
+    FEdited: boolean;           { the text is being edited; it no longer follows the drawing }
+    FErrRow: integer;
+    FDark: boolean;
     FPickBG, FPickFG: TColor;
     FFirst, FLast: TIntArrayW;  { thing -> its lines in FAll }
     FLineThing: TIntArrayW;     { line in FAll -> thing, or -1 }
     FRowLine: TIntArrayW;       { row shown in the editor -> line in FAll }
-    FLinePicked: array of Boolean;
+    FLinePicked: array of boolean;
     FPicked: TIntArrayW;
-    FDocSeq, FPickSeq: Int64;
-    FHaveState: Boolean;
-    FBusy: Boolean;             { we are moving the caret, not the person }
-    FCaretRow, FBlockA, FBlockB: Integer;
+    FDocSeq, FPickSeq: int64;
+    FHaveState: boolean;
+    FBusy: boolean;             { we are moving the caret, not the person }
+    FCaretRow, FBlockA, FBlockB: integer;
     FColors: TSynHsk2Syn;
     FComplete: THeckCompleter;
     FJigGutter: TJigGutter;
-    FFoldJigs: Boolean;           { fold the jigs' output on the next tick }
+    FFoldJigs: boolean;           { fold the jigs' output on the next tick }
     FPickFirst: TP3;              { the first point picked for the caret line }
-    FPickLine: Integer;           { which line that was; -1 for none }
-    FPicking: Boolean;
+    FPickLine: integer;           { which line that was; -1 for none }
+    FPicking: boolean;
     FCompleteChange: TNotifyEvent;
     FCompleteKey: TKeyEvent;
-    procedure SetEdited(On_: Boolean; const Msg: string = '');
+    procedure SetEdited(On_: boolean; const Msg: string = '');
     procedure FoldToPicked;
     { The 0-based row that defines Name_, looking back from FromRow:
       "name = ..." in a points block, or "circle name". }
-    function DefinedAt(const Name_: string; FromRow: Integer): Integer;
+    function DefinedAt(const Name_: string; FromRow: integer): integer;
     { Where a named point is, from the nearest points block above. }
-    function WhereIs(const Name_: string; FromRow: Integer): string;
-    procedure FindNext(Back: Boolean);
+    function WhereIs(const Name_: string; FromRow: integer): string;
+    procedure FindNext(Back: boolean);
     procedure OpenJigOn(const Line: string);
-    procedure JumpTo(Row: Integer);
-    procedure EditorMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure JumpTo(Row: integer);
+    procedure EditorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure LoadText;
     procedure ShowRows;
-    procedure ShowPicked(Scroll: Boolean);
+    procedure ShowPicked(Scroll: boolean);
     procedure TellPicked;
   public
     OnAskState: TSourceAskState;
@@ -159,20 +154,20 @@ type
       left on the line, else "the line". }
     function PickWants: string;
     { Is this 0-based line a "jig = " line? }
-    function IsJigLine(Line: Integer): Boolean;
+    function IsJigLine(Line: integer): boolean;
     { The gutter's play button on a jig line was pressed. }
-    procedure RunJigAt(Line: Integer);
+    procedure RunJigAt(Line: integer);
     { Check now instead of waiting for the next tick. }
     procedure Refresh_;
-    procedure Say(Good: Boolean; Row: Integer; const Txt: string);
-    procedure EditRows(out A, B: Integer);
+    procedure Say(Good: boolean; Row: integer; const Txt: string);
+    procedure EditRows(out A, B: integer);
     { Match the program's theme, including the picked-line wash and axis colors. }
-    procedure UseDark(Dark: Boolean; Back, Fore: TColor);
+    procedure UseDark(Dark: boolean; Back, Fore: TColor);
     { The window around the page in the dialog theme (hsDialogSkin); the page
       itself is UseDark's. }
     procedure ThemeChrome;
     { The 1-based line number and text of thing I; False when the text is not current. }
-    function LineOfThing(I: Integer; out LineNo: Integer; out Line: string): Boolean;
+    function LineOfThing(I: integer; out LineNo: integer; out Line: string): boolean;
     { Public so a command or a test can press them. }
     procedure LoadSample;
     { Text put in as if typed, to look over and Apply - the assistant's
@@ -183,9 +178,9 @@ type
     procedure DuplicateLines;
     procedure ApplyNow;
     { Completion opens by itself, or only on Ctrl+Space. }
-    procedure SetAutoComplete(On: Boolean);
+    procedure SetAutoComplete(On: boolean);
   private
-    procedure PartToFill(const L: string; out A, B: Integer);
+    procedure PartToFill(const L: string; out A, B: integer);
   end;
 
   { A play mark in the gutter on every "jig = " line; clicking it runs that
@@ -198,7 +193,7 @@ type
     procedure MouseDown(const AnInfo: TSynEditMouseActionInfo); override;
     { Fold the jig's output under this line.  Done here because a friend of
       the editor can reach the folded view and the form cannot. }
-    procedure FoldLine(Line: Integer);
+    procedure FoldLine(Line: integer);
     property Form: TSourceForm read FForm write FForm;
   end;
 
@@ -213,11 +208,11 @@ const
   PICKED_BG = TColor($FFE2C2);   { a pale blue, under the picked lines }
   PICKED_FG = TColor($401000);
 
-{ TJigGutter }
+  { TJigGutter }
 
 procedure TJigGutter.Paint(Canvas: TCanvas; AClip: TRect; FirstLine, LastLine: integer);
 var
-  I, J, H, Cx, Cy: Integer;
+  I, J, H, Cx, Cy: integer;
   R: TRect;
   Range: TLineRange;
 begin
@@ -240,14 +235,14 @@ begin
   end;
 end;
 
-procedure TJigGutter.FoldLine(Line: Integer);
+procedure TJigGutter.FoldLine(Line: integer);
 begin
   TSynEditFoldedView(FoldedTextBuffer).FoldAtTextIndex(Line);
 end;
 
 procedure TJigGutter.MouseDown(const AnInfo: TSynEditMouseActionInfo);
 var
-  J: Integer;
+  J: integer;
 begin
   inherited MouseDown(AnInfo);
   if (FForm = nil) or (AnInfo.Button <> mbXLeft) then Exit;
@@ -317,20 +312,19 @@ begin
   ThemeChrome;
 end;
 
-function TSourceForm.IsJigLine(Line: Integer): Boolean;
+function TSourceForm.IsJigLine(Line: integer): boolean;
 var
   T: string;
 begin
   Result := False;
   if (Line < 0) or (Line >= Editor.Lines.Count) then Exit;
   T := LowerCase(TrimLeft(Editor.Lines[Line]));
-  Result := (Copy(T, 1, 3) = 'jig') and (Pos('=', T) > 0) and
-            (Trim(Copy(T, 4, Pos('=', T) - 4)) = '');
+  Result := (Copy(T, 1, 3) = 'jig') and (Pos('=', T) > 0) and (Trim(Copy(T, 4, Pos('=', T) - 4)) = '');
 end;
 
-procedure TSourceForm.RunJigAt(Line: Integer);
+procedure TSourceForm.RunJigAt(Line: integer);
 var
-  T: Integer;
+  T: integer;
 begin
   if FEdited then
   begin
@@ -339,8 +333,7 @@ begin
   end;
   { The group the line belongs to, mapped through the row map. }
   T := -1;
-  if (Line >= 0) and (Line < Length(FRowLine)) and (FRowLine[Line] >= 0) and
-     (FRowLine[Line] < Length(FLineThing)) then T := FLineThing[FRowLine[Line]];
+  if (Line >= 0) and (Line < Length(FRowLine)) and (FRowLine[Line] >= 0) and (FRowLine[Line] < Length(FLineThing)) then T := FLineThing[FRowLine[Line]];
   if T < 0 then Exit;
   if Assigned(OnRunJig) and OnRunJig(T) then Refresh_;
 end;
@@ -392,7 +385,7 @@ begin
   if FEdited then btnApplyClick(nil);
 end;
 
-procedure TSourceForm.SetAutoComplete(On: Boolean);
+procedure TSourceForm.SetAutoComplete(On: boolean);
 begin
   FComplete.Auto := On;
 end;
@@ -407,8 +400,8 @@ end;
   changed, relight the same text. }
 procedure TSourceForm.tmrFollowTimer(Sender: TObject);
 var
-  D, P: Int64;
-  I: Integer;
+  D, P: int64;
+  I: integer;
 begin
   if not Visible then Exit;
   { Fold the jigs now that the highlighter has been over the text; folds
@@ -440,7 +433,7 @@ end;
 
 procedure TSourceForm.LoadText;
 var
-  I, K: Integer;
+  I, K: integer;
   Name_: string;
 begin
   FAll.Clear;
@@ -461,7 +454,9 @@ begin
         if (K >= 0) and (K < FAll.Count) then FLineThing[K] := I;
   end;
   FWhat := 'The sheet as Heck.';
-  if Name_ <> '' then Caption := 'Source - ' + Name_ else Caption := 'Source';
+  if Name_ <> '' then Caption := 'Source - ' + Name_
+  else
+    Caption := 'Source';
 end;
 
 { Put the rows in the editor.  FRowLine maps each row to its sheet line.
@@ -469,7 +464,7 @@ end;
   out work without other changes. }
 procedure TSourceForm.ShowRows;
 var
-  I, WasTop: Integer;
+  I, WasTop: integer;
   L: TStringList;
 begin
   FBusy := True;
@@ -497,9 +492,9 @@ begin
   end;
 end;
 
-procedure TSourceForm.ShowPicked(Scroll: Boolean);
+procedure TSourceForm.ShowPicked(Scroll: boolean);
 var
-  I, K, FirstRow, Rows: Integer;
+  I, K, FirstRow, Rows: integer;
 begin
   SetLength(FPicked, 0);
   if Assigned(OnAskPicked) then OnAskPicked(FPicked);
@@ -517,7 +512,11 @@ begin
     visible, so the window does not jump around while picking. }
   FirstRow := -1;
   for I := 0 to High(FRowLine) do
-    if FLinePicked[FRowLine[I]] then begin FirstRow := I; Break; end;
+    if FLinePicked[FRowLine[I]] then
+    begin
+      FirstRow := I;
+      Break;
+    end;
   if Scroll and (FirstRow >= 0) then
   begin
     Rows := Editor.LinesInWindow;
@@ -526,7 +525,8 @@ begin
       FBusy := True;
       try
         if FirstRow + 1 > 3 then Editor.TopLine := FirstRow + 1 - 3
-        else Editor.TopLine := 1;
+        else
+          Editor.TopLine := 1;
       finally
         FBusy := False;
       end;
@@ -540,7 +540,7 @@ end;
   blocks, so the whole drawing is still there a line each. }
 procedure TSourceForm.FoldToPicked;
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   FBusy := True;
   try
@@ -565,17 +565,14 @@ end;
 procedure TSourceForm.TellPicked;
 begin
   if Length(FPicked) = 0 then
-    Status.Caption := Format('  %s  %d lines, %d things.  Click a line to pick it; ' +
-      'Ctrl+click a name to go to it.', [FWhat, FAll.Count, Length(FFirst)])
+    Status.Caption := Format('  %s  %d lines, %d things.  Click a line to pick it; ' + 'Ctrl+click a name to go to it.', [FWhat, FAll.Count, Length(FFirst)])
   else
-    Status.Caption := Format('  %s  %d lines, %d things.  %d picked.',
-      [FWhat, FAll.Count, Length(FFirst), Length(FPicked)]);
+    Status.Caption := Format('  %s  %d lines, %d things.  %d picked.', [FWhat, FAll.Count, Length(FFirst), Length(FPicked)]);
 end;
 
-procedure TSourceForm.EditorSpecialLineColors(Sender: TObject; Line: integer;
-  var Special: boolean; var FG, BG: TColor);
+procedure TSourceForm.EditorSpecialLineColors(Sender: TObject; Line: integer; var Special: boolean; var FG, BG: TColor);
 var
-  R: Integer;
+  R: integer;
 begin
   R := Line - 1;
   if R = FErrRow then
@@ -600,9 +597,9 @@ end;
   SynEdit reports status for many reasons. }
 procedure TSourceForm.EditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
 var
-  A, B, R, T, N, I: Integer;
+  A, B, R, T, N, I: integer;
   Things: TIntArrayW;
-  Dup: Boolean;
+  Dup: boolean;
 begin
   if FBusy or FEdited then Exit;
   if Changes * [scCaretY, scSelection] = [] then Exit;
@@ -629,7 +626,11 @@ begin
     if T < 0 then Continue;
     Dup := False;
     for I := 0 to N - 1 do
-      if Things[I] = T then begin Dup := True; Break; end;
+      if Things[I] = T then
+      begin
+        Dup := True;
+        Break;
+      end;
     if Dup then Continue;
     Things[N] := T;
     Inc(N);
@@ -653,9 +654,9 @@ begin
   TellPicked;
 end;
 
-function TSourceForm.DefinedAt(const Name_: string; FromRow: Integer): Integer;
+function TSourceForm.DefinedAt(const Name_: string; FromRow: integer): integer;
 var
-  R, P: Integer;
+  R, P: integer;
   T, Stem: string;
 begin
   Result := -1;
@@ -663,12 +664,13 @@ begin
   Stem := LowerCase(Name_);
   P := Length(Stem);
   while (P > 0) and (Stem[P] in ['0'..'9']) do Dec(P);
-  if (P = Length(Stem)) or (P = 0) then Stem := '' else Stem := Copy(Stem, 1, P);
+  if (P = Length(Stem)) or (P = 0) then Stem := ''
+  else
+    Stem := Copy(Stem, 1, P);
   for R := FromRow downto 0 do
   begin
     T := LowerCase(Trim(Editor.Lines[R]));
-    if (Copy(T, 1, Length(Name_) + 1) = LowerCase(Name_) + ' ') and
-       (Pos('=', T) > 0) and (Trim(Copy(T, Length(Name_) + 1, Pos('=', T) - Length(Name_) - 1)) = '') then
+    if (Copy(T, 1, Length(Name_) + 1) = LowerCase(Name_) + ' ') and (Pos('=', T) > 0) and (Trim(Copy(T, Length(Name_) + 1, Pos('=', T) - Length(Name_) - 1)) = '') then
       Exit(R);
     if T = 'circle ' + LowerCase(Name_) then Exit(R);
     { ra5 is a corner of "ring ra", but floor1 and top1 are their own names }
@@ -679,9 +681,9 @@ begin
     if LowerCase(Trim(Editor.Lines[R])) = 'circle ' + LowerCase(Name_) then Exit(R);
 end;
 
-function TSourceForm.WhereIs(const Name_: string; FromRow: Integer): string;
+function TSourceForm.WhereIs(const Name_: string; FromRow: integer): string;
 var
-  I, Bar, Eq, Ln, BestLn, Row: Integer;
+  I, Bar, Eq, Ln, BestLn, Row: integer;
   E: string;
 begin
   Result := '';
@@ -708,7 +710,7 @@ end;
   kind of file with. }
 procedure TSourceForm.OpenJigOn(const Line: string);
 var
-  A, B: Integer;
+  A, B: integer;
   F: string;
 begin
   A := Pos('''', Line);
@@ -722,7 +724,7 @@ begin
     OpenDocument(F);
 end;
 
-procedure TSourceForm.FindNext(Back: Boolean);
+procedure TSourceForm.FindNext(Back: boolean);
 var
   Opt: TSynSearchOptions;
 begin
@@ -733,13 +735,14 @@ begin
   begin
     { wrap around }
     if Back then Editor.CaretXY := Point(1, Editor.Lines.Count)
-    else Editor.CaretXY := Point(1, 1);
+    else
+      Editor.CaretXY := Point(1, 1);
     if Editor.SearchReplace(edtFind.Text, '', Opt) = 0 then
       Status.Caption := '  "' + edtFind.Text + '" is not in it.';
   end;
 end;
 
-procedure TSourceForm.edtFindKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TSourceForm.edtFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = 13 then
   begin
@@ -754,7 +757,7 @@ begin
 end;
 
 { Ctrl+F to the find box, F3 and Shift+F3 for next and previous }
-procedure TSourceForm.EditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TSourceForm.EditorKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   { Esc ends a pick here as it does on the sheet }
   if (Key = 27) and FPicking then
@@ -790,7 +793,7 @@ begin
 end;
 
 { the picked lines, or the caret's: first and last, 0-based }
-procedure TSourceForm.EditRows(out A, B: Integer);
+procedure TSourceForm.EditRows(out A, B: integer);
 begin
   A := Editor.CaretY - 1;
   B := A;
@@ -805,8 +808,8 @@ end;
 { Ctrl+/: the lines become comments, or stop being them when all are }
 procedure TSourceForm.ToggleComment;
 var
-  A, B, R, P: Integer;
-  All: Boolean;
+  A, B, R, P: integer;
+  All: boolean;
   L: string;
 begin
   EditRows(A, B);
@@ -848,7 +851,7 @@ end;
 { Ctrl+D: the line, or the picked lines, again below }
 procedure TSourceForm.DuplicateLines;
 var
-  A, B, R: Integer;
+  A, B, R: integer;
   T: string;
 begin
   EditRows(A, B);
@@ -867,12 +870,13 @@ end;
 
 { The text has been edited.  Until Apply or Revert the drawing is not
   read again, lines are not picked from it, and the sheet does not change. }
-procedure TSourceForm.SetEdited(On_: Boolean; const Msg: string);
+procedure TSourceForm.SetEdited(On_: boolean; const Msg: string);
 begin
   FEdited := On_;
   pnlApply.Visible := On_;
   if Msg <> '' then lblApply.Caption := Msg
-  else lblApply.Caption := 'Changed.  Apply makes the drawing match; nothing on the sheet moves until then.';
+  else
+    lblApply.Caption := 'Changed.  Apply makes the drawing match; nothing on the sheet moves until then.';
   if not On_ then
   begin
     FErrRow := -1;
@@ -884,7 +888,7 @@ end;
 
 { A line in the messages below the text.  Row is the text's 0-based line it
   is about, -1 for none; a click on it goes there. }
-procedure TSourceForm.Say(Good: Boolean; Row: Integer; const Txt: string);
+procedure TSourceForm.Say(Good: boolean; Row: integer; const Txt: string);
 var
   S: string;
 begin
@@ -899,10 +903,10 @@ end;
   is wrong, and where, before anything changes on the sheet. }
 procedure TSourceForm.tmrCheckTimer(Sender: TObject);
 var
-  ErrLine: Integer;
+  ErrLine: integer;
   Err: string;
   T0: QWord;
-  Ok_: Boolean;
+  Ok_: boolean;
 begin
   tmrCheck.Enabled := False;
   if not FEdited or not Assigned(OnCheck) then Exit;
@@ -930,7 +934,7 @@ end;
 
 procedure TSourceForm.lstMessagesClick(Sender: TObject);
 var
-  Row: Integer;
+  Row: integer;
 begin
   if (lstMessages.ItemIndex < 0) or (lstMessages.ItemIndex >= lstMessages.Items.Count) then Exit;
   Row := PtrInt(lstMessages.Items.Objects[lstMessages.ItemIndex]) - 1;
@@ -950,7 +954,7 @@ end;
 
 procedure TSourceForm.btnApplyClick(Sender: TObject);
 var
-  ErrLine, WasTop, CY: Integer;
+  ErrLine, WasTop, CY: integer;
   Err: string;
 begin
   if not Assigned(OnApply) then Exit;
@@ -1026,28 +1030,23 @@ begin
   end;
 end;
 
-procedure TSourceForm.EditorMouseLink(Sender: TObject; X, Y: Integer;
-  var AllowMouseLink: Boolean);
+procedure TSourceForm.EditorMouseLink(Sender: TObject; X, Y: integer; var AllowMouseLink: boolean);
 var
   W: string;
-  At: Integer;
+  At: integer;
 begin
   W := Editor.GetWordAtRowCol(Point(X, Y));
   At := DefinedAt(W, Y - 1);
-  AllowMouseLink := ((At >= 0) and (At <> Y - 1)) or
-    ((Y >= 1) and (Y <= Editor.Lines.Count) and
-     (LowerCase(Copy(Trim(Editor.Lines[Y - 1]), 1, 3)) = 'jig'));
+  AllowMouseLink := ((At >= 0) and (At <> Y - 1)) or ((Y >= 1) and (Y <= Editor.Lines.Count) and (LowerCase(Copy(Trim(Editor.Lines[Y - 1]), 1, 3)) = 'jig'));
 end;
 
-procedure TSourceForm.EditorClickLink(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TSourceForm.EditorClickLink(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   P: TPoint;
-  At: Integer;
+  At: integer;
 begin
   P := Editor.PixelsToLogicalPos(Point(X, Y));
-  if (P.Y >= 1) and (P.Y <= Editor.Lines.Count) and
-     (LowerCase(Copy(Trim(Editor.Lines[P.Y - 1]), 1, 3)) = 'jig') then
+  if (P.Y >= 1) and (P.Y <= Editor.Lines.Count) and (LowerCase(Copy(Trim(Editor.Lines[P.Y - 1]), 1, 3)) = 'jig') then
   begin
     OpenJigOn(Editor.Lines[P.Y - 1]);
     Exit;
@@ -1059,11 +1058,11 @@ end;
 
 { Hovering a name shows the line that defines it, and for a point written
   as a step, where it lands. }
-procedure TSourceForm.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TSourceForm.EditorMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
   P: TPoint;
   W, H: string;
-  At: Integer;
+  At: integer;
 begin
   P := Editor.PixelsToLogicalPos(Point(X, Y));
   W := Editor.GetWordAtRowCol(P);
@@ -1093,10 +1092,9 @@ begin
   if Editor.CanFocus then Editor.SetFocus;
 end;
 
-procedure TSourceForm.EditorMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TSourceForm.EditorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  A, B, R: Integer;
+  A, B, R: integer;
 begin
   if Editor.CanFocus and not Editor.Focused then Editor.SetFocus;
   { a double-click on a <part> starts picking for it }
@@ -1123,7 +1121,7 @@ begin
   end;
 end;
 
-function TSourceForm.LineOfThing(I: Integer; out LineNo: Integer; out Line: string): Boolean;
+function TSourceForm.LineOfThing(I: integer; out LineNo: integer; out Line: string): boolean;
 begin
   Result := False;
   LineNo := 0;
@@ -1137,7 +1135,7 @@ end;
 
 procedure TSourceForm.miCenterClick(Sender: TObject);
 var
-  A, B, Depth, R: Integer;
+  A, B, Depth, R: integer;
   T: string;
 begin
   if FEdited then Exit;
@@ -1156,8 +1154,7 @@ begin
       begin
         T := LowerCase(Trim(Editor.Lines[R]));
         if T = 'end' then Dec(Depth)
-        else if (T <> '') and (Pos('=', T) = 0) and (T <> 'begin') and
-                (T[Length(T)] <> ')') then Inc(Depth);
+        else if (T <> '') and (Pos('=', T) = 0) and (T <> 'begin') and (T[Length(T)] <> ')') then Inc(Depth);
         Inc(R);
       end;
       B := R - 1;
@@ -1180,7 +1177,7 @@ end;
 
 procedure TSourceForm.miGoToClick(Sender: TObject);
 var
-  At: Integer;
+  At: integer;
   W: string;
 begin
   W := Editor.GetWordAtRowCol(Editor.CaretXY);
@@ -1191,9 +1188,9 @@ end;
 
 { Go to a line as Lazarus goes to a definition: caret on the first word,
   the line shaded as the caret's, scrolled a few lines from the top. }
-procedure TSourceForm.JumpTo(Row: Integer);
+procedure TSourceForm.JumpTo(Row: integer);
 var
-  C: Integer;
+  C: integer;
   T: string;
 begin
   if (Row < 0) or (Row >= Editor.Lines.Count) then Exit;
@@ -1202,7 +1199,9 @@ begin
   while (C <= Length(T)) and (T[C] = ' ') do Inc(C);
   FBusy := True;
   try
-    if Row + 1 > 4 then Editor.TopLine := Row + 1 - 3 else Editor.TopLine := 1;
+    if Row + 1 > 4 then Editor.TopLine := Row + 1 - 3
+    else
+      Editor.TopLine := 1;
     Editor.CaretXY := Point(C, Row + 1);
     Editor.BlockBegin := Editor.CaretXY;
     Editor.BlockEnd := Editor.CaretXY;
@@ -1231,26 +1230,36 @@ end;
 
 { The <part> to fill: the one the caret is in, else the first on the line.
   A and B are its "<" and ">" positions, or 0. }
-procedure TSourceForm.PartToFill(const L: string; out A, B: Integer);
+procedure TSourceForm.PartToFill(const L: string; out A, B: integer);
 var
-  X, P, Q: Integer;
+  X, P, Q: integer;
 begin
-  A := 0; B := 0;
+  A := 0;
+  B := 0;
   X := Editor.CaretX;
   P := Pos('<', L);
   while P > 0 do
   begin
     Q := PosEx('>', L, P + 1);
     if Q = 0 then Break;
-    if (X > P) and (X <= Q + 1) then begin A := P; B := Q; Exit; end;
-    if A = 0 then begin A := P; B := Q; end;
+    if (X > P) and (X <= Q + 1) then
+    begin
+      A := P;
+      B := Q;
+      Exit;
+    end;
+    if A = 0 then
+    begin
+      A := P;
+      B := Q;
+    end;
     P := PosEx('<', L, Q + 1);
   end;
 end;
 
 function TSourceForm.PickWants: string;
 var
-  Y, A, B: Integer;
+  Y, A, B: integer;
   L: string;
 begin
   Result := 'the line';
@@ -1263,9 +1272,9 @@ end;
 
 procedure TSourceForm.TakePoint(const P: TP3; U: TUnitSystem);
 var
-  Y, A, B: Integer;
+  Y, A, B: integer;
   L, T, Key, Add, Slot: string;
-  HasPlace: Boolean;
+  HasPlace: boolean;
 begin
   Y := Editor.CaretY - 1;
   if (Y < 0) or (Y >= Editor.Lines.Count) then Exit;
@@ -1283,13 +1292,15 @@ begin
     begin
       if FPickLine = Y then
         Add := Place2(Sub3(P, FPickFirst), U, True)
-      else Add := Place2(P, U, True);
+      else
+        Add := Place2(P, U, True);
     end
     else if Slot = 'radius' then
     begin
       if FPickLine = Y then
         Add := Len2(Sqrt(Sqr(P.X - FPickFirst.X) + Sqr(P.Y - FPickFirst.Y) + Sqr(P.Z - FPickFirst.Z)), U)
-      else Add := Len2(1, U);
+      else
+        Add := Len2(1, U);
     end
     else
     begin
@@ -1311,8 +1322,7 @@ begin
   Key := Copy(T, 1, Pos(' ', T + ' ') - 1);
   if Pos('=', Key) > 0 then Key := Copy(Key, 1, Pos('=', Key) - 1);
   if Y <> FPickLine then FPickLine := -1;
-  HasPlace := (FPickLine = Y) or (Pos(' east', T) > 0) or (Pos(' west', T) > 0) or
-              (Pos(' north', T) > 0) or (Pos(' south', T) > 0);
+  HasPlace := (FPickLine = Y) or (Pos(' east', T) > 0) or (Pos(' west', T) > 0) or (Pos(' north', T) > 0) or (Pos(' south', T) > 0);
   if not HasPlace then
   begin
     Add := Place2(P, U, False);
@@ -1322,23 +1332,26 @@ begin
   else if (Key = 'line') or (Key = 'guide') then
   begin
     if Pos(' to ', T) > 0 then Add := ' ' + Place2(P, U, False)
-    else Add := ' to ' + Place2(P, U, False);
+    else
+      Add := ' to ' + Place2(P, U, False);
   end
   else if (Key = 'box') or (Key = 'rect') or (Key = 'pull') or (Key = 'size') or (Key = 'by') then
   begin
     if (Pos(';', T) > 0) or (FPickLine <> Y) then Add := ' ' + Place2(P, U, False)
-    else Add := '; ' + Place2(Sub3(P, FPickFirst), U, True);
+    else
+      Add := '; ' + Place2(Sub3(P, FPickFirst), U, True);
   end
   else if Key = 'circle' then
   begin
     if (Pos(';', T) > 0) or (FPickLine <> Y) then Add := ' ' + Place2(P, U, False)
-    else Add := '; ' + Len2(Sqrt(Sqr(P.X - FPickFirst.X) + Sqr(P.Y - FPickFirst.Y) + Sqr(P.Z - FPickFirst.Z)), U);
+    else
+      Add := '; ' + Len2(Sqrt(Sqr(P.X - FPickFirst.X) + Sqr(P.Y - FPickFirst.Y) + Sqr(P.Z - FPickFirst.Z)), U);
   end
-  else Add := ' ' + Place2(P, U, False);
+  else
+    Add := ' ' + Place2(P, U, False);
   { Appended at the end of the line, with a space unless the line already
     ends in one or in "= ". }
-  if (L <> '') and (L[Length(L)] <> ' ') and (Add <> '') and (Add[1] <> ' ') and
-     (Add[1] <> ';') then Add := ' ' + Add;
+  if (L <> '') and (L[Length(L)] <> ' ') and (Add <> '') and (Add[1] <> ' ') and (Add[1] <> ';') then Add := ' ' + Add;
   Editor.CaretX := Length(L) + 1;
   Editor.InsertTextAtCaret(Add);
 end;
@@ -1351,7 +1364,7 @@ end;
 
 procedure TSourceForm.pmEditorPopup(Sender: TObject);
 var
-  R: Integer;
+  R: integer;
   T: string;
 begin
   R := Editor.CaretY - 1;
@@ -1379,9 +1392,9 @@ begin
   hsDialogSkin.ThemeForm(Self);
 end;
 
-procedure TSourceForm.UseDark(Dark: Boolean; Back, Fore: TColor);
+procedure TSourceForm.UseDark(Dark: boolean; Back, Fore: TColor);
 var
-  I: Integer;
+  I: integer;
 begin
   FDark := Dark;
   FColors.UseDark(Dark);
@@ -1394,7 +1407,8 @@ begin
   begin
     Editor.Gutter.Parts[I].MarkupInfo.Background := Back;
     if Dark then Editor.Gutter.Parts[I].MarkupInfo.Foreground := TColor($A0A0A0)
-    else Editor.Gutter.Parts[I].MarkupInfo.Foreground := TColor($606060);
+    else
+      Editor.Gutter.Parts[I].MarkupInfo.Foreground := TColor($606060);
   end;
   Editor.FoldedCodeColor.Foreground := TColor($A0A0A0);
   Editor.FoldedCodeColor.FrameColor := TColor($A0A0A0);

@@ -10,34 +10,52 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Dialogs, Controls, SysUtils, printer4lazarus,
+  Forms,
+  Dialogs,
+  Controls,
+  SysUtils,
+  printer4lazarus,
   {$IFDEF WINDOWS}Windows,{$ENDIF}
-  hsSurface, hsTriangulate, hsSkin, hsFilm, hsDialogSkin, hsRecorder, hsExport, hsExToy, hsDrawing, hsPaths, hsSingleCopy, hsSplash, hsNet, hsRadiant, hsMainForm;
+  hsSurface,
+  hsTriangulate,
+  hsSkin,
+  hsFilm,
+  hsDialogSkin,
+  hsRecorder,
+  hsExport,
+  hsExToy,
+  hsDrawing,
+  hsPaths,
+  hsSingleCopy,
+  hsSplash,
+  hsNet,
+  hsRadiant,
+  hsMainForm;
 
-{$R *.res}
-{$R hsdocicons.res}
+  {$R *.res}
+  {$R hsdocicons.res}
 
-{ --help is answered before any of the LCL starts up, so it prints and leaves
+ { --help is answered before any of the LCL starts up, so it prints and leaves
   rather than printing and then opening a window.  A GUI build on Windows has
   no console to write to, which is allowed to fail quietly. }
-{ Say so without needing the LCL to be up, since we are about to leave. }
-procedure ShowAlreadyRunning;
-begin
-  try
-    WriteLn('Heckers Sketch is already running.');
-    WriteLn('Only one copy at a time - they would share the same draft and');
-    WriteLn('overwrite each other.  Use --multi if you really want two.');
-    Flush(Output);
-  except
-  end;
-  {$IFDEF WINDOWS}
+  { Say so without needing the LCL to be up, since we are about to leave. }
+  procedure ShowAlreadyRunning;
+  begin
+    try
+      WriteLn('Heckers Sketch is already running.');
+      WriteLn('Only one copy at a time - they would share the same draft and');
+      WriteLn('overwrite each other.  Use --multi if you really want two.');
+      Flush(Output);
+    except
+    end;
+    {$IFDEF WINDOWS}
   MessageBoxW(0,
     'Heckers Sketch is already running.'#13#10#13#10 +
     'Only one copy at a time - two would share the same draft and overwrite '
     + 'each other''s work.',
     'Heckers Sketch', MB_OK or MB_ICONINFORMATION);
-  {$ENDIF}
-end;
+    {$ENDIF}
+  end;
 
 { After an update, the copy being replaced has not let go in the time
   allowed.  Say so and offer to keep waiting, rather than calling it a
@@ -45,84 +63,81 @@ end;
   old copy was sitting on a question nobody had answered yet, and the update
   ended with nothing running at all. }
 var
-  LCLStarted: Boolean = False;
+  LCLStarted: boolean = False;
 
-function KeepWaitingForOldCopy: Boolean;
-begin
-  if not LCLStarted then
+  function KeepWaitingForOldCopy: boolean;
   begin
-    Application.Initialize;
-    LCLStarted := True;
+    if not LCLStarted then
+    begin
+      Application.Initialize;
+      LCLStarted := True;
+    end;
+    Result := QuestionDlg('Heckers Sketch', 'The update is in place, but the copy it replaces has not closed yet - ' +
+      'it may be waiting for an answer.' + LineEnding + LineEnding + 'Close it, then press Keep waiting.', mtInformation,
+      [mrRetry, 'Keep waiting', 'IsDefault', mrCancel, 'Give up', 'IsCancel'], 0) = mrRetry;
   end;
-  Result := QuestionDlg('Heckers Sketch',
-    'The update is in place, but the copy it replaces has not closed yet - ' +
-    'it may be waiting for an answer.' + LineEnding + LineEnding +
-    'Close it, then press Keep waiting.',
-    mtInformation,
-    [mrRetry, 'Keep waiting', 'IsDefault', mrCancel, 'Give up', 'IsCancel'], 0) = mrRetry;
-end;
 
-{ --no-splash: for anything driving the program from a script }
-function AskedForNoSplash: Boolean;
-var
-  I: Integer;
-begin
-  Result := False;
-  for I := 1 to ParamCount do
-    if LowerCase(ParamStr(I)) = '--no-splash' then Result := True;
-end;
-
-function AskedForHelp: Boolean;
-var
-  I: Integer;
-  A: string;
-begin
-  Result := False;
-  for I := 1 to ParamCount do
+  { --no-splash: for anything driving the program from a script }
+  function AskedForNoSplash: boolean;
+  var
+    I: integer;
   begin
-    A := LowerCase(ParamStr(I));
-    if (A = '--help') or (A = '-h') or (A = '-?') or (A = '/?') then
-      Result := True;
+    Result := False;
+    for I := 1 to ParamCount do
+      if LowerCase(ParamStr(I)) = '--no-splash' then Result := True;
   end;
-  if not Result then Exit;
-  try
-    WriteLn('Heckers Sketch');
-    WriteLn;
-    WriteLn('  etchasketch [switches] [drawing.hsk]');
-    WriteLn;
-    WriteLn('  --maximized        open filling the screen');
-    WriteLn('  --fullscreen       open with no window frame at all');
-    WriteLn('  --size=1600x1000   open at a particular size, centerd');
-    WriteLn('  --multi            open a second copy anyway');
-    WriteLn('  --no-splash        skip the start-up screen');
-    WriteLn('  --offline          never use the network - no update check, no reports');
-    WriteLn('  --blank            start on an empty sheet - no draft, no example');
-    WriteLn('                     (the last draft is kept as ...-before-blank.hsk)');
-    WriteLn('  --updated          wait for the copy being replaced to go');
-    WriteLn('  --help             this');
-    WriteLn;
-    WriteLn('Without a switch the window comes back the size and the place it');
-    WriteLn('was left.  A drawing named on the line is opened - in the running');
-    WriteLn('window, when there is one already.');
-    Flush(Output);
-  except
-    { no console; nothing to be done about it }
-  end;
-end;
 
-{ Did somebody ask for a second window on purpose? }
-function WantsAnother: Boolean;
-var
-  I: Integer;
-  A: string;
-begin
-  Result := False;
-  for I := 1 to ParamCount do
+  function AskedForHelp: boolean;
+  var
+    I: integer;
+    A: string;
   begin
-    A := LowerCase(ParamStr(I));
-    if (A = '--multi') or (A = '--new-instance') then Result := True;
+    Result := False;
+    for I := 1 to ParamCount do
+    begin
+      A := LowerCase(ParamStr(I));
+      if (A = '--help') or (A = '-h') or (A = '-?') or (A = '/?') then
+        Result := True;
+    end;
+    if not Result then Exit;
+    try
+      WriteLn('Heckers Sketch');
+      WriteLn;
+      WriteLn('  etchasketch [switches] [drawing.hsk]');
+      WriteLn;
+      WriteLn('  --maximized        open filling the screen');
+      WriteLn('  --fullscreen       open with no window frame at all');
+      WriteLn('  --size=1600x1000   open at a particular size, centerd');
+      WriteLn('  --multi            open a second copy anyway');
+      WriteLn('  --no-splash        skip the start-up screen');
+      WriteLn('  --offline          never use the network - no update check, no reports');
+      WriteLn('  --blank            start on an empty sheet - no draft, no example');
+      WriteLn('                     (the last draft is kept as ...-before-blank.hsk)');
+      WriteLn('  --updated          wait for the copy being replaced to go');
+      WriteLn('  --help             this');
+      WriteLn;
+      WriteLn('Without a switch the window comes back the size and the place it');
+      WriteLn('was left.  A drawing named on the line is opened - in the running');
+      WriteLn('window, when there is one already.');
+      Flush(Output);
+    except
+      { no console; nothing to be done about it }
+    end;
   end;
-end;
+
+  { Did somebody ask for a second window on purpose? }
+  function WantsAnother: boolean;
+  var
+    I: integer;
+    A: string;
+  begin
+    Result := False;
+    for I := 1 to ParamCount do
+    begin
+      A := LowerCase(ParamStr(I));
+      if (A = '--multi') or (A = '--new-instance') then Result := True;
+    end;
+  end;
 
 { Started by the copy it is replacing, which is still shutting down.
 
@@ -130,18 +145,18 @@ end;
   time is that two share a draft, and that is just as true during an update.
   Fifteen seconds is far longer than a close takes and still short enough that
   a genuinely stuck old copy does not leave somebody staring at nothing. }
-function AfterAnUpdate: Integer;
-var
-  I: Integer;
-begin
-  Result := 0;
-  for I := 1 to ParamCount do
-    if LowerCase(ParamStr(I)) = '--updated' then Result := 15;
-end;
+  function AfterAnUpdate: integer;
+  var
+    I: integer;
+  begin
+    Result := 0;
+    for I := 1 to ParamCount do
+      if LowerCase(ParamStr(I)) = '--updated' then Result := 15;
+  end;
 
 var
-  UpdateWait, I: Integer;
-  OnlyCopy: Boolean;
+  UpdateWait, I: integer;
+  OnlyCopy: boolean;
   ReqFile: string;
 
 begin

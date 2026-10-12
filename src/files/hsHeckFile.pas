@@ -18,45 +18,45 @@ type
     Name: string;
     Doc: TWorkDoc;               { the caller's to free }
     Units: TUnitSystem;
-    ScaleIdx, SnapIdx: Integer;
+    ScaleIdx, SnapIdx: integer;
     View: TViewKind;
-    CamKnown: Boolean;
-    Az, El, Zoom, ViewX, ViewY: Double;
-    SliceOn: Boolean;
-    SliceLo, SliceHi: Double;
+    CamKnown: boolean;
+    Az, El, Zoom, ViewX, ViewY: double;
+    SliceOn: boolean;
+    SliceLo, SliceHi: double;
     { Drafts and handoffs only: the tab's file, document, name and saved state. }
-    HasSession: Boolean;
-    DocKey: Integer;
+    HasSession: boolean;
+    DocKey: integer;
     FilePath, DocName: string;
-    Dirty: Boolean;
+    Dirty: boolean;
   end;
   THeckSheets = array of THeckSheet;
 
 { A sheet with the program's defaults and a new, empty drawing. }
 function NewHeckSheet(const Name: string): THeckSheet;
 { Judged by the first line that is not blank or a note. }
-function IsHeckText(L: TStrings): Boolean;
+function IsHeckText(L: TStrings): boolean;
 { Session adds each tab's file and document (drafts, handoffs).  Quick writes
   every face and skips reading the text back, for drafts saved every few seconds. }
-procedure WriteHeckFile(const Sheets: array of THeckSheet; L: TStrings; Session, Quick: Boolean);
+procedure WriteHeckFile(const Sheets: array of THeckSheet; L: TStrings; Session, Quick: boolean);
 { Appends each sheet to Sheets as a new drawing.  On failure returns False with
   the line and reason, and adds nothing. }
-function ReadHeckFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: Integer; out Err: string): Boolean;
+function ReadHeckFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: integer; out Err: string): boolean;
 { ReadHeckFile for Heck text; otherwise False with a message saying whether
   it is the old line format or not a drawing at all. }
-function ReadDrawingFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: Integer; out Err: string): Boolean;
+function ReadDrawingFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: integer; out Err: string): boolean;
 
 implementation
 
 const
   VIEW_WORDS: array[TViewKind] of string = ('plan', 'iso', '3d');
 
-function Num(V: Double): string;
+function Num(V: double): string;
 begin
   Result := FloatToStrF(V, ffGeneral, 12, 0, DotFS);
 end;
 
-function NumOf(const S: string; Def: Double): Double;
+function NumOf(const S: string; Def: double): double;
 begin
   Result := StrToFloatDef(Trim(S), Def, DotFS);
 end;
@@ -77,7 +77,7 @@ end;
 { the first line that is not blank or a note }
 function FirstWord(L: TStrings): string;
 var
-  I: Integer;
+  I: integer;
   S: string;
 begin
   Result := '';
@@ -89,16 +89,16 @@ begin
   end;
 end;
 
-function IsHeckText(L: TStrings): Boolean;
+function IsHeckText(L: TStrings): boolean;
 begin
   Result := AnsiStartsText('HeckersSketch', FirstWord(L)) or AnsiStartsText('Heck ', FirstWord(L));
 end;
 
 { ---- writing ---- }
 
-procedure WriteHeckFile(const Sheets: array of THeckSheet; L: TStrings; Session, Quick: Boolean);
+procedure WriteHeckFile(const Sheets: array of THeckSheet; L: TStrings; Session, Quick: boolean);
 var
-  I, K, Start: Integer;
+  I, K, Start: integer;
   One, Extra: TStringList;
   First, Last, LineThing: TIntArrayW;
   Scale: TDrawScale;
@@ -109,13 +109,14 @@ begin
     for I := 0 to High(Sheets) do
     begin
       Extra.Clear;
-      if Sheets[I].Units = usMetric then Extra.Add('units = mm') else Extra.Add('units = ft in');
+      if Sheets[I].Units = usMetric then Extra.Add('units = mm')
+      else
+        Extra.Add('units = ft in');
       Scale := ScaleTable(Sheets[I].Units, Sheets[I].ScaleIdx);
       Extra.Add('scale = ' + QuotedStr(Scale.Name));
       Extra.Add('snap = ' + QuotedStr(SnapName(Sheets[I].Units, Sheets[I].SnapIdx)));
       Extra.Add('view = ' + VIEW_WORDS[Sheets[I].View]);
-      Extra.Add('camera = ' + Num(Sheets[I].Az) + ', ' + Num(Sheets[I].El) + ', ' + Num(Sheets[I].Zoom) +
-        ', ' + Num(Sheets[I].ViewX) + ', ' + Num(Sheets[I].ViewY));
+      Extra.Add('camera = ' + Num(Sheets[I].Az) + ', ' + Num(Sheets[I].El) + ', ' + Num(Sheets[I].Zoom) + ', ' + Num(Sheets[I].ViewX) + ', ' + Num(Sheets[I].ViewY));
       if Sheets[I].SliceOn then
         Extra.Add('cut = ' + Num(Sheets[I].SliceLo) + ', ' + Num(Sheets[I].SliceHi));
       if Session then
@@ -150,13 +151,15 @@ end;
 procedure ApplyProps(var S: THeckSheet; P: TStringList);
 var
   V: string;
-  K: Integer;
+  K: integer;
   W: TStringArray;
   U: TUnitSystem;
 begin
   V := LowerCase(Trim(P.Values['units']));
   if V <> '' then
-    if (Pos('mm', V) > 0) or (V = 'm') then S.Units := usMetric else S.Units := usImperial;
+    if (Pos('mm', V) > 0) or (V = 'm') then S.Units := usMetric
+    else
+      S.Units := usImperial;
   U := S.Units;
   V := Unquote(P.Values['scale']);
   if V <> '' then
@@ -197,23 +200,23 @@ begin
   end;
 end;
 
-function ReadHeckFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: Integer; out Err: string): Boolean;
+function ReadHeckFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: integer; out Err: string): boolean;
 var
   Spans: THeckSheetSpans;
   Head, Chunk: TStringList;
-  I, K, Base, E: Integer;
-  LineOf: array of Integer;    { each line of Chunk in L }
+  I, K, Base, E: integer;
+  LineOf: array of integer;    { each line of Chunk in L }
   S: THeckSheet;
   U: TUnitSystem;
 
-  procedure Take(K: Integer);
+  procedure Take(K: integer);
   begin
     Chunk.Add(L[K]);
     SetLength(LineOf, Chunk.Count);
     LineOf[Chunk.Count - 1] := K;
   end;
 
-  function IsComment(const Line: string): Boolean;
+  function IsComment(const Line: string): boolean;
   begin
     Result := (Copy(Trim(Line), 1, 2) = '//') or (Copy(Trim(Line), 1, 1) = '{');
   end;
@@ -253,8 +256,7 @@ begin
       if (Trim(L[K]) <> '') and not IsComment(L[K]) then
       begin
         ErrLine := K;
-        Err := '"' + Trim(L[K]) + '" is after the last sheet''s "end": everything ' +
-          'goes inside a sheet';
+        Err := '"' + Trim(L[K]) + '" is after the last sheet''s "end": everything ' + 'goes inside a sheet';
         Exit;
       end;
     for I := 0 to High(Spans) do
@@ -275,7 +277,9 @@ begin
       begin
         S.Doc.Free;
         { Map the error back to the file's own line number. }
-        if (E >= 0) and (E < Length(LineOf)) then ErrLine := LineOf[E] else ErrLine := Spans[I].Head;
+        if (E >= 0) and (E < Length(LineOf)) then ErrLine := LineOf[E]
+        else
+          ErrLine := Spans[I].Head;
         for K := Base to High(Sheets) do Sheets[K].Doc.Free;
         SetLength(Sheets, Base);
         Exit;
@@ -291,7 +295,7 @@ begin
   end;
 end;
 
-function ReadDrawingFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: Integer; out Err: string): Boolean;
+function ReadDrawingFile(L: TStrings; var Sheets: THeckSheets; out ErrLine: integer; out Err: string): boolean;
 begin
   ErrLine := -1;
   Err := '';
@@ -299,8 +303,7 @@ begin
   { The old line format started with this; recognize it so the message says
     how to convert it instead of "not a drawing". }
   if AnsiStartsStr('HECKERS-SKETCH', FirstWord(L)) then
-    Err := 'It is a drawing in the old format, from before Heck.  Open it in ' +
-      'v2026.10.02.2 or earlier and save it again - it is saved as Heck - and ' +
+    Err := 'It is a drawing in the old format, from before Heck.  Open it in ' + 'v2026.10.02.2 or earlier and save it again - it is saved as Heck - and ' +
       'this version will open it.'
   else
     Err := 'That does not look like a Heckers Sketch drawing.';

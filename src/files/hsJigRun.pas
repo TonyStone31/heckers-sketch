@@ -17,16 +17,14 @@ uses
 function JigsDir: string;
 
 { 'star' with Points = 5, Radius = 2'  ->  star, and Points=5 Radius=24 }
-function ParseJigSpec(const Spec: string; U: TUnitSystem; out Name: string;
-  Args: TStrings; out Err: string): Boolean;
+function ParseJigSpec(const Spec: string; U: TUnitSystem; out Name: string; Args: TStrings; out Err: string): boolean;
 
 { The jig's file, or ''. }
 function FindJig(const Name: string): string;
 
 { False with Err when the jig is missing, will not start, runs too long, or
   exits with an error. }
-function RunJig(const Spec: string; U: TUnitSystem; Output: TStrings;
-  out Err: string): Boolean;
+function RunJig(const Spec: string; U: TUnitSystem; Output: TStrings; out Err: string): boolean;
 
 implementation
 
@@ -40,28 +38,26 @@ function JigsDir: string;
 begin
   Result := AppDataDir + 'jigs' + PathDelim;
   { Run from bin/ in the source tree, use the tree's jigs folder. }
-  if not DirectoryExists(Result) and (SourceTreeDir <> '') and
-     DirectoryExists(SourceTreeDir + 'jigs') then
+  if not DirectoryExists(Result) and (SourceTreeDir <> '') and DirectoryExists(SourceTreeDir + 'jigs') then
     Exit(SourceTreeDir + 'jigs' + PathDelim);
   ForceDirectories(Result);
 end;
 
-function SafeName(const Name: string): Boolean;
+function SafeName(const Name: string): boolean;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := (Name <> '') and (Length(Name) <= 64);
   for I := 1 to Length(Name) do
     if not (Name[I] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '-']) then Exit(False);
 end;
 
-function ParseJigSpec(const Spec: string; U: TUnitSystem; out Name: string;
-  Args: TStrings; out Err: string): Boolean;
+function ParseJigSpec(const Spec: string; U: TUnitSystem; out Name: string; Args: TStrings; out Err: string): boolean;
 var
   S, Rest, Item, Key, Val: string;
-  P, Q: Integer;
-  V: Double;
-  IsLen: Boolean;
+  P, Q: integer;
+  V: double;
+  IsLen: boolean;
 begin
   Result := False;
   Err := '';
@@ -113,7 +109,9 @@ begin
     if HeckValue(Val, U, V, IsLen) then
     begin
       if IsLen then
-        if U = usMetric then V := V * 304.8 else V := V * 12;
+        if U = usMetric then V := V * 304.8
+        else
+          V := V * 12;
       Val := FloatToStrF(V, ffGeneral, 12, 0, DotFS);
     end
     else if (Length(Val) >= 2) and (Val[1] = '''') and (Val[Length(Val)] = '''') then
@@ -134,7 +132,7 @@ const
   {$ENDIF}
 var
   SR: TSearchRec;
-  I: Integer;
+  I: integer;
 begin
   Result := '';
   if not SafeName(Name) then Exit;
@@ -157,7 +155,13 @@ begin
   Ext := LowerCase(ExtractFileExt(FileName));
   if Ext = '.pas' then
   begin
-    Result := ExeSearch('instantfpc' + {$IFDEF WINDOWS}'.exe'{$ELSE}''{$ENDIF}, GetEnvironmentVariable('PATH'));
+    Result := ExeSearch('instantfpc' +
+      {$IFDEF WINDOWS}
+'.exe'
+      {$ELSE}
+      ''
+      {$ENDIF}
+      , GetEnvironmentVariable('PATH'));
     if Result = '' then
     begin
       { Not on the PATH: the compiler's folder can be named in HSK_FPC_BIN. }
@@ -171,16 +175,40 @@ begin
   end
   else if Ext = '.py' then
   begin
-    Result := ExeSearch({$IFDEF WINDOWS}'python.exe'{$ELSE}'python3'{$ENDIF}, GetEnvironmentVariable('PATH'));
-    if Result = '' then Result := ExeSearch('python' + {$IFDEF WINDOWS}'.exe'{$ELSE}''{$ENDIF}, GetEnvironmentVariable('PATH'));
+    Result := ExeSearch(
+      {$IFDEF WINDOWS}
+'python.exe'
+      {$ELSE}
+      'python3'
+      {$ENDIF}
+      , GetEnvironmentVariable('PATH'));
+    if Result = '' then Result := ExeSearch('python' +
+        {$IFDEF WINDOWS}
+'.exe'
+        {$ELSE}
+        ''
+        {$ENDIF}
+        , GetEnvironmentVariable('PATH'));
   end
   else if Ext = '.pl' then
-    Result := ExeSearch('perl' + {$IFDEF WINDOWS}'.exe'{$ELSE}''{$ENDIF}, GetEnvironmentVariable('PATH'))
+    Result := ExeSearch('perl' +
+      {$IFDEF WINDOWS}
+'.exe'
+      {$ELSE}
+      ''
+      {$ENDIF}
+      , GetEnvironmentVariable('PATH'))
   else if Ext = '.sh' then
     Result := ExeSearch('sh', GetEnvironmentVariable('PATH'))
   else if Ext = '.ps1' then
   begin
-    Result := ExeSearch({$IFDEF WINDOWS}'powershell.exe'{$ELSE}'pwsh'{$ENDIF}, GetEnvironmentVariable('PATH'));
+    Result := ExeSearch(
+      {$IFDEF WINDOWS}
+'powershell.exe'
+      {$ELSE}
+      'pwsh'
+      {$ENDIF}
+      , GetEnvironmentVariable('PATH'));
     Pre.Add('-NoProfile');
     Pre.Add('-ExecutionPolicy');
     Pre.Add('Bypass');
@@ -195,14 +223,13 @@ begin
     Result := FileName;
 end;
 
-function RunJig(const Spec: string; U: TUnitSystem; Output: TStrings;
-  out Err: string): Boolean;
+function RunJig(const Spec: string; U: TUnitSystem; Output: TStrings; out Err: string): boolean;
 var
   Name, FileName, Runner, ErrText: string;
   Args, Pre: TStringList;
   P: TProcess;
-  Buf: array[0..4095] of Byte;
-  N, I: Integer;
+  Buf: array[0..4095] of byte;
+  N, I: integer;
   OutS, ErrS: TMemoryStream;
   Started: QWord;
 begin
@@ -222,8 +249,7 @@ begin
     Runner := RunnerFor(FileName, Pre);
     if Runner = '' then
     begin
-      Err := 'nothing on this machine runs a ' + ExtractFileExt(FileName) + ' file, which is what the jig "' +
-        Name + '" is';
+      Err := 'nothing on this machine runs a ' + ExtractFileExt(FileName) + ' file, which is what the jig "' + Name + '" is';
       Exit;
     end;
     P := TProcess.Create(nil);
@@ -276,8 +302,7 @@ begin
       if P.ExitStatus <> 0 then
       begin
         SetString(ErrText, PChar(ErrS.Memory), ErrS.Size);
-        Err := Format('the jig "%s" ended with an error (%d): %s', [Name, P.ExitStatus,
-          Trim(Copy(ErrText, 1, 400))]);
+        Err := Format('the jig "%s" ended with an error (%d): %s', [Name, P.ExitStatus, Trim(Copy(ErrText, 1, 400))]);
         Exit;
       end;
     finally

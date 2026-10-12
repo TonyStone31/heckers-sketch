@@ -17,7 +17,7 @@ uses
 type
   { draws a layout the search has found into the preview: the one whose
     list line is Picked, or the best so far when that is '' }
-  TRadiantPreviewEvent = procedure(C: TCanvas; W, H: Integer; const Picked: string) of object;
+  TRadiantPreviewEvent = procedure(C: TCanvas; W, H: integer; const Picked: string) of object;
 
   { TRadiantBusyForm }
 
@@ -50,7 +50,7 @@ type
     procedure btnStopAllClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure lbFoundClick(Sender: TObject);
     procedure CheckLabelClick(Sender: TObject);
     procedure lbFoundDblClick(Sender: TObject);
@@ -61,17 +61,17 @@ type
       time the search finds another, and the pick follows it }
     FPicked: string;
     { the search has returned; the window waits for Search again or Close }
-    FFinished: Boolean;
+    FFinished: boolean;
     procedure CaptionPreview;
-    procedure ShowCheck(Met: Boolean);
+    procedure ShowCheck(Met: boolean);
   public
     { Stop: the current zone keeps its best and the next zone starts. The
       search reads it between tries; the caller clears it for the next zone.
       Stop all: that, and no more zones. }
-    Stopping, StoppingAll: Boolean;
+    Stopping, StoppingAll: boolean;
     { set by the search as it ends: every zone met the goals, so the check
       stays up }
-    AllMet: Boolean;
+    AllMet: boolean;
     { the search, run once the window is up; the window closes when it returns }
     OnWork: TNotifyEvent;
     { draws the picked layout (or the best so far) live beside the list }
@@ -82,7 +82,7 @@ type
     { a zone that met the goals: the big green check, a moment to see it, and
       on to the next }
     procedure ZoneMet(const What: string);
-    procedure Stage(const AStage, ADetail: string; Percent: Integer);
+    procedure Stage(const AStage, ADetail: string; Percent: integer);
     { the solutions found so far, best first, one line each; the picked line
       stays picked while the list changes under it }
     procedure ShowFound(const Lines: array of string);
@@ -90,10 +90,10 @@ type
     function Picked: string;
     { the goals, editable during the search, and how long a zone may run.
       A goal box that does not hold a number leaves that goal as it was. }
-    procedure SetGoals(CoverPct, EvenPct: Double);
-    procedure ReadGoals(var CoverPct, EvenPct: Double);
+    procedure SetGoals(CoverPct, EvenPct: double);
+    procedure ReadGoals(var CoverPct, EvenPct: double);
     { seconds a zone is searched before giving up with its best, 0 for never }
-    function GiveUpSecs: Integer;
+    function GiveUpSecs: integer;
   end;
 
 implementation
@@ -103,7 +103,8 @@ implementation
 constructor TRadiantBusyForm.CreateBusy(AOwner: TCustomForm);
 begin
   inherited Create(AOwner);
-  Stopping := False; StoppingAll := False;
+  Stopping := False;
+  StoppingAll := False;
   FPicked := '';
   PopupMode := pmExplicit;
   PopupParent := AOwner;
@@ -117,12 +118,11 @@ end;
 
 { A drawn button cannot be the cancel button, so Escape is handled here:
   it stops this zone, keeping the best so far, while there is anything to stop. }
-procedure TRadiantBusyForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TRadiantBusyForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
-    if FFinished then ModalResult := mrOK
+    if FFinished then ModalResult := mrOk
     else if btnStop.Enabled then btnStopClick(btnStop);
     Key := 0;
   end;
@@ -158,7 +158,7 @@ begin
   end;
 end;
 
-procedure TRadiantBusyForm.ShowCheck(Met: Boolean);
+procedure TRadiantBusyForm.ShowCheck(Met: boolean);
 begin
   lblCheck.Caption := #$E2#$9C#$93;
   lblCheck.Font.Color := $0050C020;
@@ -173,7 +173,7 @@ begin
   ShowCheck(False);
 end;
 
-procedure TRadiantBusyForm.Stage(const AStage, ADetail: string; Percent: Integer);
+procedure TRadiantBusyForm.Stage(const AStage, ADetail: string; Percent: integer);
 begin
   lblStage.Caption := AStage;
   lblDetail.Caption := ADetail;
@@ -196,7 +196,8 @@ procedure TRadiantBusyForm.CaptionPreview;
 begin
   if (FPicked <> '') and (lbFound.ItemIndex >= 0) then
     lblPreview.Caption := Format('The one picked - number %d in the list', [lbFound.ItemIndex + 1])
-  else lblPreview.Caption := 'The best so far - click a layout in the list to see it';
+  else
+    lblPreview.Caption := 'The best so far - click a layout in the list to see it';
 end;
 
 procedure TRadiantBusyForm.pbPreviewPaint(Sender: TObject);
@@ -211,13 +212,17 @@ end;
 
 procedure TRadiantBusyForm.ShowFound(const Lines: array of string);
 var
-  I: Integer;
-  Same: Boolean;
+  I: integer;
+  Same: boolean;
 begin
   Same := lbFound.Items.Count = Length(Lines);
   if Same then
     for I := 0 to High(Lines) do
-      if lbFound.Items[I] <> Lines[I] then begin Same := False; Break; end;
+      if lbFound.Items[I] <> Lines[I] then
+      begin
+        Same := False;
+        Break;
+      end;
   if Same then Exit;
   lbFound.Items.BeginUpdate;
   try
@@ -239,15 +244,15 @@ begin
   Result := FPicked;
 end;
 
-procedure TRadiantBusyForm.SetGoals(CoverPct, EvenPct: Double);
+procedure TRadiantBusyForm.SetGoals(CoverPct, EvenPct: double);
 begin
   edBusyCover.Value := Round(CoverPct);
   edBusyEven.Value := Round(EvenPct);
 end;
 
-procedure TRadiantBusyForm.ReadGoals(var CoverPct, EvenPct: Double);
+procedure TRadiantBusyForm.ReadGoals(var CoverPct, EvenPct: double);
 var
-  V: Double;
+  V: double;
 begin
   V := edBusyCover.Value;
   if (V >= 0) and (V <= 100) then CoverPct := V;
@@ -264,18 +269,20 @@ begin
     with TBGRAThemeCheckBox(TLabel(Sender).FocusControl) do Checked := not Checked;
 end;
 
-function TRadiantBusyForm.GiveUpSecs: Integer;
+function TRadiantBusyForm.GiveUpSecs: integer;
 const
-  SECS: array[0..5] of Integer = (0, 60, 300, 900, 1800, 3600);
+  SECS: array[0..5] of integer = (0, 60, 300, 900, 1800, 3600);
 begin
   if (cbGiveUp.ItemIndex >= 0) and (cbGiveUp.ItemIndex <= High(SECS)) then Result := SECS[cbGiveUp.ItemIndex]
-  else Result := 0;
+  else
+    Result := 0;
 end;
 
 procedure TRadiantBusyForm.lbFoundClick(Sender: TObject);
 begin
   if lbFound.ItemIndex >= 0 then FPicked := lbFound.Items[lbFound.ItemIndex]
-  else FPicked := '';
+  else
+    FPicked := '';
   CaptionPreview;
   pbPreview.Invalidate;
 end;
@@ -291,7 +298,7 @@ procedure TRadiantBusyForm.btnStopAllClick(Sender: TObject);
 begin
   if FFinished then
   begin
-    ModalResult := mrOK;
+    ModalResult := mrOk;
     Exit;
   end;
   StoppingAll := True;

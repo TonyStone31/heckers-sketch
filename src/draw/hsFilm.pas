@@ -19,7 +19,7 @@ uses
 const
   { Films get big and slow fast, so length is capped. }
   FILM_MAX_SECONDS = 20;
-  FILM_MAX_FRAMES  = 300;
+  FILM_MAX_FRAMES = 300;
   { The frame rate asked for; FilmPlan lowers it to fit the budget. }
   FILM_FPS = 20;
   { A cap on total pixels across all frames, to keep the wait and the file
@@ -34,19 +34,19 @@ type
   { Where the camera was, and when.  A recording is a list of these, not
     pixels, so the film is rendered afterwards at any size. }
   TCamKey = record
-    T: Double;          { seconds from the start }
+    T: double;          { seconds from the start }
     V: TProjector;
   end;
   TCamPath = array of TCamKey;
 
 { The camera at time T, interpolated between the recorded keys. }
-function SampleCamPath(const P: TCamPath; T: Double): TProjector;
+function SampleCamPath(const P: TCamPath; T: double): TProjector;
 { How long the recording runs. }
-function CamPathLength(const P: TCamPath): Double;
+function CamPathLength(const P: TCamPath): double;
 
 { True when the clip ends where it began, judged from the clip itself.  A
   looping film needs to know: see TFilmLoop. }
-function CamPathCloses(const P: TCamPath): Boolean;
+function CamPathCloses(const P: TCamPath): boolean;
 
 { The three axes, as the drawing area draws them: solid one way from the
   origin, dashed the other. }
@@ -55,15 +55,13 @@ procedure PaintAxesOn(S: TArtSurface; const V: TProjector);
 { Draw the model into an existing surface, so a film reuses one surface
   instead of a new bitmap per frame.  Axes go UNDER the model, as on screen,
   so solids hide them. }
-procedure ShootInto(S: TArtSurface; Doc: TWorkDoc; const V: TProjector;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  const Bg: TPix; Quick: Boolean; Axes: Boolean = False);
+procedure ShootInto(S: TArtSurface; Doc: TWorkDoc; const V: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
+  const Bg: TPix; Quick: boolean; Axes: boolean = False);
 
 { One frame of the model at any size, with the screen's view.  Also used by
   printing and the bug report picture. }
-function ShootFrame(Doc: TWorkDoc; const V: TProjector; W, H: Integer;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  const Bg: TPix; Quick: Boolean; Axes: Boolean = False): TArtSurface;
+function ShootFrame(Doc: TWorkDoc; const V: TProjector; W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
+  const Bg: TPix; Quick: boolean; Axes: boolean = False): TArtSurface;
 
 { --- moving the camera ------------------------------------------------
 
@@ -71,60 +69,52 @@ function ShootFrame(Doc: TWorkDoc; const V: TProjector; W, H: Integer;
   drawing area.  WARNING: each one computes into a local before storing.
   At -O3 (release builds) the compiler can miscompile
   Field := Field + (Y - Ref) * K into a store near address zero. }
-procedure OrbitBy(var V: TProjector; DX, DY: Double);
-procedure PanBy(var V: TProjector; DX, DY: Double);
+procedure OrbitBy(var V: TProjector; DX, DY: double);
+procedure PanBy(var V: TProjector; DX, DY: double);
 
 { Zoom keeping the point under AX, AY fixed.  A screen position is
   O + Ppu * f(point), so scaling Ppu by k gives O' = A - k * (A - O). }
-procedure ZoomAt(var V: TProjector; Factor, AX, AY: Double);
+procedure ZoomAt(var V: TProjector; Factor, AX, AY: double);
 
 { Keep a model point at a fixed screen position.  A TProjector turns about
   the world origin, so every camera move ends with this to act as a pivot;
   otherwise a model far from the origin swings out of frame. }
-procedure HoldAt(var V: TProjector; const P: TP3; SX, SY: Double);
+procedure HoldAt(var V: TProjector; const P: TP3; SX, SY: double);
 
 { The canned camera moves for showing off a model. }
 type
   TWalk = (wkTurntable, wkRise, wkUnderOver, wkNod, wkHalfBack, wkCorners,
-           wkLookAll, wkPushIn);
+    wkLookAll, wkPushIn);
 
 const
   WALK_NAME: array[TWalk] of string =
-    ('Turntable - one turn on the spot',
-     'Rise - a turn, climbing as it goes',
-     'Underneath to over the top',
-     'Nod - down to up and back, no turn',
-     'Half a turn, and back again',
-     'Corner to corner, over the top',
-     'The full look - round, over and under',
-     'Push in - closing, drifting round');
+    ('Turntable - one turn on the spot', 'Rise - a turn, climbing as it goes', 'Underneath to over the top', 'Nod - down to up and back, no turn',
+    'Half a turn, and back again', 'Corner to corner, over the top', 'The full look - round, over and under', 'Push in - closing, drifting round');
 
 { The view for a canned walk at T, 0 to 1, starting from V0.  C is the point
   it turns about, held at screen point FrameX, FrameY. }
-function WalkAt(Kind: TWalk; const V0: TProjector; const C: TP3;
-  FrameX, FrameY, T: Double): TProjector;
+function WalkAt(Kind: TWalk; const V0: TProjector; const C: TP3; FrameX, FrameY, T: double): TProjector;
 
 { The scale Fitted uses for a W by H picture, for turning preview mouse
   moves back into the stored view's terms. }
-function ViewScale(SrcW, SrcH, W, H: Integer): Double;
+function ViewScale(SrcW, SrcH, W, H: integer): double;
 
 { The same view, framed for a different size of picture. }
-function Fitted(const V: TProjector; SrcW, SrcH, W, H: Integer): TProjector;
+function Fitted(const V: TProjector; SrcW, SrcH, W, H: integer): TProjector;
 
 { Eased from view A to B, T 0 to 1.  Zoom is interpolated geometrically so
   it looks even; added linearly it seems to slow down. }
-function TweenView(const A, B: TProjector; T: Double): TProjector;
+function TweenView(const A, B: TProjector; T: double): TProjector;
 
 { A still, written as PNG or JPEG.  Quality is for the JPEG only. }
-procedure SaveStill(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH, W, H: Integer;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  const Path: string; Jpeg: Boolean; Quality: Integer; Transparent, Axes: Boolean);
+procedure SaveStill(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH, W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix;
+  EdgeW: single; const Path: string; Jpeg: boolean; Quality: integer; Transparent, Axes: boolean);
 
 type
   { where a film says what it is up to }
   TStageSay = procedure(const S: string) of object;
   { progress, since a long film takes a while to render }
-  TFilmStep = procedure(Done, Total: Integer; const What: string) of object;
+  TFilmStep = procedure(Done, Total: integer; const What: string) of object;
 
 var
   OnFilmStage: TStageSay = nil;
@@ -132,8 +122,7 @@ var
 
 { How many frames a film of this length and size will get, and the frame
   rate that works out to, so the dialog can show it up front. }
-procedure FilmPlan(Seconds: Double; Fps, W, H: Integer;
-  out Frames, RealFps: Integer);
+procedure FilmPlan(Seconds: double; Fps, W, H: integer; out Frames, RealFps: integer);
 
 { How a film loops.
   flAsIs      first frame to last, once.
@@ -147,17 +136,14 @@ type
 { Write the recording to Path as an animated WebP; returns the frame count.
   WantSeconds sets the film's length (and so its speed); 0 keeps the
   recorded length. }
-function SavePathFilm(Doc: TWorkDoc; const Cam: TCamPath;
-  SrcW, SrcH, W, H: Integer; U: TUnitSystem; AFont: TFont;
-  const LabelCol: TPix; EdgeW: Single; Fps: Integer;
-  Loop, Axes: Boolean; const Path: string;
-  Bounce: Boolean = False; WantSeconds: Double = 0): Integer;
+function SavePathFilm(Doc: TWorkDoc; const Cam: TCamPath; SrcW, SrcH, W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix;
+  EdgeW: single; Fps: integer; Loop, Axes: boolean; const Path: string; Bounce: boolean = False; WantSeconds: double = 0): integer;
 
 implementation
 
 type
   { the view for frame I of Count }
-  TViewAt = function(I, Count: Integer): TProjector is nested;
+  TViewAt = function(I, Count: integer): TProjector is nested;
 
 { Reports what the film is doing, so a failure names the frame it died on. }
 procedure Say(const S: string);
@@ -165,37 +151,38 @@ begin
   if Assigned(OnFilmStage) then OnFilmStage(S);
 end;
 
-procedure Step(Done, Total: Integer; const What: string);
+procedure Step(Done, Total: integer; const What: string);
 begin
   if Assigned(OnFilmStep) then OnFilmStep(Done, Total, What);
 end;
 
-procedure FilmPlan(Seconds: Double; Fps, W, H: Integer;
-  out Frames, RealFps: Integer);
+procedure FilmPlan(Seconds: double; Fps, W, H: integer; out Frames, RealFps: integer);
 var
-  Room: Int64;
+  Room: int64;
 begin
   Seconds := Max(0.2, Min(FILM_MAX_SECONDS, Seconds));
   Fps := Max(2, Min(50, Fps));
   Frames := Max(2, Round(Seconds * Fps));
   if Frames > FILM_MAX_FRAMES then Frames := FILM_MAX_FRAMES;
-  Room := FILM_MAX_PIXELS div Max(Int64(1), Int64(W) * H);
+  Room := FILM_MAX_PIXELS div Max(int64(1), int64(W) * H);
   if Room < 2 then Room := 2;
   if Frames > Room then Frames := Room;
   RealFps := Max(1, Round(Frames / Seconds));
 end;
 
-function CamPathLength(const P: TCamPath): Double;
+function CamPathLength(const P: TCamPath): double;
 begin
-  if Length(P) = 0 then Result := 0 else Result := P[High(P)].T;
+  if Length(P) = 0 then Result := 0
+  else
+    Result := P[High(P)].T;
 end;
 
-function CamPathCloses(const P: TCamPath): Boolean;
+function CamPathCloses(const P: TCamPath): boolean;
 var
   A, B: TProjector;
 
-  { an angle brought back into -Pi..Pi, so 2*Pi reads as nothing }
-  function WrapPi(X: Double): Double;
+{ an angle brought back into -Pi..Pi, so 2*Pi reads as nothing }
+  function WrapPi(X: double): double;
   begin
     Result := X - 2 * Pi * Round(X / (2 * Pi));
   end;
@@ -207,14 +194,13 @@ begin
   B := P[High(P)].V;
   { Azimuth is compared modulo 2*Pi, since a turntable ends at Az + 2*Pi.
     0.01 radian is under a pixel of movement at any size. }
-  Result := (Abs(WrapPi(A.Az - B.Az)) < 0.01) and (Abs(A.El - B.El) < 0.01) and
-            (Abs(A.Ppu - B.Ppu) < 0.001 * Max(1E-9, Abs(A.Ppu))) and
-            (Abs(A.OX - B.OX) < 1.0) and (Abs(A.OY - B.OY) < 1.0);
+  Result := (Abs(WrapPi(A.Az - B.Az)) < 0.01) and (Abs(A.El - B.El) < 0.01) and (Abs(A.Ppu - B.Ppu) < 0.001 * Max(1E-9, Abs(A.Ppu))) and
+    (Abs(A.OX - B.OX) < 1.0) and (Abs(A.OY - B.OY) < 1.0);
 end;
 
 { Linear between two views, no easing; a recording already has the easing
   of the hand that made it. }
-function TweenLinear(const A, B: TProjector; T: Double): TProjector;
+function TweenLinear(const A, B: TProjector; T: double): TProjector;
 begin
   T := Max(0, Min(1, T));
   Result := A;
@@ -228,10 +214,10 @@ begin
     Result.Ppu := A.Ppu;
 end;
 
-function SampleCamPath(const P: TCamPath; T: Double): TProjector;
+function SampleCamPath(const P: TCamPath; T: double): TProjector;
 var
-  Lo, Hi, M: Integer;
-  Span: Double;
+  Lo, Hi, M: integer;
+  Span: double;
 begin
   if Length(P) = 0 then
   begin
@@ -245,7 +231,9 @@ begin
   while Hi - Lo > 1 do
   begin
     M := (Lo + Hi) div 2;
-    if P[M].T <= T then Lo := M else Hi := M;
+    if P[M].T <= T then Lo := M
+    else
+      Hi := M;
   end;
   Span := P[Hi].T - P[Lo].T;
   if Span <= 1E-9 then Exit(P[Lo].V);
@@ -254,8 +242,8 @@ end;
 
 procedure PaintAxesOn(S: TArtSurface; const V: TProjector);
 var
-  K, N: Integer;
-  L, Len, DX, DY: Double;
+  K, N: integer;
+  L, Len, DX, DY: double;
   B: TP3;
   PO, PB: TPointF;
   Col: TPix;
@@ -271,7 +259,8 @@ begin
     case K of
       0: B.X := L;
       1: B.Y := L;
-    else B.Z := L;
+      else
+        B.Z := L;
     end;
     PB := Project(V, B);
     Len := Sqrt(Sqr(PB.X - PO.X) + Sqr(PB.Y - PO.Y));
@@ -284,17 +273,17 @@ begin
     while N * 11 < Len do
     begin
       S.Line(PO.X + DX * (N * 11), PO.Y + DY * (N * 11),
-             PO.X + DX * (N * 11 + 6), PO.Y + DY * (N * 11 + 6),
-             1.4, Col, 0.42);
+        PO.X + DX * (N * 11 + 6), PO.Y + DY * (N * 11 + 6),
+        1.4, Col, 0.42);
       Inc(N);
     end;
   end;
   S.Touch;
 end;
 
-procedure OrbitBy(var V: TProjector; DX, DY: Double);
+procedure OrbitBy(var V: TProjector; DX, DY: double);
 var
-  A, E: Double;
+  A, E: double;
 begin
   { drag right and the model turns with the cursor, so azimuth goes down }
   A := V.Az - DX * 0.01;
@@ -305,9 +294,9 @@ begin
   V.El := E;
 end;
 
-procedure PanBy(var V: TProjector; DX, DY: Double);
+procedure PanBy(var V: TProjector; DX, DY: double);
 var
-  X, Y: Double;
+  X, Y: double;
 begin
   X := V.OX + DX;
   Y := V.OY + DY;
@@ -315,10 +304,10 @@ begin
   V.OY := Y;
 end;
 
-procedure HoldAt(var V: TProjector; const P: TP3; SX, SY: Double);
+procedure HoldAt(var V: TProjector; const P: TP3; SX, SY: double);
 var
   Q: TPointF;
-  X, Y: Double;
+  X, Y: double;
 begin
   Q := Project(V, P);
   if IsNan(Q.X) or IsNan(Q.Y) then Exit;
@@ -328,13 +317,12 @@ begin
   V.OY := Y;
 end;
 
-function WalkAt(Kind: TWalk; const V0: TProjector; const C: TP3;
-  FrameX, FrameY, T: Double): TProjector;
+function WalkAt(Kind: TWalk; const V0: TProjector; const C: TP3; FrameX, FrameY, T: double): TProjector;
 var
-  Turn: Double;
+  Turn: double;
 
-  { in and out again, 0 at both ends and 1 in the middle }
-  function Hump(U: Double): Double;
+{ in and out again, 0 at both ends and 1 in the middle }
+  function Hump(U: double): double;
   begin
     Result := Sin(Max(0, Min(1, U)) * Pi);
   end;
@@ -347,61 +335,61 @@ begin
       Result.Az := V0.Az + 2 * Pi * T;
 
     wkRise:
-      begin
-        { one turn, climbing from near the horizon to well above }
-        Result.Az := V0.Az + 2 * Pi * T;
-        Result.El := 0.18 + (1.15 - 0.18) * T;
-      end;
+    begin
+      { one turn, climbing from near the horizon to well above }
+      Result.Az := V0.Az + 2 * Pi * T;
+      Result.El := 0.18 + (1.15 - 0.18) * T;
+    end;
 
     wkUnderOver:
-      begin
+    begin
         { from below to above, with a quarter turn, for parts whose
           underside matters }
-        Result.Az := V0.Az + 0.5 * Pi * T;
-        Result.El := -1.15 + (1.15 - -1.15) * T;
-      end;
+      Result.Az := V0.Az + 0.5 * Pi * T;
+      Result.El := -1.15 + (1.15 - -1.15) * T;
+    end;
 
     wkNod:
-      begin
-        { no turn, just tilt down and up, for something with a front }
-        Result.El := V0.El - 1.0 + 2.0 * Hump(T);
-      end;
+    begin
+      { no turn, just tilt down and up, for something with a front }
+      Result.El := V0.El - 1.0 + 2.0 * Hump(T);
+    end;
 
     wkHalfBack:
-      begin
-        { half a turn and back, like picking a thing up to look at it }
-        Turn := Hump(T);
-        Result.Az := V0.Az + Pi * Turn;
-        Result.El := V0.El + 0.35 * Turn;
-      end;
+    begin
+      { half a turn and back, like picking a thing up to look at it }
+      Turn := Hump(T);
+      Result.Az := V0.Az + Pi * Turn;
+      Result.El := V0.El + 0.35 * Turn;
+    end;
 
     wkCorners:
-      begin
-        { one corner low to the opposite corner high, showing three faces }
-        Result.Az := V0.Az - Pi / 4 + (3 * Pi / 2) * T;
-        Result.El := 0.15 + 1.05 * T;
-      end;
+    begin
+      { one corner low to the opposite corner high, showing three faces }
+      Result.Az := V0.Az - Pi / 4 + (3 * Pi / 2) * T;
+      Result.El := 0.15 + 1.05 * T;
+    end;
 
     wkLookAll:
-      begin
+    begin
         { one turn round while the elevation goes over the top, under, then
           back up, so every face comes past the camera }
-        Result.Az := V0.Az + 2 * Pi * T;
-        if T < 0.25 then
-          Result.El := 0.45 + 0.85 * Hump(T / 0.25)        { over the top }
-        else if T < 0.5 then
-          Result.El := 0.45 - 1.20 * Hump((T - 0.25) / 0.25)  { and under }
-        else
-          Result.El := 0.45 + 0.55 * Hump((T - 0.5) / 0.5);   { level, then a lean }
-      end;
+      Result.Az := V0.Az + 2 * Pi * T;
+      if T < 0.25 then
+        Result.El := 0.45 + 0.85 * Hump(T / 0.25)        { over the top }
+      else if T < 0.5 then
+        Result.El := 0.45 - 1.20 * Hump((T - 0.25) / 0.25)  { and under }
+      else
+        Result.El := 0.45 + 0.55 * Hump((T - 0.5) / 0.5);   { level, then a lean }
+    end;
 
     wkPushIn:
-      begin
-        { a slow zoom in with a little drift, so you keep your bearings }
-        Result.Az := V0.Az + 0.7 * Pi * T;
-        Result.El := V0.El + 0.25 * T;
-        Result.Ppu := V0.Ppu * Exp(Ln(2.4) * T);
-      end;
+    begin
+      { a slow zoom in with a little drift, so you keep your bearings }
+      Result.Az := V0.Az + 0.7 * Pi * T;
+      Result.El := V0.El + 0.25 * T;
+      Result.Ppu := V0.Ppu * Exp(Ln(2.4) * T);
+    end;
   end;
   if Result.El < -1.45 then Result.El := -1.45;
   if Result.El > 1.45 then Result.El := 1.45;
@@ -409,7 +397,7 @@ begin
   HoldAt(Result, C, FrameX, FrameY);
 end;
 
-function ViewScale(SrcW, SrcH, W, H: Integer): Double;
+function ViewScale(SrcW, SrcH, W, H: integer): double;
 begin
   Result := 1;
   if (SrcW <= 0) or (SrcH <= 0) or (W <= 0) or (H <= 0) then Exit;
@@ -417,9 +405,9 @@ begin
   if Result < 1E-9 then Result := 1E-9;
 end;
 
-procedure ZoomAt(var V: TProjector; Factor, AX, AY: Double);
+procedure ZoomAt(var V: TProjector; Factor, AX, AY: double);
 var
-  P, X, Y: Double;
+  P, X, Y: double;
 begin
   if Factor <= 0 then Exit;
   P := V.Ppu * Factor;
@@ -434,9 +422,9 @@ begin
   V.OY := Y;
 end;
 
-function Fitted(const V: TProjector; SrcW, SrcH, W, H: Integer): TProjector;
+function Fitted(const V: TProjector; SrcW, SrcH, W, H: integer): TProjector;
 var
-  K: Double;
+  K: double;
 begin
   Result := V;
   if (SrcW <= 0) or (SrcH <= 0) or (W <= 0) or (H <= 0) then Exit;
@@ -447,11 +435,10 @@ begin
   Result.OY := H / 2 + (V.OY - SrcH / 2) * K;
 end;
 
-procedure ShootInto(S: TArtSurface; Doc: TWorkDoc; const V: TProjector;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  const Bg: TPix; Quick: Boolean; Axes: Boolean = False);
+procedure ShootInto(S: TArtSurface; Doc: TWorkDoc; const V: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
+  const Bg: TPix; Quick: boolean; Axes: boolean = False);
 var
-  WasQuick: Boolean;
+  WasQuick: boolean;
 begin
   if S = nil then Exit;
   if Bg.A < 255 then
@@ -478,9 +465,8 @@ begin
   end;
 end;
 
-function ShootFrame(Doc: TWorkDoc; const V: TProjector; W, H: Integer;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  const Bg: TPix; Quick: Boolean; Axes: Boolean = False): TArtSurface;
+function ShootFrame(Doc: TWorkDoc; const V: TProjector; W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
+  const Bg: TPix; Quick: boolean; Axes: boolean = False): TArtSurface;
 begin
   Result := TArtSurface.Create(Max(1, W), Max(1, H));
   { a surface smaller than asked for must not be written into }
@@ -495,7 +481,7 @@ end;
 { A straight copy: TPix and TBGRAPixel share the B, G, R, A layout. }
 function ToBGRA(S: TArtSurface): TBGRABitmap;
 var
-  Y: Integer;
+  Y: integer;
 begin
   Result := TBGRABitmap.Create(S.Width, S.Height);
   for Y := 0 to S.Height - 1 do
@@ -503,9 +489,9 @@ begin
   Result.InvalidateBitmap;
 end;
 
-function TweenView(const A, B: TProjector; T: Double): TProjector;
+function TweenView(const A, B: TProjector; T: double): TProjector;
 var
-  E: Double;
+  E: double;
 begin
   E := Max(0, Min(1, T));
   E := E * E * (3 - 2 * E);        { ease in and out }
@@ -520,9 +506,8 @@ begin
     Result.Ppu := A.Ppu;
 end;
 
-procedure SaveStill(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH, W, H: Integer;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  const Path: string; Jpeg: Boolean; Quality: Integer; Transparent, Axes: Boolean);
+procedure SaveStill(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH, W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix;
+  EdgeW: single; const Path: string; Jpeg: boolean; Quality: integer; Transparent, Axes: boolean);
 var
   S: TArtSurface;
   Bmp: TBGRABitmap;
@@ -531,9 +516,9 @@ var
   Bg: TPix;
 begin
   if Transparent and not Jpeg then Bg := Pix(255, 255, 255, 0)
-  else Bg := Pix(255, 255, 255);
-  S := ShootFrame(Doc, Fitted(V, SrcW, SrcH, W, H), W, H, U, AFont, LabelCol,
-    EdgeW, Bg, False, Axes);
+  else
+    Bg := Pix(255, 255, 255);
+  S := ShootFrame(Doc, Fitted(V, SrcW, SrcH, W, H), W, H, U, AFont, LabelCol, EdgeW, Bg, False, Axes);
   try
     Bmp := ToBGRA(S);
     try
@@ -565,12 +550,10 @@ end;
   encoded to lossless WebP as it is drawn and only the bytes are kept, so
   memory does not grow with length.  Keep it lossless: lossy WebP is grainy
   when you zoom in on line work. }
-function WriteFilm(Doc: TWorkDoc; SrcW, SrcH, W, H: Integer;
-  U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: Single;
-  Frames: Integer; Seconds: Double; Loop, Axes: Boolean; const Path: string;
-  const ViewAt: TViewAt): Integer;
+function WriteFilm(Doc: TWorkDoc; SrcW, SrcH, W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single; Frames: integer;
+  Seconds: double; Loop, Axes: boolean; const Path: string; const ViewAt: TViewAt): integer;
 var
-  I, Delay: Integer;
+  I, Delay: integer;
   S: TArtSurface;
   V: TProjector;
   Web: TWebPAnimWriter;
@@ -594,7 +577,7 @@ begin
         False, Axes);
       { straight off the surface: TPix is B, G, R, A, what the encoder reads }
       Say(Format('encoding frame %d of %d', [I + 1, Frames]));
-      if not Web.AddFrame(PByte(S.ScanLine(0)), Delay, S.Stride) then
+      if not Web.AddFrame(pbyte(S.ScanLine(0)), Delay, S.Stride) then
         raise Exception.CreateFmt('frame %d would not encode', [I + 1]);
     end;
     Say(Format('writing %s', [ExtractFileName(Path)]));
@@ -607,35 +590,32 @@ begin
   end;
 end;
 
-function SavePathFilm(Doc: TWorkDoc; const Cam: TCamPath;
-  SrcW, SrcH, W, H: Integer; U: TUnitSystem; AFont: TFont;
-  const LabelCol: TPix; EdgeW: Single; Fps: Integer;
-  Loop, Axes: Boolean; const Path: string;
-  Bounce: Boolean = False; WantSeconds: Double = 0): Integer;
+function SavePathFilm(Doc: TWorkDoc; const Cam: TCamPath; SrcW, SrcH, W, H: integer; U: TUnitSystem; AFont: TFont; const LabelCol: TPix;
+  EdgeW: single; Fps: integer; Loop, Axes: boolean; const Path: string; Bounce: boolean = False; WantSeconds: double = 0): integer;
 var
-  Secs, Clip: Double;
-  N, Rate: Integer;
+  Secs, Clip: double;
+  N, Rate: integer;
   Rec: TCamPath;
   How: TFilmLoop;
 
-  function At(I, Count: Integer): TProjector;
+  function At(I, Count: integer): TProjector;
   var
-    U01: Double;
+    U01: double;
   begin
     if Count < 2 then Exit(SampleCamPath(Rec, 0));
     case How of
       flBounce:
-        begin
+      begin
           { first half forward, second half back; the far end gets one frame
             and the film stops one step short of the start so it joins up }
-          U01 := 2 * I / Count;
-          if U01 > 1 then U01 := 2 - U01;
-        end;
+        U01 := 2 * I / Count;
+        if U01 > 1 then U01 := 2 - U01;
+      end;
       flSeamless:
         { one step short of the end, because the end is the beginning }
         U01 := I / Count;
-    else
-      U01 := I / (Count - 1);
+      else
+        U01 := I / (Count - 1);
     end;
     Result := SampleCamPath(Rec, Clip * U01);
   end;
@@ -643,16 +623,18 @@ var
 begin
   Rec := Cam;
   Clip := Max(0.2, CamPathLength(Cam));
-  if WantSeconds > 0 then Secs := WantSeconds else Secs := Clip;
+  if WantSeconds > 0 then Secs := WantSeconds
+  else
+    Secs := Clip;
   Secs := Max(0.2, Min(FILM_MAX_SECONDS, Secs));
 
   if CamPathCloses(Cam) then How := flSeamless
   else if Bounce then How := flBounce
-  else How := flAsIs;
+  else
+    How := flAsIs;
 
   FilmPlan(Secs, Fps, W, H, N, Rate);
-  Result := WriteFilm(Doc, SrcW, SrcH, W, H, U, AFont, LabelCol, EdgeW,
-    N, Secs, Loop, Axes, Path, @At);
+  Result := WriteFilm(Doc, SrcW, SrcH, W, H, U, AFont, LabelCol, EdgeW, N, Secs, Loop, Axes, Path, @At);
 end;
 
 end.

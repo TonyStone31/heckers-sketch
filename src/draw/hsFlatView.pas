@@ -12,8 +12,7 @@ uses
   Dialogs, BCButton, hsDrawing, hsUnfold, hsDialogSkin;
 
 { Put a pattern on screen.  Returns when the window is closed. }
-procedure ShowFlatPattern(const Pat: TFlatPattern; U: TUnitSystem;
-  const Caption: string);
+procedure ShowFlatPattern(const Pat: TFlatPattern; U: TUnitSystem; const Caption: string);
 
 implementation
 
@@ -28,7 +27,7 @@ type
     Units: TUnitSystem;
   end;
 
-{$R *.lfm}
+  {$R *.lfm}
 
 { The sheet stays white in either theme; only the button takes the skin. }
 procedure TFlatForm.FormCreate(Sender: TObject);
@@ -39,18 +38,18 @@ end;
 
 procedure TFlatForm.FormPaint(Sender: TObject);
 var
-  I, J, K, H, N: Integer;
-  Sc, OX, OY, W, HH, NX, NY, NL: Double;
-  HeadH, FootH: Integer;
+  I, J, K, H, N: integer;
+  Sc, OX, OY, W, HH, NX, NY, NL: double;
+  HeadH, FootH: integer;
   Pts: array of TPoint;
   S: string;
 
-  function SX(X: Double): Integer; inline;
+  function SX(X: double): integer; inline;
   begin
     Result := Round(OX + (X - Pat.MinX) * Sc);
   end;
 
-  function SY(Y: Double): Integer; inline;
+  function SY(Y: double): integer; inline;
   begin
     { screen Y runs down, sheet Y runs up }
     Result := Round(OY - (Y - Pat.MinY) * Sc);
@@ -84,8 +83,7 @@ begin
     begin
       SetLength(Pts, Length(Pat.Faces[I].Holes[H]));
       for J := 0 to High(Pat.Faces[I].Holes[H]) do
-        Pts[J] := Point(SX(Pat.Faces[I].Holes[H][J].X),
-                        SY(Pat.Faces[I].Holes[H][J].Y));
+        Pts[J] := Point(SX(Pat.Faces[I].Holes[H][J].X), SY(Pat.Faces[I].Holes[H][J].Y));
       if Length(Pts) >= 3 then Canvas.Polygon(Pts);
     end;
   end;
@@ -131,11 +129,11 @@ begin
           NY := NY * 12 / NL;
         end;
         Canvas.Line(SX(Pat.Edges[I].AX), SY(Pat.Edges[I].AY),
-                    SX(Pat.Edges[I].AX) + Round(NX), SY(Pat.Edges[I].AY) + Round(NY));
+          SX(Pat.Edges[I].AX) + Round(NX), SY(Pat.Edges[I].AY) + Round(NY));
       end
       else
         Canvas.Line(SX(Pat.Edges[I].AX), SY(Pat.Edges[I].AY),
-                    SX(Pat.Edges[I].BX), SY(Pat.Edges[I].BY));
+          SX(Pat.Edges[I].BX), SY(Pat.Edges[I].BY));
     end;
   Canvas.Pen.Style := psSolid;
   Canvas.Pen.Width := 1;
@@ -154,12 +152,12 @@ begin
 
   Canvas.Font.Color := $00303030;
   S := Format('%d panels, %d folds', [Length(Pat.Faces), 0]);
-  K := 0; N := 0;
+  K := 0;
+  N := 0;
   for I := 0 to High(Pat.Edges) do
     if Pat.Edges[I].Kind = fkBend then Inc(K)
     else if Pat.Edges[I].Kind = fkNotch then Inc(N);
-  S := Format('%d panels, %d folds, %d brake notches  -  solid is cut, ' +
-    'dashed is folded', [Length(Pat.Faces), K, N div 2]);
+  S := Format('%d panels, %d folds, %d brake notches  -  solid is cut, ' + 'dashed is folded', [Length(Pat.Faces), K, N div 2]);
   Canvas.TextOut(16, ClientHeight - 26, S);
 
   if Pat.Overlaps then
@@ -173,8 +171,7 @@ begin
   begin
     Canvas.Font.Color := $000000C0;
     Canvas.TextOut(16, ClientHeight - 44,
-      Format('Only %d of %d panels are joined to the rest.',
-        [Pat.Laid, Pat.Total]));
+      Format('Only %d of %d panels are joined to the rest.', [Pat.Laid, Pat.Total]));
   end;
 end;
 
@@ -203,8 +200,7 @@ begin
   end;
 end;
 
-procedure ShowFlatPattern(const Pat: TFlatPattern; U: TUnitSystem;
-  const Caption: string);
+procedure ShowFlatPattern(const Pat: TFlatPattern; U: TUnitSystem; const Caption: string);
 var
   F: TFlatForm;
 begin

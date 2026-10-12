@@ -12,30 +12,38 @@ program makemannequin;
 {$mode objfpc}{$H+}
 
 uses
-  SysUtils, Classes, Math, Types, Process, Graphics, hsDrawing, hsHeckReader, exwrite;
+  SysUtils,
+  Classes,
+  Math,
+  Types,
+  Process,
+  Graphics,
+  hsDrawing,
+  hsHeckReader,
+  exwrite;
 
 const
   { the jig line on the group; the jig itself takes inches }
   SPEC = '''body'' with Height = 6'', Weight = 150';
-  ART_W = 1200; ART_H = 760;
+  ART_W = 1200;
+  ART_H = 760;
 
 var
   D: TWorkDoc;
   Out_, U, Printed: TStringList;
   Body: string;
-  I, G, ErrLine, F, N: Integer;
+  I, G, ErrLine, F, N: integer;
   Err: string;
   BLo, BHi, CamMid, SLo, SHi: TP3;
   CamV: TProjector;
   CamP: TPointF;
-  BaseP, CamZoom: Double;
+  BaseP, CamZoom: double;
 begin
   D := TWorkDoc.Create;
   Out_ := TStringList.Create;
   Printed := TStringList.Create;
   try
-    if not RunCommand('python3', ['../jigs/body.py', 'Height=72', 'Weight=150'], Body,
-      [poUsePipes, poStderrToOutPut]) then
+    if not RunCommand('python3', ['../jigs/body.py', 'Height=72', 'Weight=150'], Body, [poUsePipes, poStderrToOutPut]) then
     begin
       WriteLn('the jig did not run: ', Copy(Body, 1, 300));
       Halt(1);
@@ -61,21 +69,23 @@ begin
     CamV.Kind := vkOrbit;
     CamV.Az := -0.75;
     CamV.El := 0.12;
-    CamV.Ppu := 1; CamV.OX := 0; CamV.OY := 0;
-    SLo := P3(1E30, 1E30, 0); SHi := P3(-1E30, -1E30, 0);
+    CamV.Ppu := 1;
+    CamV.OX := 0;
+    CamV.OY := 0;
+    SLo := P3(1E30, 1E30, 0);
+    SHi := P3(-1E30, -1E30, 0);
     for I := 0 to 7 do
     begin
-      CamP := Project(CamV, P3(
-        specialize IfThen<Double>((I and 1) = 0, BLo.X, BHi.X),
-        specialize IfThen<Double>((I and 2) = 0, BLo.Y, BHi.Y),
-        specialize IfThen<Double>((I and 4) = 0, BLo.Z, BHi.Z)));
-      SLo.X := Min(SLo.X, CamP.X); SHi.X := Max(SHi.X, CamP.X);
-      SLo.Y := Min(SLo.Y, CamP.Y); SHi.Y := Max(SHi.Y, CamP.Y);
+      CamP := Project(CamV, P3(specialize IfThen<double>((I and 1) = 0, BLo.X, BHi.X), specialize IfThen<double>(
+        (I and 2) = 0, BLo.Y, BHi.Y), specialize IfThen<double>((I and 4) = 0, BLo.Z, BHi.Z)));
+      SLo.X := Min(SLo.X, CamP.X);
+      SHi.X := Max(SHi.X, CamP.X);
+      SLo.Y := Min(SLo.Y, CamP.Y);
+      SHi.Y := Max(SHi.Y, CamP.Y);
     end;
     { fitted to the height, with room under the feet; the canvas is smaller
       than the window }
-    CamZoom := Min((ART_W * 0.86) / ((SHi.X - SLo.X) * BaseP),
-                   (ART_H * 0.5) / ((SHi.Y - SLo.Y) * BaseP));
+    CamZoom := Min((ART_W * 0.86) / ((SHi.X - SLo.X) * BaseP), (ART_H * 0.5) / ((SHi.Y - SLo.Y) * BaseP));
     CamV.Ppu := BaseP * CamZoom;
     CamP := Project(CamV, CamMid);
 
@@ -109,11 +119,12 @@ begin
     U.SaveToFile('../src/examples/hsExMannequin.pas');
     U.Free;
 
-    F := 0; N := 0;
+    F := 0;
+    N := 0;
     for I := 0 to D.Live - 1 do
-      if D[I].Kind = ekFace then Inc(F) else if D[I].Kind = ekLine then Inc(N);
-    WriteLn(Format('wrote mannequin.hsk and ../src/examples/hsExMannequin.pas: %d faces, %d lines, %d lines of text',
-      [F, N, Out_.Count]));
+      if D[I].Kind = ekFace then Inc(F)
+      else if D[I].Kind = ekLine then Inc(N);
+    WriteLn(Format('wrote mannequin.hsk and ../src/examples/hsExMannequin.pas: %d faces, %d lines, %d lines of text', [F, N, Out_.Count]));
   finally
     Printed.Free;
     Out_.Free;

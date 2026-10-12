@@ -19,20 +19,18 @@ type
 { True when all of it was read; otherwise Err says why and ErrLine which
   line of L (from 0).  Things go into D as they are read, so read into a
   scratch document and throw it away on False. }
-function ReadHeck(L: TStrings; D: TWorkDoc; U: TUnitSystem;
-  out ErrLine: Integer; out Err: string): Boolean;
+function ReadHeck(L: TStrings; D: TWorkDoc; U: TUnitSystem; out ErrLine: integer; out Err: string): boolean;
 
 { The same, and tells the writer which faces the edges closed by
   themselves; see hsHeckWriter.ReadBack. }
-function ReadHeckImplied(L: TStrings; D: TWorkDoc; U: TUnitSystem;
-  out ErrLine: Integer; out Err: string; out Implied: TBoolArray): Boolean;
+function ReadHeckImplied(L: TStrings; D: TWorkDoc; U: TUnitSystem; out ErrLine: integer; out Err: string; out Implied: TBoolArray): boolean;
 
 { One length or plain number, for a jig's values.  Lengths come back in
   feet with IsLength set. }
 type
   { one top-level sheet of a Heck file; see HeckSheets }
   THeckSheetSpan = record
-    Head, Tail: Integer;      { its "sheet" line and its "end", in the text's own numbering }
+    Head, Tail: integer;      { its "sheet" line and its "end", in the text's own numbering }
     Name: string;
     Props: TStringList;       { its own "name = value" lines: names lowercase, values as written }
   end;
@@ -42,8 +40,7 @@ type
   Each span's Props is the caller's to free.  Text with no sheet block gives none. }
 function HeckSheets(L: TStrings): THeckSheetSpans;
 
-function HeckValue(const S: string; U: TUnitSystem; out V: Double;
-  out IsLength: Boolean): Boolean;
+function HeckValue(const S: string; U: TUnitSystem; out V: double; out IsLength: boolean): boolean;
 
 implementation
 
@@ -52,8 +49,9 @@ uses
 
 type
   TValKind = (vPlain, vLen, vAngle);
+
   TVal = record
-    V: Double;
+    V: double;
     K: TValKind;
   end;
 
@@ -70,122 +68,128 @@ type
   THeckReader = class
   private
     Src: TStringList;         { logical lines: notes gone, bracketed lists joined }
-    At: array of Integer;     { the line of the text each came from }
+    At: array of integer;     { the line of the text each came from }
     { the comments of each logical line: the lines above it and the one at its
       end; Carry is what is waiting for the next thing }
     LeadOf, TailOf: array of string;
     Carry: string;
-    Cur: Integer;
+    Cur: integer;
     D: TWorkDoc;
     U: TUnitSystem;
     Scopes: array of TScope;
     Consts: TStringList;      { name=  with the value in Vals }
     Vals: array of TVal;
     DefInk: TColor;
-    DefWidth: Single;
-    DefSides: Integer;
+    DefWidth: single;
+    DefSides: integer;
     { the solids read, and their paint, for the faces their edges imply }
-    Solids: array of record G: Integer; HasPaint: Boolean; Paint: TColor; end;
+    Solids: array of record
+      G: integer;
+      HasPaint: boolean;
+      Paint: TColor;
+      end;
     { Closed loops that are not faces ("noface = ..."), each with the solid it
       was given in, or 0 for the top level.  The same corners can be a face of
       one solid and a loop of another. }
     NoFaces: array of TLoop;
-    NoFaceGrp: array of Integer;
+    NoFaceGrp: array of integer;
     { "faces = said" in the header: make no faces from the lines at all }
-    AllSaid: Boolean;
+    AllSaid: boolean;
     { faces written out in full ("face = ..."); they give their own holes and
       are not cut by a circle lying on them }
-    Explicit: array of Integer;
+    Explicit: array of integer;
     { one flag per thing: a face its scope's edges close exactly, alone, and
       facing the way it would have been made; for the writer }
-    Implied: array of Boolean;
+    Implied: array of boolean;
     { a face its scope's edges close exactly and alone, whichever way it
       faces: HomeLooseFaces settles Implied for a disk it gives a solid }
-    Closes: array of Boolean;
+    Closes: array of boolean;
     { loose faces whose lines the reader had to add: never implied, since
       the text the writer writes for them will not have those lines }
-    Edged: array of Boolean;
+    Edged: array of boolean;
     { solids given as their faces alone, with no line of their own, whose
       lines the reader drew: those faces are all of it, and no loop of the
       new lines (a ring round a ball's middle) is made a face }
-    FacesGiven: array of Integer;
+    FacesGiven: array of integer;
     { lofts read, their statement as it will be written back; FinishLofts
       gives each its fingerprint once everything is read }
-    Lofts: array of record G: Integer; Said: string; end;
+    Lofts: array of record
+      G: integer;
+      Said: string;
+      end;
     procedure Fail(const Msg: string);
-    procedure NoteSolid(G: Integer; HasPaint: Boolean; Paint: TColor);
-    procedure ImplyFaces(FirstNew: Integer);
-    procedure EdgeFaces(FirstNew: Integer);
-    procedure HomeLooseFaces(FirstNew: Integer);
+    procedure NoteSolid(G: integer; HasPaint: boolean; Paint: TColor);
+    procedure ImplyFaces(FirstNew: integer);
+    procedure EdgeFaces(FirstNew: integer);
+    procedure HomeLooseFaces(FirstNew: integer);
     procedure Prepare(L: TStrings);
-    procedure Attach(Here, Start: Integer; const Kind, Rest, Before: string);
+    procedure Attach(Here, Start: integer; const Kind, Rest, Before: string);
     procedure PushScope;
     procedure PopScope;
-    function FindPoint(const Name: string; out P: TP3): Boolean;
-    function FindShape(const Name: string; out Lp: TLoop): Boolean;
+    function FindPoint(const Name: string; out P: TP3): boolean;
+    function FindShape(const Name: string; out Lp: TLoop): boolean;
     procedure DefinePoint(const Name: string; const P: TP3);
-    procedure NameCorners(Start, G: Integer);
+    procedure NameCorners(Start, G: integer);
     { the lexer }
-    procedure SkipSp(const S: string; var P: Integer);
-    function PeekWord(const S: string; P: Integer): string;
-    function TakeWord(const S: string; var P: Integer): string;
-    function Number(const S: string; var P: Integer): TVal;
-    function Factor(const S: string; var P: Integer): TVal;
-    function Term(const S: string; var P: Integer): TVal;
-    function Expr(const S: string; var P: Integer): TVal;
-    function AsFeet(const V: TVal): Double;
-    function AsAngle(const V: TVal): Double;
-    function DirOf(const W: string; out Axis: Integer; out Sign: Double): Boolean;
-    function ReadStep(const S: string; var P: Integer): TP3;
-    function ReadPlace(const S: string; var P: Integer; HasPrev: Boolean; const Prev: TP3): TP3;
+    procedure SkipSp(const S: string; var P: integer);
+    function PeekWord(const S: string; P: integer): string;
+    function TakeWord(const S: string; var P: integer): string;
+    function Number(const S: string; var P: integer): TVal;
+    function Factor(const S: string; var P: integer): TVal;
+    function Term(const S: string; var P: integer): TVal;
+    function Expr(const S: string; var P: integer): TVal;
+    function AsFeet(const V: TVal): double;
+    function AsAngle(const V: TVal): double;
+    function DirOf(const W: string; out Axis: integer; out Sign: double): boolean;
+    function ReadStep(const S: string; var P: integer): TP3;
+    function ReadPlace(const S: string; var P: integer; HasPrev: boolean; const Prev: TP3): TP3;
     function ReadList(const S: string): TLoop;
     function ReadFacing(const S: string): TP3;
     function ReadColor(const S: string): TColor;
-    function ReadBool(const S: string): Boolean;
+    function ReadBool(const S: string): boolean;
     { the grammar }
-    function Opens(const Line: string): Boolean;
-    function SplitProp(const Line: string; out Key, Value: string): Boolean;
+    function Opens(const Line: string): boolean;
+    function SplitProp(const Line: string; out Key, Value: string): boolean;
     procedure SkipBlock;
-    procedure Things(Solid: Integer; HasPaint: Boolean; Paint: TColor);
+    procedure Things(Solid: integer; HasPaint: boolean; Paint: TColor);
     procedure DoPoints;
     procedure DoRing(const Name: string);
     procedure DoConst;
-    procedure DoCircle(const Name: string; IsArc: Boolean; const Value: string = ''; Solid: Integer = 0);
-    procedure DoPull(const Value: string; Block: Boolean);
-    function ArcOf(const Lp: TLoop): Integer;
-    procedure DoLoft(const Value: string; Block: Boolean);
+    procedure DoCircle(const Name: string; IsArc: boolean; const Value: string = ''; Solid: integer = 0);
+    procedure DoPull(const Value: string; Block: boolean);
+    function ArcOf(const Lp: TLoop): integer;
+    procedure DoLoft(const Value: string; Block: boolean);
     procedure FinishLofts;
-    procedure DoFace(const Value: string; Block: Boolean; Solid: Integer;
-      HasPaint: Boolean; Paint: TColor);
-    procedure DoLine(const Value: string; Block: Boolean; Solid: Integer);
+    procedure DoFace(const Value: string; Block: boolean; Solid: integer; HasPaint: boolean; Paint: TColor);
+    procedure DoLine(const Value: string; Block: boolean; Solid: integer);
     procedure DoSolid;
     procedure DoGroup(const Header: string);
-    procedure DoData(Id: Integer);
+    procedure DoData(Id: integer);
     procedure DoDim;
     procedure DoNote;
-    procedure DoBore(Solid: Integer);
+    procedure DoBore(Solid: integer);
     { Primitives.  Each expands into the same lines and
       faces the tools would have made, and nothing else. }
-    procedure DoBox(const Value: string; Block: Boolean);
-    procedure DoRect(const Value: string; Block: Boolean);
-    procedure MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor; Open: Integer = 0);
-    function ReadOpen(const S: string): Integer;
-    procedure MakeRect(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
+    procedure DoBox(const Value: string; Block: boolean);
+    procedure DoRect(const Value: string; Block: boolean);
+    procedure MakeBox(const Corner, Size: TP3; HasPaint: boolean; Paint: TColor; Open: integer = 0);
+    function ReadOpen(const S: string): integer;
+    procedure MakeRect(const Corner, Size: TP3; HasPaint: boolean; Paint: TColor);
     { "place; step": two parts with a semicolon between }
     procedure PlaceAndStep(const Value: string; out Corner, Size: TP3);
   public
     constructor Create(ADoc: TWorkDoc; AUnits: TUnitSystem);
     destructor Destroy; override;
     procedure Run(L: TStrings);
-    procedure CutCircles(FirstNew: Integer);
-    function ErrLine: Integer;
+    procedure CutCircles(FirstNew: integer);
+    function ErrLine: integer;
   end;
 
 const
   LETTERS = ['A'..'Z', 'a'..'z', '_'];
   DIGITS = ['0'..'9'];
 
-{ ---- setting up ---------------------------------------------------------- }
+  { ---- setting up ---------------------------------------------------------- }
 
 constructor THeckReader.Create(ADoc: TWorkDoc; AUnits: TUnitSystem);
 begin
@@ -214,20 +218,21 @@ begin
   raise EHeck.Create(Msg);
 end;
 
-function THeckReader.ErrLine: Integer;
+function THeckReader.ErrLine: integer;
 begin
   if (Cur >= 0) and (Cur <= High(At)) then Result := At[Cur]
   else if Length(At) > 0 then Result := At[High(At)]
-  else Result := 0;
+  else
+    Result := 0;
 end;
 
 { Drop notes and blank lines and join a "(" ... ")" list into one line,
   remembering which text line each began on. }
 procedure THeckReader.Prepare(L: TStrings);
 var
-  I, K, N, Depth: Integer;
+  I, K, N, Depth: integer;
   S, Acc, Said, AccSaid, Pending: string;
-  InText: Boolean;
+  InText: boolean;
 
   procedure Keep(const Piece: string);
   var
@@ -236,8 +241,7 @@ var
     { the writer's "{ facing down }" on a face says what it worked out, not
       what anybody wrote }
     W := Trim(Piece);
-    if AnsiStartsStr('{ facing ', W) and AnsiEndsStr(' }', W) and
-       (Pos(' ', Trim(Copy(W, 10, Length(W) - 11))) = 0) then Exit;
+    if AnsiStartsStr('{ facing ', W) and AnsiEndsStr(' }', W) and (Pos(' ', Trim(Copy(W, 10, Length(W) - 11))) = 0) then Exit;
     if Said <> '' then Said := Said + ' ';
     Said := Said + W;
   end;
@@ -299,7 +303,8 @@ begin
       if Said <> '' then
         if Acc <> '' then AccSaid := Trim(AccSaid + ' ' + Said)
         else if Pending = '' then Pending := Said
-        else Pending := Pending + LineEnding + Said;
+        else
+          Pending := Pending + LineEnding + Said;
       Continue;
     end;
     if Acc <> '' then
@@ -340,7 +345,7 @@ end;
 
 { Comment lines one after the other; a line written at the end of a thing
   (tab first) stays one only with KeepTail }
-function JoinNotes(const A, B: string; KeepTail: Boolean = False): string;
+function JoinNotes(const A, B: string; KeepTail: boolean = False): string;
 var
   T: string;
 begin
@@ -349,16 +354,17 @@ begin
   if not KeepTail and (T <> '') and (T[1] = #9) then T := Copy(T, 2, MaxInt);
   if A = '' then Result := T
   else if T = '' then Result := A
-  else Result := A + LineEnding + T;
+  else
+    Result := A + LineEnding + T;
 end;
 
 { What the statement at logical line Here made (things Start to D.Live - 1)
   takes its name and every comment from where it starts to where it ends.
   A statement that made nothing hands its comments on to the next thing. }
-procedure THeckReader.Attach(Here, Start: Integer; const Kind, Rest, Before: string);
+procedure THeckReader.Attach(Here, Start: integer; const Kind, Rest, Before: string);
 var
   Note, Nm: string;
-  J, K, G: Integer;
+  J, K, G: integer;
 begin
   if (Here < 0) or (Here >= Src.Count) then Exit;
   Note := JoinNotes(Before, LeadOf[Here]);
@@ -398,7 +404,9 @@ begin
     for K := Start to D.Live - 1 do D.SetNaming(K, Nm, Note)
   else
     for K := Start to D.Live - 1 do
-      if K = Start then D.SetNaming(K, Nm, Note) else D.SetNaming(K, Nm, '');
+      if K = Start then D.SetNaming(K, Nm, Note)
+      else
+        D.SetNaming(K, Nm, '');
 end;
 
 procedure THeckReader.PushScope;
@@ -422,9 +430,9 @@ begin
   SetLength(Scopes, Length(Scopes) - 1);
 end;
 
-function THeckReader.FindPoint(const Name: string; out P: TP3): Boolean;
+function THeckReader.FindPoint(const Name: string; out P: TP3): boolean;
 var
-  I, K: Integer;
+  I, K: integer;
 begin
   for I := High(Scopes) downto 0 do
   begin
@@ -439,9 +447,9 @@ begin
   Result := False;
 end;
 
-function THeckReader.FindShape(const Name: string; out Lp: TLoop): Boolean;
+function THeckReader.FindShape(const Name: string; out Lp: TLoop): boolean;
 var
-  I, K: Integer;
+  I, K: integer;
 begin
   for I := High(Scopes) downto 0 do
   begin
@@ -458,7 +466,7 @@ end;
 
 procedure THeckReader.DefinePoint(const Name: string; const P: TP3);
 var
-  K: Integer;
+  K: integer;
 begin
   with Scopes[High(Scopes)] do
   begin
@@ -473,7 +481,8 @@ begin
       Names.AddObject(LowerCase(Name), TObject(PtrInt(High(Pts))));
       K := High(Pts);
     end
-    else K := PtrInt(Names.Objects[K]);
+    else
+      K := PtrInt(Names.Objects[K]);
     Pts[K] := P;
     Shown[K] := Name;
   end;
@@ -482,13 +491,13 @@ end;
 { Each face, edge and bore of solid G made since Start learns the names of
   the corners it was made from, so the writer can give them back.  The
   innermost name for a place wins. }
-procedure THeckReader.NameCorners(Start, G: Integer);
+procedure THeckReader.NameCorners(Start, G: integer);
 var
   Map: TFPHashList;
   Keep: TStringList;
-  I, K, H, N: Integer;
+  I, K, H, N: integer;
   S: string;
-  Any: Boolean;
+  Any: boolean;
 
   function KeyOf(const P: TP3): shortstring;
   begin
@@ -497,10 +506,12 @@ var
 
   function NameAt(const P: TP3): string;
   var
-    J: Integer;
+    J: integer;
   begin
     J := Map.FindIndexOf(KeyOf(P));
-    if J < 0 then Result := '' else Result := Keep[PtrInt(Map.Items[J]) - 1];
+    if J < 0 then Result := ''
+    else
+      Result := Keep[PtrInt(Map.Items[J]) - 1];
   end;
 
   procedure Add(const P: TP3);
@@ -535,18 +546,18 @@ begin
       Any := False;
       case D[I].Kind of
         ekLine:
-          begin
-            Add(D[I].A);
-            Add(D[I].B);
-          end;
+        begin
+          Add(D[I].A);
+          Add(D[I].B);
+        end;
         ekFace, ekBore:
-          begin
-            for K := 0 to High(D[I].Poly) do Add(D[I].Poly[K]);
-            for H := 0 to High(D[I].Holes) do
-              for K := 0 to High(D[I].Holes[H]) do Add(D[I].Holes[H][K]);
-          end;
-      else
-        Continue;
+        begin
+          for K := 0 to High(D[I].Poly) do Add(D[I].Poly[K]);
+          for H := 0 to High(D[I].Holes) do
+            for K := 0 to High(D[I].Holes[H]) do Add(D[I].Holes[H][K]);
+        end;
+        else
+          Continue;
       end;
       if Any then D.SetCorners(I, S);
     end;
@@ -558,23 +569,24 @@ end;
 
 { ---- words and numbers --------------------------------------------------- }
 
-procedure THeckReader.SkipSp(const S: string; var P: Integer);
+procedure THeckReader.SkipSp(const S: string; var P: integer);
 begin
   while (P <= Length(S)) and (S[P] = ' ') do Inc(P);
 end;
 
-function THeckReader.PeekWord(const S: string; P: Integer): string;
+function THeckReader.PeekWord(const S: string; P: integer): string;
 var
-  Q: Integer;
+  Q: integer;
 begin
   SkipSp(S, P);
   Q := P;
   while (Q <= Length(S)) and (S[Q] in LETTERS + DIGITS) do Inc(Q);
   if (P <= Length(S)) and (S[P] in LETTERS) then Result := LowerCase(Copy(S, P, Q - P))
-  else Result := '';
+  else
+    Result := '';
 end;
 
-function THeckReader.TakeWord(const S: string; var P: Integer): string;
+function THeckReader.TakeWord(const S: string; var P: integer): string;
 begin
   Result := PeekWord(S, P);
   SkipSp(S, P);
@@ -582,10 +594,11 @@ begin
 end;
 
 { 5' 10 5/8"   4'   18"   3/4"   5ft 10 5/8in   1200mm   90°   2.5 }
-function THeckReader.Number(const S: string; var P: Integer): TVal;
-  function ReadNum(var Q: Integer; out V: Double): Boolean;
+function THeckReader.Number(const S: string; var P: integer): TVal;
+
+  function ReadNum(var Q: integer; out V: double): boolean;
   var
-    B: Integer;
+    B: integer;
   begin
     B := Q;
     while (Q <= Length(S)) and (S[Q] in DIGITS) do Inc(Q);
@@ -595,11 +608,13 @@ function THeckReader.Number(const S: string; var P: Integer): TVal;
       while (Q <= Length(S)) and (S[Q] in DIGITS) do Inc(Q);
     end;
     Result := Q > B;
-    if Result then V := StrToFloat(Copy(S, B, Q - B), DotFS) else V := 0;
+    if Result then V := StrToFloat(Copy(S, B, Q - B), DotFS)
+    else
+      V := 0;
   end;
 
   { a mark at Q, after any spaces: which, and where it ends }
-  function Mark(Q: Integer; out After: Integer): string;
+  function Mark(Q: integer; out After: integer): string;
   var
     W: string;
   begin
@@ -607,11 +622,23 @@ function THeckReader.Number(const S: string; var P: Integer): TVal;
     while (Q <= Length(S)) and (S[Q] = ' ') do Inc(Q);
     After := Q;
     if Q > Length(S) then Exit;
-    if S[Q] = '''' then begin Result := 'ft'; After := Q + 1; Exit; end;
-    if S[Q] = '"' then begin Result := 'in'; After := Q + 1; Exit; end;
+    if S[Q] = '''' then
+    begin
+      Result := 'ft';
+      After := Q + 1;
+      Exit;
+    end;
+    if S[Q] = '"' then
+    begin
+      Result := 'in';
+      After := Q + 1;
+      Exit;
+    end;
     if (S[Q] = #$C2) and (Q < Length(S)) and (S[Q + 1] = #$B0) then
     begin
-      Result := 'deg'; After := Q + 2; Exit;
+      Result := 'deg';
+      After := Q + 2;
+      Exit;
     end;
     W := PeekWord(S, Q);
     if (W = 'ft') or (W = 'in') or (W = 'mm') or (W = 'm') or (W = 'deg') then
@@ -622,8 +649,8 @@ function THeckReader.Number(const S: string; var P: Integer): TVal;
   end;
 
 var
-  Q, R, R2: Integer;
-  N1, N2, Den, Inches: Double;
+  Q, R, R2: integer;
+  N1, N2, Den, Inches: double;
   M: string;
 begin
   Result.K := vPlain;
@@ -682,15 +709,38 @@ begin
     end;
     Exit;
   end;
-  if M = 'in' then begin Result.V := N1 / 12; Result.K := vLen; P := R; Exit; end;
-  if M = 'mm' then begin Result.V := N1 / 304.8; Result.K := vLen; P := R; Exit; end;
-  if M = 'm' then begin Result.V := N1 / 0.3048; Result.K := vLen; P := R; Exit; end;
-  if M = 'deg' then begin Result.V := DegToRad(N1); Result.K := vAngle; P := R; Exit; end;
+  if M = 'in' then
+  begin
+    Result.V := N1 / 12;
+    Result.K := vLen;
+    P := R;
+    Exit;
+  end;
+  if M = 'mm' then
+  begin
+    Result.V := N1 / 304.8;
+    Result.K := vLen;
+    P := R;
+    Exit;
+  end;
+  if M = 'm' then
+  begin
+    Result.V := N1 / 0.3048;
+    Result.K := vLen;
+    P := R;
+    Exit;
+  end;
+  if M = 'deg' then
+  begin
+    Result.V := DegToRad(N1);
+    Result.K := vAngle;
+    P := R;
+    Exit;
+  end;
   { 10 5/8" }
   R := Q;
   SkipSp(S, R);
-  if (R > Q) and (R <= Length(S)) and (S[R] in DIGITS) and ReadNum(R, N2) and
-     (R < Length(S)) and (S[R] = '/') then
+  if (R > Q) and (R <= Length(S)) and (S[R] in DIGITS) and ReadNum(R, N2) and (R < Length(S)) and (S[R] = '/') then
   begin
     Inc(R);
     if ReadNum(R, Den) and (Den > 0) and (Mark(R, R2) = 'in') then
@@ -705,10 +755,10 @@ begin
   P := Q;
 end;
 
-function THeckReader.Factor(const S: string; var P: Integer): TVal;
+function THeckReader.Factor(const S: string; var P: integer): TVal;
 var
   W: string;
-  K: Integer;
+  K: integer;
 begin
   SkipSp(S, P);
   if P > Length(S) then Fail('something is missing at the end of the line');
@@ -733,15 +783,16 @@ begin
   K := Consts.IndexOf(W);
   if K < 0 then
     if W = '' then Fail('a number was expected at "' + Copy(S, P, 12) + '"')
-    else Fail('"' + W + '" is not a number, a constant or a point');
+    else
+      Fail('"' + W + '" is not a number, a constant or a point');
   TakeWord(S, P);
   Result := Vals[K];
 end;
 
-function THeckReader.Term(const S: string; var P: Integer): TVal;
+function THeckReader.Term(const S: string; var P: integer): TVal;
 var
   R: TVal;
-  Op: Char;
+  Op: char;
 begin
   Result := Factor(S, P);
   while True do
@@ -765,11 +816,11 @@ begin
   end;
 end;
 
-function THeckReader.Expr(const S: string; var P: Integer): TVal;
+function THeckReader.Expr(const S: string; var P: integer): TVal;
 var
   R: TVal;
-  Op: Char;
-  Q: Integer;
+  Op: char;
+  Q: integer;
 begin
   Result := Term(S, P);
   while True do
@@ -788,7 +839,9 @@ begin
       Exit;
     end;
     R := Term(S, P);
-    if Op = '+' then Result.V := Result.V + R.V else Result.V := Result.V - R.V;
+    if Op = '+' then Result.V := Result.V + R.V
+    else
+      Result.V := Result.V - R.V;
     if R.K <> vPlain then Result.K := R.K;
   end;
 end;
@@ -796,43 +849,61 @@ end;
 { a plain number where a length goes is in the sheet's small unit }
 { An angle, in radians.  A bare number is degrees ("sweep = 120"); the
   program always writes the degree sign. }
-function THeckReader.AsAngle(const V: TVal): Double;
+function THeckReader.AsAngle(const V: TVal): double;
 begin
-  if V.K = vPlain then Result := DegToRad(V.V) else Result := V.V;
+  if V.K = vPlain then Result := DegToRad(V.V)
+  else
+    Result := V.V;
 end;
 
-function THeckReader.AsFeet(const V: TVal): Double;
+function THeckReader.AsFeet(const V: TVal): double;
 begin
   if V.K = vLen then Result := V.V
   else if U = usMetric then Result := V.V / 304.8
-  else Result := V.V / 12;
+  else
+    Result := V.V / 12;
 end;
 
-function THeckReader.DirOf(const W: string; out Axis: Integer; out Sign: Double): Boolean;
+function THeckReader.DirOf(const W: string; out Axis: integer; out Sign: double): boolean;
 begin
   Result := True;
   Sign := 1;
   if (W = 'east') or (W = 'x') then Axis := 0
-  else if W = 'west' then begin Axis := 0; Sign := -1; end
+  else if W = 'west' then
+  begin
+    Axis := 0;
+    Sign := -1;
+  end
   else if (W = 'north') or (W = 'y') then Axis := 1
-  else if W = 'south' then begin Axis := 1; Sign := -1; end
+  else if W = 'south' then
+  begin
+    Axis := 1;
+    Sign := -1;
+  end
   else if (W = 'up') or (W = 'z') then Axis := 2
-  else if W = 'down' then begin Axis := 2; Sign := -1; end
-  else Result := False;
+  else if W = 'down' then
+  begin
+    Axis := 2;
+    Sign := -1;
+  end
+  else
+    Result := False;
 end;
 
 { "4' east", "3" east, 2" up", "x 4' y 2'": parts until something that is
   not one }
-function THeckReader.ReadStep(const S: string; var P: Integer): TP3;
+function THeckReader.ReadStep(const S: string; var P: integer): TP3;
 var
   W: string;
-  Axis, Q: Integer;
-  Sign: Double;
+  Axis, Q: integer;
+  Sign: double;
   V: TVal;
-  Got: Boolean;
-  A: array[0..2] of Double;
+  Got: boolean;
+  A: array[0..2] of double;
 begin
-  A[0] := 0; A[1] := 0; A[2] := 0;
+  A[0] := 0;
+  A[1] := 0;
+  A[2] := 0;
   Got := False;
   while True do
   begin
@@ -875,13 +946,12 @@ end;
 
 { a place, a name, a name and steps, or in a list "+ step" from the one
   before }
-function THeckReader.ReadPlace(const S: string; var P: Integer; HasPrev: Boolean;
-  const Prev: TP3): TP3;
+function THeckReader.ReadPlace(const S: string; var P: integer; HasPrev: boolean; const Prev: TP3): TP3;
 var
   W: string;
   St: TP3;
-  Sign: Double;
-  Based: Boolean;
+  Sign: double;
+  Based: boolean;
 begin
   SkipSp(S, P);
   if P > Length(S) then Fail('a place was expected');
@@ -907,7 +977,9 @@ begin
   begin
     SkipSp(S, P);
     if (P > Length(S)) or not (S[P] in ['+', '-']) then Exit;
-    if S[P] = '-' then Sign := -1 else Sign := 1;
+    if S[P] = '-' then Sign := -1
+    else
+      Sign := 1;
     Inc(P);
     St := ReadStep(S, P);
     Result := P3(Result.X + Sign * St.X, Result.Y + Sign * St.Y, Result.Z + Sign * St.Z);
@@ -919,10 +991,10 @@ end;
 function THeckReader.ReadList(const S: string): TLoop;
 var
   T: TStringList;
-  I, K, P, A, B, N, Stp: Integer;
+  I, K, P, A, B, N, Stp: integer;
   V, Stem, W: string;
   Pt: TP3;
-  AllNames: Boolean;
+  AllNames: boolean;
 
   procedure Add(const Q: TP3);
   begin
@@ -931,9 +1003,9 @@ var
     Inc(N);
   end;
 
-  function Tail(const Nm: string; out St: string; out Num: Integer): Boolean;
+  function Tail(const Nm: string; out St: string; out Num: integer): boolean;
   var
-    Z: Integer;
+    Z: integer;
   begin
     Z := Length(Nm);
     while (Z > 0) and (Nm[Z] in DIGITS) do Dec(Z);
@@ -979,10 +1051,11 @@ begin
           Add(Pt);
           Continue;
         end;
-        if not (Tail(Copy(W, 1, K - 1), Stem, A) and Tail(Copy(W, K + 2, 99), V, B) and
-                SameText(Stem, V)) then
+        if not (Tail(Copy(W, 1, K - 1), Stem, A) and Tail(Copy(W, K + 2, 99), V, B) and SameText(Stem, V)) then
           Fail('"' + W + '" is not a run of names: both ends want the same name and a number');
-        if B >= A then Stp := 1 else Stp := -1;
+        if B >= A then Stp := 1
+        else
+          Stp := -1;
         K := A;
         while True do
         begin
@@ -1003,24 +1076,26 @@ begin
   while True do
   begin
     if N = 0 then Pt := ReadPlace(V, P, False, P3(0, 0, 0))
-    else Pt := ReadPlace(V, P, True, Result[N - 1]);
+    else
+      Pt := ReadPlace(V, P, True, Result[N - 1]);
     Add(Pt);
     SkipSp(V, P);
     if P > Length(V) then Break;
     if V[P] = ';' then Inc(P)
     else if PeekWord(V, P) = 'to' then TakeWord(V, P)
-    else Fail('"' + Trim(Copy(V, P, 16)) + '" - places in a list are joined with "to"');
+    else
+      Fail('"' + Trim(Copy(V, P, 16)) + '" - places in a list are joined with "to"');
   end;
 end;
 
 function THeckReader.ReadFacing(const S: string): TP3;
 var
   V: string;
-  P, Axis: Integer;
-  Sign, Tilt, Head: Double;
+  P, Axis: integer;
+  Sign, Tilt, Head: double;
   A: TVal;
   W: string;
-  L: Double;
+  L: double;
 begin
   V := LowerCase(Trim(S));
   if DirOf(V, Axis, Sign) and (Length(V) > 1) then
@@ -1046,7 +1121,8 @@ begin
     else if W = 'north' then Head := Pi / 2
     else if W = 'west' then Head := Pi
     else if W = 'south' then Head := -Pi / 2
-    else Head := AsAngle(Expr(V, P));
+    else
+      Head := AsAngle(Expr(V, P));
     Exit(P3(Sin(Tilt) * Cos(Head), Sin(Tilt) * Sin(Head), Cos(Tilt)));
   end;
   P := 1;
@@ -1061,7 +1137,7 @@ end;
 function THeckReader.ReadColor(const S: string): TColor;
 var
   V: string;
-  I, N: Integer;
+  I, N: integer;
 begin
   V := LowerCase(Trim(S));
   for I := 0 to High(HECK_COLOR_NAMES) do
@@ -1075,7 +1151,7 @@ begin
   Result := 0;
 end;
 
-function THeckReader.ReadBool(const S: string): Boolean;
+function THeckReader.ReadBool(const S: string): boolean;
 var
   V: string;
 begin
@@ -1088,10 +1164,10 @@ end;
 
 { ---- the grammar --------------------------------------------------------- }
 
-function THeckReader.SplitProp(const Line: string; out Key, Value: string): Boolean;
+function THeckReader.SplitProp(const Line: string; out Key, Value: string): boolean;
 var
-  K: Integer;
-  InText: Boolean;
+  K: integer;
+  InText: boolean;
 begin
   InText := False;
   for K := 1 to Length(Line) do
@@ -1113,7 +1189,7 @@ end;
 
 { rule 7: a line with no "=" opens a block; "end" closes one, and "begin"
   is let pass }
-function THeckReader.Opens(const Line: string): Boolean;
+function THeckReader.Opens(const Line: string): boolean;
 var
   K, V: string;
 begin
@@ -1124,7 +1200,7 @@ end;
 { Cur is on a line opening an unknown block: skip to its end }
 procedure THeckReader.SkipBlock;
 var
-  Depth: Integer;
+  Depth: integer;
 begin
   Depth := 1;
   Inc(Cur);
@@ -1139,11 +1215,11 @@ end;
 
 { The things inside a block, up to its "end", or to the end of the text
   for a fragment.  Solid <> 0 inside a solid. }
-procedure THeckReader.Things(Solid: Integer; HasPaint: Boolean; Paint: TColor);
+procedure THeckReader.Things(Solid: integer; HasPaint: boolean; Paint: TColor);
 var
   Line, Key, Value, Kind, Rest: string;
-  Block: Boolean;
-  P, K, Here, Start: Integer;
+  Block: boolean;
+  P, K, Here, Start: integer;
   Ends: TLoop;
   Before: string;
 begin
@@ -1163,7 +1239,12 @@ begin
       TailOf[Cur] := '';
       Exit;
     end;
-    if LowerCase(Line) = 'begin' then begin Attach(Here, Start, '', '', Before); Inc(Cur); Continue; end;
+    if LowerCase(Line) = 'begin' then
+    begin
+      Attach(Here, Start, '', '', Before);
+      Inc(Cur);
+      Continue;
+    end;
     Block := not SplitProp(Line, Key, Value);
     P := 1;
     Kind := TakeWord(Key + ' ', P);
@@ -1171,7 +1252,12 @@ begin
     Rest := Trim(Copy(Copy(Line, 1, Length(Key)), P, MaxInt));
     if Block then Rest := Trim(Copy(Line, Length(Kind) + 1, MaxInt));
 
-    if (Kind = 'heckerssketch') and Block then begin Attach(Here, Start, '', '', Before); Inc(Cur); Continue; end;
+    if (Kind = 'heckerssketch') and Block then
+    begin
+      Attach(Here, Start, '', '', Before);
+      Inc(Cur);
+      Continue;
+    end;
 
     if Block then
     begin
@@ -1201,7 +1287,8 @@ begin
       else if (Kind = 'bore') and (Solid <> 0) then DoBore(Solid)
       else if Kind = 'box' then DoBox(Rest, True)
       else if Kind = 'rect' then DoRect(Rest, True)
-      else SkipBlock;
+      else
+        SkipBlock;
       if Kind <> 'sheet' then Attach(Here, Start, Kind, Rest, Before);
       Continue;
     end;
@@ -1273,16 +1360,26 @@ begin
       Ends := ReadList(Value);
       if Length(Ends) = 1 then D.AddGuide(Ends[0], Ends[0])
       else if Length(Ends) = 2 then D.AddGuide(Ends[0], Ends[1])
-      else Fail('a guide goes through one place or two');
+      else
+        Fail('a guide goes through one place or two');
     end
     else if Key = 'units' then
     begin
       if (Pos('mm', LowerCase(Value)) > 0) or (LowerCase(Value) = 'm') then U := usMetric
-      else U := usImperial;
+      else
+        U := usImperial;
     end
     else if Key = 'ink' then DefInk := ReadColor(Value)
-    else if Key = 'width' then begin P := 1; DefWidth := Expr(Value, P).V; end
-    else if Key = 'sides' then begin P := 1; DefSides := Round(Expr(Value, P).V); end
+    else if Key = 'width' then
+    begin
+      P := 1;
+      DefWidth := Expr(Value, P).V;
+    end
+    else if Key = 'sides' then
+    begin
+      P := 1;
+      DefSides := Round(Expr(Value, P).V);
+    end
     { "faces = said": every face is in the text and no loop of lines becomes
       one; the writer says so when it has written them all }
     else if Key = 'faces' then AllSaid := LowerCase(Trim(Value)) = 'said';
@@ -1296,13 +1393,21 @@ end;
 procedure THeckReader.DoPoints;
 var
   Key, Value: string;
-  P: Integer;
+  P: integer;
 begin
   Inc(Cur);
   while Cur < Src.Count do
   begin
-    if LowerCase(Src[Cur]) = 'end' then begin Inc(Cur); Exit; end;
-    if LowerCase(Src[Cur]) = 'begin' then begin Inc(Cur); Continue; end;
+    if LowerCase(Src[Cur]) = 'end' then
+    begin
+      Inc(Cur);
+      Exit;
+    end;
+    if LowerCase(Src[Cur]) = 'begin' then
+    begin
+      Inc(Cur);
+      Continue;
+    end;
     if SplitProp(Src[Cur], Key, Value) then
     begin
       if (Key = '') or not (Key[1] in LETTERS) or (Pos(' ', Key) > 0) then
@@ -1314,7 +1419,8 @@ begin
       Inc(Cur);
     end
     else if Copy(Key, 1, 5) = 'ring ' then DoRing(Trim(Copy(Key, 6, MaxInt)))
-    else SkipBlock;
+    else
+      SkipBlock;
   end;
   Fail('the points are never closed: an "end" is missing');
 end;
@@ -1323,8 +1429,8 @@ procedure THeckReader.DoRing(const Name: string);
 var
   Key, Value: string;
   C, F, AU, AV: TP3;
-  R, Starts, A: Double;
-  N, K, P: Integer;
+  R, Starts, A: double;
+  N, K, P: integer;
 begin
   if Name = '' then Fail('a ring wants a name: "ring ra"');
   C := P3(0, 0, 0);
@@ -1354,22 +1460,24 @@ begin
   begin
     A := Starts + K * 2 * Pi / N;
     DefinePoint(Name + IntToStr(K + 1),
-      P3(C.X + (AU.X * Cos(A) + AV.X * Sin(A)) * R,
-         C.Y + (AU.Y * Cos(A) + AV.Y * Sin(A)) * R,
-         C.Z + (AU.Z * Cos(A) + AV.Z * Sin(A)) * R));
+      P3(C.X + (AU.X * Cos(A) + AV.X * Sin(A)) * R, C.Y + (AU.Y * Cos(A) + AV.Y * Sin(A)) * R, C.Z + (AU.Z * Cos(A) + AV.Z * Sin(A)) * R));
   end;
 end;
 
 procedure THeckReader.DoConst;
 var
   Key, Value: string;
-  P, K: Integer;
+  P, K: integer;
   V: TVal;
 begin
   Inc(Cur);
   while Cur < Src.Count do
   begin
-    if LowerCase(Src[Cur]) = 'end' then begin Inc(Cur); Exit; end;
+    if LowerCase(Src[Cur]) = 'end' then
+    begin
+      Inc(Cur);
+      Exit;
+    end;
     if SplitProp(Src[Cur], Key, Value) then
     begin
       P := 1;
@@ -1387,12 +1495,12 @@ begin
   Fail('the constants are never closed: an "end" is missing');
 end;
 
-procedure THeckReader.DoCircle(const Name: string; IsArc: Boolean; const Value: string; Solid: Integer);
+procedure THeckReader.DoCircle(const Name: string; IsArc: boolean; const Value: string; Solid: integer);
 var
   Key, V: string;
   C, F, AU, AV, PU, PV, Dir, Nrm, Tmp: TP3;
-  R, Starts, Sweep, A0, Wd: Double;
-  Sides, P, Idx, K, N: Integer;
+  R, Starts, Sweep, A0, Wd: double;
+  Sides, P, Idx, K, N: integer;
   Ink: TColor;
   Pl: TPlane;
   Lp: TLoop;
@@ -1447,19 +1555,22 @@ begin
   { The start direction, then as an angle in the axes the program keeps
     for that plane. }
   SpecAxes(F, AU, AV);
-  Dir := P3(AU.X * Cos(Starts) + AV.X * Sin(Starts), AU.Y * Cos(Starts) + AV.Y * Sin(Starts),
-            AU.Z * Cos(Starts) + AV.Z * Sin(Starts));
+  Dir := P3(AU.X * Cos(Starts) + AV.X * Sin(Starts), AU.Y * Cos(Starts) + AV.Y * Sin(Starts), AU.Z * Cos(Starts) + AV.Z * Sin(Starts));
   if (Abs(F.Z - 1) < 1E-9) then Pl := plXY
   else if (Abs(F.Y + 1) < 1E-9) then Pl := plXZ
   else if (Abs(F.X - 1) < 1E-9) then Pl := plYZ
-  else Pl := plFree;
-  if Pl = plFree then AxesFromNormal(F, PU, PV) else PlaneAxes(Pl, PU, PV);
+  else
+    Pl := plFree;
+  if Pl = plFree then AxesFromNormal(F, PU, PV)
+  else
+    PlaneAxes(Pl, PU, PV);
   A0 := ArcTan2(Dot3(Dir, PV), Dot3(Dir, PU));
   { the program's plane may turn the opposite way to the facing }
   if Dot3(Cross3(PU, PV), F) < 0 then Sweep := -Sweep;
 
   if Pl = plFree then D.AddArc(C, R, A0, Sweep, plXY, Ink, Wd)
-  else D.AddArc(C, R, A0, Sweep, Pl, Ink, Wd);
+  else
+    D.AddArc(C, R, A0, Sweep, Pl, Ink, Wd);
   Idx := D.Live - 1;
   if Pl = plFree then D.SetArcFacing(Idx, F, A0);
   { A circle with no sides uses the sheet's, as the tool does, for both its
@@ -1501,14 +1612,13 @@ begin
   end;
 end;
 
-procedure THeckReader.DoFace(const Value: string; Block: Boolean; Solid: Integer;
-  HasPaint: Boolean; Paint: TColor);
+procedure THeckReader.DoFace(const Value: string; Block: boolean; Solid: integer; HasPaint: boolean; Paint: TColor);
 var
   Key, V: string;
   Outline: TLoop;
   Holes: array of TP3Array;
   Ink: TColor;
-  Idx, K, J: Integer;
+  Idx, K, J: integer;
   Tmp: TP3;
 begin
   Ink := DefInk;
@@ -1575,14 +1685,14 @@ begin
   if HasPaint then D.SetMaterial(Idx, Paint);
 end;
 
-procedure THeckReader.DoLine(const Value: string; Block: Boolean; Solid: Integer);
+procedure THeckReader.DoLine(const Value: string; Block: boolean; Solid: integer);
 var
   Key, V: string;
   Ends: TLoop;
   Ink: TColor;
-  Wd: Double;
-  Soft, Ref: Boolean;
-  P: Integer;
+  Wd: double;
+  Soft, Ref: boolean;
+  P: integer;
 begin
   Ink := DefInk;
   Wd := DefWidth;
@@ -1626,7 +1736,7 @@ begin
   end;
 end;
 
-procedure THeckReader.NoteSolid(G: Integer; HasPaint: Boolean; Paint: TColor);
+procedure THeckReader.NoteSolid(G: integer; HasPaint: boolean; Paint: TColor);
 begin
   SetLength(Solids, Length(Solids) + 1);
   Solids[High(Solids)].G := G;
@@ -1636,9 +1746,9 @@ end;
 
 procedure THeckReader.DoSolid;
 var
-  G, Save, First: Integer;
+  G, Save, First: integer;
   Key, V: string;
-  HasPaint: Boolean;
+  HasPaint: boolean;
   Paint: TColor;
 begin
   G := D.NewGroup;
@@ -1672,9 +1782,9 @@ end;
 
 { Cur is on a group's "data": keep every line to its "end" as is; none of
   it is Heck (see hsGroupData). }
-procedure THeckReader.DoData(Id: Integer);
+procedure THeckReader.DoData(Id: integer);
 var
-  Depth: Integer;
+  Depth: integer;
   Acc: string;
 begin
   Depth := 1;
@@ -1699,7 +1809,7 @@ end;
 
 procedure THeckReader.DoGroup(const Header: string);
 var
-  Id, WasStamp, Save: Integer;
+  Id, WasStamp, Save: integer;
   Key, V: string;
 begin
   Id := D.NewPart(Unquote(Header), D.Stamp);
@@ -1707,9 +1817,7 @@ begin
   Inc(Cur);
   PushScope;
   try
-    while (Cur < Src.Count) and
-          ((SplitProp(Src[Cur], Key, V) and ((Key = 'locked') or (Key = 'hidden') or (Key = 'jig'))) or
-           (LowerCase(Src[Cur]) = 'data')) do
+    while (Cur < Src.Count) and ((SplitProp(Src[Cur], Key, V) and ((Key = 'locked') or (Key = 'hidden') or (Key = 'jig'))) or (LowerCase(Src[Cur]) = 'data')) do
     begin
       if LowerCase(Src[Cur]) = 'data' then
       begin
@@ -1718,7 +1826,8 @@ begin
       end;
       if Key = 'locked' then D.SetPartLocked(Id, ReadBool(V))
       else if Key = 'hidden' then D.SetPartHidden(Id, ReadBool(V))
-      else D.SetPartJig(Id, V);
+      else
+        D.SetPartJig(Id, V);
       Inc(Cur);
     end;
     D.Stamp := Id;
@@ -1741,9 +1850,11 @@ var
   Key, V, Lbl: string;
   A, B, Off: TP3;
   Ink: TColor;
-  P: Integer;
+  P: integer;
 begin
-  A := P3(0, 0, 0); B := A; Off := A;
+  A := P3(0, 0, 0);
+  B := A;
+  Off := A;
   Lbl := '';
   Ink := DefInk;
   Inc(Cur);
@@ -1769,12 +1880,13 @@ procedure THeckReader.DoNote;
 var
   Key, V, Txt: string;
   A, T: TP3;
-  HasT: Boolean;
+  HasT: boolean;
   Ink: TColor;
-  Size: Double;
-  P: Integer;
+  Size: double;
+  P: integer;
 begin
-  A := P3(0, 0, 0); T := A;
+  A := P3(0, 0, 0);
+  T := A;
   HasT := False;
   Txt := '';
   Ink := DefInk;
@@ -1786,7 +1898,11 @@ begin
     begin
       P := 1;
       if Key = 'at' then A := ReadPlace(V, P, False, A)
-      else if Key = 'to' then begin T := ReadPlace(V, P, False, A); HasT := True; end
+      else if Key = 'to' then
+      begin
+        T := ReadPlace(V, P, False, A);
+        HasT := True;
+      end
       else if Key = 'text' then
       begin
         if Txt <> '' then Txt := Txt + LineEnding;
@@ -1806,7 +1922,7 @@ end;
 
 procedure THeckReader.PlaceAndStep(const Value: string; out Corner, Size: TP3);
 var
-  P: Integer;
+  P: integer;
   V: string;
 begin
   V := Trim(Value);
@@ -1823,10 +1939,10 @@ end;
   rectangle pulled up by the tool }
 { "open = top north": the sides a box is left without, one bit each in the
   order of BOX_SIDES }
-function THeckReader.ReadOpen(const S: string): Integer;
+function THeckReader.ReadOpen(const S: string): integer;
 var
   W: string;
-  K: Integer;
+  K: integer;
 begin
   Result := 0;
   for W in LowerCase(StringReplace(S, ',', ' ', [rfReplaceAll])).Split([' '], TStringSplitOptions.ExcludeEmpty) do
@@ -1843,14 +1959,15 @@ begin
   end;
 end;
 
-procedure THeckReader.MakeBox(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor; Open: Integer);
+procedure THeckReader.MakeBox(const Corner, Size: TP3; HasPaint: boolean; Paint: TColor; Open: integer);
 var
   C: array[0..7] of TP3;
-  G, I, F0: Integer;
-  X, Y, Z: Double;
-  Sx, Sy, Sz: Double;
-  Save: Integer;
-  procedure Face4(Side, A, B, Cc, Dd: Integer);
+  G, I, F0: integer;
+  X, Y, Z: double;
+  Sx, Sy, Sz: double;
+  Save: integer;
+
+  procedure Face4(Side, A, B, Cc, Dd: integer);
   begin
     { an open side is a loop of edges that is not a face }
     if Open and (1 shl Side) <> 0 then
@@ -1869,18 +1986,26 @@ var
     D.SetFaceGroup(D.Live - 1, G);
     if HasPaint then D.SetMaterial(D.Live - 1, Paint);
   end;
-  procedure Edge(A, B: Integer);
+
+  procedure Edge(A, B: integer);
   begin
     D.AddLine(C[A], C[B], DefInk, DefWidth, False);
     D.SetLineGroup(D.Live - 1, G);
   end;
+
 begin
   if (Abs(Size.X) < 1E-9) or (Abs(Size.Y) < 1E-9) or (Abs(Size.Z) < 1E-9) then
     Fail('a box wants a size with all three parts');
-  Sx := Abs(Size.X); Sy := Abs(Size.Y); Sz := Abs(Size.Z);
-  X := Min(Corner.X, Corner.X + Size.X); Y := Min(Corner.Y, Corner.Y + Size.Y); Z := Min(Corner.Z, Corner.Z + Size.Z);
-  C[0] := P3(X, Y, Z);           C[1] := P3(X + Sx, Y, Z);
-  C[2] := P3(X + Sx, Y + Sy, Z); C[3] := P3(X, Y + Sy, Z);
+  Sx := Abs(Size.X);
+  Sy := Abs(Size.Y);
+  Sz := Abs(Size.Z);
+  X := Min(Corner.X, Corner.X + Size.X);
+  Y := Min(Corner.Y, Corner.Y + Size.Y);
+  Z := Min(Corner.Z, Corner.Z + Size.Z);
+  C[0] := P3(X, Y, Z);
+  C[1] := P3(X + Sx, Y, Z);
+  C[2] := P3(X + Sx, Y + Sy, Z);
+  C[3] := P3(X, Y + Sy, Z);
   for I := 0 to 3 do C[I + 4] := P3(C[I].X, C[I].Y, Z + Sz);
   G := D.NewGroup;
   NoteSolid(G, HasPaint, Paint);
@@ -1898,17 +2023,17 @@ begin
   end;
 end;
 
-procedure THeckReader.DoBox(const Value: string; Block: Boolean);
+procedure THeckReader.DoBox(const Value: string; Block: boolean);
 var
   Key, V, W: string;
   Parts: TStringArray;
-  Open: Integer;
+  Open: integer;
   Corner, Size: TP3;
-  HasPaint, HasAt, HasSize: Boolean;
+  HasPaint, HasAt, HasSize: boolean;
   Ink, WasInk: TColor;
-  Wd, WasWd: Single;
+  Wd, WasWd: single;
   Paint: TColor;
-  P: Integer;
+  P: integer;
 begin
   HasPaint := False;
   Paint := 0;
@@ -1927,7 +2052,8 @@ begin
       Open := ReadOpen(Copy(W, 5, MaxInt));
       PlaceAndStep(Parts[0] + ';' + Parts[1], Corner, Size);
     end
-    else PlaceAndStep(Value, Corner, Size);
+    else
+      PlaceAndStep(Value, Corner, Size);
     MakeBox(Corner, Size, False, 0, Open);
     Inc(Cur);
     Exit;
@@ -1942,8 +2068,16 @@ begin
     if SplitProp(Src[Cur], Key, V) then
     begin
       P := 1;
-      if Key = 'at' then begin Corner := ReadPlace(V, P, False, Corner); HasAt := True; end
-      else if Key = 'size' then begin Size := ReadStep(V, P); HasSize := True; end
+      if Key = 'at' then
+      begin
+        Corner := ReadPlace(V, P, False, Corner);
+        HasAt := True;
+      end
+      else if Key = 'size' then
+      begin
+        Size := ReadStep(V, P);
+        HasSize := True;
+      end
       else if Key = 'paint' then
       begin
         HasPaint := LowerCase(Trim(V)) <> 'none';
@@ -1959,12 +2093,15 @@ begin
   Inc(Cur);
   if not (HasAt and HasSize) then Fail('a box wants an "at" and a "size"');
   { edges in the block's pen (ink and width), or the sheet's }
-  WasInk := DefInk; WasWd := DefWidth;
-  DefInk := Ink; DefWidth := Wd;
+  WasInk := DefInk;
+  WasWd := DefWidth;
+  DefInk := Ink;
+  DefWidth := Wd;
   try
     MakeBox(Corner, Size, HasPaint, Paint, Open);
   finally
-    DefInk := WasInk; DefWidth := WasWd;
+    DefInk := WasInk;
+    DefWidth := WasWd;
   end;
 end;
 
@@ -1982,53 +2119,50 @@ end;
   triangles.  A named circle's ring becomes the loft's own edge, as a pull's
   does; between round outlines the lengthwise edges are soft. }
 { the circle whose ring this outline is, or -1 }
-function THeckReader.ArcOf(const Lp: TLoop): Integer;
+function THeckReader.ArcOf(const Lp: TLoop): integer;
 var
-  C: Integer;
+  C: integer;
   Nrm: TP3;
 begin
   for C := D.Live - 1 downto 0 do
-    if (D[C].Kind = ekArc) and FullCircle(D[C].Sweep) and
-       (Abs(Dist(D[C].C, Lp[0]) - D[C].R) < 1E-6) and
-       (Abs(Dist(D[C].C, Lp[Length(Lp) div 2]) - D[C].R) < 1E-6) then
+    if (D[C].Kind = ekArc) and FullCircle(D[C].Sweep) and (Abs(Dist(D[C].C, Lp[0]) - D[C].R) < 1E-6) and (Abs(Dist(D[C].C, Lp[Length(Lp) div 2]) - D[C].R) < 1E-6) then
     begin
       case D[C].Plane of
         plXY: Nrm := P3(0, 0, 1);
         plXZ: Nrm := P3(0, 1, 0);
         plYZ: Nrm := P3(1, 0, 0);
-      else
-        Nrm := D[C].Nm;
+        else
+          Nrm := D[C].Nm;
       end;
-      if (Abs(Dot3(Sub3(Lp[0], D[C].C), Nrm)) < 1E-6) and
-         (Abs(Dot3(Sub3(Lp[Length(Lp) div 4], D[C].C), Nrm)) < 1E-6) then Exit(C);
+      if (Abs(Dot3(Sub3(Lp[0], D[C].C), Nrm)) < 1E-6) and (Abs(Dot3(Sub3(Lp[Length(Lp) div 4], D[C].C), Nrm)) < 1E-6) then Exit(C);
     end;
   Result := -1;
 end;
 
-procedure THeckReader.DoLoft(const Value: string; Block: Boolean);
+procedure THeckReader.DoLoft(const Value: string; Block: boolean);
 var
   Key, V, Through, OpenText, W, Said, Exact: string;
   Parts: TStringArray;
   Outs: array of TLoop;
-  Tips: array of Boolean;
+  Tips: array of boolean;
   Arcs: TIntArrayW;
-  HasPaint, Round_, OpenStart, OpenEnd, Fwd: Boolean;
+  HasPaint, Round_, OpenStart, OpenEnd, Fwd: boolean;
   Paint, Ink: TColor;
-  Wd: Single;
-  P, I, J, K, N, M, G, Start: Integer;
+  Wd: single;
+  P, I, J, K, N, M, G, Start: integer;
   Q: TLoop;
   D0, Nm: TP3;
 
   function Centroid(const L: TLoop): TP3;
   var
-    C: Integer;
+    C: integer;
   begin
     Result := P3(0, 0, 0);
     for C := 0 to High(L) do Result := Add3(Result, L[C]);
     Result := Mul3(Result, 1 / Length(L));
   end;
 
-  procedure Edge(const A, B: TP3; Soft: Boolean);
+  procedure Edge(const A, B: TP3; Soft: boolean);
   begin
     if SamePt(A, B, 1E-9) then Exit;
     D.AddLine(A, B, Ink, Wd, False);
@@ -2039,7 +2173,7 @@ var
   procedure Face(const F: array of TP3);
   var
     L: TLoop;
-    C: Integer;
+    C: integer;
   begin
     { a corner where two outlines meet at a point (a cone's tip) is one }
     SetLength(L, 0);
@@ -2057,10 +2191,10 @@ var
   end;
 
   { off its plane by more than a hair: then two triangles }
-  function Flat(const A, B, C, E: TP3): Boolean;
+  function Flat(const A, B, C, E: TP3): boolean;
   var
     Nn: TP3;
-    L: Double;
+    L: double;
   begin
     Nn := Cross3(Sub3(B, A), Sub3(C, A));
     L := Len3(Nn);
@@ -2086,187 +2220,225 @@ begin
   { a points block inside the loft names its corners for it alone }
   PushScope;
   try
-  if not Block then
-  begin
-    Through := Value;
-    Inc(Cur);
-  end
-  else
-  begin
-    Inc(Cur);
-    while (Cur < Src.Count) and (LowerCase(Src[Cur]) <> 'end') do
+    if not Block then
     begin
-      if LowerCase(Src[Cur]) = 'points' then
-      begin
-        DoPoints;
-        Continue;
-      end;
-      if SplitProp(Src[Cur], Key, V) then
-      begin
-        if Key = 'through' then Through := V
-        else if Key = 'open' then OpenText := V
-        else if Key = 'paint' then
-        begin
-          HasPaint := LowerCase(Trim(V)) <> 'none';
-          if HasPaint then Paint := ReadColor(V);
-        end
-        else if Key = 'ink' then Ink := ReadColor(V)
-        else if Key = 'width' then begin P := 1; Wd := Expr(V, P).V; end;
-      end;
+      Through := Value;
       Inc(Cur);
-    end;
-    if Cur >= Src.Count then Fail('the loft is never closed: an "end" is missing');
-    Inc(Cur);
-  end;
-  { the one-line form may end "; open start" }
-  Parts := Through.Split([';']);
-  if (Length(Parts) > 0) and (LowerCase(Copy(Trim(Parts[High(Parts)]), 1, 4)) = 'open') then
-  begin
-    OpenText := Copy(Trim(Parts[High(Parts)]), 5, MaxInt);
-    SetLength(Parts, Length(Parts) - 1);
-  end;
-  if Length(Parts) < 2 then Fail('a loft goes through two outlines or more: loft = Big; Small');
-  OpenStart := False;
-  OpenEnd := False;
-  for W in LowerCase(StringReplace(OpenText, ',', ' ', [rfReplaceAll])).Split([' '], TStringSplitOptions.ExcludeEmpty) do
-    if W = 'start' then OpenStart := True
-    else if W = 'end' then OpenEnd := True
-    else if W = 'ends' then begin OpenStart := True; OpenEnd := True; end
-    else Fail('"' + W + '" - a loft is open at its start, its end, or both ends');
-  SetLength(Outs, Length(Parts));
-  SetLength(Arcs, Length(Parts));
-  Said := '';
-  Exact := '';
-  Round_ := True;
-  for I := 0 to High(Parts) do
-  begin
-    Outs[I] := ReadList(Trim(Parts[I]));
-    if Length(Outs[I]) = 2 then
-      Fail('a loft''s outline wants three corners or more, a circle''s name, or one point for a tip');
-    Arcs[I] := -1;
-    W := Trim(Parts[I]);
-    if (Length(Outs[I]) >= 3) and (Pos(' ', W) = 0) and (Pos(',', W) = 0) then Arcs[I] := ArcOf(Outs[I]);
-    if (Arcs[I] < 0) and (Length(Outs[I]) > 1) then Round_ := False;
-    { as it will be written back: a circle by its name, else its places;
-      and the places exactly, for the writer to give their names back }
-    if I > 0 then begin Said := Said + '; '; Exact := Exact + ';'; end;
-    if Arcs[I] < 0 then
-      for K := 0 to High(Outs[I]) do
-      begin
-        if K > 0 then Exact := Exact + ' ';
-        Exact := Exact + FloatToStrF(Outs[I][K].X, ffGeneral, 17, 0, DotFS) + ',' +
-          FloatToStrF(Outs[I][K].Y, ffGeneral, 17, 0, DotFS) + ',' +
-          FloatToStrF(Outs[I][K].Z, ffGeneral, 17, 0, DotFS);
-      end;
-    if Arcs[I] >= 0 then Said := Said + W
-    else
-      for K := 0 to High(Outs[I]) do
-      begin
-        if K > 0 then Said := Said + ' to ';
-        Said := Said + Place2(Outs[I][K], U, False);
-      end;
-  end;
-  if OpenStart then Said := Said + #1 + 'start';
-  if OpenEnd then if OpenStart then Said := Said + ' end' else Said := Said + #1 + 'end';
-  M := Length(Outs);
-  N := 0;
-  for I := 0 to M - 1 do
-    if Length(Outs[I]) > 1 then
-      if N = 0 then N := Length(Outs[I])
-      else if Length(Outs[I]) <> N then
-        Fail(Format('every outline of a loft has as many corners: %d here, %d in the first',
-          [Length(Outs[I]), N]));
-  { a tip is one point, met by every corner of the outline beside it }
-  SetLength(Tips, M);
-  for I := 0 to M - 1 do
-  begin
-    Tips[I] := Length(Outs[I]) = 1;
-    if not Tips[I] then Continue;
-    if (I > 0) and (I < M - 1) then Fail('a tip, one point, is a loft''s first outline or its last');
-    if (M = 2) and Tips[1 - I] then Fail('a loft from a point to a point encloses nothing');
-    D0 := Outs[I][0];
-    SetLength(Outs[I], N);
-    for K := 0 to N - 1 do Outs[I][K] := D0;
-  end;
-  { two outlines in one plane enclose nothing }
-  for I := 0 to M - 2 do
-  begin
-    if Tips[I] then J := I + 1 else J := I;
-    Nm := LoopNormal(Outs[J]);
-    if Len3(Nm) < 1E-12 then Fail('a loft''s outline is not flat: its corners lie on a line');
-    Nm := Mul3(Nm, 1 / Len3(Nm));
-    P := J;
-    if J = I then J := I + 1 else J := I;
-    K := 0;
-    for G := 0 to N - 1 do
-      if Abs(Dot3(Sub3(Outs[J][G], Outs[P][0]), Nm)) > 1E-9 then Inc(K);
-    if K = 0 then Fail(Format('outlines %d and %d of the loft lie in one plane: a loft goes from one to the next across space', [I + 1, I + 2]));
-  end;
-  G := D.NewGroup;
-  Start := D.Live;
-  NoteSolid(G, HasPaint, Paint);
-  { it makes its own faces: a flat loop of its edges (a profile through a
-    body between two tips) is not one }
-  SetLength(FacesGiven, Length(FacesGiven) + 1);
-  FacesGiven[High(FacesGiven)] := G;
-  { each outline's edges: a circle's own ring, or its lines }
-  for I := 0 to M - 1 do
-    if Arcs[I] >= 0 then
-    begin
-      if D[Arcs[I]].Grp = 0 then D.SetGroup(Arcs[I], G);
     end
     else
-      for K := 0 to N - 1 do Edge(Outs[I][K], Outs[I][(K + 1) mod N], False);
-  for I := 0 to M - 2 do
-  begin
-    { the sides face out: the way round the first outline goes says which
-      way the corners run }
-    D0 := Sub3(Centroid(Outs[I + 1]), Centroid(Outs[I]));
-    if Tips[I] then Fwd := Dot3(LoopNormal(Outs[I + 1]), D0) > 0
-    else Fwd := Dot3(LoopNormal(Outs[I]), D0) > 0;
-    for K := 0 to N - 1 do
     begin
-      J := (K + 1) mod N;
-      Edge(Outs[I][K], Outs[I + 1][K], Round_);
-      SetLength(Q, 4);
-      if Fwd then
+      Inc(Cur);
+      while (Cur < Src.Count) and (LowerCase(Src[Cur]) <> 'end') do
       begin
-        Q[0] := Outs[I][K]; Q[1] := Outs[I][J]; Q[2] := Outs[I + 1][J]; Q[3] := Outs[I + 1][K];
+        if LowerCase(Src[Cur]) = 'points' then
+        begin
+          DoPoints;
+          Continue;
+        end;
+        if SplitProp(Src[Cur], Key, V) then
+        begin
+          if Key = 'through' then Through := V
+          else if Key = 'open' then OpenText := V
+          else if Key = 'paint' then
+          begin
+            HasPaint := LowerCase(Trim(V)) <> 'none';
+            if HasPaint then Paint := ReadColor(V);
+          end
+          else if Key = 'ink' then Ink := ReadColor(V)
+          else if Key = 'width' then
+          begin
+            P := 1;
+            Wd := Expr(V, P).V;
+          end;
+        end;
+        Inc(Cur);
+      end;
+      if Cur >= Src.Count then Fail('the loft is never closed: an "end" is missing');
+      Inc(Cur);
+    end;
+    { the one-line form may end "; open start" }
+    Parts := Through.Split([';']);
+    if (Length(Parts) > 0) and (LowerCase(Copy(Trim(Parts[High(Parts)]), 1, 4)) = 'open') then
+    begin
+      OpenText := Copy(Trim(Parts[High(Parts)]), 5, MaxInt);
+      SetLength(Parts, Length(Parts) - 1);
+    end;
+    if Length(Parts) < 2 then Fail('a loft goes through two outlines or more: loft = Big; Small');
+    OpenStart := False;
+    OpenEnd := False;
+    for W in LowerCase(StringReplace(OpenText, ',', ' ', [rfReplaceAll])).Split([' '], TStringSplitOptions.ExcludeEmpty) do
+      if W = 'start' then OpenStart := True
+      else if W = 'end' then OpenEnd := True
+      else if W = 'ends' then
+      begin
+        OpenStart := True;
+        OpenEnd := True;
       end
       else
+        Fail('"' + W + '" - a loft is open at its start, its end, or both ends');
+    SetLength(Outs, Length(Parts));
+    SetLength(Arcs, Length(Parts));
+    Said := '';
+    Exact := '';
+    Round_ := True;
+    for I := 0 to High(Parts) do
+    begin
+      Outs[I] := ReadList(Trim(Parts[I]));
+      if Length(Outs[I]) = 2 then
+        Fail('a loft''s outline wants three corners or more, a circle''s name, or one point for a tip');
+      Arcs[I] := -1;
+      W := Trim(Parts[I]);
+      if (Length(Outs[I]) >= 3) and (Pos(' ', W) = 0) and (Pos(',', W) = 0) then Arcs[I] := ArcOf(Outs[I]);
+      if (Arcs[I] < 0) and (Length(Outs[I]) > 1) then Round_ := False;
+    { as it will be written back: a circle by its name, else its places;
+      and the places exactly, for the writer to give their names back }
+      if I > 0 then
       begin
-        Q[0] := Outs[I + 1][K]; Q[1] := Outs[I + 1][J]; Q[2] := Outs[I][J]; Q[3] := Outs[I][K];
+        Said := Said + '; ';
+        Exact := Exact + ';';
       end;
-      if Flat(Q[0], Q[1], Q[2], Q[3]) then Face(Q)
+      if Arcs[I] < 0 then
+        for K := 0 to High(Outs[I]) do
+        begin
+          if K > 0 then Exact := Exact + ' ';
+          Exact := Exact + FloatToStrF(Outs[I][K].X, ffGeneral, 17, 0, DotFS) + ',' + FloatToStrF(Outs[I][K].Y, ffGeneral, 17, 0, DotFS) +
+            ',' + FloatToStrF(Outs[I][K].Z, ffGeneral, 17, 0, DotFS);
+        end;
+      if Arcs[I] >= 0 then Said := Said + W
       else
+        for K := 0 to High(Outs[I]) do
+        begin
+          if K > 0 then Said := Said + ' to ';
+          Said := Said + Place2(Outs[I][K], U, False);
+        end;
+    end;
+    if OpenStart then Said := Said + #1 + 'start';
+    if OpenEnd then if OpenStart then Said := Said + ' end'
+      else
+        Said := Said + #1 + 'end';
+    M := Length(Outs);
+    N := 0;
+    for I := 0 to M - 1 do
+      if Length(Outs[I]) > 1 then
+        if N = 0 then N := Length(Outs[I])
+        else if Length(Outs[I]) <> N then
+          Fail(Format('every outline of a loft has as many corners: %d here, %d in the first', [Length(Outs[I]), N]));
+    { a tip is one point, met by every corner of the outline beside it }
+    SetLength(Tips, M);
+    for I := 0 to M - 1 do
+    begin
+      Tips[I] := Length(Outs[I]) = 1;
+      if not Tips[I] then Continue;
+      if (I > 0) and (I < M - 1) then Fail('a tip, one point, is a loft''s first outline or its last');
+      if (M = 2) and Tips[1 - I] then Fail('a loft from a point to a point encloses nothing');
+      D0 := Outs[I][0];
+      SetLength(Outs[I], N);
+      for K := 0 to N - 1 do Outs[I][K] := D0;
+    end;
+    { two outlines in one plane enclose nothing }
+    for I := 0 to M - 2 do
+    begin
+      if Tips[I] then J := I + 1
+      else
+        J := I;
+      Nm := LoopNormal(Outs[J]);
+      if Len3(Nm) < 1E-12 then Fail('a loft''s outline is not flat: its corners lie on a line');
+      Nm := Mul3(Nm, 1 / Len3(Nm));
+      P := J;
+      if J = I then J := I + 1
+      else
+        J := I;
+      K := 0;
+      for G := 0 to N - 1 do
+        if Abs(Dot3(Sub3(Outs[J][G], Outs[P][0]), Nm)) > 1E-9 then Inc(K);
+      if K = 0 then Fail(Format('outlines %d and %d of the loft lie in one plane: a loft goes from one to the next across space', [I + 1, I + 2]));
+    end;
+    G := D.NewGroup;
+    Start := D.Live;
+    NoteSolid(G, HasPaint, Paint);
+  { it makes its own faces: a flat loop of its edges (a profile through a
+    body between two tips) is not one }
+    SetLength(FacesGiven, Length(FacesGiven) + 1);
+    FacesGiven[High(FacesGiven)] := G;
+    { each outline's edges: a circle's own ring, or its lines }
+    for I := 0 to M - 1 do
+      if Arcs[I] >= 0 then
       begin
-        Face([Q[0], Q[1], Q[2]]);
-        Face([Q[0], Q[2], Q[3]]);
-        Edge(Q[0], Q[2], True);
+        if D[Arcs[I]].Grp = 0 then D.SetGroup(Arcs[I], G);
+      end
+      else
+        for K := 0 to N - 1 do Edge(Outs[I][K], Outs[I][(K + 1) mod N], False);
+    for I := 0 to M - 2 do
+    begin
+    { the sides face out: the way round the first outline goes says which
+      way the corners run }
+      D0 := Sub3(Centroid(Outs[I + 1]), Centroid(Outs[I]));
+      if Tips[I] then Fwd := Dot3(LoopNormal(Outs[I + 1]), D0) > 0
+      else
+        Fwd := Dot3(LoopNormal(Outs[I]), D0) > 0;
+      for K := 0 to N - 1 do
+      begin
+        J := (K + 1) mod N;
+        Edge(Outs[I][K], Outs[I + 1][K], Round_);
+        SetLength(Q, 4);
+        if Fwd then
+        begin
+          Q[0] := Outs[I][K];
+          Q[1] := Outs[I][J];
+          Q[2] := Outs[I + 1][J];
+          Q[3] := Outs[I + 1][K];
+        end
+        else
+        begin
+          Q[0] := Outs[I + 1][K];
+          Q[1] := Outs[I + 1][J];
+          Q[2] := Outs[I][J];
+          Q[3] := Outs[I][K];
+        end;
+        if Flat(Q[0], Q[1], Q[2], Q[3]) then Face(Q)
+        else
+        begin
+          Face([Q[0], Q[1], Q[2]]);
+          Face([Q[0], Q[2], Q[3]]);
+          Edge(Q[0], Q[2], True);
+        end;
       end;
     end;
-  end;
-  { the ends, facing away from the rest; the outlines between are no faces }
-  D0 := Sub3(Centroid(Outs[1]), Centroid(Outs[0]));
-  Q := Copy(Outs[0]);
-  if Dot3(LoopNormal(Q), D0) > 0 then
-    for K := 0 to N div 2 - 1 do begin Nm := Q[K]; Q[K] := Q[N - 1 - K]; Q[N - 1 - K] := Nm; end;
-  if Tips[0] then { a tip has no end }
-  else if OpenStart then NoFace(Outs[0]) else Face(Q);
-  D0 := Sub3(Centroid(Outs[M - 1]), Centroid(Outs[M - 2]));
-  Q := Copy(Outs[M - 1]);
-  if Dot3(LoopNormal(Q), D0) < 0 then
-    for K := 0 to N div 2 - 1 do begin Nm := Q[K]; Q[K] := Q[N - 1 - K]; Q[N - 1 - K] := Nm; end;
-  if Tips[M - 1] then { a tip has no end }
-  else if OpenEnd then NoFace(Outs[M - 1]) else Face(Q);
-  for I := 1 to M - 2 do NoFace(Outs[I]);
-  NameCorners(Start, G);
-  { what the loft made, as against what joins it later (a disk drawn on it) }
-  for I := Start to D.Live - 1 do
-    if D[I].Grp = G then D.SetMade(I, #5);
-  SetLength(Lofts, Length(Lofts) + 1);
-  Lofts[High(Lofts)].G := G;
-  Lofts[High(Lofts)].Said := Said + #3 + Exact;
+    { the ends, facing away from the rest; the outlines between are no faces }
+    D0 := Sub3(Centroid(Outs[1]), Centroid(Outs[0]));
+    Q := Copy(Outs[0]);
+    if Dot3(LoopNormal(Q), D0) > 0 then
+      for K := 0 to N div 2 - 1 do
+      begin
+        Nm := Q[K];
+        Q[K] := Q[N - 1 - K];
+        Q[N - 1 - K] := Nm;
+      end;
+    if Tips[0] then { a tip has no end }
+    else if OpenStart then NoFace(Outs[0])
+    else
+      Face(Q);
+    D0 := Sub3(Centroid(Outs[M - 1]), Centroid(Outs[M - 2]));
+    Q := Copy(Outs[M - 1]);
+    if Dot3(LoopNormal(Q), D0) < 0 then
+      for K := 0 to N div 2 - 1 do
+      begin
+        Nm := Q[K];
+        Q[K] := Q[N - 1 - K];
+        Q[N - 1 - K] := Nm;
+      end;
+    if Tips[M - 1] then { a tip has no end }
+    else if OpenEnd then NoFace(Outs[M - 1])
+    else
+      Face(Q);
+    for I := 1 to M - 2 do NoFace(Outs[I]);
+    NameCorners(Start, G);
+    { what the loft made, as against what joins it later (a disk drawn on it) }
+    for I := Start to D.Live - 1 do
+      if D[I].Grp = G then D.SetMade(I, #5);
+    SetLength(Lofts, Length(Lofts) + 1);
+    Lofts[High(Lofts)].G := G;
+    Lofts[High(Lofts)].Said := Said + #3 + Exact;
   finally
     PopScope;
   end;
@@ -2277,7 +2449,7 @@ end;
   what the statement makes. }
 procedure THeckReader.FinishLofts;
 var
-  L, I, Part: Integer;
+  L, I, Part: integer;
   Fp: string;
 begin
   for L := 0 to High(Lofts) do
@@ -2285,7 +2457,11 @@ begin
     Part := -1;
     { a group's record keeps its own number in Grp; it is no solid's }
     for I := 0 to D.Live - 1 do
-      if (D.EntRef(I)^.Grp = Lofts[L].G) and (D.EntRef(I)^.Kind <> ekPart) then begin Part := D.EntRef(I)^.Part; Break; end;
+      if (D.EntRef(I)^.Grp = Lofts[L].G) and (D.EntRef(I)^.Kind <> ekPart) then
+      begin
+        Part := D.EntRef(I)^.Part;
+        Break;
+      end;
     if Part < 0 then Continue;
     Fp := SolidPrint(D, Lofts[L].G, Part);
     { its own rings and what it made carry the statement; a face that joined
@@ -2293,31 +2469,32 @@ begin
     for I := 0 to D.Live - 1 do
       if (D.EntRef(I)^.Grp = Lofts[L].G) and (D.EntRef(I)^.Part = Part) and (D.EntRef(I)^.Kind <> ekPart) then
         if (D.EntRef(I)^.Made = #5) or (D.EntRef(I)^.Kind = ekArc) then D.SetMade(I, Lofts[L].Said + #2 + Fp)
-        else D.SetMade(I, #4 + Fp);
+        else
+          D.SetMade(I, #4 + Fp);
   end;
 end;
 
-procedure THeckReader.DoPull(const Value: string; Block: Boolean);
+procedure THeckReader.DoPull(const Value: string; Block: boolean);
 var
   Key, V, OutlineText, ByText: string;
   Lp: TLoop;
   By: TP3;
-  HasPaint, Round_: Boolean;
+  HasPaint, Round_: boolean;
   Paint, Ink: TColor;
-  Wd: Single;
+  Wd: single;
   Parts: TStringArray;
-  P, I, N, G, ArcAt, K: Integer;
+  P, I, N, G, ArcAt, K: integer;
   Top: TP3;
 
-  { the way circle I faces }
-  function ArcNormalOf(I: Integer): TP3;
+{ the way circle I faces }
+  function ArcNormalOf(I: integer): TP3;
   begin
     case D[I].Plane of
       plXY: Result := P3(0, 0, 1);
       plXZ: Result := P3(0, 1, 0);
       plYZ: Result := P3(1, 0, 0);
-    else
-      Result := D[I].Nm;
+      else
+        Result := D[I].Nm;
     end;
   end;
 
@@ -2352,7 +2529,11 @@ begin
           if HasPaint then Paint := ReadColor(V);
         end
         else if Key = 'ink' then Ink := ReadColor(V)
-        else if Key = 'width' then begin P := 1; Wd := Expr(V, P).V; end;
+        else if Key = 'width' then
+        begin
+          P := 1;
+          Wd := Expr(V, P).V;
+        end;
       end;
       Inc(Cur);
     end;
@@ -2377,11 +2558,9 @@ begin
       { the outline lies in the circle's plane: two circles of a size round
         one center (tubes meeting at a joint) share every distance, and two
         opposite corners, but not a plane }
-      if (D[I].Kind = ekArc) and FullCircle(D[I].Sweep) and
-         (Abs(Dist(D[I].C, Lp[0]) - D[I].R) < 1E-6) and
-         (Abs(Dist(D[I].C, Lp[N div 2]) - D[I].R) < 1E-6) and
-         (Abs(Dot3(Sub3(Lp[0], D[I].C), ArcNormalOf(I))) < 1E-6) and
-         (Abs(Dot3(Sub3(Lp[N div 4], D[I].C), ArcNormalOf(I))) < 1E-6) then
+      if (D[I].Kind = ekArc) and FullCircle(D[I].Sweep) and (Abs(Dist(D[I].C, Lp[0]) - D[I].R) < 1E-6) and
+        (Abs(Dist(D[I].C, Lp[N div 2]) - D[I].R) < 1E-6) and (Abs(Dot3(Sub3(Lp[0], D[I].C), ArcNormalOf(I))) < 1E-6) and
+        (Abs(Dot3(Sub3(Lp[N div 4], D[I].C), ArcNormalOf(I))) < 1E-6) then
       begin
         ArcAt := I;
         Break;
@@ -2392,7 +2571,10 @@ begin
   NoteSolid(G, HasPaint, Paint);
   { A loose circle pulled joins the solid; one that already belongs to
     another solid (the hole in the box it stands on) stays there. }
-  if Round_ then begin if D[ArcAt].Grp = 0 then D.SetGroup(ArcAt, G); end
+  if Round_ then
+  begin
+    if D[ArcAt].Grp = 0 then D.SetGroup(ArcAt, G);
+  end
   else
     for K := 0 to N - 1 do
     begin
@@ -2411,17 +2593,29 @@ begin
   end;
 end;
 
-procedure THeckReader.MakeRect(const Corner, Size: TP3; HasPaint: Boolean; Paint: TColor);
+procedure THeckReader.MakeRect(const Corner, Size: TP3; HasPaint: boolean; Paint: TColor);
 var
   C: array[0..3] of TP3;
-  I, N: Integer;
+  I, N: integer;
   EU, EV: TP3;
 begin
   N := Ord(Abs(Size.X) > 1E-9) + Ord(Abs(Size.Y) > 1E-9) + Ord(Abs(Size.Z) > 1E-9);
   if N <> 2 then Fail('a rectangle''s size has two parts - "4'' east, 3'' north", or "4'' east, 2'' up"');
-  if Abs(Size.Z) < 1E-9 then begin EU := P3(Size.X, 0, 0); EV := P3(0, Size.Y, 0); end
-  else if Abs(Size.Y) < 1E-9 then begin EU := P3(Size.X, 0, 0); EV := P3(0, 0, Size.Z); end
-  else begin EU := P3(0, Size.Y, 0); EV := P3(0, 0, Size.Z); end;
+  if Abs(Size.Z) < 1E-9 then
+  begin
+    EU := P3(Size.X, 0, 0);
+    EV := P3(0, Size.Y, 0);
+  end
+  else if Abs(Size.Y) < 1E-9 then
+  begin
+    EU := P3(Size.X, 0, 0);
+    EV := P3(0, 0, Size.Z);
+  end
+  else
+  begin
+    EU := P3(0, Size.Y, 0);
+    EV := P3(0, 0, Size.Z);
+  end;
   C[0] := Corner;
   C[1] := Add3(Corner, EU);
   C[2] := Add3(C[1], EV);
@@ -2433,22 +2627,24 @@ begin
     EU := Cross3(Sub3(C[1], C[0]), Sub3(C[3], C[0]));
     if EU.X + EU.Y + EU.Z < 0 then
     begin
-      EV := C[1]; C[1] := C[3]; C[3] := EV;
+      EV := C[1];
+      C[1] := C[3];
+      C[3] := EV;
     end;
     D.AddFaceRaw(C, DefInk, False);
     D.SetMaterial(D.Live - 1, Paint);
   end;
 end;
 
-procedure THeckReader.DoRect(const Value: string; Block: Boolean);
+procedure THeckReader.DoRect(const Value: string; Block: boolean);
 var
   Key, V: string;
   Corner, Size: TP3;
-  HasPaint, HasAt, HasSize: Boolean;
+  HasPaint, HasAt, HasSize: boolean;
   Ink, WasInk: TColor;
-  Wd, WasWd: Single;
+  Wd, WasWd: single;
   Paint: TColor;
-  P: Integer;
+  P: integer;
 begin
   HasPaint := False;
   Paint := 0;
@@ -2471,8 +2667,16 @@ begin
     if SplitProp(Src[Cur], Key, V) then
     begin
       P := 1;
-      if Key = 'at' then begin Corner := ReadPlace(V, P, False, Corner); HasAt := True; end
-      else if Key = 'size' then begin Size := ReadStep(V, P); HasSize := True; end
+      if Key = 'at' then
+      begin
+        Corner := ReadPlace(V, P, False, Corner);
+        HasAt := True;
+      end
+      else if Key = 'size' then
+      begin
+        Size := ReadStep(V, P);
+        HasSize := True;
+      end
       else if Key = 'paint' then
       begin
         HasPaint := LowerCase(Trim(V)) <> 'none';
@@ -2486,21 +2690,24 @@ begin
   if Cur >= Src.Count then Fail('the rectangle is never closed: an "end" is missing');
   Inc(Cur);
   if not (HasAt and HasSize) then Fail('a rectangle wants an "at" and a "size"');
-  WasInk := DefInk; WasWd := DefWidth;
-  DefInk := Ink; DefWidth := Wd;
+  WasInk := DefInk;
+  WasWd := DefWidth;
+  DefInk := Ink;
+  DefWidth := Wd;
   try
     MakeRect(Corner, Size, HasPaint, Paint);
   finally
-    DefInk := WasInk; DefWidth := WasWd;
+    DefInk := WasInk;
+    DefWidth := WasWd;
   end;
 end;
 
-procedure THeckReader.DoBore(Solid: Integer);
+procedure THeckReader.DoBore(Solid: integer);
 var
   Key, V: string;
   Lp: TLoop;
   Goes: TP3;
-  P: Integer;
+  P: integer;
 begin
   SetLength(Lp, 0);
   Goes := P3(0, 0, 0);
@@ -2526,13 +2733,13 @@ end;
   no "hole".  So after reading, each circle lying flat inside a face becomes
   a hole in it unless it already is.  The disk is not made; that is
   "face = c1", which the writer writes. }
-procedure THeckReader.CutCircles(FirstNew: Integer);
+procedure THeckReader.CutCircles(FirstNew: integer);
 var
-  I, F, K, N, J: Integer;
+  I, F, K, N, J: integer;
   Lp: TLoop;
   Nm, P0, Q, E1, E2: TP3;
   Holes: array of TP3Array;
-  Inside, Known: Boolean;
+  Inside, Known: boolean;
   Tmp: TP3;
 begin
   for I := FirstNew to D.Live - 1 do
@@ -2553,14 +2760,23 @@ begin
         box's top, a pull's, one the lines closed) are cut. }
       Known := False;
       for J := 0 to High(Explicit) do
-        if Explicit[J] = F then begin Known := True; Break; end;
+        if Explicit[J] = F then
+        begin
+          Known := True;
+          Break;
+        end;
       if Known then Continue;
       if Length(D.EntRef(F)^.Poly) = N then
       begin
         { the disk itself, or a face that is this ring: not cut }
         Inside := True;
         for K := 0 to N - 1 do
-          if not SamePt(D.EntRef(F)^.Poly[K], Lp[0], 1E-6) then Continue else begin Inside := False; Break; end;
+          if not SamePt(D.EntRef(F)^.Poly[K], Lp[0], 1E-6) then Continue
+          else
+          begin
+            Inside := False;
+            Break;
+          end;
         if not Inside then Continue;
       end;
       Nm := D.FaceNormal(F);
@@ -2569,8 +2785,16 @@ begin
       for K := 0 to N - 1 do
       begin
         Q := Sub3(Lp[K], P0);
-        if Abs(Dot3(Q, Nm)) > 1E-6 then begin Inside := False; Break; end;
-        if not PointInLoop(Lp[K], D.EntRef(F)^.Poly, Nm) then begin Inside := False; Break; end;
+        if Abs(Dot3(Q, Nm)) > 1E-6 then
+        begin
+          Inside := False;
+          Break;
+        end;
+        if not PointInLoop(Lp[K], D.EntRef(F)^.Poly, Nm) then
+        begin
+          Inside := False;
+          Break;
+        end;
       end;
       if not Inside then Continue;
       { already a hole of it? }
@@ -2578,7 +2802,11 @@ begin
       for J := 0 to High(D.EntRef(F)^.Holes) do
         if (Length(D.EntRef(F)^.Holes[J]) = N) then
           for K := 0 to N - 1 do
-            if SamePt(D.EntRef(F)^.Holes[J][K], Lp[0], 1E-6) then begin Known := True; Break; end;
+            if SamePt(D.EntRef(F)^.Holes[J][K], Lp[0], 1E-6) then
+            begin
+              Known := True;
+              Break;
+            end;
       if Known then Continue;
       { a hole goes round the other way from its face }
       SetLength(Holes, Length(D.EntRef(F)^.Holes) + 1);
@@ -2607,42 +2835,47 @@ end;
   edges after every edit, so one with none is gone at the next.  A side
   already drawn in the same solid and group, along a longer line, or on a
   circle or an arc, is left alone. }
-procedure THeckReader.EdgeFaces(FirstNew: Integer);
+procedure THeckReader.EdgeFaces(FirstNew: integer);
 var
   Have: TFPHashList;
-  I, K, H, N: Integer;
+  I, K, H, N: integer;
   Lp: TP3Array;
   Rounds: TIntArrayW;
-  Added: Boolean;
+  Added: boolean;
   Lined: TFPHashList;     { the solids that came with lines of their own }
 
-  function KeyOf(const A, B: TP3; Grp, Part: Integer): shortstring;
+  function KeyOf(const A, B: TP3; Grp, Part: integer): shortstring;
   var
     P, Q: TP3;
   begin
     { either way round }
     if (A.X < B.X) or ((A.X = B.X) and ((A.Y < B.Y) or ((A.Y = B.Y) and (A.Z <= B.Z)))) then
-    begin P := A; Q := B; end
-    else begin P := B; Q := A; end;
-    Result := Format('%d,%d,%d,%d,%d,%d|%d|%d', [Round(P.X * 1E6), Round(P.Y * 1E6), Round(P.Z * 1E6),
-      Round(Q.X * 1E6), Round(Q.Y * 1E6), Round(Q.Z * 1E6), Grp, Part]);
+    begin
+      P := A;
+      Q := B;
+    end
+    else
+    begin
+      P := B;
+      Q := A;
+    end;
+    Result := Format('%d,%d,%d,%d,%d,%d|%d|%d', [Round(P.X * 1E6), Round(P.Y * 1E6), Round(P.Z * 1E6), Round(Q.X * 1E6), Round(Q.Y * 1E6), Round(Q.Z * 1E6), Grp, Part]);
   end;
 
-  function OnCircle(const A, B: TP3): Boolean;
+  function OnCircle(const A, B: TP3): boolean;
   var
-    J: Integer;
+    J: integer;
   begin
     for J := 0 to High(Rounds) do
-      if (Abs(Dist(D.EntRef(Rounds[J])^.C, A) - D.EntRef(Rounds[J])^.R) < 1E-6) and
-         (Abs(Dist(D.EntRef(Rounds[J])^.C, B) - D.EntRef(Rounds[J])^.R) < 1E-6) then
+      if (Abs(Dist(D.EntRef(Rounds[J])^.C, A) - D.EntRef(Rounds[J])^.R) < 1E-6) and (Abs(Dist(D.EntRef(Rounds[J])^.C, B) - D.EntRef(Rounds[J])^.R) < 1E-6) then
         Exit(True);
     Result := False;
   end;
 
   { P on the line L, between its ends }
-  function OnLine(const P: TP3; L: Integer): Boolean;
+  function OnLine(const P: TP3; L: integer): boolean;
   var
-    T, Len2: Double;
+    T, Len2: double;
     Q: TP3;
   begin
     Q := Sub3(D.EntRef(L)^.B, D.EntRef(L)^.A);
@@ -2654,19 +2887,19 @@ var
   end;
 
   { a side that is part of a longer line: a corner where another line meets it }
-  function AlongLine(const A, B: TP3; F: Integer): Boolean;
+  function AlongLine(const A, B: TP3; F: integer): boolean;
   var
-    L: Integer;
+    L: integer;
   begin
     { the face's own solid's lines, or loose ones in its group: a rectangle
       drawn on a solid's face is the hole's edges }
     for L := 0 to D.Live - 1 do
       if (D.EntRef(L)^.Kind = ekLine) and ((D.EntRef(L)^.Grp = D.EntRef(F)^.Grp) or (D.EntRef(L)^.Grp = 0)) and (D.EntRef(L)^.Part = D.EntRef(F)^.Part) and
-         OnLine(A, L) and OnLine(B, L) then Exit(True);
+        OnLine(A, L) and OnLine(B, L) then Exit(True);
     Result := False;
   end;
 
-  procedure Edge(const A, B: TP3; F: Integer);
+  procedure Edge(const A, B: TP3; F: integer);
   begin
     if SamePt(A, B, 1E-9) then Exit;
     if Have.FindIndexOf(KeyOf(A, B, D.EntRef(F)^.Grp, D.EntRef(F)^.Part)) >= 0 then Exit;
@@ -2701,15 +2934,17 @@ begin
       if D.EntRef(I)^.Kind <> ekFace then Continue;
       for H := -1 to High(D.EntRef(I)^.Holes) do
       begin
-        if H < 0 then Lp := D.EntRef(I)^.Poly else Lp := D.EntRef(I)^.Holes[H];
+        if H < 0 then Lp := D.EntRef(I)^.Poly
+        else
+          Lp := D.EntRef(I)^.Holes[H];
         Added := False;
         for K := 0 to High(Lp) do Edge(Lp[K], Lp[(K + 1) mod Length(Lp)], I);
         if Added then
         begin
           if Length(Edged) < D.Live then SetLength(Edged, D.Live);
           Edged[I] := True;
-          if (D.EntRef(I)^.Grp <> 0) and (Lined.FindIndexOf(IntToStr(D.EntRef(I)^.Grp)) < 0) and
-             ((Length(FacesGiven) = 0) or (FacesGiven[High(FacesGiven)] <> D.EntRef(I)^.Grp)) then
+          if (D.EntRef(I)^.Grp <> 0) and (Lined.FindIndexOf(IntToStr(D.EntRef(I)^.Grp)) < 0) and ((Length(FacesGiven) = 0) or
+            (FacesGiven[High(FacesGiven)] <> D.EntRef(I)^.Grp)) then
           begin
             SetLength(FacesGiven, Length(FacesGiven) + 1);
             FacesGiven[High(FacesGiven)] := D.EntRef(I)^.Grp;
@@ -2731,25 +2966,27 @@ begin
   end;
 end;
 
-procedure THeckReader.ImplyFaces(FirstNew: Integer);
+procedure THeckReader.ImplyFaces(FirstNew: integer);
 type
-  TKey = record Part, Grp: Integer; end;
+  TKey = record
+    Part, Grp: integer;
+  end;
 var
   Keys: array of TKey;
-  I, K, F, S, J, C: Integer;
+  I, K, F, S, J, C: integer;
   Segs: TSegArray;
   Regs: TRegionArray;
   Outer: TP3Array;
   Holes: TLoopArray;
   Mid: TP3;
-  Known, InSolid: Boolean;
-  SolidAt, Hit, NHit: Integer;
+  Known, InSolid: boolean;
+  SolidAt, Hit, NHit: integer;
   Faces: TLoopIndex;
   Cands: TIntArrayW;
 
-  function FaceSaid(G: Integer): Boolean;
+  function FaceSaid(G: integer): boolean;
   var
-    J: Integer;
+    J: integer;
   begin
     for J := 0 to High(FacesGiven) do
       if FacesGiven[J] = G then Exit(True);
@@ -2760,11 +2997,11 @@ var
   { A loop of loose lines lying flat inside a solid's face cuts it, as a
     rectangle drawn on a face does on the sheet and a circle does here (see
     CutCircles).  Whether the loop is a face itself is the noface's say. }
-  procedure CutWith(const Lp: TP3Array; Part: Integer);
+  procedure CutWith(const Lp: TP3Array; Part: integer);
   var
-    F, J, H: Integer;
+    F, J, H: integer;
     Nm, T: TP3;
-    Inside: Boolean;
+    Inside: boolean;
     Holes: array of TP3Array;
     Hole: TP3Array;
   begin
@@ -2813,7 +3050,11 @@ begin
     begin
       Known := False;
       for K := 0 to High(Keys) do
-        if (Keys[K].Part = D.EntRef(I)^.Part) and (Keys[K].Grp = D.EntRef(I)^.Grp) then begin Known := True; Break; end;
+        if (Keys[K].Part = D.EntRef(I)^.Part) and (Keys[K].Grp = D.EntRef(I)^.Grp) then
+        begin
+          Known := True;
+          Break;
+        end;
       if Known then Continue;
       SetLength(Keys, Length(Keys) + 1);
       Keys[High(Keys)].Part := D.EntRef(I)^.Part;
@@ -2839,12 +3080,11 @@ begin
       Known := False;
       Hit := -1;
       NHit := 0;
-      Cands := Faces.Near(Regs[I].Outer);
+      Cands := Faces. Near(Regs[I].Outer);
       for C := 0 to High(Cands) do
       begin
         F := Cands[C];
-        if ((D.EntRef(F)^.Grp = Keys[K].Grp) or (Keys[K].Grp = 0)) and
-           SameLoopTol(D.EntRef(F)^.Poly, Regs[I].Outer, 1E-4) then
+        if ((D.EntRef(F)^.Grp = Keys[K].Grp) or (Keys[K].Grp = 0)) and SameLoopTol(D.EntRef(F)^.Poly, Regs[I].Outer, 1E-4) then
         begin
           Known := True;
           if RegionIsFace(Regs[I], D, F) then
@@ -2861,8 +3101,7 @@ begin
         if Length(Closes) < D.Live then SetLength(Closes, D.Live);
         Closes[Hit] := True;
         ImpliedLoop(Regs[I], InSolid, Mid, Outer, Holes);
-        if (Dot3(LoopNormal(Outer), D.FaceNormal(Hit)) > 0) and
-           not ((Hit <= High(Edged)) and Edged[Hit]) then
+        if (Dot3(LoopNormal(Outer), D.FaceNormal(Hit)) > 0) and not ((Hit <= High(Edged)) and Edged[Hit]) then
         begin
           if Length(Implied) < D.Live then SetLength(Implied, D.Live);
           Implied[Hit] := True;
@@ -2901,15 +3140,15 @@ end;
 { A loose face that fills a hole in a solid's face belongs to that solid
   (the disk cut in a box's top, typed as "face = c1" or made from the circle),
   as the tool heals it. }
-procedure THeckReader.HomeLooseFaces(FirstNew: Integer);
+procedure THeckReader.HomeLooseFaces(FirstNew: integer);
 var
-  F, S, J, C: Integer;
+  F, S, J, C: integer;
   Holes: TLoopIndex;
   Cands: TIntArrayW;
 
-  function WrittenOut(Face: Integer): Boolean;
+  function WrittenOut(Face: integer): boolean;
   var
-    K: Integer;
+    K: integer;
   begin
     for K := 0 to High(Explicit) do
       if Explicit[K] = Face then Exit(True);
@@ -2918,9 +3157,9 @@ var
 
   { another solid's edges meet the disk: it is that solid's end too (a
     cylinder pulled up from a circle drawn on a box), and faces its way }
-  function Shared(Face, G: Integer): Boolean;
+  function Shared(Face, G: integer): boolean;
   var
-    K, L: Integer;
+    K, L: integer;
   begin
     for L := 0 to D.Live - 1 do
       if (D.EntRef(L)^.Kind = ekLine) and (D.EntRef(L)^.Grp <> 0) and (D.EntRef(L)^.Grp <> G) then
@@ -2939,7 +3178,7 @@ begin
     for F := FirstNew to D.Live - 1 do
     begin
       if (D.EntRef(F)^.Kind <> ekFace) or (D.EntRef(F)^.Grp <> 0) then Continue;
-      Cands := Holes.Near(D.EntRef(F)^.Poly);
+      Cands := Holes. Near(D.EntRef(F)^.Poly);
       for C := 0 to High(Cands) do
       begin
         S := Cands[C];
@@ -2952,7 +3191,7 @@ begin
               fills, not east, north or up as a loose face would; one written
               out keeps the way it was written }
             if Shared(F, D.EntRef(S)^.Grp) then
-              { as it was }
+            { as it was }
             else if not WrittenOut(F) then
             begin
               if Dot3(D.FaceNormal(F), D.FaceNormal(S)) < 0 then D.FlipFace(F);
@@ -2975,7 +3214,7 @@ end;
 
 procedure THeckReader.Run(L: TStrings);
 var
-  FirstNew: Integer;
+  FirstNew: integer;
   T0, T1, T2, T3: QWord;
 begin
   T0 := GetTickCount64;
@@ -2994,15 +3233,13 @@ begin
   HomeLooseFaces(FirstNew);
   FinishLofts;
   if GetEnvironmentVariable('HECK_TIMING') <> '' then
-    WriteLn(StdErr, Format('read: things %d ms, imply %d ms, circles %d ms, home %d ms',
-      [T1 - T0, T2 - T1, T3 - T2, GetTickCount64 - T3]));
+    WriteLn(StdErr, Format('read: things %d ms, imply %d ms, circles %d ms, home %d ms', [T1 - T0, T2 - T1, T3 - T2, GetTickCount64 - T3]));
 end;
 
-function ReadHeckImplied(L: TStrings; D: TWorkDoc; U: TUnitSystem;
-  out ErrLine: Integer; out Err: string; out Implied: TBoolArray): Boolean;
+function ReadHeckImplied(L: TStrings; D: TWorkDoc; U: TUnitSystem; out ErrLine: integer; out Err: string; out Implied: TBoolArray): boolean;
 var
   R: THeckReader;
-  WasStamp: Integer;
+  WasStamp: integer;
 begin
   Err := '';
   ErrLine := -1;
@@ -3031,8 +3268,7 @@ begin
   end;
 end;
 
-function ReadHeck(L: TStrings; D: TWorkDoc; U: TUnitSystem;
-  out ErrLine: Integer; out Err: string): Boolean;
+function ReadHeck(L: TStrings; D: TWorkDoc; U: TUnitSystem; out ErrLine: integer; out Err: string): boolean;
 var
   Implied: TBoolArray;
 begin
@@ -3042,7 +3278,7 @@ end;
 function HeckSheets(L: TStrings): THeckSheetSpans;
 var
   R: THeckReader;
-  I, Depth, Cur, P: Integer;
+  I, Depth, Cur, P: integer;
   Line, Key, V, Word_: string;
 begin
   Result := nil;
@@ -3097,11 +3333,10 @@ begin
   end;
 end;
 
-function HeckValue(const S: string; U: TUnitSystem; out V: Double;
-  out IsLength: Boolean): Boolean;
+function HeckValue(const S: string; U: TUnitSystem; out V: double; out IsLength: boolean): boolean;
 var
   R: THeckReader;
-  P: Integer;
+  P: integer;
   T: TVal;
   Scratch: TWorkDoc;
 begin

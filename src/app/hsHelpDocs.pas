@@ -19,7 +19,7 @@ const
   HELP_VERSION_FILE = 'VERSION';
 
 type
-  THelpProgress = procedure(BytesReceived, TotalBytes: Int64) of object;
+  THelpProgress = procedure(BytesReceived, TotalBytes: int64) of object;
 
 { Beside the program when portable, else in the user's own folder. }
 function HelpFolder: string;
@@ -34,16 +34,15 @@ function HelpSumsURL(const Tag: string): string;
 { Unpacks ZipPath into Dest, replacing the old copy only once the new one is
   complete.  Refuses entries that would land outside Dest, anything
   implausibly large, and a zip with no index.html. }
-function InstallHelpZip(const ZipPath, Dest: string; out Err: string): Boolean;
+function InstallHelpZip(const ZipPath, Dest: string; out Err: string): boolean;
 
 { Fetches, checks and installs the pages for Tag, or the latest release
   when Tag has none.  GotTag says which release they came from. }
-function FetchHelp(const Tag: string; OnProgress: THelpProgress;
-  out GotTag, Err: string): Boolean;
+function FetchHelp(const Tag: string; OnProgress: THelpProgress; out GotTag, Err: string): boolean;
 
 { True when the local pages are missing or from another release, as right
   after an update.  Never true when running from the source tree. }
-function HelpIsStale(const ProgramTag: string): Boolean;
+function HelpIsStale(const ProgramTag: string): boolean;
 
 type
   { FetchHelp on its own thread.  OnDone and OnProgress run on the main
@@ -51,19 +50,18 @@ type
   THelpFetch = class(TThread)
   private
     FTag, FGotTag, FErr: string;
-    FOK: Boolean;
-    FGot, FTotal: Int64;
+    FOK: boolean;
+    FGot, FTotal: int64;
     FOnProgress: THelpProgress;
     FOnDone: TNotifyEvent;
-    procedure Progress(BytesReceived, TotalBytes: Int64);
+    procedure Progress(BytesReceived, TotalBytes: int64);
     procedure SyncProgress;
     procedure SyncDone;
   protected
     procedure Execute; override;
   public
-    constructor Create(const ATag: string; AOnProgress: THelpProgress;
-      AOnDone: TNotifyEvent);
-    property OK: Boolean read FOK;
+    constructor Create(const ATag: string; AOnProgress: THelpProgress; AOnDone: TNotifyEvent);
+    property OK: boolean read FOK;
     property GotTag: string read FGotTag;
     property Err: string read FErr;
   end;
@@ -73,8 +71,7 @@ var
   HelpFetching: THelpFetch = nil;
 
 { False when a fetch is already running. }
-function StartHelpFetch(const Tag: string; AOnProgress: THelpProgress;
-  AOnDone: TNotifyEvent): Boolean;
+function StartHelpFetch(const Tag: string; AOnProgress: THelpProgress; AOnDone: TNotifyEvent): boolean;
 
 implementation
 
@@ -119,14 +116,12 @@ end;
 
 function HelpZipURL(const Tag: string): string;
 begin
-  Result := 'https://github.com/' + UPDATE_REPO + '/releases/download/' +
-    Tag + '/' + HELP_ZIP;
+  Result := 'https://github.com/' + UPDATE_REPO + '/releases/download/' + Tag + '/' + HELP_ZIP;
 end;
 
 function HelpSumsURL(const Tag: string): string;
 begin
-  Result := 'https://github.com/' + UPDATE_REPO + '/releases/download/' +
-    Tag + '/SHA256SUMS';
+  Result := 'https://github.com/' + UPDATE_REPO + '/releases/download/' + Tag + '/SHA256SUMS';
 end;
 
 { A zip entry name made safe, or '' to refuse it.  Names that climb (..),
@@ -136,7 +131,7 @@ function SafeName(const Name: string): string;
 var
   S, Part: string;
   Parts: TStringList;
-  I: Integer;
+  I: integer;
 begin
   Result := '';
   S := StringReplace(Name, '\', '/', [rfReplaceAll]);
@@ -159,11 +154,11 @@ begin
   end;
 end;
 
-function InstallHelpZip(const ZipPath, Dest: string; out Err: string): Boolean;
+function InstallHelpZip(const ZipPath, Dest: string; out Err: string): boolean;
 var
   Z: TUnZipper;
-  I, N: Integer;
-  Total: Int64;
+  I, N: integer;
+  Total: int64;
   Target, Fresh, Old: string;
   Entry: TFullZipFileEntry;
 begin
@@ -199,8 +194,7 @@ begin
         begin
           if Entry.IsDirectory and (Trim(Entry.ArchiveFileName) = '') then
             Continue;
-          Err := 'the help archive has a file that would land outside ' +
-            'its folder (' + Entry.ArchiveFileName + ')';
+          Err := 'the help archive has a file that would land outside ' + 'its folder (' + Entry.ArchiveFileName + ')';
           Exit;
         end;
         Inc(Total, Entry.Size);
@@ -252,14 +246,13 @@ begin
   Result := True;
 end;
 
-function FetchHelp(const Tag: string; OnProgress: THelpProgress;
-  out GotTag, Err: string): Boolean;
+function FetchHelp(const Tag: string; OnProgress: THelpProgress; out GotTag, Err: string): boolean;
 var
   Tried, Want, Tmp, Sum: string;
   Info: TUpdateInfo;
   LatestErr: string;
 
-  function TryTag(const T: string): Boolean;
+  function TryTag(const T: string): boolean;
   begin
     Result := False;
     Want := ExpectedSum(HelpSumsURL(T), HELP_ZIP);
@@ -275,8 +268,7 @@ var
       Sum := Sha256Of(Tmp);
       if not SameText(Sum, Want) then
       begin
-        Err := 'the downloaded help did not match its checksum, so it was ' +
-          'not used';
+        Err := 'the downloaded help did not match its checksum, so it was ' + 'not used';
         Exit;
       end;
       if not InstallHelpZip(Tmp, HelpFolder, Err) then Exit;
@@ -322,7 +314,7 @@ begin
     Err := 'release ' + Info.Tag + ' has no help pages attached';
 end;
 
-function HelpIsStale(const ProgramTag: string): Boolean;
+function HelpIsStale(const ProgramTag: string): boolean;
 var
   Index: string;
 begin
@@ -337,8 +329,7 @@ begin
   Result := LocalHelpVersion <> ProgramTag;
 end;
 
-constructor THelpFetch.Create(const ATag: string; AOnProgress: THelpProgress;
-  AOnDone: TNotifyEvent);
+constructor THelpFetch.Create(const ATag: string; AOnProgress: THelpProgress; AOnDone: TNotifyEvent);
 begin
   FTag := ATag;
   FOnProgress := AOnProgress;
@@ -347,7 +338,7 @@ begin
   inherited Create(False);
 end;
 
-procedure THelpFetch.Progress(BytesReceived, TotalBytes: Int64);
+procedure THelpFetch.Progress(BytesReceived, TotalBytes: int64);
 begin
   FGot := BytesReceived;
   FTotal := TotalBytes;
@@ -379,8 +370,7 @@ begin
   Synchronize(@SyncDone);
 end;
 
-function StartHelpFetch(const Tag: string; AOnProgress: THelpProgress;
-  AOnDone: TNotifyEvent): Boolean;
+function StartHelpFetch(const Tag: string; AOnProgress: THelpProgress; AOnDone: TNotifyEvent): boolean;
 begin
   Result := HelpFetching = nil;
   if Result then HelpFetching := THelpFetch.Create(Tag, AOnProgress, AOnDone);

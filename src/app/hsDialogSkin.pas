@@ -14,7 +14,8 @@ interface
 uses
   Classes, SysUtils, Graphics, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
   BGRABitmap, BGRABitmapTypes, BCButton, BCPanel, BCLabel, BCTypes,
-  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox, InkEdit, InkMemo, InkRichEdit, InkLabel, hsSkin, hsSurface;
+  BGRATheme, BGRAThemeCheckBox, BGRAThemeRadioButton, BCComboBox, BCTrackbarUpdown, BGRAFlashProgressBar, BCFluentSlider, InkListBox,
+  InkEdit, InkMemo, InkRichEdit, InkLabel, hsSkin, hsSurface;
 
 type
   { How loudly a button is painted.  Only the main action should be bright. }
@@ -26,9 +27,9 @@ type
     window-relative delta counts twice and the drag shakes.  Move with one
     SetBounds; Left then Top is two moves and the window visibly steps. }
   TFormDrag = record
-    Live: Boolean;
-    GrabX, GrabY: Integer;    { the pointer, on the screen, when it went down }
-    FormX, FormY: Integer;    { where the window was at that moment }
+    Live: boolean;
+    GrabX, GrabY: integer;    { the pointer, on the screen, when it went down }
+    FormX, FormY: integer;    { where the window was at that moment }
   end;
 
 { Begin, continue and end a title-bar drag.  The mouse event's X and Y are
@@ -44,15 +45,10 @@ type
     this theme. }
   THsBoxTheme = class(TBGRATheme)
   private
-    procedure DrawBox(const Caption: string; State: TBGRAThemeButtonState;
-      Focused, Checked, Round: Boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+    procedure DrawBox(const Caption: string; State: TBGRAThemeButtonState; Focused, Checked, Round: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
   public
-    procedure DrawCheckBox(Caption: string; State: TBGRAThemeButtonState;
-      Focused: boolean; Checked: boolean; ARect: TRect;
-      ASurface: TBGRAThemeSurface); override;
-    procedure DrawRadioButton(Caption: string; State: TBGRAThemeButtonState;
-      Focused: boolean; Checked: boolean; ARect: TRect;
-      ASurface: TBGRAThemeSurface); override;
+    procedure DrawCheckBox(Caption: string; State: TBGRAThemeButtonState; Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface); override;
+    procedure DrawRadioButton(Caption: string; State: TBGRAThemeButtonState; Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface); override;
   end;
 
   { Tabs drawn on a paint box in the dialog colors, for the same reason: a
@@ -63,20 +59,18 @@ type
     FBox: TPaintBox;
     FPages: TNotebook;
     FTabs: TStringList;
-    FIndex: Integer;
+    FIndex: integer;
     FOnChange: TNotifyEvent;
     procedure Paint(Sender: TObject);
-    procedure MouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure TabsChanged(Sender: TObject);
-    procedure SetIndex(V: Integer);
-    function TabRight(I: Integer): Integer;
+    procedure SetIndex(V: integer);
+    function TabRight(I: integer): integer;
   public
-    constructor Create(ABox: TPaintBox; APages: TNotebook;
-      const Names: array of string); reintroduce;
+    constructor Create(ABox: TPaintBox; APages: TNotebook; const Names: array of string); reintroduce;
     destructor Destroy; override;
     property Tabs: TStringList read FTabs;
-    property TabIndex: Integer read FIndex write SetIndex;
+    property TabIndex: integer read FIndex write SetIndex;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
@@ -90,13 +84,12 @@ procedure UseTheme(const T: TTheme);
 
 { A shade of a color - Amount above 0 lightens, below 0 darkens.
   PixToColor, for turning a TPix into an LCL color, comes from hsSurface. }
-function Shade(C: TColor; Amount: Double): TColor;
+function Shade(C: TColor; Amount: double): TColor;
 
 procedure SkinForm(F: TForm);
-procedure SkinPanel(P: TBCPanel; Raised: Boolean = False; Rounding: Integer = 10);
-procedure SkinButton(B: TBCButton; Kind: TBtnKind; FontH: Integer = 0);
-procedure SkinLabel(L: TBCLabel; Dim: Boolean = False; FontH: Integer = 0;
-  Bold: Boolean = False);
+procedure SkinPanel(P: TBCPanel; Raised: boolean = False; Rounding: integer = 10);
+procedure SkinButton(B: TBCButton; Kind: TBtnKind; FontH: integer = 0);
+procedure SkinLabel(L: TBCLabel; Dim: boolean = False; FontH: integer = 0; Bold: boolean = False);
 procedure SkinCheck(C: TBGRAThemeControl);
 procedure SkinCombo(C: TBCComboBox);
 procedure SkinSpin(C: TBCTrackbarUpdown);
@@ -110,7 +103,7 @@ procedure ThemeForm(F: TForm);
 { A window kept above the others, or not.  On GTK3 the style changed on a
   window already showing lost it behind the main window, so a showing one
   is hidden, changed and shown again. }
-procedure SetOnTop(F: TForm; On: Boolean);
+procedure SetOnTop(F: TForm; On: boolean);
 { Keep the message loop turning this long, so what was just put up paints
   and the window stays responsive. }
 procedure PauseFor(Milliseconds: QWord);
@@ -120,12 +113,12 @@ function FieldColor: TColor;
 
 { Markup for LazInk lists and memos, in the current theme.  ToneColor is
   green for good and red for bad, readable on a light or a dark field. }
-function ToneColor(Good: Boolean): TColor;
+function ToneColor(Good: boolean): TColor;
 { Hard keeps every space, for a row that never wraps; otherwise a line can
   still break between words }
-function InkSpan(const Txt: string; C: TColor; Bold: Boolean = False; Hard: Boolean = True): string;
-function DimSpan(const Txt: string; Hard: Boolean = True): string;
-function TextSpan(const Txt: string; Bold: Boolean = False; Hard: Boolean = True): string;
+function InkSpan(const Txt: string; C: TColor; Bold: boolean = False; Hard: boolean = True): string;
+function DimSpan(const Txt: string; Hard: boolean = True): string;
+function TextSpan(const Txt: string; Bold: boolean = False; Hard: boolean = True): string;
 { a plain report dressed up, columns kept: a line over indented ones is a
   heading, figures stand out from the words, a line in capitals is a title
   and one led by WARNING, SHORT and the like is a warning, and Warn goes
@@ -134,11 +127,11 @@ function InkReport(const Plain: string; const Warn: string = ''): string;
 
 { A radio group is a panel of BGRA radio buttons; they count in the order
   they were laid out.  RadioIndex is -1 when none is checked. }
-function RadioIndex(P: TWinControl): Integer;
-procedure SetRadioIndex(P: TWinControl; I: Integer);
-function RadioText(P: TWinControl; I: Integer): string;
-function RadioCount(P: TWinControl): Integer;
-function IsRadioPanel(C: TComponent): Boolean;
+function RadioIndex(P: TWinControl): integer;
+procedure SetRadioIndex(P: TWinControl; I: integer);
+function RadioText(P: TWinControl; I: integer): string;
+function RadioCount(P: TWinControl): integer;
+function IsRadioPanel(C: TComponent): boolean;
 
 implementation
 
@@ -160,7 +153,7 @@ end;
 procedure DragTo(const D: TFormDrag; F: TForm);
 var
   P: TPoint;
-  NX, NY: Integer;
+  NX, NY: integer;
 begin
   if not D.Live then Exit;
   P := Mouse.CursorPos;
@@ -182,14 +175,15 @@ begin
   if BoxTheme <> nil then BoxTheme.InvalidateThemedControls;
 end;
 
-function Shade(C: TColor; Amount: Double): TColor;
+function Shade(C: TColor; Amount: double): TColor;
 var
-  R, G, B: Integer;
+  R, G, B: integer;
 
-  function Mix(V: Integer): Integer;
+  function Mix(V: integer): integer;
   begin
     if Amount >= 0 then Result := Round(V + (255 - V) * Amount)
-    else Result := Round(V * (1 + Amount));
+    else
+      Result := Round(V * (1 + Amount));
     if Result < 0 then Result := 0;
     if Result > 255 then Result := 255;
   end;
@@ -208,12 +202,13 @@ begin
   F.Font.Height := -13;
 end;
 
-procedure SkinPanel(P: TBCPanel; Raised: Boolean; Rounding: Integer);
+procedure SkinPanel(P: TBCPanel; Raised: boolean; Rounding: integer);
 var
   Base: TColor;
 begin
   if Raised then Base := PixToColor(DlgTheme.PanelHi)
-  else Base := PixToColor(DlgTheme.Panel);
+  else
+    Base := PixToColor(DlgTheme.Panel);
   P.Background.Style := bbsColor;
   P.Background.Color := Base;
   { set Color too: a child with ParentColor (a BCLabel by default) reads
@@ -234,20 +229,18 @@ type
     button renders, every partly transparent pixel is mixed with the
     parent's color and made opaque. }
   TCornerFix = class
-    procedure AfterRender(Sender: TObject; const ABGRA: TBGRABitmap;
-      AState: TBCButtonState; ARect: TRect);
+    procedure AfterRender(Sender: TObject; const ABGRA: TBGRABitmap; AState: TBCButtonState; ARect: TRect);
   end;
 
 var
   CornerFix: TCornerFix = nil;
 
-procedure TCornerFix.AfterRender(Sender: TObject; const ABGRA: TBGRABitmap;
-  AState: TBCButtonState; ARect: TRect);
+procedure TCornerFix.AfterRender(Sender: TObject; const ABGRA: TBGRABitmap; AState: TBCButtonState; ARect: TRect);
 var
   Back: TColor;
-  BR, BG, BB, X, Y, A: Integer;
+  BR, BG, BB, X, Y, A: integer;
   P: PBGRAPixel;
-  Off: Boolean;
+  Off: boolean;
 begin
   { A disabled button is faded most of the way into the background.  The
     library only grays it, and on a dark theme a plain button is gray
@@ -298,29 +291,29 @@ begin
   S.FontEx.Style := [];
 end;
 
-procedure SkinButton(B: TBCButton; Kind: TBtnKind; FontH: Integer);
+procedure SkinButton(B: TBCButton; Kind: TBtnKind; FontH: integer);
 var
   Fill, Edge, Txt: TColor;
 begin
   case Kind of
     bkGo:
-      begin
+    begin
         { the accent, with black or white text, whichever reads on it.  Do
           not assume the accent is bright; the light theme's is not. }
-        Fill := PixToColor(DlgTheme.Accent);
-        Edge := Shade(Fill, -0.25);
-        Txt := PixToColor(OnPix(DlgTheme.Accent));
-      end;
+      Fill := PixToColor(DlgTheme.Accent);
+      Edge := Shade(Fill, -0.25);
+      Txt := PixToColor(OnPix(DlgTheme.Accent));
+    end;
     bkQuiet:
-      begin
-        Fill := PixToColor(DlgTheme.Panel);
-        Edge := PixToColor(DlgTheme.Panel);
-        Txt := PixToColor(DlgTheme.TextDim);
-      end;
-  else
-    Fill := PixToColor(DlgTheme.PanelHi);
-    Edge := PixToColor(DlgTheme.Bezel1);
-    Txt := PixToColor(DlgTheme.Text);
+    begin
+      Fill := PixToColor(DlgTheme.Panel);
+      Edge := PixToColor(DlgTheme.Panel);
+      Txt := PixToColor(DlgTheme.TextDim);
+    end;
+    else
+      Fill := PixToColor(DlgTheme.PanelHi);
+      Edge := PixToColor(DlgTheme.Bezel1);
+      Txt := PixToColor(DlgTheme.Text);
   end;
 
   B.Rounding.RoundX := 8;
@@ -339,18 +332,21 @@ begin
   B.OnAfterRenderBCButton := @CornerFix.AfterRender;
 end;
 
-procedure SkinLabel(L: TBCLabel; Dim: Boolean; FontH: Integer; Bold: Boolean);
+procedure SkinLabel(L: TBCLabel; Dim: boolean; FontH: integer; Bold: boolean);
 begin
   if Dim then L.FontEx.Color := PixToColor(DlgTheme.TextDim)
-  else L.FontEx.Color := PixToColor(DlgTheme.Text);
+  else
+    L.FontEx.Color := PixToColor(DlgTheme.Text);
   if FontH = 0 then FontH := -13;
   L.FontEx.Height := FontH;
-  if Bold then L.FontEx.Style := [fsBold] else L.FontEx.Style := [];
+  if Bold then L.FontEx.Style := [fsBold]
+  else
+    L.FontEx.Style := [];
   L.Background.Style := bbsClear;
   L.Border.Style := bboNone;
 end;
 
-function LightTheme: Boolean;
+function LightTheme: boolean;
 begin
   Result := (DlgTheme.Panel.R + DlgTheme.Panel.G + DlgTheme.Panel.B) > 3 * 140;
 end;
@@ -363,21 +359,24 @@ begin
     Result := PixToColor(MixPix(DlgTheme.Panel, Pix(0, 0, 0), 0.30));
 end;
 
-function ToneColor(Good: Boolean): TColor;
+function ToneColor(Good: boolean): TColor;
 begin
   if LightTheme then
   begin
-    if Good then Result := $00308A1B else Result := $002828C6;
+    if Good then Result := $00308A1B
+    else
+      Result := $002828C6;
   end
   else if Good then Result := $007AD35C
-  else Result := $006B6BFF;
+  else
+    Result := $006B6BFF;
 end;
 
 { HTML text with its spacing kept: a run of spaces collapses, so all but
   the last of one become &nbsp; - all of them when Hard }
-function KeepSpaces(const Txt: string; Hard: Boolean): string;
+function KeepSpaces(const Txt: string; Hard: boolean): string;
 var
-  I, J: Integer;
+  I, J: integer;
 begin
   Result := '';
   I := 1;
@@ -387,7 +386,8 @@ begin
       J := I;
       while (J <= Length(Txt)) and (Txt[J] = ' ') do Inc(J);
       if Hard then Result := Result + DupeString('&nbsp;', J - I)
-      else Result := Result + DupeString('&nbsp;', J - I - 1) + ' ';
+      else
+        Result := Result + DupeString('&nbsp;', J - I - 1) + ' ';
       I := J;
     end
     else
@@ -396,14 +396,14 @@ begin
         '&': Result := Result + '&amp;';
         '<': Result := Result + '&lt;';
         '>': Result := Result + '&gt;';
-      else
-        Result := Result + Txt[I];
+        else
+          Result := Result + Txt[I];
       end;
       Inc(I);
     end;
 end;
 
-function InkSpan(const Txt: string; C: TColor; Bold, Hard: Boolean): string;
+function InkSpan(const Txt: string; C: TColor; Bold, Hard: boolean): string;
 begin
   if Txt = '' then Exit('');
   C := ColorToRGB(C);
@@ -412,12 +412,12 @@ begin
   Result := Format('<font color="#%.2X%.2X%.2X">%s</font>', [Red(C), Green(C), Blue(C), Result]);
 end;
 
-function DimSpan(const Txt: string; Hard: Boolean): string;
+function DimSpan(const Txt: string; Hard: boolean): string;
 begin
   Result := InkSpan(Txt, PixToColor(DlgTheme.TextDim), False, Hard);
 end;
 
-function TextSpan(const Txt: string; Bold, Hard: Boolean): string;
+function TextSpan(const Txt: string; Bold, Hard: boolean): string;
 begin
   Result := InkSpan(Txt, PixToColor(DlgTheme.Text), Bold, Hard);
 end;
@@ -425,20 +425,20 @@ end;
 function InkReport(const Plain: string; const Warn: string): string;
 var
   Lines, Out: TStringList;
-  I, K, Indent, Start: Integer;
+  I, K, Indent, Start: integer;
   L, Body, Lead: string;
-  Head, Indented: Boolean;
+  Head, Indented: boolean;
 
-  function NextIndented(From: Integer): Boolean;
+  function NextIndented(From: integer): boolean;
   var
-    J: Integer;
+    J: integer;
   begin
     for J := From to Lines.Count - 1 do
       if Trim(Lines[J]) <> '' then Exit((Lines[J] <> '') and (Lines[J][1] = ' '));
     Result := False;
   end;
 
-  function Digit(J: Integer): Boolean;
+  function Digit(J: integer): boolean;
   begin
     Result := (J >= 1) and (J <= Length(Body)) and (Body[J] in ['0'..'9']);
   end;
@@ -446,27 +446,28 @@ var
   { the line's own words, its figures picked out }
   function Figures: string;
   var
-    J, From: Integer;
+    J, From: integer;
   begin
     Result := '';
     J := 1;
     From := 1;
     while J <= Length(Body) do
-      if (Digit(J) or ((Body[J] = '-') and Digit(J + 1))) and
-         ((J = 1) or not (Body[J - 1] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.'])) then
+      if (Digit(J) or ((Body[J] = '-') and Digit(J + 1))) and ((J = 1) or not (Body[J - 1] in ['A'..'Z', 'a'..'z', '0'..'9', '_', '.'])) then
       begin
         if Indented then Result := Result + DimSpan(Copy(Body, From, J - From), False)
-        else Result := Result + TextSpan(Copy(Body, From, J - From), False, False);
+        else
+          Result := Result + TextSpan(Copy(Body, From, J - From), False, False);
         From := J;
         Inc(J);
-        while (J <= Length(Body)) and (Digit(J) or (Body[J] in ['''', '"', '%']) or
-          ((Body[J] in ['.', ',', '/', '-']) and Digit(J + 1))) do Inc(J);
+        while (J <= Length(Body)) and (Digit(J) or (Body[J] in ['''', '"', '%']) or ((Body[J] in ['.', ',', '/', '-']) and Digit(J + 1))) do Inc(J);
         Result := Result + TextSpan(Copy(Body, From, J - From), True, False);
         From := J;
       end
-      else Inc(J);
+      else
+        Inc(J);
     if Indented then Result := Result + DimSpan(Copy(Body, From, MaxInt), False)
-    else Result := Result + TextSpan(Copy(Body, From, MaxInt), False, False);
+    else
+      Result := Result + TextSpan(Copy(Body, From, MaxInt), False, False);
   end;
 
 begin
@@ -483,7 +484,11 @@ begin
     for I := 0 to Lines.Count - 1 do
     begin
       L := TrimRight(Lines[I]);
-      if L = '' then begin Out.Add('&nbsp;'); Continue; end;
+      if L = '' then
+      begin
+        Out.Add('&nbsp;');
+        Continue;
+      end;
       Indent := 0;
       while (Indent < Length(L)) and (L[Indent + 1] = ' ') do Inc(Indent);
       Body := Copy(L, Indent + 1, MaxInt);
@@ -601,6 +606,7 @@ begin
     from here }
   if C.Hint <> '' then C.ShowHint := True;
 end;
+
 procedure SkinSlider(T: TBCFluentSlider);
 begin
   T.LineColor := PixToColor(DlgTheme.Accent);
@@ -627,11 +633,13 @@ begin
   end;
 end;
 
-procedure SetOnTop(F: TForm; On: Boolean);
+procedure SetOnTop(F: TForm; On: boolean);
 var
   Want: TFormStyle;
 begin
-  if On then Want := fsStayOnTop else Want := fsNormal;
+  if On then Want := fsStayOnTop
+  else
+    Want := fsNormal;
   if F.FormStyle = Want then Exit;
   if not F.Visible then
   begin
@@ -657,7 +665,7 @@ end;
 
 procedure ThemeForm(F: TForm);
 var
-  I: Integer;
+  I: integer;
   C: TComponent;
   Kind: TBtnKind;
 begin
@@ -670,8 +678,8 @@ begin
       case C.Tag of
         1: Kind := bkGo;
         2: Kind := bkQuiet;
-      else
-        Kind := bkPlain;
+        else
+          Kind := bkPlain;
       end;
       SkinButton(TBCButton(C), Kind, TBCButton(C).StateNormal.FontEx.Height);
       { the rounded corners show the button's own color }
@@ -685,7 +693,8 @@ begin
     else if C is TLabel then
     begin
       if C.Tag = 1 then TLabel(C).Font.Color := PixToColor(DlgTheme.TextDim)
-      else TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
+      else
+        TLabel(C).Font.Color := PixToColor(DlgTheme.Text);
       { a label with a font of its own but no size would take the desktop's }
       if TLabel(C).Font.Height = 0 then TLabel(C).Font.Height := -13;
       TLabel(C).Transparent := True;
@@ -701,7 +710,8 @@ begin
     else if C is TInkLabel then
     begin
       if C.Tag = 1 then TInkLabel(C).Font.Color := PixToColor(DlgTheme.TextDim)
-      else TInkLabel(C).Font.Color := PixToColor(DlgTheme.Text);
+      else
+        TInkLabel(C).Font.Color := PixToColor(DlgTheme.Text);
       if TInkLabel(C).Font.Height = 0 then TInkLabel(C).Font.Height := -13;
       TInkLabel(C).Transparent := True;
     end
@@ -731,14 +741,13 @@ begin
   Result := ColorToBGRA(ColorToRGB(C));
 end;
 
-procedure THsBoxTheme.DrawBox(const Caption: string; State: TBGRAThemeButtonState;
-  Focused, Checked, Round: Boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+procedure THsBoxTheme.DrawBox(const Caption: string; State: TBGRAThemeButtonState; Focused, Checked, Round: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
 var
   Ctl: TCustomControl;
   C: TCanvas;
   Bmp: TBGRABitmap;
-  S, Y, I, Gap: Integer;
-  W, Lw: Single;
+  S, Y, I, Gap: integer;
+  W, Lw: single;
   Edge, Fill, Mark: TBGRAPixel;
   Txt: TColor;
   St: TTextStyle;
@@ -766,7 +775,8 @@ begin
     Edge := PixOfColor(PixToColor(DlgTheme.TextDim));
   { a dark mark on a pale accent, a white one on a deep accent }
   if A.R * 3 + A.G * 6 + A.B >= 1400 then Mark := PixOfColor(PixToColor(DlgTheme.Shell1))
-  else Mark := BGRAWhite;
+  else
+    Mark := BGRAWhite;
 
   S := ASurface.ScaleForCanvas(16);
   Y := ARect.Top + (ARect.Height - S) div 2;
@@ -786,16 +796,14 @@ begin
   begin
     Bmp.FillRoundRectAntialias(0.5, 0.5, W - 1.5, W - 1.5, W * 0.22, W * 0.22,
       BGRA(A.R, A.G, A.B));
-    Bmp.DrawPolyLineAntialias([PointF(W * 0.24, W * 0.52), PointF(W * 0.42, W * 0.70),
-      PointF(W * 0.76, W * 0.32)], Mark, W / 8);
+    Bmp.DrawPolyLineAntialias([PointF(W * 0.24, W * 0.52), PointF(W * 0.42, W * 0.70), PointF(W * 0.76, W * 0.32)], Mark, W / 8);
   end
   else
   begin
     Bmp.RoundRectAntialias(Lw / 2, Lw / 2, W - 1 - Lw / 2, W - 1 - Lw / 2,
       W * 0.22, W * 0.22, Edge, Lw, Fill);
     if Checked then
-      Bmp.DrawPolyLineAntialias([PointF(W * 0.24, W * 0.52), PointF(W * 0.42, W * 0.70),
-        PointF(W * 0.76, W * 0.32)], Edge, W / 8);
+      Bmp.DrawPolyLineAntialias([PointF(W * 0.24, W * 0.52), PointF(W * 0.42, W * 0.70), PointF(W * 0.76, W * 0.32)], Edge, W / 8);
   end;
   ASurface.DrawBitmap;
 
@@ -813,22 +821,19 @@ begin
     ARect.Left + S + Gap, ARect.Top, Caption, St);
 end;
 
-procedure THsBoxTheme.DrawCheckBox(Caption: string; State: TBGRAThemeButtonState;
-  Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+procedure THsBoxTheme.DrawCheckBox(Caption: string; State: TBGRAThemeButtonState; Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
 begin
   DrawBox(Caption, State, Focused, Checked, False, ARect, ASurface);
 end;
 
-procedure THsBoxTheme.DrawRadioButton(Caption: string; State: TBGRAThemeButtonState;
-  Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
+procedure THsBoxTheme.DrawRadioButton(Caption: string; State: TBGRAThemeButtonState; Focused: boolean; Checked: boolean; ARect: TRect; ASurface: TBGRAThemeSurface);
 begin
   DrawBox(Caption, State, Focused, Checked, True, ARect, ASurface);
 end;
 
-constructor THsTabStrip.Create(ABox: TPaintBox; APages: TNotebook;
-  const Names: array of string);
+constructor THsTabStrip.Create(ABox: TPaintBox; APages: TNotebook; const Names: array of string);
 var
-  I: Integer;
+  I: integer;
 begin
   inherited Create(ABox);
   FBox := ABox;
@@ -854,7 +859,7 @@ begin
   FBox.Invalidate;
 end;
 
-procedure THsTabStrip.SetIndex(V: Integer);
+procedure THsTabStrip.SetIndex(V: integer);
 begin
   if (V < 0) or (V >= FTabs.Count) or (V = FIndex) then Exit;
   FIndex := V;
@@ -864,10 +869,10 @@ end;
 
 { where tab I ends: tabs take their words' width, and share the strip
   evenly when that does not fit }
-function THsTabStrip.TabRight(I: Integer): Integer;
+function THsTabStrip.TabRight(I: integer): integer;
 var
-  K, Pad, Total: Integer;
-  Wid: array of Integer;
+  K, Pad, Total: integer;
+  Wid: array of integer;
 begin
   FBox.Canvas.Font.Height := FBox.Scale96ToForm(-13);
   Pad := FBox.Scale96ToForm(14);
@@ -887,7 +892,7 @@ end;
 procedure THsTabStrip.Paint(Sender: TObject);
 var
   C: TCanvas;
-  I, X0, X1, H, Bar, R: Integer;
+  I, X0, X1, H, Bar, R: integer;
   St: TTextStyle;
 begin
   C := FBox.Canvas;
@@ -932,10 +937,9 @@ begin
   end;
 end;
 
-procedure THsTabStrip.MouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure THsTabStrip.MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  I, Was: Integer;
+  I, Was: integer;
 begin
   if Button <> mbLeft then Exit;
   for I := 0 to FTabs.Count - 1 do
@@ -948,18 +952,18 @@ begin
     end;
 end;
 
-function RadioCount(P: TWinControl): Integer;
+function RadioCount(P: TWinControl): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := 0 to P.ControlCount - 1 do
     if P.Controls[I] is TBGRAThemeRadioButton then Inc(Result);
 end;
 
-function RadioAt(P: TWinControl; Idx: Integer): TBGRAThemeRadioButton;
+function RadioAt(P: TWinControl; Idx: integer): TBGRAThemeRadioButton;
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   N := 0;
   for I := 0 to P.ControlCount - 1 do
@@ -971,16 +975,16 @@ begin
   Result := nil;
 end;
 
-function RadioIndex(P: TWinControl): Integer;
+function RadioIndex(P: TWinControl): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to RadioCount(P) - 1 do
     if RadioAt(P, I).Checked then Exit(I);
   Result := -1;
 end;
 
-procedure SetRadioIndex(P: TWinControl; I: Integer);
+procedure SetRadioIndex(P: TWinControl; I: integer);
 var
   B: TBGRAThemeRadioButton;
 begin
@@ -988,15 +992,17 @@ begin
   if B <> nil then B.Checked := True;
 end;
 
-function RadioText(P: TWinControl; I: Integer): string;
+function RadioText(P: TWinControl; I: integer): string;
 var
   B: TBGRAThemeRadioButton;
 begin
   B := RadioAt(P, I);
-  if B <> nil then Result := B.Caption else Result := '';
+  if B <> nil then Result := B.Caption
+  else
+    Result := '';
 end;
 
-function IsRadioPanel(C: TComponent): Boolean;
+function IsRadioPanel(C: TComponent): boolean;
 begin
   Result := (C is TWinControl) and (RadioCount(TWinControl(C)) > 0);
 end;

@@ -41,7 +41,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure btnSettingsClick(Sender: TObject);
     procedure btnShowGivenClick(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
@@ -50,22 +50,22 @@ type
     procedure chkOnTopChange(Sender: TObject);
   private
     FSettings: TAssistantSettings;
-    FLoading: Boolean;
+    FLoading: boolean;
     FChat: TChatThread;
     FHistory: TChatMsgs;
     FAnswer: string;
-    FThought: Integer;
+    FThought: integer;
     procedure ChatPiece(Sender: TObject; const Piece: string);
     procedure ChatThink(Sender: TObject; const Piece: string);
-    procedure ChatDone(Sender: TObject; OK: Boolean; const Err: string);
-    procedure Busy(On: Boolean);
+    procedure ChatDone(Sender: TObject; OK: boolean; const Err: string);
+    procedure Busy(On: boolean);
     procedure ShowWho;
     procedure ShowGiven;
     procedure Say(const Who, Txt: string; C: TColor);
-    function SheetText(out Lines: Integer; out Picked: string; out NPicked: Integer): string;
+    function SheetText(out Lines: integer; out Picked: string; out NPicked: integer): string;
     function GivenText: string;
     function SystemParts: TChatSystem;
-    procedure CodeAction(Sender: TObject; ABlock: Integer; const AAction, ACode, ALanguage: string);
+    procedure CodeAction(Sender: TObject; ABlock: integer; const AAction, ACode, ALanguage: string);
   public
     { the same questions the source window asks the sheet }
     OnAskSource: TSourceAskSource;
@@ -77,8 +77,7 @@ var
   AssistantForm: TAssistantForm = nil;
 
 { Opens the one assistant window, making it on first use. }
-procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource;
-  AskPicked: TSourceAskPicked; UseHeck: TUseHeckEvent);
+procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource; AskPicked: TSourceAskPicked; UseHeck: TUseHeckEvent);
 
 implementation
 
@@ -87,8 +86,7 @@ implementation
 uses
   hsDialogSkin, hsSurface, hsLongText, hsAssistantSettings, InkMarkdown;
 
-procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource;
-  AskPicked: TSourceAskPicked; UseHeck: TUseHeckEvent);
+procedure ShowAssistant(AOwner: TComponent; AskSource: TSourceAskSource; AskPicked: TSourceAskPicked; UseHeck: TUseHeckEvent);
 begin
   if AssistantForm = nil then AssistantForm := TAssistantForm.Create(AOwner);
   AssistantForm.OnAskSource := AskSource;
@@ -113,8 +111,7 @@ begin
   memChat.CodeActions.Add('Use this');
   memChat.OnCodeAction := @CodeAction;
   ShowWho;
-  Say('', 'Ask about this sheet, or ask for a change to it.  A change comes ' +
-    'back as Heck, to look over before it goes into the drawing.',
+  Say('', 'Ask about this sheet, or ask for a change to it.  A change comes ' + 'back as Heck, to look over before it goes into the drawing.',
     PixToColor(DlgTheme.TextDim));
 end;
 
@@ -130,7 +127,7 @@ begin
   ShowGiven;
 end;
 
-procedure TAssistantForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TAssistantForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   { Enter sends; Ctrl+Enter or Shift+Enter is a new line in the question }
   if (Key = VK_RETURN) and (Shift * [ssCtrl, ssShift, ssAlt] = []) and memAsk.Focused then
@@ -158,8 +155,7 @@ end;
 
 { Use this on a code block: its Heck into the source window, to look over
   and Apply - never into the drawing by itself }
-procedure TAssistantForm.CodeAction(Sender: TObject; ABlock: Integer;
-  const AAction, ACode, ALanguage: string);
+procedure TAssistantForm.CodeAction(Sender: TObject; ABlock: integer; const AAction, ACode, ALanguage: string);
 begin
   if AAction <> 'Use this' then Exit;
   if (ALanguage <> '') and not SameText(ALanguage, 'heck') then
@@ -173,7 +169,7 @@ end;
 { what the sheet would give, on the status line }
 procedure TAssistantForm.ShowGiven;
 var
-  N, NP: Integer;
+  N, NP: integer;
   Picked, S: string;
 begin
   SheetText(N, Picked, NP);
@@ -182,7 +178,8 @@ begin
   begin
     S := DimSpan('This sheet is ', False) + TextSpan(IntToStr(N), True) + DimSpan(' lines of Heck; ', False);
     if NP > 0 then S := S + TextSpan(IntToStr(NP), True) + DimSpan(' picked, on lines ' + Picked, False)
-    else S := S + DimSpan('nothing picked', False);
+    else
+      S := S + DimSpan('nothing picked', False);
   end;
   lblStatus.Caption := S;
 end;
@@ -190,17 +187,18 @@ end;
 procedure TAssistantForm.Say(const Who, Txt: string; C: TColor);
 begin
   if Who = '' then memChat.Append(InkSpan(Txt, C, False, False))
-  else memChat.Append(InkSpan(Who + ':', C, True) + ' ' + TextSpan(Txt, False, False));
+  else
+    memChat.Append(InkSpan(Who + ':', C, True) + ' ' + TextSpan(Txt, False, False));
 end;
 
 { The sheet as Heck, and the lines of what is picked, as "12-18, 40". }
-function TAssistantForm.SheetText(out Lines: Integer; out Picked: string; out NPicked: Integer): string;
+function TAssistantForm.SheetText(out Lines: integer; out Picked: string; out NPicked: integer): string;
 var
   L, Hints, Names: TStringList;
   First, Last, LineThing, Sel: TIntArrayW;
   Sheet: string;
-  On: array of Boolean;
-  I, K, A: Integer;
+  On: array of boolean;
+  I, K, A: integer;
 begin
   Result := '';
   Lines := 0;
@@ -225,12 +223,17 @@ begin
     I := 0;
     while I < Length(On) do
     begin
-      if not On[I] then begin Inc(I); Continue; end;
+      if not On[I] then
+      begin
+        Inc(I);
+        Continue;
+      end;
       A := I;
       while (I + 1 < Length(On)) and On[I + 1] do Inc(I);
       if Picked <> '' then Picked := Picked + ', ';
       if A = I then Picked := Picked + IntToStr(A + 1)
-      else Picked := Picked + IntToStr(A + 1) + '-' + IntToStr(I + 1);
+      else
+        Picked := Picked + IntToStr(A + 1) + '-' + IntToStr(I + 1);
       Inc(I);
     end;
   finally
@@ -244,7 +247,7 @@ end;
 function TAssistantForm.GivenText: string;
 var
   Manual, Missing, Sheet, Picked: string;
-  N, NP: Integer;
+  N, NP: integer;
 begin
   Result := '';
   if chkManual.Checked then
@@ -280,7 +283,7 @@ end;
 function TAssistantForm.SystemParts: TChatSystem;
 var
   Manual, Missing, Sheet, Picked: string;
-  N, NP: Integer;
+  N, NP: integer;
 begin
   Manual := '';
   if chkManual.Checked then Manual := ManualText(Missing);
@@ -290,9 +293,11 @@ begin
   Result := ChatSystem(Manual, Sheet, Picked);
 end;
 
-procedure TAssistantForm.Busy(On: Boolean);
+procedure TAssistantForm.Busy(On: boolean);
 begin
-  if On then btnSend.Caption := 'Stop' else btnSend.Caption := 'Send';
+  if On then btnSend.Caption := 'Stop'
+  else
+    btnSend.Caption := 'Send';
   btnClear.Enabled := not On;
   btnSettings.Enabled := not On;
 end;
@@ -345,11 +350,10 @@ begin
   if FAnswer <> '' then Exit;
   if FThought = 0 then memChat.ReplaceLast('*thinking...*');
   Inc(FThought, Length(Piece));
-  lblStatus.Caption := DimSpan('Thinking first - ', False) +
-    TextSpan(IntToStr(FThought), True) + DimSpan(' characters so far', False);
+  lblStatus.Caption := DimSpan('Thinking first - ', False) + TextSpan(IntToStr(FThought), True) + DimSpan(' characters so far', False);
 end;
 
-procedure TAssistantForm.ChatDone(Sender: TObject; OK: Boolean; const Err: string);
+procedure TAssistantForm.ChatDone(Sender: TObject; OK: boolean; const Err: string);
 begin
   FChat := nil;
   Busy(False);
@@ -377,8 +381,7 @@ begin
       Say('', 'It went wrong: ' + Err, ToneColor(False));
       { the commonest one with a model on this machine }
       if (Pos('context', LowerCase(Err)) > 0) and (Pos('exceed', LowerCase(Err)) > 0) then
-        Say('', 'The manual and this sheet do not fit in what the model was loaded ' +
-          'with.  Load it with a longer context (32768 or more), or untick the manual or ' +
+        Say('', 'The manual and this sheet do not fit in what the model was loaded ' + 'with.  Load it with a longer context (32768 or more), or untick the manual or ' +
           'the sheet above.', PixToColor(DlgTheme.TextDim));
     end;
 end;

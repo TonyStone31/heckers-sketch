@@ -17,25 +17,24 @@ uses
 
 type
   { triples of indices into the caller's vertex list }
-  TTriList = array of Integer;
-  TIndexRing = array of Integer;
+  TTriList = array of integer;
+  TIndexRing = array of integer;
   TIndexRings = array of TIndexRing;
 
 { Cut an outline and its holes into triangles.  Outline and holes are index
   rings into Pts, in any winding.  Tris comes back as index triples.  False
   means the ring was degenerate; Tris is then empty. }
-function Triangulate(const Pts: array of TPointF; const Outline: TIndexRing;
-  const Holes: TIndexRings; out Tris: TTriList): Boolean;
+function Triangulate(const Pts: array of TPointF; const Outline: TIndexRing; const Holes: TIndexRings; out Tris: TTriList): boolean;
 
 { Signed area, positive anticlockwise.  Public so a triangulation can be
   checked: the pieces must add up to the whole. }
-function RingArea(const Pts: array of TPointF; const Ring: TIndexRing): Double;
+function RingArea(const Pts: array of TPointF; const Ring: TIndexRing): double;
 
 implementation
 
-function RingArea(const Pts: array of TPointF; const Ring: TIndexRing): Double;
+function RingArea(const Pts: array of TPointF; const Ring: TIndexRing): double;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
 begin
   Result := 0;
   N := Length(Ring);
@@ -45,26 +44,24 @@ begin
     J := (I + 1) mod N;
     { keep the casts: TPointF holds singles, and without them each product
       is rounded to single before the subtraction }
-    Result := Result + (Double(Pts[Ring[I]].X) * Double(Pts[Ring[J]].Y) -
-                        Double(Pts[Ring[J]].X) * Double(Pts[Ring[I]].Y));
+    Result := Result + (double(Pts[Ring[I]].X) * double(Pts[Ring[J]].Y) - double(Pts[Ring[J]].X) * double(Pts[Ring[I]].Y));
   end;
   Result := Result / 2;
 end;
 
 { Twice the signed area of a triangle: positive when A, B, C turn
   anticlockwise. }
-function Cross2(const A, B, C: TPointF): Double; inline;
+function Cross2(const A, B, C: TPointF): double; inline;
 begin
-  Result := (Double(B.X) - A.X) * (Double(C.Y) - A.Y) -
-            (Double(C.X) - A.X) * (Double(B.Y) - A.Y);
+  Result := (double(B.X) - A.X) * (double(C.Y) - A.Y) - (double(C.X) - A.X) * (double(B.Y) - A.Y);
 end;
 
 { Is P inside triangle ABC?  A point on an edge counts as inside, so an ear
   with a vertex on its edge is refused; otherwise slivers overlap. }
-function InTri(const A, B, C, P: TPointF): Boolean;
+function InTri(const A, B, C, P: TPointF): boolean;
 var
-  D1, D2, D3: Double;
-  Neg, Pos: Boolean;
+  D1, D2, D3: double;
+  Neg, Pos: boolean;
 begin
   D1 := Cross2(A, B, P);
   D2 := Cross2(B, C, P);
@@ -79,14 +76,13 @@ end;
   edge's right end P, unless a reflex corner sits inside triangle M-X-P; then
   aim at the one at the shallowest angle.  The hole goes in out and back
   along the bridge, so both ends appear twice. }
-procedure BridgeHole(const Pts: array of TPointF; var Ring: TIndexRing;
-  const Hole: TIndexRing);
+procedure BridgeHole(const Pts: array of TPointF; var Ring: TIndexRing; const Hole: TIndexRing);
 var
-  I, J, N, M, HStart, Best, K: Integer;
-  HX, HY, X, T, BestX, Ang, BestAng: Double;
+  I, J, N, M, HStart, Best, K: integer;
+  HX, HY, X, T, BestX, Ang, BestAng: double;
   A, B, Mp, Xp, Pp: TPointF;
   Merged: TIndexRing;
-  EdgeI: Integer;
+  EdgeI: integer;
 begin
   N := Length(Ring);
   M := Length(Hole);
@@ -126,7 +122,9 @@ begin
   { the right-hand end of that edge is the candidate to aim at }
   A := Pts[Ring[EdgeI]];
   B := Pts[Ring[(EdgeI + 1) mod N]];
-  if A.X >= B.X then Best := EdgeI else Best := (EdgeI + 1) mod N;
+  if A.X >= B.X then Best := EdgeI
+  else
+    Best := (EdgeI + 1) mod N;
   Pp := Pts[Ring[Best]];
 
   { unless a reflex corner of the ring is in the way, in which case aim at
@@ -153,28 +151,35 @@ begin
   { out along the bridge, round the hole, and back }
   SetLength(Merged, N + M + 2);
   K := 0;
-  for I := 0 to Best do begin Merged[K] := Ring[I]; Inc(K); end;
+  for I := 0 to Best do
+  begin
+    Merged[K] := Ring[I];
+    Inc(K);
+  end;
   for I := 0 to M do
   begin
     Merged[K] := Hole[(HStart + I) mod M];
     Inc(K);
   end;
-  for I := Best to N - 1 do begin Merged[K] := Ring[I]; Inc(K); end;
+  for I := Best to N - 1 do
+  begin
+    Merged[K] := Ring[I];
+    Inc(K);
+  end;
   SetLength(Merged, K);
   Ring := Merged;
 end;
 
-function Triangulate(const Pts: array of TPointF; const Outline: TIndexRing;
-  const Holes: TIndexRings; out Tris: TTriList): Boolean;
+function Triangulate(const Pts: array of TPointF; const Outline: TIndexRing; const Holes: TIndexRings; out Tris: TTriList): boolean;
 var
   Ring: TIndexRing;
   Work: TIndexRings;
-  Order: array of Integer;
-  N, I, J, K, P, Q, R, NT, Stuck: Integer;
+  Order: array of integer;
+  N, I, J, K, P, Q, R, NT, Stuck: integer;
   A, B, C: TPointF;
-  Ear: Boolean;
-  Rightmost: array of Double;
-  TI: Integer;
+  Ear: boolean;
+  Rightmost: array of double;
+  TI: integer;
 begin
   Tris := nil;
   Result := False;
@@ -225,7 +230,9 @@ begin
     for J := 0 to High(Order) - 1 - I do
       if Rightmost[Order[J]] < Rightmost[Order[J + 1]] then
       begin
-        TI := Order[J]; Order[J] := Order[J + 1]; Order[J + 1] := TI;
+        TI := Order[J];
+        Order[J] := Order[J + 1];
+        Order[J + 1] := TI;
       end;
 
   for I := 0 to High(Order) do
@@ -278,7 +285,9 @@ begin
     end;
 
     if NT + 3 > Length(Tris) then SetLength(Tris, NT + 3);
-    Tris[NT] := Ring[P]; Tris[NT + 1] := Ring[Q]; Tris[NT + 2] := Ring[R];
+    Tris[NT] := Ring[P];
+    Tris[NT + 1] := Ring[Q];
+    Tris[NT + 2] := Ring[R];
     Inc(NT, 3);
 
     { snip the corner off and carry on from what has taken its place }
@@ -291,7 +300,9 @@ begin
   if Length(Ring) = 3 then
   begin
     if NT + 3 > Length(Tris) then SetLength(Tris, NT + 3);
-    Tris[NT] := Ring[0]; Tris[NT + 1] := Ring[1]; Tris[NT + 2] := Ring[2];
+    Tris[NT] := Ring[0];
+    Tris[NT + 1] := Ring[1];
+    Tris[NT + 2] := Ring[2];
     Inc(NT, 3);
   end;
   SetLength(Tris, NT);

@@ -11,28 +11,45 @@ interface
 uses
   Classes, SysUtils, Math, Graphics, hsDrawing;
 
-procedure PaintDocIso(C: TCanvas; W, H: Integer; D: TWorkDoc;
-  const Title, Foot: string);
+procedure PaintDocIso(C: TCanvas; W, H: integer; D: TWorkDoc; const Title, Foot: string);
 
 implementation
 
-procedure PaintDocIso(C: TCanvas; W, H: Integer; D: TWorkDoc;
-  const Title, Foot: string);
+procedure PaintDocIso(C: TCanvas; W, H: integer; D: TWorkDoc; const Title, Foot: string);
 const
   CX = 0.866;
 var
-  I, J, Margin, N: Integer;
-  MinX, MaxX, MinY, MaxY, Sc: Double;
-  Order: array of Integer;
-  Depth: array of Double;
+  I, J, Margin, N: integer;
+  MinX, MaxX, MinY, MaxY, Sc: double;
+  Order: array of integer;
+  Depth: array of double;
   Pts: array of TPoint;
-  Sw: Boolean;
+  Sw: boolean;
 
-  function PX(const P: TP3): Double; begin Result := (P.X + P.Y) * CX; end;
-  function PY(const P: TP3): Double; begin Result := -P.Z + (P.X - P.Y) * 0.5; end;
-  function SX(const P: TP3): Integer; begin Result := Round(Margin + (PX(P) - MinX) * Sc); end;
-  function SY(const P: TP3): Integer; begin Result := Round(Margin + (PY(P) - MinY) * Sc); end;
-  function Near(const P: TP3): Double; begin Result := P.X - P.Y + P.Z; end;
+  function PX(const P: TP3): double;
+  begin
+    Result := (P.X + P.Y) * CX;
+  end;
+
+  function PY(const P: TP3): double;
+  begin
+    Result := -P.Z + (P.X - P.Y) * 0.5;
+  end;
+
+  function SX(const P: TP3): integer;
+  begin
+    Result := Round(Margin + (PX(P) - MinX) * Sc);
+  end;
+
+  function SY(const P: TP3): integer;
+  begin
+    Result := Round(Margin + (PY(P) - MinY) * Sc);
+  end;
+
+  function Near(const P: TP3): double;
+  begin
+    Result := P.X - P.Y + P.Z;
+  end;
 
 begin
   C.Brush.Color := clWhite;
@@ -40,7 +57,10 @@ begin
   C.Pen.Color := clSilver;
   C.Rectangle(0, 0, W, H);
   Margin := 16;
-  MinX := 1E30; MaxX := -1E30; MinY := 1E30; MaxY := -1E30;
+  MinX := 1E30;
+  MaxX := -1E30;
+  MinY := 1E30;
+  MaxY := -1E30;
   for I := 0 to D.Live - 1 do
     if D[I].Kind = ekLine then
     begin
@@ -50,8 +70,7 @@ begin
       MaxY := Max(MaxY, Max(PY(D[I].A), PY(D[I].B)));
     end;
   if MaxX <= MinX then Exit;
-  Sc := Min((W - 2 * Margin) / Max(MaxX - MinX, 1E-9),
-            (H - 2 * Margin) / Max(MaxY - MinY, 1E-9));
+  Sc := Min((W - 2 * Margin) / Max(MaxX - MinX, 1E-9), (H - 2 * Margin) / Max(MaxY - MinY, 1E-9));
   SetLength(Order, 0);
   SetLength(Depth, 0);
   for I := 0 to D.Live - 1 do
@@ -70,13 +89,16 @@ begin
     for I := 0 to High(Order) - 1 do
       if Depth[I] > Depth[I + 1] then
       begin
-        N := Order[I]; Order[I] := Order[I + 1]; Order[I + 1] := N;
-        Sc := Depth[I]; Depth[I] := Depth[I + 1]; Depth[I + 1] := Sc;
+        N := Order[I];
+        Order[I] := Order[I + 1];
+        Order[I + 1] := N;
+        Sc := Depth[I];
+        Depth[I] := Depth[I + 1];
+        Depth[I + 1] := Sc;
         Sw := True;
       end;
   until not Sw;
-  Sc := Min((W - 2 * Margin) / Max(MaxX - MinX, 1E-9),
-            (H - 2 * Margin) / Max(MaxY - MinY, 1E-9));
+  Sc := Min((W - 2 * Margin) / Max(MaxX - MinX, 1E-9), (H - 2 * Margin) / Max(MaxY - MinY, 1E-9));
   C.Pen.Color := $00B0B0B0;
   C.Pen.Width := 1;
   for I := 0 to High(Order) do

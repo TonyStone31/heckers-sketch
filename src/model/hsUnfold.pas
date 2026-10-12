@@ -14,11 +14,11 @@ uses
   Classes, SysUtils, Math, hsDrawing, hsDxf;
 
 type
-  TIntArray = array of Integer;
+  TIntArray = array of integer;
 
   { A point on the sheet; its own type so this unit needs no widget set. }
   TFlatPt = record
-    X, Y: Double;
+    X, Y: double;
   end;
 
   { What an edge of the pattern turns out to be. }
@@ -26,7 +26,7 @@ type
     fkCut,     // nothing joined here: it gets cut
     fkBend,    // joined, and the metal turns: it gets a bend line
     fkNotch    // a nick at the end of a bend, so the brake can be set to it
-  );
+    );
 
 const
   { Feet (a quarter inch).  Leg length of the V cut at each end of a fold,
@@ -35,9 +35,9 @@ const
 
 type
   TFlatEdge = record
-    AX, AY, BX, BY: Double;   // where it lies on the sheet
+    AX, AY, BX, BY: double;   // where it lies on the sheet
     Kind: TFoldKind;
-    Angle: Double;            // how far the metal turns, radians, signed
+    Angle: double;            // how far the metal turns, radians, signed
   end;
 
   { One face of the model laid flat, same shape and size. }
@@ -45,27 +45,26 @@ type
     P: array of TFlatPt;
     { openings in the panel, laid flat the same way, so they get cut too }
     Holes: array of array of TFlatPt;
-    Face: Integer;            // which face of the document it came from
+    Face: integer;            // which face of the document it came from
   end;
 
   TFlatPattern = record
     Faces: array of TFlatFace;
     Edges: array of TFlatEdge;
-    MinX, MinY, MaxX, MaxY: Double;   // the sheet it needs
-    Overlaps: Boolean;                // it folds back onto itself
-    Laid: Integer;                    // panels placed
-    Total: Integer;                   // panels asked for
-    Ok: Boolean;
+    MinX, MinY, MaxX, MaxY: double;   // the sheet it needs
+    Overlaps: boolean;                // it folds back onto itself
+    Laid: integer;                    // panels placed
+    Total: integer;                   // panels asked for
+    Ok: boolean;
     Why: string;
   end;
 
 { Lay the given faces of a document out flat.  Pass every face of one piece. }
-function Unfold(const Doc: TWorkDoc; const Faces: array of Integer;
-  Tol: Double = 1E-6): TFlatPattern;
+function Unfold(const Doc: TWorkDoc; const Faces: array of integer; Tol: double = 1E-6): TFlatPattern;
 
 { Every face belonging to the same solid as the one given, so a click on any
   part of a piece lays the whole piece out. }
-function SolidFaces(const Doc: TWorkDoc; Index: Integer): TIntArray;
+function SolidFaces(const Doc: TWorkDoc; Index: integer): TIntArray;
 
 { The pattern as a DXF a table can cut: CUT, BEND and NOTCH on layers of
   their own, in inches or millimeters according to the drawing's units. }
@@ -75,24 +74,24 @@ implementation
 
 type
   TPanel = record
-    Doc: Integer;                 // index in the document
+    Doc: integer;                 // index in the document
     V: TIntArray;                 // welded vertex numbers, in order
     L: array of TFlatPt;          // the panel in its own plane
     LH: array of array of TFlatPt;  // its openings, in that same plane
     Q: array of TFlatPt;          // and where it ended up on the sheet
     Nm: TP3;
-    Placed: Boolean;
+    Placed: boolean;
   end;
 
   TEdgeRef = record
-    A, B: Integer;
-    F: array[0..1] of Integer;    // the panels that share it
-    N: Integer;
+    A, B: integer;
+    F: array[0..1] of integer;    // the panels that share it
+    N: integer;
   end;
 
-function SolidFaces(const Doc: TWorkDoc; Index: Integer): TIntArray;
+function SolidFaces(const Doc: TWorkDoc; Index: integer): TIntArray;
 var
-  I, N, G: Integer;
+  I, N, G: integer;
 begin
   Result := nil;
   if (Index < 0) or (Index >= Doc.Live) then Exit;
@@ -113,12 +112,14 @@ end;
 procedure PatternToDxf(const Pat: TFlatPattern; U: TUnitSystem; L: TStrings);
 var
   W: TDxfWriter;
-  I: Integer;
-  K: Double;
+  I: integer;
+  K: double;
   Lay: string;
 begin
   { feet to inches, or meters to millimeters - a table wants shop units }
-  if U = usImperial then K := 12 else K := 1000;
+  if U = usImperial then K := 12
+  else
+    K := 1000;
   W := TDxfWriter.Create;
   try
     { colors are AutoCAD's index: 7 white/black, 1 red, 5 blue }
@@ -128,12 +129,13 @@ begin
     for I := 0 to High(Pat.Edges) do
     begin
       case Pat.Edges[I].Kind of
-        fkBend:  Lay := 'BEND';
+        fkBend: Lay := 'BEND';
         fkNotch: Lay := 'NOTCH';
-      else       Lay := 'CUT';
+        else
+          Lay := 'CUT';
       end;
       W.Line(Lay, Pat.Edges[I].AX * K, Pat.Edges[I].AY * K, 0,
-                  Pat.Edges[I].BX * K, Pat.Edges[I].BY * K, 0);
+        Pat.Edges[I].BX * K, Pat.Edges[I].BY * K, 0);
     end;
     W.SaveTo(L, U = usImperial);
   finally
@@ -144,20 +146,21 @@ end;
 { Do two laid-out panels overlap?  Both are shrunk slightly toward their
   middles first so panels touching along a fold do not count.  Separating
   axis test on every edge of both. }
-function PanelsOverlap(const A, B: TFlatFace): Boolean;
+function PanelsOverlap(const A, B: TFlatFace): boolean;
 const
   SHRINK = 0.02;
 var
   P, Q: array of TFlatPt;
-  I, J, K, N: Integer;
-  EX, EY, D, MinA, MaxA, MinB, MaxB: Double;
+  I, J, K, N: integer;
+  EX, EY, D, MinA, MaxA, MinB, MaxB: double;
 
   procedure Pull(const S: TFlatFace; out R: array of TFlatPt);
   var
-    M: Integer;
-    MX, MY: Double;
+    M: integer;
+    MX, MY: double;
   begin
-    MX := 0; MY := 0;
+    MX := 0;
+    MY := 0;
     for M := 0 to High(S.P) do
     begin
       MX := MX + S.P[M].X;
@@ -181,7 +184,9 @@ begin
   Pull(B, Q);
   for K := 0 to 1 do
   begin
-    if K = 0 then N := High(P) else N := High(Q);
+    if K = 0 then N := High(P)
+    else
+      N := High(Q);
     for I := 0 to N do
     begin
       if K = 0 then
@@ -194,16 +199,21 @@ begin
         EX := Q[(I + 1) mod Length(Q)].Y - Q[I].Y;
         EY := Q[I].X - Q[(I + 1) mod Length(Q)].X;
       end;
-      MinA := 1E30; MaxA := -1E30; MinB := 1E30; MaxB := -1E30;
+      MinA := 1E30;
+      MaxA := -1E30;
+      MinB := 1E30;
+      MaxB := -1E30;
       for J := 0 to High(P) do
       begin
         D := P[J].X * EX + P[J].Y * EY;
-        MinA := Min(MinA, D); MaxA := Max(MaxA, D);
+        MinA := Min(MinA, D);
+        MaxA := Max(MaxA, D);
       end;
       for J := 0 to High(Q) do
       begin
         D := Q[J].X * EX + Q[J].Y * EY;
-        MinB := Min(MinB, D); MaxB := Max(MaxB, D);
+        MinB := Min(MinB, D);
+        MaxB := Max(MaxB, D);
       end;
       if (MaxA <= MinB) or (MaxB <= MinA) then Exit(False);
     end;
@@ -211,48 +221,45 @@ begin
   Result := True;
 end;
 
-function Unfold(const Doc: TWorkDoc; const Faces: array of Integer;
-  Tol: Double): TFlatPattern;
+function Unfold(const Doc: TWorkDoc; const Faces: array of integer; Tol: double): TFlatPattern;
 var
   Pan: array of TPanel;
   Verts: array of TP3;
   Edges: array of TEdgeRef;
-  NP, NV, NE: Integer;
+  NP, NV, NE: integer;
   Order, Parent: TIntArray;
-  I, J, K, F, H, Head, Tail, T, O, E, Ai, Bi, NE2: Integer;
-  DX, DY, PX, PY, Len: Double;
-  OnEdge: Boolean;
+  I, J, K, F, H, Head, Tail, T, O, E, Ai, Bi, NE2: integer;
+  DX, DY, PX, PY, Len: double;
+  OnEdge: boolean;
   U, V, Nm, D3: TP3;
   Poly: TP3Array;
-  Dot, Ang, Sx, Sy, Cs, Sn, LenL, LenP: Double;
+  Dot, Ang, Sx, Sy, Cs, Sn, LenL, LenP: double;
   PA, PB, LA, LB, Inside: TFlatPt;
 
-  function WeldVertex(const Q: TP3): Integer;
+  function WeldVertex(const Q: TP3): integer;
   var
-    M2: Integer;
+    M2: integer;
   begin
     for M2 := 0 to NV - 1 do
-      if (Abs(Verts[M2].X - Q.X) < Tol) and (Abs(Verts[M2].Y - Q.Y) < Tol) and
-         (Abs(Verts[M2].Z - Q.Z) < Tol) then Exit(M2);
+      if (Abs(Verts[M2].X - Q.X) < Tol) and (Abs(Verts[M2].Y - Q.Y) < Tol) and (Abs(Verts[M2].Z - Q.Z) < Tol) then Exit(M2);
     if NV >= Length(Verts) then SetLength(Verts, Max(16, NV * 2));
     Verts[NV] := Q;
     Result := NV;
     Inc(NV);
   end;
 
-  function FindEdge(A, B: Integer): Integer;
+  function FindEdge(A, B: integer): integer;
   var
-    M2: Integer;
+    M2: integer;
   begin
     for M2 := 0 to NE - 1 do
-      if ((Edges[M2].A = A) and (Edges[M2].B = B)) or
-         ((Edges[M2].A = B) and (Edges[M2].B = A)) then Exit(M2);
+      if ((Edges[M2].A = A) and (Edges[M2].B = B)) or ((Edges[M2].A = B) and (Edges[M2].B = A)) then Exit(M2);
     Result := -1;
   end;
 
-  procedure NoteEdge(A, B, Panel: Integer);
+  procedure NoteEdge(A, B, Panel: integer);
   var
-    M2: Integer;
+    M2: integer;
   begin
     M2 := FindEdge(A, B);
     if M2 < 0 then
@@ -271,9 +278,9 @@ var
     end;
   end;
 
-  function CornerOf(Panel, Vtx: Integer): Integer;
+  function CornerOf(Panel, Vtx: integer): integer;
   var
-    M2: Integer;
+    M2: integer;
   begin
     Result := -1;
     for M2 := 0 to High(Pan[Panel].V) do
@@ -282,7 +289,7 @@ var
 
   function Mid(const S: array of TFlatPt): TFlatPt;
   var
-    M2: Integer;
+    M2: integer;
   begin
     Result.X := 0;
     Result.Y := 0;
@@ -300,18 +307,22 @@ var
     the panel was also mirrored. }
   function Carried(const L, Q: array of TFlatPt; const X: TFlatPt): TFlatPt;
   var
-    EX, EY, FX, FY, LenE, LenF, A, B, Sg: Double;
+    EX, EY, FX, FY, LenE, LenF, A, B, Sg: double;
     T: TFlatPt;
   begin
     Result := X;
     if (Length(L) < 2) or (Length(Q) < 2) then Exit;
-    EX := L[1].X - L[0].X; EY := L[1].Y - L[0].Y;
-    FX := Q[1].X - Q[0].X; FY := Q[1].Y - Q[0].Y;
+    EX := L[1].X - L[0].X;
+    EY := L[1].Y - L[0].Y;
+    FX := Q[1].X - Q[0].X;
+    FY := Q[1].Y - Q[0].Y;
     LenE := Sqrt(EX * EX + EY * EY);
     LenF := Sqrt(FX * FX + FY * FY);
     if (LenE < 1E-12) or (LenF < 1E-12) then Exit;
-    EX := EX / LenE; EY := EY / LenE;
-    FX := FX / LenF; FY := FY / LenF;
+    EX := EX / LenE;
+    EY := EY / LenE;
+    FX := FX / LenF;
+    FY := FY / LenF;
     Sg := 1;
     if Length(L) >= 3 then
     begin
@@ -329,15 +340,16 @@ var
   end;
 
   { Which side of the line PA..PB a point falls. }
-  function Side(const PA2, PB2, Pt: TFlatPt): Double;
+  function Side(const PA2, PB2, Pt: TFlatPt): double;
   begin
-    Result := (PB2.X - PA2.X) * (Pt.Y - PA2.Y) -
-              (PB2.Y - PA2.Y) * (Pt.X - PA2.X);
+    Result := (PB2.X - PA2.X) * (Pt.Y - PA2.Y) - (PB2.Y - PA2.Y) * (Pt.X - PA2.X);
   end;
 
 begin
   Result := Default(TFlatPattern);
-  NP := 0; NV := 0; NE := 0;
+  NP := 0;
+  NV := 0;
+  NE := 0;
   SetLength(Pan, Max(4, Length(Faces)));
   SetLength(Verts, 64);
   SetLength(Edges, 128);
@@ -400,7 +412,8 @@ begin
   Pan[0].Q := Copy(Pan[0].L);
   Pan[0].Placed := True;
   Order[0] := 0;
-  Head := 0; Tail := 1;
+  Head := 0;
+  Tail := 1;
 
   while Head < Tail do
   begin
@@ -410,7 +423,9 @@ begin
     begin
       E := FindEdge(Pan[T].V[J], Pan[T].V[(J + 1) mod Length(Pan[T].V)]);
       if (E < 0) or (Edges[E].N < 2) then Continue;
-      if Edges[E].F[0] = T then O := Edges[E].F[1] else O := Edges[E].F[0];
+      if Edges[E].F[0] = T then O := Edges[E].F[1]
+      else
+        O := Edges[E].F[0];
       if (O < 0) or (O >= NP) or Pan[O].Placed then Continue;
 
       Ai := CornerOf(T, Edges[E].A);
@@ -430,10 +445,8 @@ begin
       LenL := Sqrt(Sqr(LB.X - LA.X) + Sqr(LB.Y - LA.Y));
       LenP := Sqrt(Sqr(PB.X - PA.X) + Sqr(PB.Y - PA.Y));
       if (LenL < 1E-12) or (LenP < 1E-12) then Continue;
-      Cs := ((LB.X - LA.X) * (PB.X - PA.X) +
-             (LB.Y - LA.Y) * (PB.Y - PA.Y)) / (LenL * LenP);
-      Sn := ((LB.X - LA.X) * (PB.Y - PA.Y) -
-             (LB.Y - LA.Y) * (PB.X - PA.X)) / (LenL * LenP);
+      Cs := ((LB.X - LA.X) * (PB.X - PA.X) + (LB.Y - LA.Y) * (PB.Y - PA.Y)) / (LenL * LenP);
+      Sn := ((LB.X - LA.X) * (PB.Y - PA.Y) - (LB.Y - LA.Y) * (PB.X - PA.X)) / (LenL * LenP);
 
       for K := 0 to High(Pan[O].L) do
       begin
@@ -546,17 +559,27 @@ begin
     DY := Result.Edges[I].BY - Result.Edges[I].AY;
     Len := Sqrt(DX * DX + DY * DY);
     if Len < 1E-9 then Continue;
-    DX := DX / Len; DY := DY / Len;
+    DX := DX / Len;
+    DY := DY / Len;
     for E := 0 to 1 do
     begin
-      if E = 0 then begin PX := Result.Edges[I].AX; PY := Result.Edges[I].AY; end
-      else begin PX := Result.Edges[I].BX; PY := Result.Edges[I].BY; DX := -DX; DY := -DY; end;
+      if E = 0 then
+      begin
+        PX := Result.Edges[I].AX;
+        PY := Result.Edges[I].AY;
+      end
+      else
+      begin
+        PX := Result.Edges[I].BX;
+        PY := Result.Edges[I].BY;
+        DX := -DX;
+        DY := -DY;
+      end;
       { on the sheet's edge means: an end of some cut is right here }
       OnEdge := False;
       for J := 0 to NE2 - 1 do
         if Result.Edges[J].Kind = fkCut then
-          if (Sqr(Result.Edges[J].AX - PX) + Sqr(Result.Edges[J].AY - PY) < 1E-12) or
-             (Sqr(Result.Edges[J].BX - PX) + Sqr(Result.Edges[J].BY - PY) < 1E-12) then
+          if (Sqr(Result.Edges[J].AX - PX) + Sqr(Result.Edges[J].AY - PY) < 1E-12) or (Sqr(Result.Edges[J].BX - PX) + Sqr(Result.Edges[J].BY - PY) < 1E-12) then
           begin
             OnEdge := True;
             Break;
@@ -588,8 +611,10 @@ begin
   SetLength(Result.Edges, K);
 
   { --- the sheet it needs --------------------------------------------- }
-  Result.MinX := 1E30; Result.MinY := 1E30;
-  Result.MaxX := -1E30; Result.MaxY := -1E30;
+  Result.MinX := 1E30;
+  Result.MinY := 1E30;
+  Result.MaxX := -1E30;
+  Result.MaxY := -1E30;
   for I := 0 to High(Result.Faces) do
     for J := 0 to High(Result.Faces[I].P) do
     begin

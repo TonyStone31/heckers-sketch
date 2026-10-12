@@ -27,7 +27,7 @@ type
   end;
 
   TChatPiece = procedure(Sender: TObject; const Piece: string) of object;
-  TChatDone = procedure(Sender: TObject; OK: Boolean; const Err: string) of object;
+  TChatDone = procedure(Sender: TObject; OK: boolean; const Err: string) of object;
 
   { Reads a streamed answer as it is written into it: "data: {...}" lines,
     each holding the next piece, in either service's shape.  A server that
@@ -37,20 +37,20 @@ type
   private
     FLine: string;
     FAll: string;
-    FStreamed: Boolean;
+    FStreamed: boolean;
     FProblem: string;
     FOnPiece, FOnThink: TChatPiece;
-    function PieceOf(const Json: string; Streamed: Boolean; const Field: string = 'content'): string;
+    function PieceOf(const Json: string; Streamed: boolean; const Field: string = 'content'): string;
     function ErrorOf(const Json: string): string;
     procedure TakeAnthropic(const Json: string);
     procedure TakeLine(const L: string);
   public
-    Stopped: Boolean;
+    Stopped: boolean;
     { Anthropic's events rather than chat-completions chunks }
-    Anthropic: Boolean;
-    function Write(const Buffer; Count: LongInt): LongInt; override;
-    function Read(var Buffer; Count: LongInt): LongInt; override;
-    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
+    Anthropic: boolean;
+    function Write(const Buffer; Count: longint): longint; override;
+    function Read(var Buffer; Count: longint): longint; override;
+    function Seek(const Offset: int64; Origin: TSeekOrigin): int64; override;
     { what came in one body, when nothing streamed; '' otherwise }
     function Finish: string;
     { the reply as it came, for an error message }
@@ -69,7 +69,7 @@ type
     FURL, FHeaders, FBody: string;
     FStream: TChatStream;
     FPiece, FErr: string;
-    FOK: Boolean;
+    FOK: boolean;
     FOnPiece, FOnThink: TChatPiece;
     FOnDone: TChatDone;
     procedure GotPiece(Sender: TObject; const Piece: string);
@@ -80,8 +80,7 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(const S: TAssistantSettings; const Key: string;
-      const Sys: TChatSystem; const Msgs: TChatMsgs; AOnPiece: TChatPiece;
+    constructor Create(const S: TAssistantSettings; const Key: string; const Sys: TChatSystem; const Msgs: TChatMsgs; AOnPiece: TChatPiece;
       AOnDone: TChatDone; AOnThink: TChatPiece = nil);
     procedure Stop;
     { stops it and drops its events, for a window going away }
@@ -131,8 +130,8 @@ begin
       if Result = '' then Result := ANTHROPIC_SERVER;
     PROV_OPENAI:
       if Result = '' then Result := OPENAI_SERVER;
-  else
-    if Result = '' then Result := OWN_SERVER;
+    else
+      if Result = '' then Result := OWN_SERVER;
   end;
   if ProviderOf(S) = PROV_ANTHROPIC then Exit;
   while (Result <> '') and (Result[Length(Result)] = '/') do SetLength(Result, Length(Result) - 1);
@@ -149,12 +148,11 @@ begin
   if (Result = '') and (ProviderOf(S) = PROV_ANTHROPIC) then Result := ANTHROPIC_MODEL;
 end;
 
-function AnthropicBody(const S: TAssistantSettings; const Sys: TChatSystem;
-  const Msgs: TChatMsgs): string;
+function AnthropicBody(const S: TAssistantSettings; const Sys: TChatSystem; const Msgs: TChatMsgs): string;
 var
   O, M, B, OC: TJSONObject;
   A, SysA: TJSONArray;
-  I: Integer;
+  I: integer;
 begin
   O := TJSONObject.Create;
   try
@@ -178,7 +176,9 @@ begin
       says how hard }
     O.Add('thinking', TJSONObject.Create(['type', 'adaptive', 'display', 'summarized']));
     OC := TJSONObject.Create;
-    if S.Think then OC.Add('effort', 'high') else OC.Add('effort', 'low');
+    if S.Think then OC.Add('effort', 'high')
+    else
+      OC.Add('effort', 'low');
     O.Add('output_config', OC);
     { a request a safety check declines goes on to another model, chosen
       by the service }
@@ -198,12 +198,11 @@ begin
   end;
 end;
 
-function CompletionsBody(const S: TAssistantSettings; const Sys: TChatSystem;
-  const Msgs: TChatMsgs): string;
+function CompletionsBody(const S: TAssistantSettings; const Sys: TChatSystem; const Msgs: TChatMsgs): string;
 var
   O, M: TJSONObject;
   A: TJSONArray;
-  I: Integer;
+  I: integer;
   T: string;
 begin
   O := TJSONObject.Create;
@@ -214,7 +213,8 @@ begin
       a local server takes none; one that does not know it lets it pass }
     if not S.Think then
       if ProviderOf(S) = PROV_OPENAI then O.Add('reasoning_effort', 'low')
-      else O.Add('reasoning_effort', 'none');
+      else
+        O.Add('reasoning_effort', 'none');
     A := TJSONArray.Create;
     T := Sys.Fixed;
     if Sys.Sheet <> '' then T := T + LineEnding + LineEnding + Sys.Sheet;
@@ -236,7 +236,8 @@ end;
 function ChatBody(const S: TAssistantSettings; const Sys: TChatSystem; const Msgs: TChatMsgs): string;
 begin
   if ProviderOf(S) = PROV_ANTHROPIC then Result := AnthropicBody(S, Sys, Msgs)
-  else Result := CompletionsBody(S, Sys, Msgs);
+  else
+    Result := CompletionsBody(S, Sys, Msgs);
 end;
 
 procedure ChatHeaders(const S: TAssistantSettings; const Key: string; H: TStrings);
@@ -255,7 +256,7 @@ end;
 function ChatRefusal(const S: TAssistantSettings; const Key: string): string;
 var
   U, Host: string;
-  K: Integer;
+  K: integer;
 begin
   Result := '';
   if (ProviderOf(S) <> PROV_OWN) and (Key = '') then
@@ -278,27 +279,21 @@ end;
 function ChatSystem(const Manual, Sheet, Picked: string): TChatSystem;
 begin
   Result.Fixed :=
-    'You help someone draw in Heckers Sketch, a 3D sketching program.  ' +
-    'Drawings are written in Heck, a plain-text language; the manual below ' +
-    'is all of it.  Answer plainly and briefly.  When you change the ' +
-    'drawing, give the whole changed sheet as Heck in one ```heck block, ' +
-    'keeping every name and comment that is there; it is looked over ' +
-    'before it is used.';
+    'You help someone draw in Heckers Sketch, a 3D sketching program.  ' + 'Drawings are written in Heck, a plain-text language; the manual below ' +
+    'is all of it.  Answer plainly and briefly.  When you change the ' + 'drawing, give the whole changed sheet as Heck in one ```heck block, ' +
+    'keeping every name and comment that is there; it is looked over ' + 'before it is used.';
   if Manual <> '' then
-    Result.Fixed := Result.Fixed + LineEnding + LineEnding + '# The manual' +
-      LineEnding + LineEnding + Manual;
+    Result.Fixed := Result.Fixed + LineEnding + LineEnding + '# The manual' + LineEnding + LineEnding + Manual;
   Result.Sheet := '';
   if Sheet <> '' then
-    Result.Sheet := '# The sheet as it stands' + LineEnding + LineEnding + '```heck' +
-      LineEnding + Sheet + '```';
+    Result.Sheet := '# The sheet as it stands' + LineEnding + LineEnding + '```heck' + LineEnding + Sheet + '```';
   if Picked <> '' then
-    Result.Sheet := Result.Sheet + LineEnding + LineEnding + 'Picked on the sheet: lines ' +
-      Picked + '.';
+    Result.Sheet := Result.Sheet + LineEnding + LineEnding + 'Picked on the sheet: lines ' + Picked + '.';
 end;
 
 { TChatStream }
 
-function TChatStream.PieceOf(const Json: string; Streamed: Boolean; const Field: string): string;
+function TChatStream.PieceOf(const Json: string; Streamed: boolean; const Field: string): string;
 var
   D: TJSONData;
   C: TJSONArray;
@@ -315,7 +310,8 @@ begin
     C := TJSONObject(D).Find('choices', jtArray) as TJSONArray;
     if (C = nil) or (C.Count = 0) or not (C.Items[0] is TJSONObject) then Exit;
     if Streamed then E := TJSONObject(C.Items[0]).FindPath('delta.' + Field)
-    else E := TJSONObject(C.Items[0]).FindPath('message.' + Field);
+    else
+      E := TJSONObject(C.Items[0]).FindPath('message.' + Field);
     if (E <> nil) and (E.JSONType = jtString) then Result := E.AsString;
   finally
     D.Free;
@@ -342,7 +338,8 @@ begin
     if E.JSONType = jtString then Result := E.AsString
     else if (E is TJSONObject) and (TJSONObject(E).Find('message') <> nil) then
       Result := TJSONObject(E).Get('message', '')
-    else Result := E.AsJSON;
+    else
+      Result := E.AsJSON;
   finally
     D.Free;
   end;
@@ -389,7 +386,9 @@ begin
     else if Kind = 'error' then
     begin
       E := TJSONObject(D).FindPath('error.message');
-      if E <> nil then FProblem := E.AsString else FProblem := 'the service sent an error';
+      if E <> nil then FProblem := E.AsString
+      else
+        FProblem := 'the service sent an error';
     end;
   finally
     D.Free;
@@ -424,10 +423,10 @@ begin
   if (P <> '') and Assigned(FOnPiece) then FOnPiece(Self, P);
 end;
 
-function TChatStream.Write(const Buffer; Count: LongInt): LongInt;
+function TChatStream.Write(const Buffer; Count: longint): longint;
 var
   S: string;
-  K: Integer;
+  K: integer;
 begin
   if Stopped then raise EAbort.Create('stopped');
   SetString(S, PChar(@Buffer), Count);
@@ -445,12 +444,12 @@ begin
   Result := Count;
 end;
 
-function TChatStream.Read(var Buffer; Count: LongInt): LongInt;
+function TChatStream.Read(var Buffer; Count: longint): longint;
 begin
   Result := 0;
 end;
 
-function TChatStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
+function TChatStream.Seek(const Offset: int64; Origin: TSeekOrigin): int64;
 begin
   Result := Length(FAll);
 end;
@@ -467,8 +466,7 @@ end;
 
 { TChatThread }
 
-constructor TChatThread.Create(const S: TAssistantSettings; const Key: string;
-  const Sys: TChatSystem; const Msgs: TChatMsgs; AOnPiece: TChatPiece;
+constructor TChatThread.Create(const S: TAssistantSettings; const Key: string; const Sys: TChatSystem; const Msgs: TChatMsgs; AOnPiece: TChatPiece;
   AOnDone: TChatDone; AOnThink: TChatPiece);
 var
   H: TStringList;
@@ -538,7 +536,7 @@ procedure TChatThread.Execute;
 var
   H: TStringList;
   Body: TStringStream;
-  Status: Integer;
+  Status: integer;
   One, Why: string;
 begin
   H := TStringList.Create;

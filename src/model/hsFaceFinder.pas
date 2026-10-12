@@ -38,7 +38,7 @@ type
     offset along it. }
   TPlaneKey = record
     N: TP3;
-    D: Double;
+    D: double;
   end;
   TPlaneArray = array of TPlaneKey;
 
@@ -46,7 +46,7 @@ type
     back each time. }
   TRegionCache = record
     Keys: TPlaneArray;
-    Sig: array of Int64;
+    Sig: array of int64;
     Found: array of TRegionArray;
   end;
 
@@ -55,28 +55,26 @@ type
 function CanonicalNormal(const N: TP3): TP3;
 
 { Keep a loop found more than once only once.  Public so tests can call it. }
-procedure DropTwinRegions(var R: TRegionArray; Tol: Double = REGION_TOL);
+procedure DropTwinRegions(var R: TRegionArray; Tol: double = REGION_TOL);
 
 { Segments in, regions out. }
-function BuildRegions(const Segs: TSegArray; Tol: Double = REGION_TOL): TRegionArray;
+function BuildRegions(const Segs: TSegArray; Tol: double = REGION_TOL): TRegionArray;
 
 { The same, but a plane whose segments have not changed keeps last time's
   regions, so editing one wall does not redo the whole model.  An empty
   cache means a full rebuild. }
-function BuildRegionsCached(const Segs: TSegArray; var Cache: TRegionCache;
-  Tol: Double = REGION_TOL): TRegionArray;
+function BuildRegionsCached(const Segs: TSegArray; var Cache: TRegionCache; Tol: double = REGION_TOL): TRegionArray;
 
 { Step 1 on its own, for testing: cut every segment wherever another
   crosses or touches it. }
-function SplitAtCrossings(const Segs: TSegArray; Tol: Double = REGION_TOL): TSegArray;
+function SplitAtCrossings(const Segs: TSegArray; Tol: double = REGION_TOL): TSegArray;
 
 { Signed area of a closed loop, in its own plane. }
-function LoopArea(const Loop: TP3Array; const Normal: TP3): Double;
+function LoopArea(const Loop: TP3Array; const Normal: TP3): double;
 
 { Is the point inside the flat loop?  The point is assumed in its plane; on
   the boundary counts as inside. }
-function PointInLoop(const P: TP3; const Loop: TP3Array; const Normal: TP3;
-  Tol: Double = REGION_TOL): Boolean;
+function PointInLoop(const P: TP3; const Loop: TP3Array; const Normal: TP3; Tol: double = REGION_TOL): boolean;
 
 { A point truly inside the loop.  The corner average can fall outside (a
   wall with a half-round bite in it), so this falls back to an edge's middle
@@ -85,29 +83,28 @@ function InnerPoint(const Loop: TP3Array; const Normal: TP3): TP3;
 
 { The same for a region with openings: inside the outline and in no hole.
   A ring's center is in its hole, so that point would not do. }
-function InnerPointOf(const Outer: TP3Array; const Holes: array of TP3Array;
-  const Normal: TP3): TP3;
+function InnerPointOf(const Outer: TP3Array; const Holes: array of TP3Array; const Normal: TP3): TP3;
 
 implementation
 
 type
-  TIntArray = array of Integer;
+  TIntArray = array of integer;
 
   TDart = record
-    V0, V1: Integer;      { from, to }
-    Twin: Integer;
-    Ang: Double;          { direction leaving V0, in the plane's coordinates }
-    Used: Boolean;
+    V0, V1: integer;      { from, to }
+    Twin: integer;
+    Ang: double;          { direction leaving V0, in the plane's coordinates }
+    Used: boolean;
   end;
 
-{ ---------------------------------------------------------------- helpers - }
+  { ---------------------------------------------------------------- helpers - }
 
 { Where P falls along AB, and how far off it is.  T is clamped so Off is the
   distance to the segment, not its infinite line. }
-procedure ClosestOnSeg(const P, A, B: TP3; out T, Off: Double);
+procedure ClosestOnSeg(const P, A, B: TP3; out T, Off: double);
 var
   D: TP3;
-  L2: Double;
+  L2: double;
 begin
   D := Sub3(B, A);
   L2 := D.X * D.X + D.Y * D.Y + D.Z * D.Z;
@@ -130,7 +127,7 @@ function CanonicalNormal(const N: TP3): TP3;
 const
   PHI = 0.6180339887498949;
 var
-  L: Double;
+  L: double;
 begin
   L := Len3(N);
   if L < 1E-12 then Exit(P3(0, 0, 1));
@@ -144,17 +141,17 @@ end;
   this, every rebuild stacks another copy.  Loosening the plane tolerance
   would merge real planes instead.  Loops match when every corner is within
   10*Tol; the middles go in a grid so this is not all-pairs. }
-procedure DropTwinRegions(var R: TRegionArray; Tol: Double);
+procedure DropTwinRegions(var R: TRegionArray; Tol: double);
 const
   CELL = 1E-3;
 var
   Mid: TP3Array;
-  Keep: array of Boolean;
+  Keep: array of boolean;
   Next: TIntArray;
   Head: TFPHashList;
-  I, N, Kept: Integer;
+  I, N, Kept: integer;
 
-  function CellKey(CX, CY, CZ: Int64; Corners: Int64): shortstring;
+  function CellKey(CX, CY, CZ: int64; Corners: int64): shortstring;
   begin
     SetLength(Result, 32);
     Move(CX, Result[1], 8);
@@ -164,10 +161,10 @@ var
   end;
 
   { same corner count and every corner of A near one of B }
-  function SameLoop(A, B: Integer): Boolean;
+  function SameLoop(A, B: integer): boolean;
   var
-    P, Q: Integer;
-    Found: Boolean;
+    P, Q: integer;
+    Found: boolean;
   begin
     Result := False;
     if Length(R[A].Outer) <> Length(R[B].Outer) then Exit;
@@ -185,10 +182,10 @@ var
     Result := True;
   end;
 
-  function TwinOf(I: Integer): Integer;
+  function TwinOf(I: integer): integer;
   var
-    CX, CY, CZ, DX, DY, DZ: Int64;
-    Q: Integer;
+    CX, CY, CZ, DX, DY, DZ: int64;
+    Q: integer;
   begin
     Result := -1;
     CX := Floor(Mid[I].X / CELL);
@@ -198,8 +195,7 @@ var
       for DY := -1 to 1 do
         for DZ := -1 to 1 do
         begin
-          Q := PtrInt(Head.Find(CellKey(CX + DX, CY + DY, CZ + DZ,
-            Length(R[I].Outer)))) - 1;
+          Q := PtrInt(Head.Find(CellKey(CX + DX, CY + DY, CZ + DZ, Length(R[I].Outer)))) - 1;
           while Q >= 0 do
           begin
             if SameLoop(I, Q) then Exit(Q);
@@ -208,13 +204,12 @@ var
         end;
   end;
 
-  procedure Note(I: Integer);
+  procedure Note(I: integer);
   var
     Key: shortstring;
-    At: Integer;
+    At: integer;
   begin
-    Key := CellKey(Floor(Mid[I].X / CELL), Floor(Mid[I].Y / CELL),
-      Floor(Mid[I].Z / CELL), Length(R[I].Outer));
+    Key := CellKey(Floor(Mid[I].X / CELL), Floor(Mid[I].Y / CELL), Floor(Mid[I].Z / CELL), Length(R[I].Outer));
     At := Head.FindIndexOf(Key);
     if At < 0 then
     begin
@@ -229,7 +224,7 @@ var
   end;
 
 var
-  K: Integer;
+  K: integer;
 begin
   N := Length(R);
   if N < 2 then Exit;
@@ -279,10 +274,9 @@ begin
   Result.D := U.X * Through.X + U.Y * Through.Y + U.Z * Through.Z;
 end;
 
-function SamePlane(const A, B: TPlaneKey; Tol: Double): Boolean;
+function SamePlane(const A, B: TPlaneKey; Tol: double): boolean;
 begin
-  Result := (Abs(A.N.X - B.N.X) < 1E-6) and (Abs(A.N.Y - B.N.Y) < 1E-6) and
-            (Abs(A.N.Z - B.N.Z) < 1E-6) and (Abs(A.D - B.D) < Tol);
+  Result := (Abs(A.N.X - B.N.X) < 1E-6) and (Abs(A.N.Y - B.N.Y) < 1E-6) and (Abs(A.N.Z - B.N.Z) < 1E-6) and (Abs(A.D - B.D) < Tol);
 end;
 
 { Two axes across a plane, so points in it can be treated as flat. }
@@ -290,7 +284,9 @@ procedure PlaneBasis(const N: TP3; out U, W: TP3);
 var
   T: TP3;
 begin
-  if Abs(N.Z) < 0.9 then T := P3(0, 0, 1) else T := P3(1, 0, 0);
+  if Abs(N.Z) < 0.9 then T := P3(0, 0, 1)
+  else
+    T := P3(1, 0, 0);
   U := Norm3(Cross3(T, N));
   W := Norm3(Cross3(N, U));
 end;
@@ -300,11 +296,10 @@ end;
 { Where two segments properly cross, each through the other's middle.  Ends
   landing on a segment, and overlapping segments, are handled separately in
   SplitAtCrossings as "this point lies on that segment". }
-function MeetAt(const A1, A2, B1, B2: TP3; Tol: Double;
-  out TA, TB: Double): Boolean;
+function MeetAt(const A1, A2, B1, B2: TP3; Tol: double; out TA, TB: double): boolean;
 var
   U, V, W, PA, PB: TP3;
-  A, B, C, D, E, Den: Double;
+  A, B, C, D, E, Den: double;
 begin
   Result := False;
   TA := 0;
@@ -336,11 +331,11 @@ begin
   Result := True;
 end;
 
-function SplitAtCrossings(const Segs: TSegArray; Tol: Double): TSegArray;
+function SplitAtCrossings(const Segs: TSegArray; Tol: double): TSegArray;
 var
-  Cuts: array of array of Double;
-  I, J, K, M, N, Count, GMask: Integer;
-  TA, TB, Tmp, Cell: Double;
+  Cuts: array of array of double;
+  I, J, K, M, N, Count, GMask: integer;
+  TA, TB, Tmp, Cell: double;
   P, Q, Lo, Hi: TP3;
   Grid: array of TIntArray;
   Near: TIntArray;
@@ -351,18 +346,17 @@ var
     Hi := P3(Max(Hi.X, R.X), Max(Hi.Y, R.Y), Max(Hi.Z, R.Z));
   end;
 
-  function GridHash(CX, CY, CZ: Int64): Integer;
+  function GridHash(CX, CY, CZ: int64): integer;
   begin
-    Result := Integer((CX * 73856093) xor (CY * 19349663) xor (CZ * 83492791))
-      and GMask;
+    Result := integer((CX * 73856093) xor (CY * 19349663) xor (CZ * 83492791)) and GMask;
   end;
 
   { Visit the cells this segment's box covers: add it if Add, else gather
     what is already there into Near. }
-  procedure Visit(Which: Integer; Add: Boolean);
+  procedure Visit(Which: integer; Add: boolean);
   var
-    X0, Y0, Z0, X1, Y1, Z1, CX, CY, CZ: Int64;
-    H, Q2: Integer;
+    X0, Y0, Z0, X1, Y1, Z1, CX, CY, CZ: int64;
+    H, Q2: integer;
   begin
     X0 := Floor(Min(Segs[Which].A.X, Segs[Which].B.X) / Cell);
     X1 := Floor(Max(Segs[Which].A.X, Segs[Which].B.X) / Cell);
@@ -389,9 +383,9 @@ var
         end;
   end;
 
-  procedure AddCut(Which: Integer; T: Double);
+  procedure AddCut(Which: integer; T: double);
   var
-    Z: Integer;
+    Z: integer;
   begin
     if (T <= Tol) or (T >= 1 - Tol) then Exit;
     for Z := 0 to High(Cuts[Which]) do
@@ -406,7 +400,8 @@ begin
 
   { Only pairs sharing a cell of a coarse grid are tried, not every pair.
     Trying a pair twice is harmless; a repeated cut is ignored. }
-  Lo := Segs[0].A; Hi := Segs[0].A;
+  Lo := Segs[0].A;
+  Hi := Segs[0].A;
   for I := 0 to N - 1 do
   begin
     GrowBox(Segs[I].A);
@@ -468,7 +463,8 @@ begin
     for J := 0 to Length(Cuts[I]) do
     begin
       if J = Length(Cuts[I]) then Q := Segs[I].B
-      else Q := Lerp3(Segs[I].A, Segs[I].B, Cuts[I][J]);
+      else
+        Q := Lerp3(Segs[I].A, Segs[I].B, Cuts[I][J]);
       if Dist(P, Q) > Tol then
       begin
         if Count >= Length(Result) then SetLength(Result, Count * 2 + 8);
@@ -481,14 +477,14 @@ begin
   end;
   SetLength(Result, Count);
   M := 0;
-  if M > 0 then ;
+  if M > 0 then;
 end;
 
 { ------------------------------------------------------------- the rest - }
 
-function LoopArea(const Loop: TP3Array; const Normal: TP3): Double;
+function LoopArea(const Loop: TP3Array; const Normal: TP3): double;
 var
-  I, N: Integer;
+  I, N: integer;
   Acc: TP3;
 begin
   Result := 0;
@@ -500,16 +496,15 @@ begin
   Result := Dot3(Acc, Normal) / 2;
 end;
 
-function InnerPointOf(const Outer: TP3Array; const Holes: array of TP3Array;
-  const Normal: TP3): TP3;
+function InnerPointOf(const Outer: TP3Array; const Holes: array of TP3Array; const Normal: TP3): TP3;
 var
-  I, N, F: Integer;
+  I, N, F: integer;
   Mid, E, Side, N1, Q: TP3;
-  Size, Step: Double;
+  Size, Step: double;
 
-  function InHole(const P: TP3): Boolean;
+  function InHole(const P: TP3): boolean;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := False;
     for K := 0 to High(Holes) do
@@ -533,9 +528,7 @@ begin
     begin
       E := Sub3(Outer[(I + 1) mod N], Outer[I]);
       if Len3(E) < Step then Continue;
-      Mid := P3((Outer[I].X + Outer[(I + 1) mod N].X) / 2,
-                (Outer[I].Y + Outer[(I + 1) mod N].Y) / 2,
-                (Outer[I].Z + Outer[(I + 1) mod N].Z) / 2);
+      Mid := P3((Outer[I].X + Outer[(I + 1) mod N].X) / 2, (Outer[I].Y + Outer[(I + 1) mod N].Y) / 2, (Outer[I].Z + Outer[(I + 1) mod N].Z) / 2);
       Side := Norm3(Cross3(N1, E));
       Q := P3(Mid.X + Side.X * Step, Mid.Y + Side.Y * Step, Mid.Z + Side.Z * Step);
       if PointInLoop(Q, Outer, Normal) and not InHole(Q) then Exit(Q);
@@ -547,9 +540,9 @@ end;
 
 function InnerPoint(const Loop: TP3Array; const Normal: TP3): TP3;
 var
-  I, N: Integer;
+  I, N: integer;
   Mid, E, Side, N1, Q: TP3;
-  Size, Step: Double;
+  Size, Step: double;
 begin
   N := Length(Loop);
   Result := P3(0, 0, 0);
@@ -569,9 +562,7 @@ begin
   begin
     E := Sub3(Loop[(I + 1) mod N], Loop[I]);
     if Len3(E) < Step then Continue;
-    Mid := P3((Loop[I].X + Loop[(I + 1) mod N].X) / 2,
-              (Loop[I].Y + Loop[(I + 1) mod N].Y) / 2,
-              (Loop[I].Z + Loop[(I + 1) mod N].Z) / 2);
+    Mid := P3((Loop[I].X + Loop[(I + 1) mod N].X) / 2, (Loop[I].Y + Loop[(I + 1) mod N].Y) / 2, (Loop[I].Z + Loop[(I + 1) mod N].Z) / 2);
     Side := Norm3(Cross3(N1, E));
     Q := P3(Mid.X + Side.X * Step, Mid.Y + Side.Y * Step, Mid.Z + Side.Z * Step);
     if PointInLoop(Q, Loop, Normal) then Exit(Q);
@@ -580,15 +571,14 @@ begin
   end;
 end;
 
-function PointInLoop(const P: TP3; const Loop: TP3Array; const Normal: TP3;
-  Tol: Double): Boolean;
+function PointInLoop(const P: TP3; const Loop: TP3Array; const Normal: TP3; Tol: double): boolean;
 var
-  I, J, N: Integer;
+  I, J, N: integer;
   U, W: TP3;
-  PU, PV: Double;
-  AU, AV, BU, BV: Double;
-  Inside: Boolean;
-  T, Off: Double;
+  PU, PV: double;
+  AU, AV, BU, BV: double;
+  Inside: boolean;
+  T, Off: double;
 begin
   Result := False;
   N := Length(Loop);
@@ -612,8 +602,7 @@ begin
     AV := Dot3(Sub3(Loop[I], Loop[0]), W);
     BU := Dot3(Sub3(Loop[J], Loop[0]), U);
     BV := Dot3(Sub3(Loop[J], Loop[0]), W);
-    if ((AV > PV) <> (BV > PV)) and
-       (PU < (BU - AU) * (PV - AV) / (BV - AV) + AU) then
+    if ((AV > PV) <> (BV > PV)) and (PU < (BU - AU) * (PV - AV) / (BV - AV) + AU) then
       Inside := not Inside;
     J := I;
   end;
@@ -622,16 +611,16 @@ end;
 
 { Every plane the segments can lie in, without splitting or welding.  Cheap
   enough to run on every edit. }
-function PlanesOf(const Segs: TSegArray; Tol: Double): TPlaneArray;
+function PlanesOf(const Segs: TSegArray; Tol: double): TPlaneArray;
 { Ends and planes are looked up through hash grids (neighbor cells checked
   too) because linear scans are far too slow on big drawings. }
 const
   CELL = 1E-4;       { ends: the grid cell; the tolerance is far inside it }
   PCELL = 1E-3;      { planes: the cell along the offset }
 var
-  I, J, K, N, NP: Integer;
+  I, J, K, N, NP: integer;
   Ends: TP3Array;
-  NEnds: Integer;
+  NEnds: integer;
   AtEnd: array of TIntArray;
   Key: TPlaneKey;
   Dir1, Dir2: TP3;
@@ -639,7 +628,7 @@ var
   EndNext, PlaneNext: TIntArray;
   Found: TPlaneArray;
 
-  function CellKey(X, Y, Z, W: Int64): shortstring;
+  function CellKey(X, Y, Z, W: int64): shortstring;
   begin
     SetLength(Result, 32);
     Move(X, Result[1], 8);
@@ -649,14 +638,14 @@ var
   end;
 
   { the entry chained at the head of a cell, or -1 }
-  function HeadOf(H: TFPHashList; const K: shortstring): Integer;
+  function HeadOf(H: TFPHashList; const K: shortstring): integer;
   begin
     Result := PtrInt(H.Find(K)) - 1;
   end;
 
-  procedure Chain(H: TFPHashList; var Next: TIntArray; const K: shortstring; Ix: Integer);
+  procedure Chain(H: TFPHashList; var Next: TIntArray; const K: shortstring; Ix: integer);
   var
-    At: Integer;
+    At: integer;
   begin
     if Ix >= Length(Next) then SetLength(Next, Max(16, Ix * 2));
     At := H.FindIndexOf(K);
@@ -672,10 +661,10 @@ var
     end;
   end;
 
-  function EndOf(const P: TP3): Integer;
+  function EndOf(const P: TP3): integer;
   var
-    CX, CY, CZ, DX, DY, DZ: Int64;
-    Q: Integer;
+    CX, CY, CZ, DX, DY, DZ: int64;
+    Q: integer;
   begin
     CX := Floor(P.X / CELL);
     CY := Floor(P.Y / CELL);
@@ -700,24 +689,26 @@ var
 
   { is this plane already listed?  The normal is rounded to a thousandth; a
     part near a rounding boundary is looked up on both sides. }
-  function KnownPlane(const Kp: TPlaneKey): Boolean;
+  function KnownPlane(const Kp: TPlaneKey): boolean;
   var
-    NX, NY, NZ, D0: Int64;
-    AX, AY, AZ: array[0..1] of Int64;
-    CX, CY, CZ: Integer;
-    IX, IY, IZ, ID: Integer;
-    Q: Integer;
+    NX, NY, NZ, D0: int64;
+    AX, AY, AZ: array[0..1] of int64;
+    CX, CY, CZ: integer;
+    IX, IY, IZ, ID: integer;
+    Q: integer;
 
-    procedure Cands(V: Double; var A: array of Int64; out C: Integer);
+    procedure Cands(V: double; var A: array of int64; out C: integer);
     var
-      S: Double;
+      S: double;
     begin
       S := V * 1000;
       A[0] := Round(S);
       C := 1;
       if Abs(Frac(S)) > 0.5 - 2E-3 then
       begin
-        if S >= A[0] then A[1] := A[0] + 1 else A[1] := A[0] - 1;
+        if S >= A[0] then A[1] := A[0] + 1
+        else
+          A[1] := A[0] - 1;
         C := 2;
       end;
     end;
@@ -742,11 +733,10 @@ var
     Result := False;
   end;
 
-  procedure NotePlane(const Kp: TPlaneKey; Ix: Integer);
+  procedure NotePlane(const Kp: TPlaneKey; Ix: integer);
   begin
     Chain(PlaneHead, PlaneNext,
-      CellKey(Round(Kp.N.X * 1000), Round(Kp.N.Y * 1000), Round(Kp.N.Z * 1000),
-              Floor(Kp.D / PCELL)), Ix);
+      CellKey(Round(Kp.N.X * 1000), Round(Kp.N.Y * 1000), Round(Kp.N.Z * 1000), Floor(Kp.D / PCELL)), Ix);
   end;
 
 begin
@@ -801,12 +791,11 @@ end;
 
 { The segments in one plane, plus a signature that changes when they do, so
   an unchanged plane can reuse its cached regions. }
-function SegsInPlane(const Segs: TSegArray; const K: TPlaneKey; Tol: Double;
-  out Sig: Int64): TSegArray;
+function SegsInPlane(const Segs: TSegArray; const K: TPlaneKey; Tol: double; out Sig: int64): TSegArray;
 var
-  I, N: Integer;
+  I, N: integer;
 
-  function Mix(const P: TP3): Int64;
+  function Mix(const P: TP3): int64;
   begin
     Result := Round(P.X / Tol) * 73856093;
     Result := Result xor (Round(P.Y / Tol) * 19349663);
@@ -818,8 +807,7 @@ begin
   Sig := 0;
   SetLength(Result, Length(Segs));
   for I := 0 to High(Segs) do
-    if (Abs(Dot3(K.N, Segs[I].A) - K.D) < Tol) and
-       (Abs(Dot3(K.N, Segs[I].B) - K.D) < Tol) then
+    if (Abs(Dot3(K.N, Segs[I].A) - K.D) < Tol) and (Abs(Dot3(K.N, Segs[I].B) - K.D) < Tol) then
     begin
       Result[N] := Segs[I];
       { summed, so segment order does not matter }
@@ -827,18 +815,17 @@ begin
       Inc(N);
     end;
   SetLength(Result, N);
-  Sig := Sig xor (Int64(N) * 2654435761);
+  Sig := Sig xor (int64(N) * 2654435761);
 end;
 
-function BuildRegionsCached(const Segs: TSegArray; var Cache: TRegionCache;
-  Tol: Double): TRegionArray;
+function BuildRegionsCached(const Segs: TSegArray; var Cache: TRegionCache; Tol: double): TRegionArray;
 var
   Keys: TPlaneArray;
   Mine: TSegArray;
   Fresh: TRegionCache;
-  Sig: Int64;
-  I, J, N, Count: Integer;
-  Hit: Boolean;
+  Sig: int64;
+  I, J, N, Count: integer;
+  Hit: boolean;
 begin
   Result := nil;
   Keys := PlanesOf(Segs, Tol);
@@ -895,47 +882,50 @@ begin
   DropTwinRegions(Result, Tol);
 end;
 
-function BuildRegions(const Segs: TSegArray; Tol: Double): TRegionArray;
+function BuildRegions(const Segs: TSegArray; Tol: double): TRegionArray;
 var
   Cut: TSegArray;
   Verts: TP3Array;
-  NV: Integer;
+  NV: integer;
   Bucket: array of TIntArray;
   EBucket: array of TIntArray;
   Parent: TIntArray;
-  HashMask: Integer;
+  HashMask: integer;
 
   EA, EB: TIntArray;          { each undirected edge, as two vertex numbers }
-  NE: Integer;
+  NE: integer;
   Planes: array of TPlaneKey;
-  NP: Integer;
+  NP: integer;
   Loops: TLoopArray;
   LoopPlane: TIntArray;
-  NLoop: Integer;
+  NLoop: integer;
 
-  { any mixing will do; a cell holds one or two vertices }
-  function CellHash(CX, CY, CZ: Int64): Integer;
+{ any mixing will do; a cell holds one or two vertices }
+  function CellHash(CX, CY, CZ: int64): integer;
   begin
-    Result := Integer((CX * 73856093) xor (CY * 19349663) xor (CZ * 83492791))
-      and HashMask;
+    Result := integer((CX * 73856093) xor (CY * 19349663) xor (CZ * 83492791)) and HashMask;
   end;
 
   { Has this edge been added already, either way round?  Records it if not.
     Both directions must match: a duplicate edge makes the walk trace a slit
     instead of dividing the face.  EA/EB keep the drawn direction, which the
     dart builder needs. }
-  function EdgeSeen(A, B: Integer): Boolean;
+  function EdgeSeen(A, B: integer): boolean;
   var
-    H, K, T, W: Integer;
+    H, K, T, W: integer;
   begin
-    if A > B then begin T := A; A := B; B := T; end;
+    if A > B then
+    begin
+      T := A;
+      A := B;
+      B := T;
+    end;
     H := ((A * 92837111) xor (B * 689287499)) and HashMask;
     if H < 0 then H := -H and HashMask;
     for K := 0 to High(EBucket[H]) do
     begin
       W := EBucket[H][K];
-      if ((EA[W] = A) and (EB[W] = B)) or
-         ((EA[W] = B) and (EB[W] = A)) then Exit(True);
+      if ((EA[W] = A) and (EB[W] = B)) or ((EA[W] = B) and (EB[W] = A)) then Exit(True);
     end;
     SetLength(EBucket[H], Length(EBucket[H]) + 1);
     EBucket[H][High(EBucket[H])] := NE;
@@ -944,7 +934,7 @@ var
 
   { Which connected piece a vertex belongs to.  Only loops in different
     pieces can nest, so this avoids testing every loop against every other. }
-  function Root(V: Integer): Integer;
+  function Root(V: integer): integer;
   begin
     while Parent[V] <> V do
     begin
@@ -956,10 +946,10 @@ var
 
   { Welds through a grid of cells one tolerance across, so a match is in this
     cell or one of the 26 around it; a linear scan is far too slow. }
-  function VertexOf(const P: TP3): Integer;
+  function VertexOf(const P: TP3): integer;
   var
-    CX, CY, CZ, DX, DY, DZ: Int64;
-    H, I, K: Integer;
+    CX, CY, CZ, DX, DY, DZ: int64;
+    H, I, K: integer;
   begin
     CX := Floor(P.X / Tol);
     CY := Floor(P.Y / Tol);
@@ -987,7 +977,7 @@ var
   procedure NotePlane(const N, Through: TP3);
   var
     K: TPlaneKey;
-    I: Integer;
+    I: integer;
   begin
     if Len3(N) < 1E-9 then Exit;
     K := MakePlane(N, Through);
@@ -998,25 +988,24 @@ var
     Inc(NP);
   end;
 
-  function EdgeInPlane(E: Integer; const K: TPlaneKey): Boolean;
+  function EdgeInPlane(E: integer; const K: TPlaneKey): boolean;
   begin
-    Result := (Abs(Dot3(K.N, Verts[EA[E]]) - K.D) < Tol) and
-              (Abs(Dot3(K.N, Verts[EB[E]]) - K.D) < Tol);
+    Result := (Abs(Dot3(K.N, Verts[EA[E]]) - K.D) < Tol) and (Abs(Dot3(K.N, Verts[EB[E]]) - K.D) < Tol);
   end;
 
   { Walk one plane's sub-graph and collect every cycle that goes round the
     right way. }
-  procedure WalkPlane(PI: Integer);
+  procedure WalkPlane(PI: integer);
   var
     K: TPlaneKey;
     U, W: TP3;
     Darts: array of TDart;
-    ND, I, J, E, D, T, Start, Cur, Best, Steps: Integer;
+    ND, I, J, E, D, T, Start, Cur, Best, Steps: integer;
     Out_: array of TIntArray;      { darts leaving each vertex, by angle }
     Loop: TP3Array;
-    NL: Integer;
-    Ang: Double;
-    Tmp: Integer;
+    NL: integer;
+    Ang: double;
+    Tmp: integer;
   begin
     K := Planes[PI];
     PlaneBasis(K.N, U, W);
@@ -1040,9 +1029,7 @@ var
     for I := 0 to ND - 1 do
     begin
       Darts[I].Used := False;
-      Darts[I].Ang := ArcTan2(
-        Dot3(Sub3(Verts[Darts[I].V1], Verts[Darts[I].V0]), W),
-        Dot3(Sub3(Verts[Darts[I].V1], Verts[Darts[I].V0]), U));
+      Darts[I].Ang := ArcTan2(Dot3(Sub3(Verts[Darts[I].V1], Verts[Darts[I].V0]), W), Dot3(Sub3(Verts[Darts[I].V1], Verts[Darts[I].V0]), U));
     end;
 
     { the darts leaving each vertex, sorted anticlockwise }
@@ -1091,7 +1078,8 @@ var
           begin
             if Length(Out_[J]) = 1 then Best := D
             else if I = 0 then Best := Out_[J][High(Out_[J])]
-            else Best := Out_[J][I - 1];
+            else
+              Best := Out_[J][I - 1];
             Break;
           end;
         if Best < 0 then Break;
@@ -1115,13 +1103,13 @@ var
   end;
 
 var
-  I, J, K, E, Count: Integer;
+  I, J, K, E, Count: integer;
   Dir1, Dir2: TP3;
   Mid: TP3;
   AtVert: array of TIntArray;
-  LoopArea_: array of Double;
+  LoopArea_: array of double;
   LoopPart: TIntArray;
-  Between: Boolean;
+  Between: boolean;
   KMid: TP3;
 begin
   Result := nil;

@@ -18,31 +18,31 @@ type
     pbProgress: TBGRAFlashProgressBar;
     tmrStart: TTimer;
     procedure btnCloseClick(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure tmrStartTimer(Sender: TObject);
   private
-    FBusy: Boolean;
-    FBytesReceived: Int64;
-    FFinishing: Boolean;
+    FBusy: boolean;
+    FBytesReceived: int64;
+    FFinishing: boolean;
     FInfo: TUpdateInfo;
     FLastPaint: QWord;
-    FSucceeded: Boolean;
+    FSucceeded: boolean;
     FTmp: string;
-    procedure DownloadProgress(BytesReceived, TotalBytes: Int64);
+    procedure DownloadProgress(BytesReceived, TotalBytes: int64);
     procedure Fail(const Msg: string);
-    procedure SetStage(const Stage, Detail: string; ProgressValue: Integer);
+    procedure SetStage(const Stage, Detail: string; ProgressValue: integer);
   public
-    function Run(const Info: TUpdateInfo; const TempFile: string): Boolean;
+    function Run(const Info: TUpdateInfo; const TempFile: string): boolean;
   end;
 
 implementation
 
 {$R *.lfm}
 
-function ByteSize(Value: Int64): string;
+function ByteSize(Value: int64): string;
 begin
   if Value >= 1024 * 1024 then
     Result := FormatFloat('0.0', Value / (1024 * 1024)) + ' MB'
@@ -52,8 +52,7 @@ begin
     Result := IntToStr(Value) + ' bytes';
 end;
 
-procedure TUpdateForm.SetStage(const Stage, Detail: string;
-  ProgressValue: Integer);
+procedure TUpdateForm.SetStage(const Stage, Detail: string; ProgressValue: integer);
 begin
   lblStage.Caption := Stage;
   lblDetail.Caption := Detail;
@@ -61,9 +60,9 @@ begin
   Application.ProcessMessages;
 end;
 
-procedure TUpdateForm.DownloadProgress(BytesReceived, TotalBytes: Int64);
+procedure TUpdateForm.DownloadProgress(BytesReceived, TotalBytes: int64);
 var
-  Percent: Integer;
+  Percent: integer;
   NowTick: QWord;
 begin
   FBytesReceived := BytesReceived;
@@ -73,15 +72,13 @@ begin
     if Percent < 0 then Percent := 0;
     if Percent > 100 then Percent := 100;
     pbProgress.Value := Percent;
-    lblDetail.Caption := ByteSize(BytesReceived) + ' of ' + ByteSize(TotalBytes) +
-      '  (' + IntToStr(Percent) + '%)';
+    lblDetail.Caption := ByteSize(BytesReceived) + ' of ' + ByteSize(TotalBytes) + '  (' + IntToStr(Percent) + '%)';
   end
   else
     lblDetail.Caption := ByteSize(BytesReceived) + ' downloaded';
 
   NowTick := GetTickCount64;
-  if (NowTick - FLastPaint >= 50) or
-     ((TotalBytes > 0) and (BytesReceived >= TotalBytes)) then
+  if (NowTick - FLastPaint >= 50) or ((TotalBytes > 0) and (BytesReceived >= TotalBytes)) then
   begin
     FLastPaint := NowTick;
     Application.ProcessMessages;
@@ -105,7 +102,7 @@ begin
   tmrStart.Enabled := False;
   if FFinishing then
   begin
-    ModalResult := mrOK;
+    ModalResult := mrOk;
     Exit;
   end;
   FBusy := True;
@@ -166,8 +163,7 @@ end;
 
 { A drawn button cannot be the default, so Enter is handled here once Close
   is showing, which is only when the update has stopped. }
-procedure TUpdateForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TUpdateForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (Key = VK_RETURN) and btnClose.Visible and btnClose.Enabled then
   begin
@@ -181,7 +177,7 @@ begin
   tmrStart.Enabled := True;
 end;
 
-procedure TUpdateForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TUpdateForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   CanClose := not FBusy;
 end;
@@ -191,8 +187,7 @@ begin
   ModalResult := mrCancel;
 end;
 
-function TUpdateForm.Run(const Info: TUpdateInfo;
-  const TempFile: string): Boolean;
+function TUpdateForm.Run(const Info: TUpdateInfo; const TempFile: string): boolean;
 begin
   FInfo := Info;
   FTmp := TempFile;

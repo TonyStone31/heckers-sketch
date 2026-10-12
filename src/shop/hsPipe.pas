@@ -22,15 +22,15 @@ type
 
   TSpoolLeg = record
     Dir: TP3;        { a unit direction: an axis, or a 45 between two }
-    Len: Double;     { what the fitter measured, in drawing units }
-    Has: Boolean;    { whether a length has been given at all }
+    Len: double;     { what the fitter measured, in drawing units }
+    Has: boolean;    { whether a length has been given at all }
     { What the measurement runs between: elbow centers or pipe ends (flange
       face, weld).  The take-outs convert it to center to center. }
-    FromEnd: Boolean;   { measured from the pipe end at the start, not the center }
-    ToEnd: Boolean;     { measured to the pipe end at the finish, not the center }
-    Steps: Integer;  { how long it was drawn on the paper, in grid steps }
+    FromEnd: boolean;   { measured from the pipe end at the start, not the center }
+    ToEnd: boolean;     { measured to the pipe end at the finish, not the center }
+    Steps: integer;  { how long it was drawn on the paper, in grid steps }
     After: TLegAfter;   { a reducer or a pair of flanges at the far end }
-    NewSize: Integer;   { the size a reducer goes to, an NPS index }
+    NewSize: integer;   { the size a reducer goes to, an NPS index }
   end;
 
   { What the pipe is made of: black (carbon steel with mill scale) or 304
@@ -38,24 +38,24 @@ type
   TPipeFinish = (pfBlack, pfStainless);
 
   TSpoolSpec = record
-    Size: Integer;               { index into the NPS tables }
+    Size: integer;               { index into the NPS tables }
     Finish: TPipeFinish;
-    LongRadius: Boolean;         { long radius elbows (1.5 D) or short (1 D) }
+    LongRadius: boolean;         { long radius elbows (1.5 D) or short (1 D) }
     Ends: array[0..1] of TPipeEnd;
     Legs: array of TSpoolLeg;
-    Inch: Double;                { one inch in drawing units }
+    Inch: double;                { one inch in drawing units }
     Tag: string;
-    Dims: Boolean;
+    Dims: boolean;
   end;
 
 const
   NPS_NAMES: array[0..12] of string = ('1/2"', '3/4"', '1"', '1 1/4"', '1 1/2"',
     '2"', '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"');
-  NPS_NOMINAL: array[0..12] of Double = (0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 6, 8, 10, 12);
-  NPS_OD: array[0..12] of Double = (0.84, 1.05, 1.315, 1.66, 1.9, 2.375, 2.875, 3.5,
+  NPS_NOMINAL: array[0..12] of double = (0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 6, 8, 10, 12);
+  NPS_OD: array[0..12] of double = (0.84, 1.05, 1.315, 1.66, 1.9, 2.375, 2.875, 3.5,
     4.5, 6.625, 8.625, 10.75, 12.75);
   { class 150 weld-neck flange outside diameters, and one thickness for all }
-  NPS_FLANGE_OD: array[0..12] of Double = (3.5, 3.875, 4.25, 4.625, 5, 6, 7, 7.5,
+  NPS_FLANGE_OD: array[0..12] of double = (3.5, 3.875, 4.25, 4.625, 5, 6, 7, 7.5,
     9, 11, 13.5, 16, 19);
   FLANGE_THICK_IN = 1.0;
   PIPE_END_NAMES: array[TPipeEnd] of string = ('Plain, bevelled for weld',
@@ -63,7 +63,7 @@ const
   LEG_AFTER_NAMES: array[TLegAfter] of string = ('nothing after it', 'a reducer to...',
     'a flanged joint');
   { concentric reducer lengths by the larger size, near enough to B16.9 }
-  NPS_REDUCER_LEN: array[0..12] of Double = (1.5, 1.5, 2, 2, 2.5, 3, 3.5, 3.5, 4, 5.5, 6, 7, 8);
+  NPS_REDUCER_LEN: array[0..12] of double = (1.5, 1.5, 2, 2, 2.5, 3, 3.5, 3.5, 4, 5.5, 6, 7, 8);
   { Facets around a pipe: ten degrees each.  Fewer reads as a barrel up
     close, and pipe gets looked at up close. }
   PIPE_SIDES = 36;
@@ -73,26 +73,26 @@ const
     ('Carbon steel', 'Stainless');
 
 { the bend radius of the elbows, in drawing units }
-function ElbowRadius(const S: TSpoolSpec): Double;
+function ElbowRadius(const S: TSpoolSpec): double;
 { the turn at the corner after leg I, radians, 0 where the run goes straight on }
-function TurnAfter(const S: TSpoolSpec; I: Integer): Double;
+function TurnAfter(const S: TSpoolSpec; I: integer): double;
 { what an elbow of that turn takes off each leg it joins }
-function TakeOut(const S: TSpoolSpec; Turn: Double): Double;
+function TakeOut(const S: TSpoolSpec; Turn: double): double;
 { the take-out at the start of leg I and at its end: 0 at the run's ends }
-function TakeOutBefore(const S: TSpoolSpec; I: Integer): Double;
-function TakeOutAfterLeg(const S: TSpoolSpec; I: Integer): Double;
+function TakeOutBefore(const S: TSpoolSpec; I: integer): double;
+function TakeOutAfterLeg(const S: TSpoolSpec; I: integer): double;
 { leg I center to center, whatever the fitter measured between }
-function CCLength(const S: TSpoolSpec; I: Integer): Double;
+function CCLength(const S: TSpoolSpec; I: integer): double;
 { the cut length of leg I: center to center less its elbows }
-function CutLength(const S: TSpoolSpec; I: Integer): Double;
+function CutLength(const S: TSpoolSpec; I: integer): double;
 { whether every leg has its length, so the spool can be worked out }
-function SketchComplete(const S: TSpoolSpec): Boolean;
+function SketchComplete(const S: TSpoolSpec): boolean;
 { the pipe size in force on leg I, reducers before it counted }
-function SizeOfLeg(const S: TSpoolSpec; I: Integer): Integer;
+function SizeOfLeg(const S: TSpoolSpec; I: integer): integer;
 { how long the fitting after leg I is along the run, 0 for none }
-function AfterLength(const S: TSpoolSpec; I: Integer): Double;
+function AfterLength(const S: TSpoolSpec; I: integer): double;
 { the measurement in the fitter's words: center to center, end to center... }
-function MeasureWords(const S: TSpoolSpec; I: Integer): string;
+function MeasureWords(const S: TSpoolSpec; I: integer): string;
 { what is wrong, or '' }
 function SpoolProblem(const S: TSpoolSpec): string;
 { The centerline: straight legs with the bends as arcs.  Kind says what each
@@ -100,7 +100,7 @@ function SpoolProblem(const S: TSpoolSpec): string;
 procedure SpoolPath(const S: TSpoolSpec; out Pts: TP3Array);
 procedure SpoolPathFull(const S: TSpoolSpec; out Pts: TP3Array; out Kind, Size: TIntArrayW);
 { the spool as one solid; returns the index of its first entity }
-function BuildSpool(D: TWorkDoc; const S: TSpoolSpec; Ink: TColor; Weight: Single): Integer;
+function BuildSpool(D: TWorkDoc; const S: TSpoolSpec; Ink: TColor; Weight: single): integer;
 { the ticket, in words: size, ends, every leg with its cut length, the elbows }
 function SpoolTicket(const S: TSpoolSpec): string;
 { the name of a direction the way a fitter says it }
@@ -108,22 +108,24 @@ function DirName(const Dir: TP3): string;
 
 implementation
 
-function Inch(const S: TSpoolSpec): Double;
+function Inch(const S: TSpoolSpec): double;
 begin
   Result := S.Inch;
   if Result <= 0 then Result := 1 / 12;
 end;
 
-function ElbowRadius(const S: TSpoolSpec): Double;
+function ElbowRadius(const S: TSpoolSpec): double;
 var
-  Nom: Double;
+  Nom: double;
 begin
   Nom := NPS_NOMINAL[EnsureRange(S.Size, 0, High(NPS_NOMINAL))];
-  if S.LongRadius then Result := 1.5 * Nom else Result := Max(1, Nom);
+  if S.LongRadius then Result := 1.5 * Nom
+  else
+    Result := Max(1, Nom);
   Result := Result * Inch(S);
 end;
 
-function TurnAfter(const S: TSpoolSpec; I: Integer): Double;
+function TurnAfter(const S: TSpoolSpec; I: integer): double;
 begin
   Result := 0;
   if (I < 0) or (I >= High(S.Legs)) then Exit;
@@ -131,55 +133,60 @@ begin
   if Result < 1E-6 then Result := 0;
 end;
 
-function TakeOut(const S: TSpoolSpec; Turn: Double): Double;
+function TakeOut(const S: TSpoolSpec; Turn: double): double;
 begin
   if Turn <= 0 then Result := 0
-  else Result := ElbowRadius(S) * Tan(Turn / 2);
+  else
+    Result := ElbowRadius(S) * Tan(Turn / 2);
 end;
 
-function TakeOutBefore(const S: TSpoolSpec; I: Integer): Double;
+function TakeOutBefore(const S: TSpoolSpec; I: integer): double;
 begin
-  if I <= 0 then Result := 0 else Result := TakeOut(S, TurnAfter(S, I - 1));
+  if I <= 0 then Result := 0
+  else
+    Result := TakeOut(S, TurnAfter(S, I - 1));
 end;
 
-function TakeOutAfterLeg(const S: TSpoolSpec; I: Integer): Double;
+function TakeOutAfterLeg(const S: TSpoolSpec; I: integer): double;
 begin
-  if I >= High(S.Legs) then Result := 0 else Result := TakeOut(S, TurnAfter(S, I));
+  if I >= High(S.Legs) then Result := 0
+  else
+    Result := TakeOut(S, TurnAfter(S, I));
 end;
 
-function CCLength(const S: TSpoolSpec; I: Integer): Double;
+function CCLength(const S: TSpoolSpec; I: integer): double;
 begin
   Result := S.Legs[I].Len;
   if S.Legs[I].FromEnd then Result := Result + TakeOutBefore(S, I);
   if S.Legs[I].ToEnd then Result := Result + TakeOutAfterLeg(S, I);
 end;
 
-function SizeOfLeg(const S: TSpoolSpec; I: Integer): Integer;
+function SizeOfLeg(const S: TSpoolSpec; I: integer): integer;
 var
-  K: Integer;
+  K: integer;
 begin
   Result := S.Size;
   for K := 0 to Min(I - 1, High(S.Legs)) do
     if S.Legs[K].After = laReducer then Result := EnsureRange(S.Legs[K].NewSize, 0, High(NPS_OD));
 end;
 
-function AfterLength(const S: TSpoolSpec; I: Integer): Double;
+function AfterLength(const S: TSpoolSpec; I: integer): double;
 var
-  Big: Integer;
+  Big: integer;
 begin
   Result := 0;
   if (I < 0) or (I > High(S.Legs)) then Exit;
   case S.Legs[I].After of
     laReducer:
-      begin
-        Big := Max(SizeOfLeg(S, I), EnsureRange(S.Legs[I].NewSize, 0, High(NPS_OD)));
-        Result := NPS_REDUCER_LEN[Big] * Inch(S);
-      end;
+    begin
+      Big := Max(SizeOfLeg(S, I), EnsureRange(S.Legs[I].NewSize, 0, High(NPS_OD)));
+      Result := NPS_REDUCER_LEN[Big] * Inch(S);
+    end;
     laFlanges: Result := 2 * FLANGE_THICK_IN * Inch(S);
   end;
 end;
 
-function CutLength(const S: TSpoolSpec; I: Integer): Double;
+function CutLength(const S: TSpoolSpec; I: integer): double;
 begin
   Result := CCLength(S, I) - TakeOutBefore(S, I) - TakeOutAfterLeg(S, I);
   { a reducer at the end of the leg is its own piece; a flanged joint is a
@@ -192,31 +199,37 @@ begin
     Result := Result - FLANGE_THICK_IN * Inch(S);
 end;
 
-function SketchComplete(const S: TSpoolSpec): Boolean;
+function SketchComplete(const S: TSpoolSpec): boolean;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := Length(S.Legs) > 0;
   for I := 0 to High(S.Legs) do
     if not S.Legs[I].Has or (S.Legs[I].Len <= 0) then Exit(False);
 end;
 
-function MeasureWords(const S: TSpoolSpec; I: Integer): string;
-  function EndWord(AtStart: Boolean): string;
+function MeasureWords(const S: TSpoolSpec; I: integer): string;
+
+  function EndWord(AtStart: boolean): string;
   begin
     if AtStart and (I = 0) and (S.Ends[0] = peFlange) then Exit('face');
     if (not AtStart) and (I = High(S.Legs)) and (S.Ends[1] = peFlange) then Exit('face');
     Result := 'end';
   end;
+
 begin
-  if S.Legs[I].FromEnd then Result := EndWord(True) else Result := 'center';
+  if S.Legs[I].FromEnd then Result := EndWord(True)
+  else
+    Result := 'center';
   Result := Result + ' to ';
-  if S.Legs[I].ToEnd then Result := Result + EndWord(False) else Result := Result + 'center';
+  if S.Legs[I].ToEnd then Result := Result + EndWord(False)
+  else
+    Result := Result + 'center';
 end;
 
 function SpoolProblem(const S: TSpoolSpec): string;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := '';
   if Length(S.Legs) = 0 then Exit('Draw the run: at least one leg with a length on it.');
@@ -247,9 +260,9 @@ end;
 
 procedure SpoolPathFull(const S: TSpoolSpec; out Pts: TP3Array; out Kind, Size: TIntArrayW);
 var
-  I, K, N, CurKind, CurSize: Integer;
+  I, K, N, CurKind, CurSize: integer;
   P, A, B, T1, T2, O, Nrm, W, Rv, F0, F1: TP3;
-  Turn, T, R, Fl: Double;
+  Turn, T, R, Fl: double;
 
   procedure Put(const Q: TP3);
   begin
@@ -269,7 +282,9 @@ var
   end;
 
 begin
-  Pts := nil; Kind := nil; Size := nil;
+  Pts := nil;
+  Kind := nil;
+  Size := nil;
   if Length(S.Legs) = 0 then Exit;
   R := ElbowRadius(S);
   P := P3(0, 0, 0);
@@ -290,7 +305,9 @@ begin
       F1 := P3(P.X - A.X * T, P.Y - A.Y * T, P.Z - A.Z * T);
       F0 := P3(F1.X - A.X * Fl, F1.Y - A.Y * Fl, F1.Z - A.Z * Fl);
       Put(F0);
-      if S.Legs[I].After = laReducer then CurKind := 1 else CurKind := 2;
+      if S.Legs[I].After = laReducer then CurKind := 1
+      else
+        CurKind := 2;
       Put(F0);
       CurKind := 0;
       if S.Legs[I].After = laReducer then CurSize := SizeOfLeg(S, I + 1);
@@ -313,42 +330,40 @@ begin
     N := Max(2, Round(Turn / BEND_STEP));
     for K := 0 to N do
     begin
-      Put(P3(O.X + RotV(Rv, W, Turn * K / N).X, O.Y + RotV(Rv, W, Turn * K / N).Y,
-             O.Z + RotV(Rv, W, Turn * K / N).Z));
+      Put(P3(O.X + RotV(Rv, W, Turn * K / N).X, O.Y + RotV(Rv, W, Turn * K / N).Y, O.Z + RotV(Rv, W, Turn * K / N).Z));
     end;
     Put(T2);
   end;
 end;
 
-function BuildSpool(D: TWorkDoc; const S: TSpoolSpec; Ink: TColor; Weight: Single): Integer;
+function BuildSpool(D: TWorkDoc; const S: TSpoolSpec; Ink: TColor; Weight: single): integer;
 var
   Path, Circle, Run: TP3Array;
   Kind, Size: TIntArrayW;
-  G, I, K, Face, First, RunStart, RunEnd: Integer;
+  G, I, K, Face, First, RunStart, RunEnd: integer;
   A, U, V, Off, P0, P1: TP3;
-  OD, FOD: Double;
+  OD, FOD: double;
 
-  { a circle of diameter Dia square to direction Dir at point At }
-  procedure CircleAt(const At, Dir: TP3; Dia: Double; out Pts: TP3Array);
+{ a circle of diameter Dia square to direction Dir at point At }
+  procedure CircleAt(const At, Dir: TP3; Dia: double; out Pts: TP3Array);
   var
-    K: Integer;
-    Ang: Double;
+    K: integer;
+    Ang: double;
   begin
     AxesFromNormal(Norm3(Dir), U, V);
     SetLength(Pts, PIPE_SIDES);
     for K := 0 to PIPE_SIDES - 1 do
     begin
       Ang := 2 * Pi * K / PIPE_SIDES;
-      Pts[K] := P3(At.X + (U.X * Cos(Ang) + V.X * Sin(Ang)) * Dia / 2,
-                   At.Y + (U.Y * Cos(Ang) + V.Y * Sin(Ang)) * Dia / 2,
-                   At.Z + (U.Z * Cos(Ang) + V.Z * Sin(Ang)) * Dia / 2);
+      Pts[K] := P3(At.X + (U.X * Cos(Ang) + V.X * Sin(Ang)) * Dia / 2, At.Y + (U.Y * Cos(Ang) + V.Y * Sin(Ang)) * Dia /
+        2, At.Z + (U.Z * Cos(Ang) + V.Z * Sin(Ang)) * Dia / 2);
     end;
   end;
 
-  procedure Disc(const At, Dir: TP3; Dia, Thick: Double);
+  procedure Disc(const At, Dir: TP3; Dia, Thick: double);
   var
     Pts, Two: TP3Array;
-    F: Integer;
+    F: integer;
   begin
     CircleAt(At, Dir, Dia, Pts);
     D.AddFaceRaw(Pts, Ink, False);
@@ -361,10 +376,10 @@ var
 
   { a reducer: a ring of the big size at P0 down to a ring of the small at
     P1, a quad between each pair of points, wound outward }
-  procedure Frustum(const P0, P1, Dir: TP3; DiaA, DiaB: Double);
+  procedure Frustum(const P0, P1, Dir: TP3; DiaA, DiaB: double);
   var
     RA, RB: TP3Array;
-    K, K2, F: Integer;
+    K, K2, F: integer;
     Mid, Cen: TP3;
   begin
     CircleAt(P0, Dir, DiaA, RA);
@@ -375,8 +390,7 @@ var
       K2 := (K + 1) mod PIPE_SIDES;
       D.AddFaceRaw([RA[K], RA[K2], RB[K2], RB[K]], Ink, True);
       F := D.Live - 1;
-      Mid := P3((RA[K].X + RB[K2].X) / 2 - Cen.X, (RA[K].Y + RB[K2].Y) / 2 - Cen.Y,
-                (RA[K].Z + RB[K2].Z) / 2 - Cen.Z);
+      Mid := P3((RA[K].X + RB[K2].X) / 2 - Cen.X, (RA[K].Y + RB[K2].Y) / 2 - Cen.Y, (RA[K].Z + RB[K2].Z) / 2 - Cen.Z);
       if Dot3(D.FaceNormal(F), Mid) < 0 then D.FlipFace(F);
       D.AddLine(RA[K], RB[K], Ink, Weight, False);
       D.SetSoft(D.Live - 1, True);
@@ -392,18 +406,20 @@ var
     own faces and knows nothing about material. }
   procedure Regroup;
   var
-    I: Integer;
+    I: integer;
     Mat: TColor;
   begin
     if S.Finish = pfStainless then Mat := RGBToColor(198, 202, 207)
-    else Mat := RGBToColor(68, 64, 60);
+    else
+      Mat := RGBToColor(68, 64, 60);
     for I := First to D.Live - 1 do
       if D[I].Kind = ekFace then
       begin
         D.SetFaceGroup(I, G);
         D.SetMaterial(I, Mat);
       end
-      else D.SetGroup(I, G);
+      else
+        D.SetGroup(I, G);
   end;
 
 begin
@@ -419,7 +435,9 @@ begin
   for I := 1 to High(Path) do
     if (Kind[I] <> 0) or (I = High(Path)) then
     begin
-      if I = High(Path) then RunEnd := I else RunEnd := I;
+      if I = High(Path) then RunEnd := I
+      else
+        RunEnd := I;
       if RunEnd > RunStart then
       begin
         SetLength(Run, RunEnd - RunStart + 1);
@@ -440,8 +458,8 @@ begin
         begin
           FOD := NPS_FLANGE_OD[EnsureRange(Size[I], 0, High(NPS_FLANGE_OD))] * Inch(S);
           Disc(Path[I], A, FOD, FLANGE_THICK_IN * Inch(S));
-          Disc(P3(Path[I].X + A.X * FLANGE_THICK_IN * Inch(S), Path[I].Y + A.Y * FLANGE_THICK_IN * Inch(S),
-                  Path[I].Z + A.Z * FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
+          Disc(P3(Path[I].X + A.X * FLANGE_THICK_IN * Inch(S), Path[I].Y + A.Y * FLANGE_THICK_IN * Inch(S), Path[I].Z +
+            A.Z * FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
         end;
         RunStart := I + 1;
       end;
@@ -454,22 +472,22 @@ begin
   case S.Ends[0] of
     peFlange: Disc(P0, A, FOD, FLANGE_THICK_IN * Inch(S));
     peCap:
-      begin
-        CircleAt(P0, A, OD, Circle);
-        D.AddFaceRaw(Circle, Ink, True);
-      end;
+    begin
+      CircleAt(P0, A, OD, Circle);
+      D.AddFaceRaw(Circle, Ink, True);
+    end;
   end;
   A := Norm3(S.Legs[High(S.Legs)].Dir);
   OD := NPS_OD[SizeOfLeg(S, High(S.Legs))] * Inch(S);
   FOD := NPS_FLANGE_OD[SizeOfLeg(S, High(S.Legs))] * Inch(S);
   case S.Ends[1] of
-    peFlange: Disc(P3(P1.X - A.X * FLANGE_THICK_IN * Inch(S), P1.Y - A.Y * FLANGE_THICK_IN * Inch(S),
-                      P1.Z - A.Z * FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
+    peFlange: Disc(P3(P1.X - A.X * FLANGE_THICK_IN * Inch(S), P1.Y - A.Y * FLANGE_THICK_IN * Inch(S), P1.Z - A.Z *
+        FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
     peCap:
-      begin
-        CircleAt(P1, A, OD, Circle);
-        D.AddFaceRaw(Circle, Ink, True);
-      end;
+    begin
+      CircleAt(P1, A, OD, Circle);
+      D.AddFaceRaw(Circle, Ink, True);
+    end;
   end;
   Regroup;
   { the name, above the start }
@@ -486,7 +504,9 @@ begin
     begin
       A := Norm3(S.Legs[I].Dir);
       P1 := P3(P0.X + A.X * CCLength(S, I), P0.Y + A.Y * CCLength(S, I), P0.Z + A.Z * CCLength(S, I));
-      if Abs(A.Z) < 0.9 then Off := Norm3(Cross3(A, P3(0, 0, 1))) else Off := P3(1, 0, 0);
+      if Abs(A.Z) < 0.9 then Off := Norm3(Cross3(A, P3(0, 0, 1)))
+      else
+        Off := P3(1, 0, 0);
       Off := P3(Off.X * OD * 1.5, Off.Y * OD * 1.5, Off.Z * OD * 1.5);
       D.AddDim(P0, P1, Ink, Off);
       D.SetGroup(D.Live - 1, G);
@@ -500,11 +520,13 @@ function DirName(const Dir: TP3): string;
 var
   D: TP3;
   Parts: string;
-  procedure Part(V: Double; const Pos, Neg: string);
+
+  procedure Part(V: double; const Pos, Neg: string);
   begin
     if V > 0.3 then Parts := Parts + Pos + ' '
     else if V < -0.3 then Parts := Parts + Neg + ' ';
   end;
+
 begin
   D := Norm3(Dir);
   Parts := '';
@@ -512,68 +534,68 @@ begin
   Part(D.X, 'right', 'left');
   Part(D.Y, 'away', 'towards you');
   Result := Trim(Parts);
-  if (Abs(D.X) > 0.3) and (Abs(D.Y) > 0.3) or (Abs(D.X) > 0.3) and (Abs(D.Z) > 0.3) or
-     (Abs(D.Y) > 0.3) and (Abs(D.Z) > 0.3) then
+  if (Abs(D.X) > 0.3) and (Abs(D.Y) > 0.3) or (Abs(D.X) > 0.3) and (Abs(D.Z) > 0.3) or (Abs(D.Y) > 0.3) and (Abs(D.Z) > 0.3) then
     Result := Result + ' (45)';
 end;
 
 function SpoolTicket(const S: TSpoolSpec): string;
 var
-  I, N90, N45, NOther: Integer;
-  Turn, Total: Double;
-  function Ins(V: Double): string;
+  I, N90, N45, NOther: integer;
+  Turn, Total: double;
+
+  function Ins(V: double): string;
   begin
     Result := FormatFloat('0.###', V / Inch(S)) + '"';
   end;
+
 begin
   Result := 'Pipe spool';
   if S.Tag <> '' then Result := Result + ': ' + S.Tag;
-  Result := Result + LineEnding +
-    'Pipe: ' + NPS_NAMES[EnsureRange(S.Size, 0, High(NPS_NAMES))] + ' NPS, OD ' +
-      FormatFloat('0.###', NPS_OD[EnsureRange(S.Size, 0, High(NPS_OD))]) + '"' + LineEnding +
-    'Elbows: ';
+  Result := Result + LineEnding + 'Pipe: ' + NPS_NAMES[EnsureRange(S.Size, 0, High(NPS_NAMES))] + ' NPS, OD ' + FormatFloat('0.###',
+    NPS_OD[EnsureRange(S.Size, 0, High(NPS_OD))]) + '"' + LineEnding + 'Elbows: ';
   if S.LongRadius then Result := Result + 'long radius (1.5 D), R = '
-  else Result := Result + 'short radius (1 D), R = ';
-  Result := Result + Ins(ElbowRadius(S)) + LineEnding +
-    'Start end: ' + PIPE_END_NAMES[S.Ends[0]] + LineEnding +
-    'Far end: ' + PIPE_END_NAMES[S.Ends[1]] + LineEnding + LineEnding +
-    'Legs, as measured, then center to center, then the cut length:' + LineEnding;
+  else
+    Result := Result + 'short radius (1 D), R = ';
+  Result := Result + Ins(ElbowRadius(S)) + LineEnding + 'Start end: ' + PIPE_END_NAMES[S.Ends[0]] + LineEnding + 'Far end: ' +
+    PIPE_END_NAMES[S.Ends[1]] + LineEnding + LineEnding + 'Legs, as measured, then center to center, then the cut length:' + LineEnding;
   Total := 0;
   for I := 0 to High(S.Legs) do
   begin
     if S.Legs[I].Has then
-      Result := Result + Format('  %d. %s  %s %s  (c-c %s, cut %s)', [I + 1, DirName(S.Legs[I].Dir),
-        Ins(S.Legs[I].Len), MeasureWords(S, I), Ins(CCLength(S, I)), Ins(Max(0, CutLength(S, I)))])
+      Result := Result + Format('  %d. %s  %s %s  (c-c %s, cut %s)', [I + 1, DirName(S.Legs[I].Dir), Ins(S.Legs[I].Len),
+        MeasureWords(S, I), Ins(CCLength(S, I)), Ins(Max(0, CutLength(S, I)))])
     else
       Result := Result + Format('  %d. %s  ? - no length yet', [I + 1, DirName(S.Legs[I].Dir)]);
     case S.Legs[I].After of
-      laReducer: Result := Result + Format('  then a %s x %s reducer, %s long',
-        [NPS_NAMES[SizeOfLeg(S, I)], NPS_NAMES[EnsureRange(S.Legs[I].NewSize, 0, High(NPS_NAMES))],
-         Ins(AfterLength(S, I))]);
+      laReducer: Result := Result + Format('  then a %s x %s reducer, %s long', [NPS_NAMES[SizeOfLeg(S, I)],
+          NPS_NAMES[EnsureRange(S.Legs[I].NewSize, 0, High(NPS_NAMES))], Ins(AfterLength(S, I))]);
       laFlanges: Result := Result + '  then a flanged joint';
     end;
     if I < High(S.Legs) then
     begin
       Turn := TurnAfter(S, I);
       if Turn > 0 then
-        Result := Result + Format('  then a %s %s elbow',
-          [NPS_NAMES[SizeOfLeg(S, I + 1)], FormatFloat('0.#', RadToDeg(Turn))]);
+        Result := Result + Format('  then a %s %s elbow', [NPS_NAMES[SizeOfLeg(S, I + 1)], FormatFloat('0.#', RadToDeg(Turn))]);
     end;
     Result := Result + LineEnding;
     if S.Legs[I].Has then Total := Total + CCLength(S, I);
   end;
-  N90 := 0; N45 := 0; NOther := 0;
+  N90 := 0;
+  N45 := 0;
+  NOther := 0;
   for I := 0 to High(S.Legs) - 1 do
   begin
     Turn := TurnAfter(S, I);
     if Turn <= 0 then Continue;
     if Abs(RadToDeg(Turn) - 90) < 0.5 then Inc(N90)
     else if Abs(RadToDeg(Turn) - 45) < 0.5 then Inc(N45)
-    else Inc(NOther);
+    else
+      Inc(NOther);
   end;
   Result := Result + LineEnding + Format('Fittings: %d x 90, %d x 45', [N90, N45]);
   if NOther > 0 then Result := Result + Format(', %d other', [NOther]);
-  N90 := 0; N45 := 0;
+  N90 := 0;
+  N45 := 0;
   for I := 0 to High(S.Legs) do
     if S.Legs[I].After = laReducer then Inc(N90)
     else if S.Legs[I].After = laFlanges then Inc(N45);

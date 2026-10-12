@@ -83,8 +83,8 @@ type
     procedure btnOffClick(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure FieldChange(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure pbPlanMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure pbPlanMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure pbPlanPaint(Sender: TObject);
   private
     FJob: THeatJob;
@@ -93,13 +93,13 @@ type
     FLayouts: TRadiantResults;
     FSpecs: array of TRadiantSpec;
     FUnits: TUnitSystem;
-    FSel: Integer;
+    FSel: integer;
     { set while the fields are filled from the job, so their change events
       are not taken as the user's edits }
-    FListing: Boolean;
+    FListing: boolean;
     { the plan's frame, and how it sits in the paint box }
     FFrame: TRadiantFrame;
-    FScale, FX0, FY0, FMinU, FMaxV: Double;
+    FScale, FX0, FY0, FMinU, FMaxV: double;
     procedure Dress;
     procedure Fill;
     procedure ShowZone;
@@ -112,8 +112,8 @@ type
     { Edits the heat load for these zones. True and Job changed when kept;
       Job.Enabled off when the user leaves it out. Specs are the zones' own
       (tube, spacing), Layouts their loops. }
-    class function Edit(Units: TUnitSystem; const Zones: TRadiantZones; const Titles: TStringArray;
-      const Layouts: TRadiantResults; const Specs: array of TRadiantSpec; var Job: THeatJob): Boolean;
+    class function Edit(Units: TUnitSystem; const Zones: TRadiantZones; const Titles: TStringArray; const Layouts: TRadiantResults;
+      const Specs: array of TRadiantSpec; var Job: THeatJob): boolean;
   end;
 
 implementation
@@ -137,19 +137,33 @@ end;
 { the lists, from the unit's own names - one place says what each is }
 procedure TRadiantHeatForm.Fill;
 var
-  I: Integer;
-  U: THeatUse; A: THeatAbove; W: THeatWalls; S: THeatSlabIns; C: THeatCover; T: THeatTight; N: THeatSnow;
+  I: integer;
+  U: THeatUse;
+  A: THeatAbove;
+  W: THeatWalls;
+  S: THeatSlabIns;
+  C: THeatCover;
+  T: THeatTight;
+  N: THeatSnow;
 begin
   cbClimate.Items.Clear;
   for I := 1 to 8 do cbClimate.Items.Add('Zone ' + IntToStr(I));
-  cbUse.Items.Clear; for U := Low(THeatUse) to High(THeatUse) do cbUse.Items.Add(HEAT_USE_NAMES[U]);
-  cbAbove.Items.Clear; for A := Low(THeatAbove) to High(THeatAbove) do cbAbove.Items.Add(HEAT_ABOVE_NAMES[A]);
-  cbWalls.Items.Clear; for W := Low(THeatWalls) to High(THeatWalls) do cbWalls.Items.Add(HEAT_WALL_NAMES[W]);
-  cbSlab.Items.Clear; for S := Low(THeatSlabIns) to High(THeatSlabIns) do cbSlab.Items.Add(HEAT_SLAB_NAMES[S]);
-  cbCover.Items.Clear; for C := Low(THeatCover) to High(THeatCover) do cbCover.Items.Add(HEAT_COVER_NAMES[C]);
-  cbTight.Items.Clear; for T := Low(THeatTight) to High(THeatTight) do cbTight.Items.Add(HEAT_TIGHT_NAMES[T]);
-  cbSnow.Items.Clear; for N := Low(THeatSnow) to High(THeatSnow) do cbSnow.Items.Add(HEAT_SNOW_NAMES[N]);
-  cbRun.Items.Clear; for I := 0 to High(HEAT_RUN_NAMES) do cbRun.Items.Add(HEAT_RUN_NAMES[I]);
+  cbUse.Items.Clear;
+  for U := Low(THeatUse) to High(THeatUse) do cbUse.Items.Add(HEAT_USE_NAMES[U]);
+  cbAbove.Items.Clear;
+  for A := Low(THeatAbove) to High(THeatAbove) do cbAbove.Items.Add(HEAT_ABOVE_NAMES[A]);
+  cbWalls.Items.Clear;
+  for W := Low(THeatWalls) to High(THeatWalls) do cbWalls.Items.Add(HEAT_WALL_NAMES[W]);
+  cbSlab.Items.Clear;
+  for S := Low(THeatSlabIns) to High(THeatSlabIns) do cbSlab.Items.Add(HEAT_SLAB_NAMES[S]);
+  cbCover.Items.Clear;
+  for C := Low(THeatCover) to High(THeatCover) do cbCover.Items.Add(HEAT_COVER_NAMES[C]);
+  cbTight.Items.Clear;
+  for T := Low(THeatTight) to High(THeatTight) do cbTight.Items.Add(HEAT_TIGHT_NAMES[T]);
+  cbSnow.Items.Clear;
+  for N := Low(THeatSnow) to High(THeatSnow) do cbSnow.Items.Add(HEAT_SNOW_NAMES[N]);
+  cbRun.Items.Clear;
+  for I := 0 to High(HEAT_RUN_NAMES) do cbRun.Items.Add(HEAT_RUN_NAMES[I]);
   cbZone.Items.Clear;
   for I := 0 to High(FZones) do cbZone.Items.Add(FTitles[I]);
 end;
@@ -227,7 +241,7 @@ procedure TRadiantHeatForm.Report;
 var
   R: THeatZoneResults;
   B: THeatBoiler;
-  Z: Integer;
+  Z: integer;
   L: TStringList;
   Lay: TRadiantResult;
   Sp: TRadiantSpec;
@@ -235,8 +249,12 @@ begin
   SetLength(R, Length(FZones));
   for Z := 0 to High(FZones) do
   begin
-    if Z <= High(FLayouts) then Lay := FLayouts[Z] else Lay := Default(TRadiantResult);
-    if Z <= High(FSpecs) then Sp := FSpecs[Z] else Sp := DefaultRadiantSpec;
+    if Z <= High(FLayouts) then Lay := FLayouts[Z]
+    else
+      Lay := Default(TRadiantResult);
+    if Z <= High(FSpecs) then Sp := FSpecs[Z]
+    else
+      Sp := DefaultRadiantSpec;
     R[Z] := HeatZone(FJob, FZones, Z, Lay, Sp);
   end;
   B := HeatBoiler(FJob, R);
@@ -273,19 +291,24 @@ end;
 { the zones fitted to the paint box, north up }
 procedure TRadiantHeatForm.Fit;
 var
-  Z, I: Integer;
+  Z, I: integer;
   P: T2;
-  MinV, MaxU: Double;
+  MinV, MaxU: double;
 begin
   if Length(FZones) = 0 then Exit;
   FFrame := RadiantPlanFrame(FZones[0].Outline);
-  FMinU := 1E300; MaxU := -1E300; MinV := 1E300; FMaxV := -1E300;
+  FMinU := 1E300;
+  MaxU := -1E300;
+  MinV := 1E300;
+  FMaxV := -1E300;
   for Z := 0 to High(FZones) do
     for I := 0 to High(FZones[Z].Outline) do
     begin
       P := RadiantTo2(FFrame, FZones[Z].Outline[I]);
-      FMinU := Min(FMinU, P.X); MaxU := Max(MaxU, P.X);
-      MinV := Min(MinV, P.Y); FMaxV := Max(FMaxV, P.Y);
+      FMinU := Min(FMinU, P.X);
+      MaxU := Max(MaxU, P.X);
+      MinV := Min(MinV, P.Y);
+      FMaxV := Max(FMaxV, P.Y);
     end;
   FScale := Min((pbPlan.Width - 32) / Max(1E-6, MaxU - FMinU), (pbPlan.Height - 32) / Max(1E-6, FMaxV - MinV));
   FX0 := (pbPlan.Width - (MaxU - FMinU) * FScale) / 2;
@@ -303,13 +326,13 @@ end;
 procedure TRadiantHeatForm.pbPlanPaint(Sender: TObject);
 var
   C: TCanvas;
-  Z, E, N: Integer;
+  Z, E, N: integer;
   Pts: array of TPoint;
   A, B: TPoint;
   Edge: THeatEdge;
-  Cx, Cy: Double;
+  Cx, Cy: double;
   S: string;
-  Shared: Boolean;
+  Shared: boolean;
 begin
   C := pbPlan.Canvas;
   C.Brush.Color := PixToColor(DlgTheme.Shell2);
@@ -321,7 +344,8 @@ begin
     SetLength(Pts, N);
     for E := 0 to N - 1 do Pts[E] := ToScreen(FZones[Z].Outline[E]);
     if Z = FSel then C.Brush.Color := Shade(PixToColor(DlgTheme.Shell2), 0.15)
-    else C.Brush.Color := PixToColor(DlgTheme.Shell2);
+    else
+      C.Brush.Color := PixToColor(DlgTheme.Shell2);
     C.Pen.Color := PixToColor(DlgTheme.TextDim);
     C.Pen.Width := 1;
     C.Polygon(Pts);
@@ -334,12 +358,15 @@ begin
     for E := 0 to N - 1 do
     begin
       if (Z <= High(FJob.Zones)) and (E <= High(FJob.Zones[Z].Edges)) then Edge := FJob.Zones[Z].Edges[E]
-      else Edge := heInside;
+      else
+        Edge := heInside;
       Shared := HeatSharedFt(FZones, Z, E) >= Dist(FZones[Z].Outline[E], FZones[Z].Outline[(E + 1) mod N]) - 0.5;
       if Shared or (Edge = heInside) then Continue;
       A := ToScreen(FZones[Z].Outline[E]);
       B := ToScreen(FZones[Z].Outline[(E + 1) mod N]);
-      if Edge = heOutside then C.Pen.Color := $00E09030 else C.Pen.Color := $002090F0;
+      if Edge = heOutside then C.Pen.Color := $00E09030
+      else
+        C.Pen.Color := $002090F0;
       C.Pen.Width := 4;
       C.Line(A, B);
     end;
@@ -350,12 +377,14 @@ begin
   C.Font.Height := -13;
   for Z := 0 to High(FZones) do
   begin
-    Cx := 0; Cy := 0;
+    Cx := 0;
+    Cy := 0;
     N := Length(FZones[Z].Outline);
     for E := 0 to N - 1 do
     begin
       A := ToScreen(FZones[Z].Outline[E]);
-      Cx := Cx + A.X / N; Cy := Cy + A.Y / N;
+      Cx := Cx + A.X / N;
+      Cy := Cy + A.Y / N;
     end;
     S := IntToStr(Z + 1);
     C.TextOut(Round(Cx) - C.TextWidth(S) div 2, Round(Cy) - C.TextHeight(S) div 2, S);
@@ -365,16 +394,16 @@ end;
 
 { a click near a wall changes it - outside, to a space not heated,
   inside, round again; a click inside a zone opens it }
-procedure TRadiantHeatForm.pbPlanMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TRadiantHeatForm.pbPlanMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  Z, E, N, BZ, BE: Integer;
+  Z, E, N, BZ, BE: integer;
   A, B: TPoint;
-  D, BD, T, L2: Double;
+  D, BD, T, L2: double;
   Pts: array of TPoint;
 
-  function Inside(const P: array of TPoint): Boolean;
+  function Inside(const P: array of TPoint): boolean;
   var
-    I, J: Integer;
+    I, J: integer;
   begin
     Result := False;
     J := High(P);
@@ -388,7 +417,9 @@ var
 
 begin
   Fit;
-  BZ := -1; BE := -1; BD := 7;
+  BZ := -1;
+  BE := -1;
+  BD := 7;
   for Z := 0 to High(FZones) do
   begin
     N := Length(FZones[Z].Outline);
@@ -403,7 +434,12 @@ begin
       D := Hypot(X - (A.X + T * (B.X - A.X)), Y - (A.Y + T * (B.Y - A.Y)));
       { the open zone's own walls first, where two lie close }
       if Z = FSel then D := D - 1;
-      if D < BD then begin BD := D; BZ := Z; BE := E; end;
+      if D < BD then
+      begin
+        BD := D;
+        BZ := Z;
+        BE := E;
+      end;
     end;
   end;
   if BZ >= 0 then
@@ -412,7 +448,8 @@ begin
     case FJob.Zones[BZ].Edges[BE] of
       heInside: FJob.Zones[BZ].Edges[BE] := heOutside;
       heOutside: FJob.Zones[BZ].Edges[BE] := heUnheated;
-    else FJob.Zones[BZ].Edges[BE] := heInside;
+      else
+        FJob.Zones[BZ].Edges[BE] := heInside;
     end;
     FSel := BZ;
   end
@@ -432,13 +469,13 @@ end;
 procedure TRadiantHeatForm.btnOkClick(Sender: TObject);
 begin
   FJob.Enabled := True;
-  ModalResult := mrOK;
+  ModalResult := mrOk;
 end;
 
 procedure TRadiantHeatForm.btnOffClick(Sender: TObject);
 begin
   FJob.Enabled := False;
-  ModalResult := mrOK;
+  ModalResult := mrOk;
 end;
 
 { A check box's words are a separate label, because Windows draws a check
@@ -460,7 +497,7 @@ begin
   ModalResult := mrCancel;
 end;
 
-procedure TRadiantHeatForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TRadiantHeatForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if Key = VK_ESCAPE then
   begin
@@ -469,11 +506,11 @@ begin
   end;
 end;
 
-class function TRadiantHeatForm.Edit(Units: TUnitSystem; const Zones: TRadiantZones; const Titles: TStringArray;
-  const Layouts: TRadiantResults; const Specs: array of TRadiantSpec; var Job: THeatJob): Boolean;
+class function TRadiantHeatForm.Edit(Units: TUnitSystem; const Zones: TRadiantZones; const Titles: TStringArray; const Layouts: TRadiantResults;
+  const Specs: array of TRadiantSpec; var Job: THeatJob): boolean;
 var
   F: TRadiantHeatForm;
-  Z, E: Integer;
+  Z, E: integer;
   G: TIntArray;
 begin
   Result := False;
@@ -519,7 +556,7 @@ begin
     F.FSel := 0;
     F.ShowZone;
     F.Report;
-    if F.ShowModal <> mrOK then Exit;
+    if F.ShowModal <> mrOk then Exit;
     Job := F.FJob;
     Result := True;
   finally

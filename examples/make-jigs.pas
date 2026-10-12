@@ -4,7 +4,11 @@
       fpc -Mobjfpc -Sh -Fu"../src/*" -Fu"../src/vendor/*" -Fi.. make-jigs.pas && ./make-jigs   }
 program makejigsexample;
 {$mode objfpc}{$H+}
-uses Classes, SysUtils, exwrite;
+uses
+  Classes,
+  SysUtils,
+  exwrite;
+
 var
   U, L: TStringList;
 begin

@@ -14,214 +14,261 @@ program makerobot;
 {$mode objfpc}{$H+}
 
 uses
-  SysUtils, Classes, Math, Types, Graphics, hsDrawing, hsExToy, exwrite;
+  SysUtils,
+  Classes,
+  Math,
+  Types,
+  Graphics,
+  hsDrawing,
+  hsExToy,
+  exwrite;
 
 const
   IN_ = 1 / 12;
 
   { --- the robot, in inches ------------------------------------------- }
-  FOOT_L = 10;  FOOT_W = 5.5;  FOOT_H = 2.5;
-  SHIN    = 17;    SHIN_W  = 4.0;
-  THIGH   = 14;    THIGH_W = 5.0;
-  HIP_W   = 17;  HIP_D = 8;   HIP_H = 6;
-  TORSO_W = 21;  TORSO_D = 10; TORSO_H = 23;
-  NECK_H  = 3;
-  HEAD_W  = 11;  HEAD_D = 9;  HEAD_H = 9;
-  ARM_UP  = 13;  ARM_LO = 12;  ARM_W = 4.4;
-  STANCE  = 6.5;                 { half the distance between the feet }
+  FOOT_L = 10;
+  FOOT_W = 5.5;
+  FOOT_H = 2.5;
+  SHIN = 17;
+  SHIN_W = 4.0;
+  THIGH = 14;
+  THIGH_W = 5.0;
+  HIP_W = 17;
+  HIP_D = 8;
+  HIP_H = 6;
+  TORSO_W = 21;
+  TORSO_D = 10;
+  TORSO_H = 23;
+  NECK_H = 3;
+  HEAD_W = 11;
+  HEAD_D = 9;
+  HEAD_H = 9;
+  ARM_UP = 13;
+  ARM_LO = 12;
+  ARM_W = 4.4;
+  STANCE = 6.5;                 { half the distance between the feet }
 
   { Worked out from the parts below, so the shoulders stay on the torso. }
-  HIP_Z   = FOOT_H + SHIN + THIGH;
+  HIP_Z = FOOT_H + SHIN + THIGH;
   TORSO_Z = HIP_Z + HIP_H;
   TORSO_T = TORSO_Z + TORSO_H;
-  SHZ     = TORSO_T - 4;          { the shoulder joint }
-  BALL_R  = 3.4;                  { the shoulder ball }
-  ELB_R   = 2.3;
+  SHZ = TORSO_T - 4;          { the shoulder joint }
+  BALL_R = 3.4;                  { the shoulder ball }
+  ELB_R = 2.3;
 
   { where the toy sits: its middle, off the floor and off the chest }
   PANEL_Z = 50;
   { the toy is 12 x 9 x 1.67, and stands proud of the chest on a bezel }
-  TOY_W = 12;  TOY_H = 9;  TOY_T = 1.67;
+  TOY_W = 12;
+  TOY_H = 9;
+  TOY_T = 1.67;
   BEZEL = 1.4;
 
 var
   D: TWorkDoc;
   CSteel, CDark, CRed, CEye, CRubber: TColor;
 
-function Pt(X, Y, Z: Double): TP3;
-begin
-  Result := P3(X * IN_, Y * IN_, Z * IN_);
-end;
-
-{ --- the same solid-making helpers the broom uses -------------------- }
-
-procedure FaceOut(const Pts: array of TP3; const Mid: TP3; Mat: TColor;
-  G: Integer);
-var
-  I, K: Integer;
-  C, N: TP3;
-begin
-  D.AddFace(Pts, clBlack, True);
-  K := D.Live - 1;
-  D.SetFaceGroup(K, G);
-  C := P3(0, 0, 0);
-  for I := 0 to High(Pts) do
+  function Pt(X, Y, Z: double): TP3;
   begin
-    C.X := C.X + Pts[I].X; C.Y := C.Y + Pts[I].Y; C.Z := C.Z + Pts[I].Z;
+    Result := P3(X * IN_, Y * IN_, Z * IN_);
   end;
-  C.X := C.X / Length(Pts); C.Y := C.Y / Length(Pts); C.Z := C.Z / Length(Pts);
-  N := D.FaceNormal(K);
-  if Dot3(N, P3(C.X - Mid.X, C.Y - Mid.Y, C.Z - Mid.Z)) < 0 then D.FlipFace(K);
-  D.SetMaterial(K, Mat);
-end;
 
-procedure Tube(const Lo, Hi: array of TP3; Mat: TColor; EdgeW: Single);
-var
-  N, I, J, G: Integer;
-  Mid: TP3;
-  Side: array[0..3] of TP3;
-begin
-  N := Length(Lo);
-  G := D.NewGroup;
-  Mid := P3(0, 0, 0);
-  for I := 0 to N - 1 do
+  { --- the same solid-making helpers the broom uses -------------------- }
+
+  procedure FaceOut(const Pts: array of TP3; const Mid: TP3; Mat: TColor; G: integer);
+  var
+    I, K: integer;
+    C, N: TP3;
   begin
-    Mid.X := Mid.X + Lo[I].X + Hi[I].X;
-    Mid.Y := Mid.Y + Lo[I].Y + Hi[I].Y;
-    Mid.Z := Mid.Z + Lo[I].Z + Hi[I].Z;
-  end;
-  Mid := P3(Mid.X / (2 * N), Mid.Y / (2 * N), Mid.Z / (2 * N));
-  FaceOut(Lo, Mid, Mat, G);
-  FaceOut(Hi, Mid, Mat, G);
-  for I := 0 to N - 1 do
-  begin
-    J := (I + 1) mod N;
-    Side[0] := Lo[I]; Side[1] := Lo[J]; Side[2] := Hi[J]; Side[3] := Hi[I];
-    FaceOut(Side, Mid, Mat, G);
-    if EdgeW > 0 then
+    D.AddFace(Pts, clBlack, True);
+    K := D.Live - 1;
+    D.SetFaceGroup(K, G);
+    C := P3(0, 0, 0);
+    for I := 0 to High(Pts) do
     begin
-      D.AddLine(Lo[I], Lo[J], clBlack, EdgeW, False); D.SetGroup(D.Live - 1, G);
-      D.AddLine(Hi[I], Hi[J], clBlack, EdgeW, False); D.SetGroup(D.Live - 1, G);
-      D.AddLine(Lo[I], Hi[I], clBlack, EdgeW, False); D.SetGroup(D.Live - 1, G);
+      C.X := C.X + Pts[I].X;
+      C.Y := C.Y + Pts[I].Y;
+      C.Z := C.Z + Pts[I].Z;
+    end;
+    C.X := C.X / Length(Pts);
+    C.Y := C.Y / Length(Pts);
+    C.Z := C.Z / Length(Pts);
+    N := D.FaceNormal(K);
+    if Dot3(N, P3(C.X - Mid.X, C.Y - Mid.Y, C.Z - Mid.Z)) < 0 then D.FlipFace(K);
+    D.SetMaterial(K, Mat);
+  end;
+
+  procedure Tube(const Lo, Hi: array of TP3; Mat: TColor; EdgeW: single);
+  var
+    N, I, J, G: integer;
+    Mid: TP3;
+    Side: array[0..3] of TP3;
+  begin
+    N := Length(Lo);
+    G := D.NewGroup;
+    Mid := P3(0, 0, 0);
+    for I := 0 to N - 1 do
+    begin
+      Mid.X := Mid.X + Lo[I].X + Hi[I].X;
+      Mid.Y := Mid.Y + Lo[I].Y + Hi[I].Y;
+      Mid.Z := Mid.Z + Lo[I].Z + Hi[I].Z;
+    end;
+    Mid := P3(Mid.X / (2 * N), Mid.Y / (2 * N), Mid.Z / (2 * N));
+    FaceOut(Lo, Mid, Mat, G);
+    FaceOut(Hi, Mid, Mat, G);
+    for I := 0 to N - 1 do
+    begin
+      J := (I + 1) mod N;
+      Side[0] := Lo[I];
+      Side[1] := Lo[J];
+      Side[2] := Hi[J];
+      Side[3] := Hi[I];
+      FaceOut(Side, Mid, Mat, G);
+      if EdgeW > 0 then
+      begin
+        D.AddLine(Lo[I], Lo[J], clBlack, EdgeW, False);
+        D.SetGroup(D.Live - 1, G);
+        D.AddLine(Hi[I], Hi[J], clBlack, EdgeW, False);
+        D.SetGroup(D.Live - 1, G);
+        D.AddLine(Lo[I], Hi[I], clBlack, EdgeW, False);
+        D.SetGroup(D.Live - 1, G);
+      end;
     end;
   end;
-end;
 
-{ A box, corner to corner. }
-procedure Box(X0, Y0, Z0, X1, Y1, Z1: Double; Mat: TColor; EdgeW: Single = 1.0);
-var
-  Lo, Hi: array[0..3] of TP3;
-begin
-  Lo[0] := Pt(X0, Y0, Z0); Lo[1] := Pt(X1, Y0, Z0);
-  Lo[2] := Pt(X1, Y1, Z0); Lo[3] := Pt(X0, Y1, Z0);
-  Hi[0] := Pt(X0, Y0, Z1); Hi[1] := Pt(X1, Y0, Z1);
-  Hi[2] := Pt(X1, Y1, Z1); Hi[3] := Pt(X0, Y1, Z1);
-  Tube(Lo, Hi, Mat, EdgeW);
-end;
+  { A box, corner to corner. }
+  procedure Box(X0, Y0, Z0, X1, Y1, Z1: double; Mat: TColor; EdgeW: single = 1.0);
+  var
+    Lo, Hi: array[0..3] of TP3;
+  begin
+    Lo[0] := Pt(X0, Y0, Z0);
+    Lo[1] := Pt(X1, Y0, Z0);
+    Lo[2] := Pt(X1, Y1, Z0);
+    Lo[3] := Pt(X0, Y1, Z0);
+    Hi[0] := Pt(X0, Y0, Z1);
+    Hi[1] := Pt(X1, Y0, Z1);
+    Hi[2] := Pt(X1, Y1, Z1);
+    Hi[3] := Pt(X0, Y1, Z1);
+    Tube(Lo, Hi, Mat, EdgeW);
+  end;
 
 { A ball joint at the shoulder or elbow, so the arms attach without a seam.
   Rings of quads with a fan at each pole, and no edges: the shading alone
   makes it read as a ball. }
-procedure Ball(const C: TP3; R: Double; Mat: TColor);
-const
+  procedure Ball(const C: TP3; R: double; Mat: TColor);
+  const
   { Few enough that each facet is bigger than a pixel; more and the flat
     shading speckles into noise. }
-  SEG = 12; RINGS = 6;
-var
-  G, I, J: Integer;
-  Lat0, Lat1, Lon0, Lon1: Double;
-  P: array[0..3] of TP3;
+    SEG = 12;
+    RINGS = 6;
+  var
+    G, I, J: integer;
+    Lat0, Lat1, Lon0, Lon1: double;
+    P: array[0..3] of TP3;
 
-  function Sph(Lat, Lon: Double): TP3;
-  begin
-    Result := P3(C.X + R * Cos(Lat) * Cos(Lon),
-                 C.Y + R * Cos(Lat) * Sin(Lon),
-                 C.Z + R * Sin(Lat));
-  end;
-
-begin
-  G := D.NewGroup;
-  for I := 0 to RINGS - 1 do
-  begin
-    Lat0 := -Pi / 2 + Pi * I / RINGS;
-    Lat1 := -Pi / 2 + Pi * (I + 1) / RINGS;
-    for J := 0 to SEG - 1 do
+    function Sph(Lat, Lon: double): TP3;
     begin
-      Lon0 := 2 * Pi * J / SEG;
-      Lon1 := 2 * Pi * (J + 1) / SEG;
-      if I = 0 then
+      Result := P3(C.X + R * Cos(Lat) * Cos(Lon), C.Y + R * Cos(Lat) * Sin(Lon), C.Z + R * Sin(Lat));
+    end;
+
+  begin
+    G := D.NewGroup;
+    for I := 0 to RINGS - 1 do
+    begin
+      Lat0 := -Pi / 2 + Pi * I / RINGS;
+      Lat1 := -Pi / 2 + Pi * (I + 1) / RINGS;
+      for J := 0 to SEG - 1 do
       begin
-        P[0] := Sph(Lat0, 0); P[1] := Sph(Lat1, Lon0); P[2] := Sph(Lat1, Lon1);
-        FaceOut([P[0], P[1], P[2]], C, Mat, G);
-      end
-      else if I = RINGS - 1 then
-      begin
-        P[0] := Sph(Lat0, Lon0); P[1] := Sph(Lat0, Lon1); P[2] := Sph(Lat1, 0);
-        FaceOut([P[0], P[1], P[2]], C, Mat, G);
-      end
-      else
-      begin
-        P[0] := Sph(Lat0, Lon0); P[1] := Sph(Lat0, Lon1);
-        P[2] := Sph(Lat1, Lon1); P[3] := Sph(Lat1, Lon0);
-        FaceOut([P[0], P[1], P[2], P[3]], C, Mat, G);
+        Lon0 := 2 * Pi * J / SEG;
+        Lon1 := 2 * Pi * (J + 1) / SEG;
+        if I = 0 then
+        begin
+          P[0] := Sph(Lat0, 0);
+          P[1] := Sph(Lat1, Lon0);
+          P[2] := Sph(Lat1, Lon1);
+          FaceOut([P[0], P[1], P[2]], C, Mat, G);
+        end
+        else if I = RINGS - 1 then
+        begin
+          P[0] := Sph(Lat0, Lon0);
+          P[1] := Sph(Lat0, Lon1);
+          P[2] := Sph(Lat1, 0);
+          FaceOut([P[0], P[1], P[2]], C, Mat, G);
+        end
+        else
+        begin
+          P[0] := Sph(Lat0, Lon0);
+          P[1] := Sph(Lat0, Lon1);
+          P[2] := Sph(Lat1, Lon1);
+          P[3] := Sph(Lat1, Lon0);
+          FaceOut([P[0], P[1], P[2], P[3]], C, Mat, G);
+        end;
       end;
     end;
   end;
-end;
 
 { A limb: a square section swept from one point to another, so an arm can
   lie along any direction rather than only along an axis. }
-procedure Limb(const A, B: TP3; W: Double; Mat: TColor);
-var
-  Dir, U, V: TP3;
-  Lo, Hi: array[0..3] of TP3;
-  I: Integer;
-  H: Double;
-begin
-  H := W * IN_ / 2;
-  Dir := Norm3(P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z));
-  AxesFromNormal(Dir, U, V);
-  for I := 0 to 3 do
+  procedure Limb(const A, B: TP3; W: double; Mat: TColor);
+  var
+    Dir, U, V: TP3;
+    Lo, Hi: array[0..3] of TP3;
+    I: integer;
+    H: double;
   begin
-    case I of
-      0: begin Lo[I] := P3(A.X - U.X * H - V.X * H, A.Y - U.Y * H - V.Y * H, A.Z - U.Z * H - V.Z * H); end;
-      1: begin Lo[I] := P3(A.X + U.X * H - V.X * H, A.Y + U.Y * H - V.Y * H, A.Z + U.Z * H - V.Z * H); end;
-      2: begin Lo[I] := P3(A.X + U.X * H + V.X * H, A.Y + U.Y * H + V.Y * H, A.Z + U.Z * H + V.Z * H); end;
-    else  begin Lo[I] := P3(A.X - U.X * H + V.X * H, A.Y - U.Y * H + V.Y * H, A.Z - U.Z * H + V.Z * H); end;
+    H := W * IN_ / 2;
+    Dir := Norm3(P3(B.X - A.X, B.Y - A.Y, B.Z - A.Z));
+    AxesFromNormal(Dir, U, V);
+    for I := 0 to 3 do
+    begin
+      case I of
+        0: begin
+          Lo[I] := P3(A.X - U.X * H - V.X * H, A.Y - U.Y * H - V.Y * H, A.Z - U.Z * H - V.Z * H);
+        end;
+        1: begin
+          Lo[I] := P3(A.X + U.X * H - V.X * H, A.Y + U.Y * H - V.Y * H, A.Z + U.Z * H - V.Z * H);
+        end;
+        2: begin
+          Lo[I] := P3(A.X + U.X * H + V.X * H, A.Y + U.Y * H + V.Y * H, A.Z + U.Z * H + V.Z * H);
+        end;
+        else
+        begin
+          Lo[I] := P3(A.X - U.X * H + V.X * H, A.Y - U.Y * H + V.Y * H, A.Z - U.Z * H + V.Z * H);
+        end;
+      end;
+      Hi[I] := P3(Lo[I].X + B.X - A.X, Lo[I].Y + B.Y - A.Y, Lo[I].Z + B.Z - A.Z);
     end;
-    Hi[I] := P3(Lo[I].X + B.X - A.X, Lo[I].Y + B.Y - A.Y, Lo[I].Z + B.Z - A.Z);
+    Tube(Lo, Hi, Mat, 1.0);
   end;
-  Tube(Lo, Hi, Mat, 1.0);
-end;
 
-{ --- the toy, stood on end and set in the chest ---------------------- }
+  { --- the toy, stood on end and set in the chest ---------------------- }
 
 { Copy another drawing in, turned and moved into place, as one group.
   Parts (docs/groupplan.md) would do this with one copy and a placement. }
-procedure PlaceDrawing(Src: TWorkDoc; const Turn: TP3; Ang: Double;
-  const Shift: TP3);
-var
-  I, J, K, G, F: Integer;
-  Poly: TP3Array;
-  Holes: array of TP3Array;
+  procedure PlaceDrawing(Src: TWorkDoc; const Turn: TP3; Ang: double; const Shift: TP3);
+  var
+    I, J, K, G, F: integer;
+    Poly: TP3Array;
+    Holes: array of TP3Array;
 
-  function Put(const P: TP3): TP3;
+    function Put(const P: TP3): TP3;
+    begin
+      Result := RotP(P, P3(0, 0, 0), Turn, Ang);
+      Result := P3(Result.X + Shift.X, Result.Y + Shift.Y, Result.Z + Shift.Z);
+    end;
+
   begin
-    Result := RotP(P, P3(0, 0, 0), Turn, Ang);
-    Result := P3(Result.X + Shift.X, Result.Y + Shift.Y, Result.Z + Shift.Z);
-  end;
-
-begin
-  G := D.NewGroup;
-  for I := 0 to Src.Live - 1 do
-    case Src[I].Kind of
-      ekLine:
+    G := D.NewGroup;
+    for I := 0 to Src.Live - 1 do
+      case Src[I].Kind of
+        ekLine:
         begin
           D.AddLine(Put(Src[I].A), Put(Src[I].B), Src[I].Ink, Src[I].Weight, False);
           D.SetGroup(D.Live - 1, G);
           D.SetSoft(D.Live - 1, Src[I].Soft);
         end;
-      ekFace:
+        ekFace:
         begin
           SetLength(Poly, Length(Src[I].Poly));
           for J := 0 to High(Poly) do Poly[J] := Put(Src[I].Poly[J]);
@@ -242,29 +289,30 @@ begin
             D.SetFaceHoles(F, Holes);
           end;
         end;
-    end;
-end;
+      end;
+  end;
 
 var
   Toy: TWorkDoc;
   L, Out_, U: TStringList;
-  I, F: Integer;
+  I, F: integer;
   BLo, BHi, CamMid: TP3;
   CamV: TProjector;
   CamP: TPointF;
-  BaseP, Diag, CamZoom: Double;
+  BaseP, Diag, CamZoom: double;
   SLo, SHi: TP3;
   FS: TFormatSettings;
 const
-  ART_W = 1200; ART_H = 760;
+  ART_W = 1200;
+  ART_H = 760;
 begin
   FS := DefaultFormatSettings;
   FS.DecimalSeparator := '.';
-  CSteel  := RGBToColor(172, 179, 187);
-  CDark   := RGBToColor( 86,  92, 100);
-  CRed    := RGBToColor(200,  48,  32);   { the toy's own red }
-  CEye    := RGBToColor(255, 176,  60);
-  CRubber := RGBToColor( 46,  48,  52);
+  CSteel := RGBToColor(172, 179, 187);
+  CDark := RGBToColor(86, 92, 100);
+  CRed := RGBToColor(200, 48, 32);   { the toy's own red }
+  CEye := RGBToColor(255, 176, 60);
+  CRubber := RGBToColor(46, 48, 52);
 
   D := TWorkDoc.Create;
   Toy := TWorkDoc.Create;
@@ -276,24 +324,24 @@ begin
     begin
       F := 1 - 2 * I;            { +1 right, -1 left }
       Box(F * STANCE - FOOT_W / 2, -FOOT_L * 0.62, 0,
-          F * STANCE + FOOT_W / 2,  FOOT_L * 0.38, FOOT_H, CRubber);
+        F * STANCE + FOOT_W / 2, FOOT_L * 0.38, FOOT_H, CRubber);
       Limb(Pt(F * STANCE, 0, FOOT_H), Pt(F * STANCE, 0, FOOT_H + SHIN),
         SHIN_W, CDark);
       Limb(Pt(F * STANCE, 0, FOOT_H + SHIN),
-           Pt(F * (HIP_W / 2 - THIGH_W / 2), 0, FOOT_H + SHIN + THIGH),
+        Pt(F * (HIP_W / 2 - THIGH_W / 2), 0, FOOT_H + SHIN + THIGH),
         THIGH_W, CSteel);
     end;
 
     { --- hips and torso ---------------------------------------------- }
     Box(-HIP_W / 2, -HIP_D / 2, FOOT_H + SHIN + THIGH,
-         HIP_W / 2,  HIP_D / 2, FOOT_H + SHIN + THIGH + HIP_H, CDark);
+      HIP_W / 2, HIP_D / 2, FOOT_H + SHIN + THIGH + HIP_H, CDark);
     Box(-TORSO_W / 2, -TORSO_D / 2, FOOT_H + SHIN + THIGH + HIP_H,
-         TORSO_W / 2,  TORSO_D / 2, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H,
+      TORSO_W / 2, TORSO_D / 2, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H,
       CSteel);
 
     { --- the chest panel: a red bezel, and the toy standing in it ----- }
     Box(-(TOY_W / 2 + BEZEL), -TORSO_D / 2 - 0.6, PANEL_Z - (TOY_H / 2 + BEZEL),
-         (TOY_W / 2 + BEZEL), -TORSO_D / 2,       PANEL_Z + (TOY_H / 2 + BEZEL),
+      (TOY_W / 2 + BEZEL), -TORSO_D / 2, PANEL_Z + (TOY_H / 2 + BEZEL),
       CRed);
 
     { --- arms, hung off a ball at the top of the chest ----------------- }
@@ -304,43 +352,43 @@ begin
       Ball(Pt(F * (TORSO_W / 2 - 0.8), 0, SHZ), BALL_R * IN_, CDark);
       { upper arm, out of the middle of the ball and down }
       Limb(Pt(F * (TORSO_W / 2 - 0.8), 0, SHZ),
-           Pt(F * (TORSO_W / 2 + 4.2), 0, SHZ - ARM_UP), ARM_W, CSteel);
+        Pt(F * (TORSO_W / 2 + 4.2), 0, SHZ - ARM_UP), ARM_W, CSteel);
       { the elbow, and the forearm forward - as if he is offering the panel }
       Ball(Pt(F * (TORSO_W / 2 + 4.2), 0, SHZ - ARM_UP), ELB_R * IN_, CDark);
       Limb(Pt(F * (TORSO_W / 2 + 4.2), 0, SHZ - ARM_UP),
-           Pt(F * (TORSO_W / 2 + 4.2), -ARM_LO * 0.82, SHZ - ARM_UP - ARM_LO * 0.34),
+        Pt(F * (TORSO_W / 2 + 4.2), -ARM_LO * 0.82, SHZ - ARM_UP - ARM_LO * 0.34),
         ARM_W, CDark);
       { and a two-fingered hand on the end of it }
       Box(F * (TORSO_W / 2 + 4.2) - 1.6, -ARM_LO * 0.82 - 3.4, SHZ - ARM_UP - ARM_LO * 0.34 - 1.4,
-          F * (TORSO_W / 2 + 4.2) - 0.2, -ARM_LO * 0.82,       SHZ - ARM_UP - ARM_LO * 0.34 + 1.4,
+        F * (TORSO_W / 2 + 4.2) - 0.2, -ARM_LO * 0.82, SHZ - ARM_UP - ARM_LO * 0.34 + 1.4,
         CSteel);
       Box(F * (TORSO_W / 2 + 4.2) + 0.2, -ARM_LO * 0.82 - 3.4, SHZ - ARM_UP - ARM_LO * 0.34 - 1.4,
-          F * (TORSO_W / 2 + 4.2) + 1.6, -ARM_LO * 0.82,       SHZ - ARM_UP - ARM_LO * 0.34 + 1.4,
+        F * (TORSO_W / 2 + 4.2) + 1.6, -ARM_LO * 0.82, SHZ - ARM_UP - ARM_LO * 0.34 + 1.4,
         CSteel);
     end;
 
     { --- neck, head, eyes, antenna ------------------------------------ }
     Box(-2.6, -2.6, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H,
-         2.6,  2.6, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H, CDark);
+      2.6, 2.6, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H, CDark);
     Box(-HEAD_W / 2, -HEAD_D / 2, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H,
-         HEAD_W / 2,  HEAD_D / 2, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H,
+      HEAD_W / 2, HEAD_D / 2, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H,
       CSteel);
     { the eyes, standing a little proud of the face so they catch the light }
     for I := 0 to 1 do
     begin
       F := 1 - 2 * I;
       Box(F * 2.9 - 1.5, -HEAD_D / 2 - 0.35, TORSO_T + NECK_H + 5.1,
-          F * 2.9 + 1.5, -HEAD_D / 2,        TORSO_T + NECK_H + 7.5, CEye, 0.8);
+        F * 2.9 + 1.5, -HEAD_D / 2, TORSO_T + NECK_H + 7.5, CEye, 0.8);
     end;
     { a jaw band, so the head has a front }
     Box(-HEAD_W / 2 - 0.2, -HEAD_D / 2 - 0.25, TORSO_T + NECK_H + 1.2,
-         HEAD_W / 2 + 0.2, -HEAD_D / 2,        TORSO_T + NECK_H + 3.0, CDark, 0.8);
+      HEAD_W / 2 + 0.2, -HEAD_D / 2, TORSO_T + NECK_H + 3.0, CDark, 0.8);
     { antenna }
     Box(-0.35, -0.35, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H,
-         0.35,  0.35, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H + 5.5,
+      0.35, 0.35, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H + 5.5,
       CDark, 0.8);
     Box(-1.1, -1.1, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H + 5.5,
-         1.1,  1.1, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H + 7.0,
+      1.1, 1.1, FOOT_H + SHIN + THIGH + HIP_H + TORSO_H + NECK_H + HEAD_H + 7.0,
       CRed, 0.8);
 
     { --- and the toy itself, stood on end and set on the bezel -------- }
@@ -361,19 +409,21 @@ begin
     CamV.Kind := vkOrbit;
     CamV.Az := -1.05;
     CamV.El := 0.26;
-    CamV.Ppu := 1; CamV.OX := 0; CamV.OY := 0;
-    SLo := P3(1E30, 1E30, 0); SHi := P3(-1E30, -1E30, 0);
+    CamV.Ppu := 1;
+    CamV.OX := 0;
+    CamV.OY := 0;
+    SLo := P3(1E30, 1E30, 0);
+    SHi := P3(-1E30, -1E30, 0);
     for I := 0 to 7 do
     begin
-      CamP := Project(CamV, P3(
-        specialize IfThen<Double>((I and 1) = 0, BLo.X, BHi.X),
-        specialize IfThen<Double>((I and 2) = 0, BLo.Y, BHi.Y),
-        specialize IfThen<Double>((I and 4) = 0, BLo.Z, BHi.Z)));
-      SLo.X := Min(SLo.X, CamP.X); SHi.X := Max(SHi.X, CamP.X);
-      SLo.Y := Min(SLo.Y, CamP.Y); SHi.Y := Max(SHi.Y, CamP.Y);
+      CamP := Project(CamV, P3(specialize IfThen<double>((I and 1) = 0, BLo.X, BHi.X), specialize IfThen<double>(
+        (I and 2) = 0, BLo.Y, BHi.Y), specialize IfThen<double>((I and 4) = 0, BLo.Z, BHi.Z)));
+      SLo.X := Min(SLo.X, CamP.X);
+      SHi.X := Max(SHi.X, CamP.X);
+      SLo.Y := Min(SLo.Y, CamP.Y);
+      SHi.Y := Max(SHi.Y, CamP.Y);
     end;
-    CamZoom := Min((ART_W * 0.86) / ((SHi.X - SLo.X) * BaseP),
-                   (ART_H * 0.86) / ((SHi.Y - SLo.Y) * BaseP));
+    CamZoom := Min((ART_W * 0.86) / ((SHi.X - SLo.X) * BaseP), (ART_H * 0.86) / ((SHi.Y - SLo.Y) * BaseP));
     CamV.Ppu := BaseP * CamZoom;   { low elevation: you look at him, not down on him }
     CamV.OX := 0;
     CamV.OY := 0;
@@ -411,9 +461,11 @@ begin
 
     F := 0;
     for I := 0 to D.Live - 1 do if D[I].Kind = ekFace then Inc(F);
-    WriteLn(Format('%d things, %d faces -> robot.hsk and hsExRobot.pas (%d lines)',
-      [D.Live, F, Out_.Count]));
+    WriteLn(Format('%d things, %d faces -> robot.hsk and hsExRobot.pas (%d lines)', [D.Live, F, Out_.Count]));
   finally
-    Out_.Free; L.Free; Toy.Free; D.Free;
+    Out_.Free;
+    L.Free;
+    Toy.Free;
+    D.Free;
   end;
 end.

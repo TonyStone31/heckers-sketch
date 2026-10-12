@@ -16,8 +16,7 @@ uses
 const
   { The one compiled-in address; everything else is looked up. }
   ENDPOINT_URL =
-    'https://raw.githubusercontent.com/TonyStone31/heckers-sketch/' +
-    'main/docs/bug-report-endpoint.json';
+    'https://raw.githubusercontent.com/TonyStone31/heckers-sketch/' + 'main/docs/bug-report-endpoint.json';
 
 type
   { Where reports go now.  Cached locally so a report can still go out when
@@ -29,23 +28,22 @@ type
   end;
 
 { Asks GitHub where reports go.  False, with a reason, on failure. }
-function FetchEndpoint(out E: TEndpoint; out Err: string): Boolean;
+function FetchEndpoint(out E: TEndpoint; out Err: string): boolean;
 
 { The last endpoint that worked, or a blank one. }
-function CachedEndpoint(out E: TEndpoint): Boolean;
+function CachedEndpoint(out E: TEndpoint): boolean;
 procedure RememberEndpoint(const E: TEndpoint);
 
 { Size of the last report once sealed, shown in the send window. }
 var
-  LastSealedBytes: Integer = 0;
+  LastSealedBytes: integer = 0;
 
 { Sends Body as FileName.  Tries the cached bin first; if the refusal means
   the bin is gone, asks GitHub again and tries once more. }
-function SendReport(const FileName, Body: string; out Err: string): Boolean;
+function SendReport(const FileName, Body: string; out Err: string): boolean;
 
 { The same, for something that is not text - a picture of the screen. }
-function SendBinary(const FileName: string; Data: TStream;
-  const ContentType: string; out Err: string): Boolean;
+function SendBinary(const FileName: string; Data: TStream; const ContentType: string; out Err: string): boolean;
 
 { A name no other report will have. }
 function UniqueReportName(const Prefix, Version: string): string;
@@ -55,12 +53,12 @@ implementation
 uses
   hsNet, fpjson, jsonparser, IniFiles, hsPaths, hsReportCrypto;
 
-function HttpGet(const URL: string; out Body, Err: string): Boolean;
+function HttpGet(const URL: string; out Body, Err: string): boolean;
 begin
   Result := NetGetText(URL, '', Body, Err);
 end;
 
-function FetchEndpoint(out E: TEndpoint; out Err: string): Boolean;
+function FetchEndpoint(out E: TEndpoint; out Err: string): boolean;
 var
   Body: string;
   J: TJSONData;
@@ -96,8 +94,7 @@ begin
       Err := 'the endpoint file names no place to upload to';
       Exit;
     end;
-    while (E.UploadBase <> '') and
-          (E.UploadBase[Length(E.UploadBase)] = '/') do
+    while (E.UploadBase <> '') and (E.UploadBase[Length(E.UploadBase)] = '/') do
       SetLength(E.UploadBase, Length(E.UploadBase) - 1);
     Result := True;
   finally
@@ -105,7 +102,7 @@ begin
   end;
 end;
 
-function CachedEndpoint(out E: TEndpoint): Boolean;
+function CachedEndpoint(out E: TEndpoint): boolean;
 var
   Ini: TIniFile;
 begin
@@ -148,19 +145,18 @@ end;
 
 { True when the status means the bin is gone, so a fresh lookup is worth a
   retry.  Any other refusal would just fail the same way again. }
-function BinIsGone(Status: Integer): Boolean;
+function BinIsGone(Status: integer): boolean;
 begin
   case Status of
     401, 403, 404, 405, 409, 410, 423: Result := True;
-  else
-    Result := False;
+    else
+      Result := False;
   end;
 end;
 
 { Every upload goes through here and is sealed first, so it is always sent
   as application/octet-stream whatever ContentType says. }
-function PostStream(const Base, FileName: string; Data: TStream;
-  const ContentType: string; out Status: Integer; out Err: string): Boolean;
+function PostStream(const Base, FileName: string; Data: TStream; const ContentType: string; out Status: integer; out Err: string): boolean;
 var
   Plain, Sealed: TBytes;
   Sent: TMemoryStream;
@@ -184,8 +180,7 @@ begin
   try
     if Length(Sealed) > 0 then Sent.WriteBuffer(Sealed[0], Length(Sealed));
     Sent.Position := 0;
-    Result := NetPost(Base + '/' + FileName, Sent, 'application/octet-stream',
-      Status, Err);
+    Result := NetPost(Base + '/' + FileName, Sent, 'application/octet-stream', Status, Err);
     if (not Result) and (Status > 0) then
       Err := 'the postbox answered ' + IntToStr(Status);
   finally
@@ -193,25 +188,23 @@ begin
   end;
 end;
 
-function PostTo(const Base, FileName, Body: string;
-  out Status: Integer; out Err: string): Boolean;
+function PostTo(const Base, FileName, Body: string; out Status: integer; out Err: string): boolean;
 var
   Src: TStringStream;
 begin
   { PostStream seals it, so this content type is not what gets sent }
   Src := TStringStream.Create(Body);
   try
-    Result := PostStream(Base, FileName, Src, 'text/plain; charset=utf-8',
-      Status, Err);
+    Result := PostStream(Base, FileName, Src, 'text/plain; charset=utf-8', Status, Err);
   finally
     Src.Free;
   end;
 end;
 
-function SendReport(const FileName, Body: string; out Err: string): Boolean;
+function SendReport(const FileName, Body: string; out Err: string): boolean;
 var
   E: TEndpoint;
-  Status: Integer;
+  Status: integer;
   E2: TEndpoint;
   Err2: string;
 begin
@@ -231,7 +224,9 @@ begin
 
     if not FetchEndpoint(E2, Err2) then
     begin
-      if Err = '' then Err := Err2 else Err := Err + '; ' + Err2;
+      if Err = '' then Err := Err2
+      else
+        Err := Err + '; ' + Err2;
       Exit;
     end;
     RememberEndpoint(E2);
@@ -245,11 +240,10 @@ begin
   end;
 end;
 
-function SendBinary(const FileName: string; Data: TStream;
-  const ContentType: string; out Err: string): Boolean;
+function SendBinary(const FileName: string; Data: TStream; const ContentType: string; out Err: string): boolean;
 var
   E, E2: TEndpoint;
-  Status: Integer;
+  Status: integer;
   Err2: string;
 begin
   Result := False;
@@ -263,12 +257,13 @@ begin
     end;
     if not FetchEndpoint(E2, Err2) then
     begin
-      if Err = '' then Err := Err2 else Err := Err + '; ' + Err2;
+      if Err = '' then Err := Err2
+      else
+        Err := Err + '; ' + Err2;
       Exit;
     end;
     RememberEndpoint(E2);
-    Result := PostStream(E2.UploadBase, FileName, Data, ContentType,
-      Status, Err);
+    Result := PostStream(E2.UploadBase, FileName, Data, ContentType, Status, Err);
   except
     on Ex: Exception do
     begin
@@ -281,15 +276,14 @@ end;
 function UniqueReportName(const Prefix, Version: string): string;
 var
   Tag, V: string;
-  I: Integer;
+  I: integer;
 begin
   Tag := IntToHex(Random($1000000), 6);
   V := '';
   for I := 1 to Length(Version) do
     if Version[I] in ['0'..'9', 'A'..'Z', 'a'..'z', '.', '-'] then
       V := V + Version[I];
-  Result := Prefix + '-' + FormatDateTime('yyyymmdd-hhnnss', Now) +
-    '-' + V + '-' + Tag + '.txt';
+  Result := Prefix + '-' + FormatDateTime('yyyymmdd-hhnnss', Now) + '-' + V + '-' + Tag + '.txt';
 end;
 
 end.

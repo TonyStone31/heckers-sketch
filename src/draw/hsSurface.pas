@@ -27,19 +27,19 @@ type
     is not flat has no single plane; cut into triangles it has an exact
     depth everywhere.  See DepthMesh. }
   TDepthTri = record
-    AX, AY, BX, BY, CX, CY: Single;
-    ZA, ZB, ZC: Double;
+    AX, AY, BX, BY, CX, CY: single;
+    ZA, ZB, ZC: double;
     { the lowest and highest depth of its three corners.  Depth is clamped
       to these, since a long thin triangle's plane runs far out of range
       with half a pixel of rounding. }
-    ZLo, ZHi: Double;
+    ZLo, ZHi: double;
   end;
   TDepthTris = array of TDepthTri;
 
 type
   { One pixel, laid out exactly as Init_BPP32_B8G8R8A8_BIO_TTB stores it. }
   TPix = packed record
-    B, G, R, A: Byte;
+    B, G, R, A: byte;
   end;
   PPix = ^TPix;
 
@@ -48,9 +48,9 @@ type
     bmNormal,    // ordinary source-over alpha blend
     bmLighten,   // keep the brighter channel - additive-ish
     bmMaxAlpha,  // keep whichever is more opaque; glow halos that do not
-                 // accumulate where strokes overlap
+    // accumulate where strokes overlap
     bmReplace    // overwrite, alpha included
-  );
+    );
 
   { TArtSurface }
 
@@ -58,78 +58,76 @@ type
   private
     FImage: TLazIntfImage;
     FBitmap: TBitmap;
-    FBitmapValid: Boolean;
-    FWidth, FHeight: Integer;
+    FBitmapValid: boolean;
+    FWidth, FHeight: integer;
     { A decoy at offset 40, where a stray 8 byte store (a double that looks
       like a TDrawing's Zoom, also at offset 40) has landed.  Nothing reads
       it; if it stops holding GUARD_WORD the crash report says so. }
     FGuard: PtrInt;
     FStride: PtrInt;
-    FBits: PByte;
+    FBits: pbyte;
     FMode: TBlendMode;
-    FKeepAlpha: Boolean;
+    FKeepAlpha: boolean;
     { A depth per pixel.  Sorting shapes back to front fails when two shapes
       have no correct order, such as a wide panel and a small object beside it. }
-    FZ: array of Single;
-    FZOn: Boolean;
+    FZ: array of single;
+    FZOn: boolean;
     { Lines read the depth buffer but never write it, or a line would hide
       the face it is drawn on. }
-    FZTest: Boolean;
+    FZTest: boolean;
     { draw only what the depth test REJECTS, dashed; see DepthBehind }
-    FZBehind: Boolean;
-    FZa, FZb, FZc: Double;
+    FZBehind: boolean;
+    FZa, FZb, FZc: double;
     { exact depth triangles from DepthMesh, used by the next FillLoops only }
     FZTris: TDepthTris;
-    FZTriY0, FZTriY1: array of Integer;
-    procedure Allocate(AWidth, AHeight: Integer);
+    FZTriY0, FZTriY1: array of integer;
+    procedure Allocate(AWidth, AHeight: integer);
     procedure Verify;
     procedure Invalidate; inline;
   public
-    constructor Create(AWidth, AHeight: Integer);
+    constructor Create(AWidth, AHeight: integer);
     destructor Destroy; override;
 
-    procedure SetSize(AWidth, AHeight: Integer; APreserve: Boolean = False);
-    function ScanLine(Y: Integer): PPix; inline;
+    procedure SetSize(AWidth, AHeight: integer; APreserve: boolean = False);
+    function ScanLine(Y: integer): PPix; inline;
 
     { --- damage tracking, so compositing only touches what changed ------- }
 
     { --- primitives ------------------------------------------------------ }
-    procedure BlendPixel(X, Y: Integer; const C: TPix; Cover: Single); inline;
+    procedure BlendPixel(X, Y: integer; const C: TPix; Cover: single); inline;
     procedure Clear(const C: TPix);
-    procedure FillRect(const R: TRect; const C: TPix; Alpha: Single = 1.0);
-    procedure RoundRect(const R: TRect; Radius: Single; const C: TPix; Alpha: Single = 1.0);
-    procedure RoundRectV(const R: TRect; Radius: Single; const C1, C2: TPix; Alpha: Single = 1.0);
-    procedure RoundFrame(const R: TRect; Radius, LineW: Single; const C: TPix; Alpha: Single = 1.0);
-    procedure Disc(CX, CY, Radius: Single; const C: TPix; Alpha: Single = 1.0);
-    procedure Ring(CX, CY, Radius, LineW: Single; const C: TPix; Alpha: Single = 1.0);
+    procedure FillRect(const R: TRect; const C: TPix; Alpha: single = 1.0);
+    procedure RoundRect(const R: TRect; Radius: single; const C: TPix; Alpha: single = 1.0);
+    procedure RoundRectV(const R: TRect; Radius: single; const C1, C2: TPix; Alpha: single = 1.0);
+    procedure RoundFrame(const R: TRect; Radius, LineW: single; const C: TPix; Alpha: single = 1.0);
+    procedure Disc(CX, CY, Radius: single; const C: TPix; Alpha: single = 1.0);
+    procedure Ring(CX, CY, Radius, LineW: single; const C: TPix; Alpha: single = 1.0);
     { A cheap one pixel antialiased line for faint things drawn in bulk, like
       the ground grid.  Clipped to the surface first.  No depth test. }
-    procedure HairLine(X0, Y0, X1, Y1: Single; const C: TPix; Alpha: Single);
-    procedure Line(X0, Y0, X1, Y1, LineW: Single; const C: TPix; Alpha: Single = 1.0);
-    procedure Arc(CX, CY, Radius, A0, A1, LineW: Single; const C: TPix; Alpha: Single = 1.0);
-    procedure Poly(const Pts: array of TPointF; LineW: Single; const C: TPix;
-      Closed: Boolean = False; Alpha: Single = 1.0);
-    procedure Triangle(const P1, P2, P3: TPointF; const C: TPix; Alpha: Single = 1.0);
-    procedure FillLoops(const Loops: array of TPtFLoop; const C: TPix;
-      Alpha: Single);
+    procedure HairLine(X0, Y0, X1, Y1: single; const C: TPix; Alpha: single);
+    procedure Line(X0, Y0, X1, Y1, LineW: single; const C: TPix; Alpha: single = 1.0);
+    procedure Arc(CX, CY, Radius, A0, A1, LineW: single; const C: TPix; Alpha: single = 1.0);
+    procedure Poly(const Pts: array of TPointF; LineW: single; const C: TPix; Closed: boolean = False; Alpha: single = 1.0);
+    procedure Triangle(const P1, P2, P3: TPointF; const C: TPix; Alpha: single = 1.0);
+    procedure FillLoops(const Loops: array of TPtFLoop; const C: TPix; Alpha: single);
 
     { Depth: start a pass, say what plane the next shape lies in, ask what
       depth a pixel ended up at.  Depth counts up towards the eye. }
   public
     { one coverage sample a row instead of four, for quick frames while the
       camera moves }
-    QuickFill: Boolean;
+    QuickFill: boolean;
   public
     procedure DepthBegin;
-    procedure DepthPlane(A, B, C: Double);
-    function DepthAt(X, Y: Integer): Single;
-    function DepthOn: Boolean;
-    procedure DepthTest(B: Boolean);
+    procedure DepthPlane(A, B, C: double);
+    function DepthAt(X, Y: integer): single;
+    function DepthOn: boolean;
+    procedure DepthTest(B: boolean);
     { Draw only what the depth test rejects, dashed.  Hidden lines in a
       drawing are dashed, not dropped (a footing under a wall still shows).
       Run as a second pass over the lines after the faces; turn it off after. }
-    procedure DepthBehind(B: Boolean);
-    procedure DepthAlong(X0, Y0, Z0, X1, Y1, Z1: Double);
+    procedure DepthBehind(B: boolean);
+    procedure DepthAlong(X0, Y0, Z0, X1, Y1, Z1: double);
     { Give the NEXT FillLoops an exact depth per pixel from the face cut into
       triangles.  Use it for faces that are not flat (a revolve makes warped
       quads); a fitted plane can be badly wrong and let the back show through.
@@ -139,46 +137,45 @@ type
 
     { --- whole-surface effects ------------------------------------------- }
     procedure ClearTransparent;
-    procedure FadeAlpha(Amount: Single);
+    procedure FadeAlpha(Amount: single);
     procedure CompositeOver(Base, Ink: TArtSurface; const R: TRect);
-    procedure Grain(Amount, Density: Single);
-    procedure SmearDown(Rows: Integer);
+    procedure Grain(Amount, Density: single);
+    procedure SmearDown(Rows: integer);
 
     { --- transfer -------------------------------------------------------- }
-    procedure CopyFrom(Src: TArtSurface; DX, DY: Integer);
-    procedure CopyRegion(Src: TArtSurface; SrcX, SrcY, DX, DY, W, H: Integer);
+    procedure CopyFrom(Src: TArtSurface; DX, DY: integer);
+    procedure CopyRegion(Src: TArtSurface; SrcX, SrcY, DX, DY, W, H: integer);
     { fill this surface from one half its size, each pixel of H becoming
       four, depth buffer included.  See TWorkDoc.Render. }
     procedure ScaleUp2From(H: TArtSurface);
     procedure Snapshot(out Buf: TBytes);
     procedure Restore(const Buf: TBytes);
-    procedure DrawTo(ACanvas: TCanvas; X, Y: Integer);
+    procedure DrawTo(ACanvas: TCanvas; X, Y: integer);
     procedure SaveToPNG(const AFileName: string);
     function TextExtent(const S: string; AFont: TFont): TSize;
-    procedure TextOut(X, Y: Integer; const S: string; AFont: TFont; const C: TPix;
-      Alpha: Single = 1.0);
+    procedure TextOut(X, Y: integer; const S: string; AFont: TFont; const C: TPix; Alpha: single = 1.0);
     function AsBitmap: TBitmap;
     procedure Touch; inline;
 
-    property Width: Integer read FWidth;
-    property Height: Integer read FHeight;
+    property Width: integer read FWidth;
+    property Height: integer read FHeight;
     property BlendMode: TBlendMode read FMode write FMode;
     property Stride: PtrInt read FStride;
-    class function Repairs: Integer;
+    class function Repairs: integer;
     { An ink layer keeps its own alpha so it can be composited over any
       background; a background surface stays fully opaque. }
-    property PreserveAlpha: Boolean read FKeepAlpha write FKeepAlpha;
+    property PreserveAlpha: boolean read FKeepAlpha write FKeepAlpha;
   end;
 
 { --- color helpers ----------------------------------------------------- }
-function Pix(R, G, B: Byte; A: Byte = 255): TPix; inline;
+function Pix(R, G, B: byte; A: byte = 255): TPix; inline;
 function ColorToPix(C: TColor): TPix; inline;
 function PixToColor(const P: TPix): TColor; inline;
-function MixPix(const A, B: TPix; T: Single): TPix;
+function MixPix(const A, B: TPix; T: single): TPix;
 { Near-black or near-white, whichever reads on this color. }
 function OnPix(const C: TPix): TPix;
-function ShadePix(const C: TPix; F: Single): TPix;
-function PtF(X, Y: Single): TPointF; inline;
+function ShadePix(const C: TPix; F: single): TPix;
+function PtF(X, Y: single): TPointF; inline;
 
 { Called when a surface finds its buffer details changed under it, so the
   crash report trail shows which action was in progress. }
@@ -205,11 +202,11 @@ const
 const
   DEG = Pi / 180;
 
-{ ------------------------------------------------------------------------ }
-{ color helpers                                                            }
-{ ------------------------------------------------------------------------ }
+  { ------------------------------------------------------------------------ }
+  { color helpers                                                            }
+  { ------------------------------------------------------------------------ }
 
-function Pix(R, G, B: Byte; A: Byte): TPix;
+function Pix(R, G, B: byte; A: byte): TPix;
 begin
   Result.R := R;
   Result.G := G;
@@ -219,12 +216,12 @@ end;
 
 function ColorToPix(C: TColor): TPix;
 var
-  V: LongInt;
+  V: longint;
 begin
   V := ColorToRGB(C);
-  Result.R := Byte(V);
-  Result.G := Byte(V shr 8);
-  Result.B := Byte(V shr 16);
+  Result.R := byte(V);
+  Result.G := byte(V shr 8);
+  Result.B := byte(V shr 16);
   Result.A := 255;
 end;
 
@@ -233,7 +230,7 @@ begin
   Result := TColor(P.R or (P.G shl 8) or (P.B shl 16));
 end;
 
-function MixPix(const A, B: TPix; T: Single): TPix;
+function MixPix(const A, B: TPix; T: single): TPix;
 begin
   T := EnsureRange(T, 0, 1);
   Result.R := Round(A.R + (B.R - A.R) * T);
@@ -247,25 +244,27 @@ end;
   luminance, with the threshold where the two contrasts are equal. }
 function OnPix(const C: TPix): TPix;
 var
-  L: Single;
+  L: single;
 
-  function Chan(V: Byte): Single;
+  function Chan(V: byte): single;
   var
-    F: Single;
+    F: single;
   begin
     F := V / 255;
     if F <= 0.03928 then Result := F / 12.92
-    else Result := Power((F + 0.055) / 1.055, 2.4);
+    else
+      Result := Power((F + 0.055) / 1.055, 2.4);
   end;
 
 begin
   L := 0.2126 * Chan(C.R) + 0.7152 * Chan(C.G) + 0.0722 * Chan(C.B);
   if L > 0.183 then Result := Pix(22, 22, 26)
-  else Result := Pix(246, 248, 252);
+  else
+    Result := Pix(246, 248, 252);
   Result.A := 255;
 end;
 
-function ShadePix(const C: TPix; F: Single): TPix;
+function ShadePix(const C: TPix; F: single): TPix;
 begin
   Result.R := EnsureRange(Round(C.R * F), 0, 255);
   Result.G := EnsureRange(Round(C.G * F), 0, 255);
@@ -273,7 +272,7 @@ begin
   Result.A := C.A;
 end;
 
-function PtF(X, Y: Single): TPointF;
+function PtF(X, Y: single): TPointF;
 begin
   Result.X := X;
   Result.Y := Y;
@@ -285,9 +284,9 @@ end;
 
 { Distance from (PX,PY) to a rounded box centered on (CX,CY) with half-extents
   (HX,HY) and corner radius Rad.  Negative inside, positive outside. }
-function SdRoundBox(PX, PY, CX, CY, HX, HY, Rad: Single): Single; inline;
+function SdRoundBox(PX, PY, CX, CY, HX, HY, Rad: single): single; inline;
 var
-  QX, QY: Single;
+  QX, QY: single;
 begin
   Rad := Min(Rad, Min(HX, HY));
   QX := Abs(PX - CX) - (HX - Rad);
@@ -296,9 +295,9 @@ begin
 end;
 
 { Distance from (PX,PY) to the segment (AX,AY)-(BX,BY). }
-function SdSegment(PX, PY, AX, AY, BX, BY: Single): Single; inline;
+function SdSegment(PX, PY, AX, AY, BX, BY: single): single; inline;
 var
-  PAX, PAY, BAX, BAY, H, D: Single;
+  PAX, PAY, BAX, BAY, H, D: single;
 begin
   PAX := PX - AX;
   PAY := PY - AY;
@@ -313,7 +312,7 @@ begin
 end;
 
 { Convert a signed distance to pixel coverage (1px wide analytic edge). }
-function Coverage(D: Single): Single; inline;
+function Coverage(D: single): single; inline;
 begin
   Result := EnsureRange(0.5 - D, 0, 1);
 end;
@@ -322,7 +321,7 @@ end;
 { TArtSurface                                                               }
 { ------------------------------------------------------------------------ }
 
-constructor TArtSurface.Create(AWidth, AHeight: Integer);
+constructor TArtSurface.Create(AWidth, AHeight: integer);
 begin
   inherited Create;
   FImage := TLazIntfImage.Create(0, 0);
@@ -335,7 +334,7 @@ end;
 { Watchers are told before the memory goes.  See WatchSurfaceGone. }
 destructor TArtSurface.Destroy;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(GGoneWatchers) do
     if Assigned(GGoneWatchers[I]) then GGoneWatchers[I](Self);
@@ -354,20 +353,20 @@ begin
 end;
 
 var
-  GRepairs: Integer = 0;
+  GRepairs: integer = 0;
 
 { A corrupt stride has turned out to be a double before, so the crash report
   shows the value read as one too. }
 function AsDouble(V: PtrInt): string;
 var
-  D: Double;
+  D: double;
 begin
   Move(V, D, SizeOf(D));
   if IsNan(D) or IsInfinite(D) then Exit('not a number');
   Result := Format('as a double %.6g', [D]);
 end;
 
-class function TArtSurface.Repairs: Integer;
+class function TArtSurface.Repairs: integer;
 begin
   Result := GRepairs;
 end;
@@ -377,14 +376,14 @@ end;
   stride is a wild pointer.  The repair count goes into the crash report. }
 procedure TArtSurface.Verify;
 var
-  P: PByte;
+  P: pbyte;
   St: PtrInt;
 begin
   if (FWidth <= 0) or (FHeight <= 0) then Exit;
-  P := PByte(FImage.GetDataLineStart(0));
+  P := pbyte(FImage.GetDataLineStart(0));
   if P = nil then Exit;
   if FHeight > 1 then
-    St := PByte(FImage.GetDataLineStart(1)) - P
+    St := pbyte(FImage.GetDataLineStart(1)) - P
   else
     St := FWidth * 4;
   if St < FWidth * 4 then Exit;      { the image is talking nonsense too }
@@ -392,24 +391,22 @@ begin
   begin
     Inc(GRepairs);
     if Assigned(OnSurfaceRepair) then
-      OnSurfaceRepair(Format('surface guard hit: %d (%s), stride %s',
-        [FGuard, AsDouble(FGuard),
-         specialize IfThen<string>(St = FStride, 'untouched', 'also wrong')]));
+      OnSurfaceRepair(Format('surface guard hit: %d (%s), stride %s', [FGuard, AsDouble(FGuard), specialize IfThen<string>(St =
+        FStride, 'untouched', 'also wrong')]));
     FGuard := GUARD_WORD;
   end;
   if (P <> FBits) or (St <> FStride) then
   begin
     Inc(GRepairs);
     if Assigned(OnSurfaceRepair) then
-      OnSurfaceRepair(Format('surface repaired: stride %d (%s) -> %d, bits %s',
-        [FStride, AsDouble(FStride), St,
-         specialize IfThen<string>(P = FBits, 'same', 'moved')]));
+      OnSurfaceRepair(Format('surface repaired: stride %d (%s) -> %d, bits %s', [FStride, AsDouble(FStride), St,
+        specialize IfThen<string>(P = FBits, 'same', 'moved')]));
     FBits := P;
     FStride := St;
   end;
 end;
 
-procedure TArtSurface.Allocate(AWidth, AHeight: Integer);
+procedure TArtSurface.Allocate(AWidth, AHeight: integer);
 var
   Desc: TRawImageDescription;
   RI: TRawImage;
@@ -421,7 +418,7 @@ begin
   FillChar(Desc, SizeOf(Desc), 0);
   Desc.Init_BPP32_B8G8R8A8_BIO_TTB(AWidth, AHeight);
   FImage.DataDescription := Desc;
-  FBits := PByte(FImage.GetDataLineStart(0));
+  FBits := pbyte(FImage.GetDataLineStart(0));
   { Width and height come from what the image actually gave, set after the
     allocation.  Every clip in this unit trusts them; a surface with no
     memory behind it reports itself as one pixel. }
@@ -439,7 +436,7 @@ begin
   FStride := AWidth * 4;
   if AHeight > 1 then
   begin
-    St := PByte(FImage.GetDataLineStart(1)) - FBits;
+    St := pbyte(FImage.GetDataLineStart(1)) - FBits;
     if (St >= AWidth * 4) and (St <= PtrInt(AWidth) * 4 + 4096) then
       FStride := St;
   end;
@@ -453,9 +450,8 @@ begin
   except
     Room := 0;
   end;
-  if (Room > 0) and (FStride > 0) and
-     (Room div PtrUInt(FStride) < PtrUInt(AHeight)) then
-    AHeight := Integer(Room div PtrUInt(FStride));
+  if (Room > 0) and (FStride > 0) and (Room div PtrUInt(FStride) < PtrUInt(AHeight)) then
+    AHeight := integer(Room div PtrUInt(FStride));
   if AHeight < 1 then
   begin
     FWidth := 0;
@@ -483,10 +479,10 @@ begin
   FBitmapValid := False;
 end;
 
-procedure TArtSurface.SetSize(AWidth, AHeight: Integer; APreserve: Boolean);
+procedure TArtSurface.SetSize(AWidth, AHeight: integer; APreserve: boolean);
 var
   Keep: TBytes;
-  OldW, OldH: Integer;
+  OldW, OldH: integer;
   Old: TArtSurface;
 begin
   AWidth := Max(1, AWidth);
@@ -517,7 +513,7 @@ end;
 
 { Refuses a stride that cannot be real and uses the packed width instead:
   a sheared picture beats writing through a wild pointer. }
-function TArtSurface.ScanLine(Y: Integer): PPix;
+function TArtSurface.ScanLine(Y: integer): PPix;
 var
   St: PtrInt;
 begin
@@ -527,10 +523,10 @@ begin
   Result := PPix(FBits + St * Y);
 end;
 
-procedure TArtSurface.BlendPixel(X, Y: Integer; const C: TPix; Cover: Single);
+procedure TArtSurface.BlendPixel(X, Y: integer; const C: TPix; Cover: single);
 var
   P: PPix;
-  A, DA, OA: Integer;
+  A, DA, OA: integer;
 begin
   if (X < 0) or (Y < 0) or (X >= FWidth) or (Y >= FHeight) then Exit;
   { written as "not > 0" so a NaN coverage - a degenerate shape upstream -
@@ -544,65 +540,72 @@ begin
 
   case FMode of
     bmReplace:
-      begin
-        P^ := C;
-        P^.A := Byte(A);
-      end;
+    begin
+      P^ := C;
+      P^.A := byte(A);
+    end;
 
     bmLighten:
-      begin
-        P^.R := Max(P^.R, Byte((C.R * A) div 255));
-        P^.G := Max(P^.G, Byte((C.G * A) div 255));
-        P^.B := Max(P^.B, Byte((C.B * A) div 255));
-        if FKeepAlpha then P^.A := Max(P^.A, Byte(A)) else P^.A := 255;
-      end;
+    begin
+      P^.R := Max(P^.R, byte((C.R * A) div 255));
+      P^.G := Max(P^.G, byte((C.G * A) div 255));
+      P^.B := Max(P^.B, byte((C.B * A) div 255));
+      if FKeepAlpha then P^.A := Max(P^.A, byte(A))
+      else
+        P^.A := 255;
+    end;
 
     bmMaxAlpha:
+    begin
+      if A > P^.A then
       begin
-        if A > P^.A then
+        P^.R := C.R;
+        P^.G := C.G;
+        P^.B := C.B;
+        P^.A := byte(A);
+      end;
+    end;
+
+    else
+      if FKeepAlpha then
+      begin
+        { source-over onto a surface that carries its own alpha }
+        DA := P^.A;
+        OA := A + (DA * (255 - A)) div 255;
+        if OA <= 0 then
+        begin
+          P^.R := 0;
+          P^.G := 0;
+          P^.B := 0;
+          P^.A := 0;
+        end
+        else
+        begin
+        { out = (src*sa + dst*da*(1-sa)) / oa in 0..255 integers.  OA is
+          truncated, so the result can exceed 255 (509 at A=1 over DA=1);
+          the clamp prevents a range check error. }
+          P^.R := Min(255, (C.R * A * 255 + P^.R * DA * (255 - A)) div (255 * OA));
+          P^.G := Min(255, (C.G * A * 255 + P^.G * DA * (255 - A)) div (255 * OA));
+          P^.B := Min(255, (C.B * A * 255 + P^.B * DA * (255 - A)) div (255 * OA));
+          P^.A := byte(OA);
+        end;
+      end
+      else
+      begin
+        if A >= 255 then
         begin
           P^.R := C.R;
           P^.G := C.G;
           P^.B := C.B;
-          P^.A := Byte(A);
+        end
+        else
+        begin
+          P^.R := P^.R + ((C.R - P^.R) * A) div 255;
+          P^.G := P^.G + ((C.G - P^.G) * A) div 255;
+          P^.B := P^.B + ((C.B - P^.B) * A) div 255;
         end;
+        P^.A := 255;
       end;
-
-  else
-    if FKeepAlpha then
-    begin
-      { source-over onto a surface that carries its own alpha }
-      DA := P^.A;
-      OA := A + (DA * (255 - A)) div 255;
-      if OA <= 0 then
-      begin
-        P^.R := 0; P^.G := 0; P^.B := 0; P^.A := 0;
-      end
-      else
-      begin
-        { out = (src*sa + dst*da*(1-sa)) / oa in 0..255 integers.  OA is
-          truncated, so the result can exceed 255 (509 at A=1 over DA=1);
-          the clamp prevents a range check error. }
-        P^.R := Min(255, (C.R * A * 255 + P^.R * DA * (255 - A)) div (255 * OA));
-        P^.G := Min(255, (C.G * A * 255 + P^.G * DA * (255 - A)) div (255 * OA));
-        P^.B := Min(255, (C.B * A * 255 + P^.B * DA * (255 - A)) div (255 * OA));
-        P^.A := Byte(OA);
-      end;
-    end
-    else
-    begin
-      if A >= 255 then
-      begin
-        P^.R := C.R; P^.G := C.G; P^.B := C.B;
-      end
-      else
-      begin
-        P^.R := P^.R + ((C.R - P^.R) * A) div 255;
-        P^.G := P^.G + ((C.G - P^.G) * A) div 255;
-        P^.B := P^.B + ((C.B - P^.B) * A) div 255;
-      end;
-      P^.A := 255;
-    end;
   end;
 
   FBitmapValid := False;
@@ -610,7 +613,7 @@ end;
 
 procedure TArtSurface.ClearTransparent;
 var
-  Y: Integer;
+  Y: integer;
 begin
   for Y := 0 to FHeight - 1 do
     FillChar(ScanLine(Y)^, FWidth * SizeOf(TPix), 0);
@@ -619,9 +622,9 @@ end;
 
 { Wind the whole layer toward transparent - how the shake dissolves ink
   without touching the paper underneath. }
-procedure TArtSurface.FadeAlpha(Amount: Single);
+procedure TArtSurface.FadeAlpha(Amount: single);
 var
-  X, Y, K: Integer;
+  X, Y, K: integer;
   P: PPix;
 begin
   K := EnsureRange(Round((1 - Amount) * 255), 0, 255);
@@ -640,7 +643,7 @@ end;
 { Self := Base with Ink composited on top, over the rectangle R only. }
 procedure TArtSurface.CompositeOver(Base, Ink: TArtSurface; const R: TRect);
 var
-  X, Y, A: Integer;
+  X, Y, A: integer;
   Cl: TRect;
   B, S, D: PPix;
 begin
@@ -650,18 +653,19 @@ begin
   Ink.Verify;
   { Clipped to all three surfaces, not just this one; if one is a row short
     the loop would otherwise run off its end. }
-  Cl := Rect(Max(0, R.Left), Max(0, R.Top),
-             Min(FWidth,  Min(Base.Width,  Ink.Width)),
-             Min(FHeight, Min(Base.Height, Ink.Height)));
+  Cl := Rect(Max(0, R.Left), Max(0, R.Top), Min(FWidth, Min(Base.Width, Ink.Width)), Min(FHeight, Min(Base.Height, Ink.Height)));
   if R.Right < Cl.Right then Cl.Right := R.Right;
   if R.Bottom < Cl.Bottom then Cl.Bottom := R.Bottom;
   if (Cl.Right <= Cl.Left) or (Cl.Bottom <= Cl.Top) then Exit;
 
   for Y := Cl.Top to Cl.Bottom - 1 do
   begin
-    B := Base.ScanLine(Y); Inc(B, Cl.Left);
-    S := Ink.ScanLine(Y);  Inc(S, Cl.Left);
-    D := ScanLine(Y);      Inc(D, Cl.Left);
+    B := Base.ScanLine(Y);
+    Inc(B, Cl.Left);
+    S := Ink.ScanLine(Y);
+    Inc(S, Cl.Left);
+    D := ScanLine(Y);
+    Inc(D, Cl.Left);
     for X := Cl.Left to Cl.Right - 1 do
     begin
       A := S^.A;
@@ -676,7 +680,9 @@ begin
         D^.B := B^.B + ((S^.B - B^.B) * A) div 255;
       end;
       D^.A := 255;
-      Inc(B); Inc(S); Inc(D);
+      Inc(B);
+      Inc(S);
+      Inc(D);
     end;
   end;
   Invalidate;
@@ -684,7 +690,7 @@ end;
 
 procedure TArtSurface.Clear(const C: TPix);
 var
-  X, Y: Integer;
+  X, Y: integer;
   P: PPix;
 begin
   for Y := 0 to FHeight - 1 do
@@ -700,9 +706,9 @@ begin
   Invalidate;
 end;
 
-procedure TArtSurface.FillRect(const R: TRect; const C: TPix; Alpha: Single);
+procedure TArtSurface.FillRect(const R: TRect; const C: TPix; Alpha: single);
 var
-  X, Y: Integer;
+  X, Y: integer;
   P: PPix;
   Cl: TRect;
 begin
@@ -722,11 +728,10 @@ begin
 end;
 
 
-procedure TArtSurface.RoundRectV(const R: TRect; Radius: Single; const C1, C2: TPix;
-  Alpha: Single);
+procedure TArtSurface.RoundRectV(const R: TRect; Radius: single; const C1, C2: TPix; Alpha: single);
 var
-  X, Y, H: Integer;
-  CX, CY, HX, HY: Single;
+  X, Y, H: integer;
+  CX, CY, HX, HY: single;
   C: TPix;
   Cl: TRect;
 begin
@@ -737,8 +742,7 @@ begin
   H := R.Bottom - R.Top;
   if (HX <= 0) or (HY <= 0) then Exit;
 
-  Cl := Rect(Max(0, R.Left - 1), Max(0, R.Top - 1),
-             Min(FWidth, R.Right + 1), Min(FHeight, R.Bottom + 1));
+  Cl := Rect(Max(0, R.Left - 1), Max(0, R.Top - 1), Min(FWidth, R.Right + 1), Min(FHeight, R.Bottom + 1));
   for Y := Cl.Top to Cl.Bottom - 1 do
   begin
     C := MixPix(C1, C2, (Y - R.Top) / H);
@@ -749,21 +753,20 @@ begin
   Invalidate;
 end;
 
-procedure TArtSurface.RoundRect(const R: TRect; Radius: Single; const C: TPix; Alpha: Single);
+procedure TArtSurface.RoundRect(const R: TRect; Radius: single; const C: TPix; Alpha: single);
 begin
   RoundRectV(R, Radius, C, C, Alpha);
 end;
 
-procedure TArtSurface.RoundFrame(const R: TRect; Radius, LineW: Single; const C: TPix;
-  Alpha: Single);
+procedure TArtSurface.RoundFrame(const R: TRect; Radius, LineW: single; const C: TPix; Alpha: single);
 var
-  Y, Pad, Band: Integer;
-  CX, CY, HX, HY: Single;
+  Y, Pad, Band: integer;
+  CX, CY, HX, HY: single;
   Cl: TRect;
 
-  procedure Row(AY, AX0, AX1: Integer);
+  procedure Row(AY, AX0, AX1: integer);
   var
-    IX: Integer;
+    IX: integer;
   begin
     if (AY < 0) or (AY >= FHeight) then Exit;
     for IX := Max(0, AX0) to Min(FWidth - 1, AX1) do
@@ -800,23 +803,23 @@ end;
   can project millions of pixels off the surface, which would be a range
   check error; clamped, it just makes an empty loop. }
 
-function LoBound(V: Double; Limit: Integer): Integer;
+function LoBound(V: double; Limit: integer): integer;
 begin
   if IsNan(V) or (V <= 0) then Exit(0);
   if V >= Limit then Exit(Limit);        // Lo > Hi: nothing to walk
   Result := Floor(V);
 end;
 
-function HiBound(V: Double; Limit: Integer): Integer;
+function HiBound(V: double; Limit: integer): integer;
 begin
   if IsNan(V) or (V < 0) then Exit(-1);  // Hi < Lo: nothing to walk
   if V >= Limit - 1 then Exit(Limit - 1);
   Result := Ceil(V);
 end;
 
-procedure TArtSurface.Disc(CX, CY, Radius: Single; const C: TPix; Alpha: Single);
+procedure TArtSurface.Disc(CX, CY, Radius: single; const C: TPix; Alpha: single);
 var
-  X, Y, X0, Y0, X1, Y1: Integer;
+  X, Y, X0, Y0, X1, Y1: integer;
 begin
   if Radius <= 0 then Exit;
   X0 := LoBound(CX - Radius - 1, FWidth);
@@ -830,10 +833,10 @@ begin
   Invalidate;
 end;
 
-procedure TArtSurface.Ring(CX, CY, Radius, LineW: Single; const C: TPix; Alpha: Single);
+procedure TArtSurface.Ring(CX, CY, Radius, LineW: single; const C: TPix; Alpha: single);
 var
-  X, Y, X0, Y0, X1, Y1: Integer;
-  Pad: Double;
+  X, Y, X0, Y0, X1, Y1: integer;
+  Pad: double;
 begin
   Pad := Radius + LineW + 2;
   X0 := LoBound(CX - Pad, FWidth);
@@ -850,16 +853,16 @@ end;
 { Xiaolin Wu's line.  The ends are cut to the surface (Liang and Barsky)
   before anything is walked, then the long axis is stepped a pixel at a time
   and the two pixels either side of the line share its coverage. }
-procedure TArtSurface.HairLine(X0, Y0, X1, Y1: Single; const C: TPix; Alpha: Single);
+procedure TArtSurface.HairLine(X0, Y0, X1, Y1: single; const C: TPix; Alpha: single);
 var
-  T0, T1, DX, DY, Grad, Inter, F: Double;
-  Steep: Boolean;
-  I, IA, IB, Y: Integer;
-  Tmp: Double;
+  T0, T1, DX, DY, Grad, Inter, F: double;
+  Steep: boolean;
+  I, IA, IB, Y: integer;
+  Tmp: double;
 
-  function Clip(P, Q: Double): Boolean;
+  function Clip(P, Q: double): boolean;
   var
-    R: Double;
+    R: double;
   begin
     Result := True;
     if Abs(P) < 1E-12 then
@@ -880,10 +883,11 @@ var
     end;
   end;
 
-  procedure Plot(A, B: Integer; Cover: Double);
+  procedure Plot(A, B: integer; Cover: double);
   begin
     if Steep then BlendPixel(B, A, C, Cover * Alpha)
-    else BlendPixel(A, B, C, Cover * Alpha);
+    else
+      BlendPixel(A, B, C, Cover * Alpha);
   end;
 
 begin
@@ -899,23 +903,35 @@ begin
   if not Clip(-DY, Y0 + 1) then Exit;
   if not Clip(DY, FHeight - Y0) then Exit;
   if T1 < T0 then Exit;
-  X1 := X0 + DX * T1;  Y1 := Y0 + DY * T1;
-  X0 := X0 + DX * T0;  Y0 := Y0 + DY * T0;
+  X1 := X0 + DX * T1;
+  Y1 := Y0 + DY * T1;
+  X0 := X0 + DX * T0;
+  Y0 := Y0 + DY * T0;
 
   Steep := Abs(Y1 - Y0) > Abs(X1 - X0);
   if Steep then
   begin
-    Tmp := X0; X0 := Y0; Y0 := Tmp;
-    Tmp := X1; X1 := Y1; Y1 := Tmp;
+    Tmp := X0;
+    X0 := Y0;
+    Y0 := Tmp;
+    Tmp := X1;
+    X1 := Y1;
+    Y1 := Tmp;
   end;
   if X0 > X1 then
   begin
-    Tmp := X0; X0 := X1; X1 := Tmp;
-    Tmp := Y0; Y0 := Y1; Y1 := Tmp;
+    Tmp := X0;
+    X0 := X1;
+    X1 := Tmp;
+    Tmp := Y0;
+    Y0 := Y1;
+    Y1 := Tmp;
   end;
   DX := X1 - X0;
   DY := Y1 - Y0;
-  if DX < 1E-9 then Grad := 0 else Grad := DY / DX;
+  if DX < 1E-9 then Grad := 0
+  else
+    Grad := DY / DX;
 
   { pixel centers sit at .5; step every whole column the line spans }
   IA := Round(X0);
@@ -934,10 +950,10 @@ end;
 
 { Walks only the span each row of the segment can reach, not its bounding
   box; a long diagonal's box is the whole surface. }
-procedure TArtSurface.Line(X0, Y0, X1, Y1, LineW: Single; const C: TPix; Alpha: Single);
+procedure TArtSurface.Line(X0, Y0, X1, Y1, LineW: single; const C: TPix; Alpha: single);
 var
-  X, Y, IX0, IY0, IX1, IY1, RX0, RX1: Integer;
-  HW, Pad, DY, Lo, Hi, XA, XB, T, Len, DX, DYc: Single;
+  X, Y, IX0, IY0, IX1, IY1, RX0, RX1: integer;
+  HW, Pad, DY, Lo, Hi, XA, XB, T, Len, DX, DYc: single;
 begin
   HW := Max(LineW, 0.35) / 2;
   { A line is a capsule, so its round caps poke half a width past each end.
@@ -950,8 +966,10 @@ begin
     begin
       DX := (X1 - X0) / Len * HW;
       DYc := (Y1 - Y0) / Len * HW;
-      X0 := X0 + DX; Y0 := Y0 + DYc;
-      X1 := X1 - DX; Y1 := Y1 - DYc;
+      X0 := X0 + DX;
+      Y0 := Y0 + DYc;
+      X1 := X1 - DX;
+      Y1 := Y1 - DYc;
     end;
   end;
   { How far from the line a pixel can still be touched: coverage ends half
@@ -977,13 +995,23 @@ begin
       { where the segment enters and leaves this row, padded by the width }
       Lo := (Y - Pad - Y0) / DY;
       Hi := (Y + 1 + Pad - Y0) / DY;
-      if Lo > Hi then begin T := Lo; Lo := Hi; Hi := T; end;
+      if Lo > Hi then
+      begin
+        T := Lo;
+        Lo := Hi;
+        Hi := T;
+      end;
       if Lo < 0 then Lo := 0;
       if Hi > 1 then Hi := 1;
       if Lo > Hi then Continue;               // the row is past an end
       XA := X0 + (X1 - X0) * Lo;
       XB := X0 + (X1 - X0) * Hi;
-      if XA > XB then begin T := XA; XA := XB; XB := T; end;
+      if XA > XB then
+      begin
+        T := XA;
+        XA := XB;
+        XB := T;
+      end;
       RX0 := Max(IX0, LoBound(XA - Pad, FWidth));
       RX1 := Min(IX1, HiBound(XB + Pad, FWidth));
     end;
@@ -1015,10 +1043,10 @@ begin
   Invalidate;
 end;
 
-procedure TArtSurface.Arc(CX, CY, Radius, A0, A1, LineW: Single; const C: TPix; Alpha: Single);
+procedure TArtSurface.Arc(CX, CY, Radius, A0, A1, LineW: single; const C: TPix; Alpha: single);
 var
-  Steps, I: Integer;
-  A, Step, PX, PY, NX, NY: Single;
+  Steps, I: integer;
+  A, Step, PX, PY, NX, NY: single;
 begin
   Steps := Max(6, Round(Abs(A1 - A0) * Radius / 30));
   Step := (A1 - A0) / Steps;
@@ -1035,10 +1063,9 @@ begin
   end;
 end;
 
-procedure TArtSurface.Poly(const Pts: array of TPointF; LineW: Single; const C: TPix;
-  Closed: Boolean; Alpha: Single);
+procedure TArtSurface.Poly(const Pts: array of TPointF; LineW: single; const C: TPix; Closed: boolean; Alpha: single);
 var
-  I: Integer;
+  I: integer;
 begin
   if Length(Pts) < 2 then Exit;
   for I := 0 to High(Pts) - 1 do
@@ -1047,16 +1074,16 @@ begin
     Line(Pts[High(Pts)].X, Pts[High(Pts)].Y, Pts[0].X, Pts[0].Y, LineW, C, Alpha);
 end;
 
-procedure TArtSurface.Triangle(const P1, P2, P3: TPointF; const C: TPix; Alpha: Single);
+procedure TArtSurface.Triangle(const P1, P2, P3: TPointF; const C: TPix; Alpha: single);
 
-  function Edge(const A, B: TPointF; PX, PY: Single): Single; inline;
+  function Edge(const A, B: TPointF; PX, PY: single): single; inline;
   begin
     Result := (PX - A.X) * (B.Y - A.Y) - (PY - A.Y) * (B.X - A.X);
   end;
 
 var
-  X, Y, X0, Y0, X1, Y1: Integer;
-  E1, E2, E3, Sign: Single;
+  X, Y, X0, Y0, X1, Y1: integer;
+  E1, E2, E3, Sign: single;
 begin
   X0 := LoBound(Min(P1.X, Min(P2.X, P3.X)) - 1, FWidth);
   Y0 := LoBound(Min(P1.Y, Min(P2.Y, P3.Y)) - 1, FHeight);
@@ -1079,7 +1106,7 @@ end;
 
 procedure TArtSurface.DepthBegin;
 var
-  I: Integer;
+  I: integer;
 begin
   if (FWidth <= 0) or (FHeight <= 0) then Exit;
   if Length(FZ) <> FWidth * FHeight then SetLength(FZ, FWidth * FHeight);
@@ -1087,30 +1114,32 @@ begin
   FZOn := True;
   FZTest := False;
   FZBehind := False;
-  FZa := 0; FZb := 0; FZc := -1E30;
+  FZa := 0;
+  FZb := 0;
+  FZc := -1E30;
 end;
 
 
-function TArtSurface.DepthOn: Boolean;
+function TArtSurface.DepthOn: boolean;
 begin
   Result := FZOn;
 end;
 
-procedure TArtSurface.DepthTest(B: Boolean);
+procedure TArtSurface.DepthTest(B: boolean);
 begin
   FZTest := B;
 end;
 
-procedure TArtSurface.DepthBehind(B: Boolean);
+procedure TArtSurface.DepthBehind(B: boolean);
 begin
   FZBehind := B;
 end;
 
 { A line's depth as a plane in screen space, sloped along the line and flat
   across it, so a line lying on a face stays at the face's depth. }
-procedure TArtSurface.DepthAlong(X0, Y0, Z0, X1, Y1, Z1: Double);
+procedure TArtSurface.DepthAlong(X0, Y0, Z0, X1, Y1, Z1: double);
 var
-  DX, DY, L2: Double;
+  DX, DY, L2: double;
 begin
   DX := X1 - X0;
   DY := Y1 - Y0;
@@ -1129,8 +1158,8 @@ end;
 
 procedure TArtSurface.DepthMesh(const Tris: TDepthTris);
 var
-  I: Integer;
-  Lo, Hi: Single;
+  I: integer;
+  Lo, Hi: single;
 begin
   FZTris := Tris;
   SetLength(FZTriY0, Length(Tris));
@@ -1145,7 +1174,7 @@ begin
   end;
 end;
 
-procedure TArtSurface.DepthPlane(A, B, C: Double);
+procedure TArtSurface.DepthPlane(A, B, C: double);
 begin
   { a new plane means a new shape, so drop any leftover mesh }
   FZTris := nil;
@@ -1156,7 +1185,7 @@ begin
   FZc := C;
 end;
 
-function TArtSurface.DepthAt(X, Y: Integer): Single;
+function TArtSurface.DepthAt(X, Y: integer): single;
 begin
   Result := -1E30;
   if Length(FZ) <> FWidth * FHeight then Exit;
@@ -1167,57 +1196,62 @@ end;
 { Scanline fill of one shape: an outline plus any holes, filled even-odd so
   holes need no special case.  Four vertical samples per row plus exact span
   ends make edges smooth enough to sit beside the anti-aliased strokes. }
-procedure TArtSurface.FillLoops(const Loops: array of TPtFLoop; const C: TPix;
-  Alpha: Single);
+procedure TArtSurface.FillLoops(const Loops: array of TPtFLoop; const C: TPix; Alpha: single);
 const
   SAMPLES = 4;
 var
-  N, I, J, Y, X, K, L, Cnt, X0, X1, Y0, Y1, Total: Integer;
-  MinX, MaxX, MinY, MaxY, SY, XA, XB: Single;
-  Xs: array of Single;
-  Cov: array of Single;
-  T: Single;
-  Z: Double;
-  Any: Boolean;
-  Smp: Integer;
+  N, I, J, Y, X, K, L, Cnt, X0, X1, Y0, Y1, Total: integer;
+  MinX, MaxX, MinY, MaxY, SY, XA, XB: single;
+  Xs: array of single;
+  Cov: array of single;
+  T: single;
+  Z: double;
+  Any: boolean;
+  Smp: integer;
   { the exact depth for this row, where DepthMesh supplied triangles }
   Mesh: TDepthTris;
-  MeshY0, MeshY1: array of Integer;
+  MeshY0, MeshY1: array of integer;
   { The edges of every loop, flattened and sorted, so each row only tests
     the few edges that can cross it instead of the whole outline. }
-  EAX, EAY, EBX, EBY, ELo, EHi: array of Single;
-  EOrder, EAct: array of Integer;
-  NE, NAct, NextE, AI, AJ: Integer;
+  EAX, EAY, EBX, EBY, ELo, EHi: array of single;
+  EOrder, EAct: array of integer;
+  NE, NAct, NextE, AI, AJ: integer;
   { The part of the coverage row written last time, so only that is
     cleared; clearing the full width is slow for long thin diagonal faces. }
-  ClrLo, ClrHi, CurLo, CurHi: Integer;
+  ClrLo, ClrHi, CurLo, CurHi: integer;
   { and the same idea for the depth triangles }
-  RowZ: array of Double;
-  RowHas: array of Boolean;
-  TI, TC, TXLo, TXHi: Integer;
-  TxA, TxB: Single;
+  RowZ: array of double;
+  RowHas: array of boolean;
+  TI, TC, TXLo, TXHi: integer;
+  TxA, TxB: single;
 
-  { grow the stretch of the row to take in one more x }
-  procedure Take(V: Single; var N: Integer; var Lo, Hi: Single); inline;
+{ grow the stretch of the row to take in one more x }
+  procedure Take(V: single; var N: integer; var Lo, Hi: single); inline;
   begin
-    if N = 0 then begin Lo := V; Hi := V; end
-    else begin if V < Lo then Lo := V; if V > Hi then Hi := V; end;
+    if N = 0 then
+    begin
+      Lo := V;
+      Hi := V;
+    end
+    else
+    begin
+      if V < Lo then Lo := V;
+      if V > Hi then Hi := V;
+    end;
     Inc(N);
   end;
 
   { a corner of the triangle, if it falls inside the row's band }
-  procedure Span(VX, VY: Single; Row: Integer; var N: Integer;
-    var Lo, Hi: Single); inline;
+  procedure Span(VX, VY: single; Row: integer; var N: integer; var Lo, Hi: single); inline;
   begin
     if (VY >= Row) and (VY <= Row + 1) then Take(VX, N, Lo, Hi);
   end;
 
   { where an edge of it crosses the top or the bottom of the band }
-  procedure Cross(X1s, Y1s, X2s, Y2s: Single; Row: Integer; var N: Integer;
-    var Lo, Hi: Single);
+  procedure Cross(X1s, Y1s, X2s, Y2s: single; Row: integer; var N: integer; var Lo, Hi: single);
   var
-    B: Integer;
-    YB: Single;
+    B: integer;
+    YB: single;
   begin
     if Y1s = Y2s then Exit;
     for B := 0 to 1 do
@@ -1237,10 +1271,15 @@ begin
   FZTriY0 := nil;
   FZTriY1 := nil;
   if not FZOn then Mesh := nil;
-  if QuickFill then Smp := 1 else Smp := SAMPLES;
+  if QuickFill then Smp := 1
+  else
+    Smp := SAMPLES;
   Any := False;
   Total := 0;
-  MinY := 0; MaxY := 0; MinX := 0; MaxX := 0;
+  MinY := 0;
+  MaxY := 0;
+  MinX := 0;
+  MaxX := 0;
   for L := 0 to High(Loops) do
   begin
     N := Length(Loops[L]);
@@ -1250,8 +1289,10 @@ begin
     begin
       if not Any then
       begin
-        MinY := Loops[L][I].Y; MaxY := MinY;
-        MinX := Loops[L][I].X; MaxX := MinX;
+        MinY := Loops[L][I].Y;
+        MaxY := MinY;
+        MinX := Loops[L][I].X;
+        MaxX := MinX;
         Any := True;
       end
       else
@@ -1276,10 +1317,14 @@ begin
 
   { --- the edges, once ------------------------------------------------
         Level edges are left out; they can never cross a sample row. }
-  SetLength(EAX, Total); SetLength(EAY, Total);
-  SetLength(EBX, Total); SetLength(EBY, Total);
-  SetLength(ELo, Total); SetLength(EHi, Total);
-  SetLength(EOrder, Total); SetLength(EAct, Total);
+  SetLength(EAX, Total);
+  SetLength(EAY, Total);
+  SetLength(EBX, Total);
+  SetLength(EBY, Total);
+  SetLength(ELo, Total);
+  SetLength(EHi, Total);
+  SetLength(EOrder, Total);
+  SetLength(EAct, Total);
   NE := 0;
   for L := 0 to High(Loops) do
   begin
@@ -1289,12 +1334,20 @@ begin
     begin
       J := (I + 1) mod N;
       if Loops[L][I].Y = Loops[L][J].Y then Continue;
-      EAX[NE] := Loops[L][I].X; EAY[NE] := Loops[L][I].Y;
-      EBX[NE] := Loops[L][J].X; EBY[NE] := Loops[L][J].Y;
+      EAX[NE] := Loops[L][I].X;
+      EAY[NE] := Loops[L][I].Y;
+      EBX[NE] := Loops[L][J].X;
+      EBY[NE] := Loops[L][J].Y;
       if EAY[NE] < EBY[NE] then
-      begin ELo[NE] := EAY[NE]; EHi[NE] := EBY[NE]; end
+      begin
+        ELo[NE] := EAY[NE];
+        EHi[NE] := EBY[NE];
+      end
       else
-      begin ELo[NE] := EBY[NE]; EHi[NE] := EAY[NE]; end;
+      begin
+        ELo[NE] := EBY[NE];
+        EHi[NE] := EAY[NE];
+      end;
       EOrder[NE] := NE;
       Inc(NE);
     end;
@@ -1362,7 +1415,8 @@ begin
       begin
         if (Y < MeshY0[TI]) or (Y > MeshY1[TI]) then Continue;
         TC := 0;
-        TxA := 0; TxB := 0;
+        TxA := 0;
+        TxB := 0;
         { corners of it that are in the band }
         Span(Mesh[TI].AX, Mesh[TI].AY, Y, TC, TxA, TxB);
         Span(Mesh[TI].BX, Mesh[TI].BY, Y, TC, TxA, TxB);
@@ -1376,8 +1430,7 @@ begin
         TXHi := Min(X1, Ceil(TxB));
         for X := TXLo to TXHi do
         begin
-          RowZ[X - X0] := Min(Mesh[TI].ZHi, Max(Mesh[TI].ZLo,
-            Mesh[TI].ZA * X + Mesh[TI].ZB * Y + Mesh[TI].ZC));
+          RowZ[X - X0] := Min(Mesh[TI].ZHi, Max(Mesh[TI].ZLo, Mesh[TI].ZA * X + Mesh[TI].ZB * Y + Mesh[TI].ZC));
           RowHas[X - X0] := True;
         end;
       end;
@@ -1461,9 +1514,9 @@ end;
 
 
 { Sprinkle bright/dark specks - the aluminum powder look while erasing. }
-procedure TArtSurface.Grain(Amount, Density: Single);
+procedure TArtSurface.Grain(Amount, Density: single);
 var
-  I, N, X, Y, D: Integer;
+  I, N, X, Y, D: integer;
   P: PPix;
 begin
   N := Round(FWidth * FHeight * EnsureRange(Density, 0, 1));
@@ -1483,9 +1536,9 @@ end;
 
 { Shift the image down by a few rows with a ragged edge, so the drawing
   looks like it is sliding off the screen. }
-procedure TArtSurface.SmearDown(Rows: Integer);
+procedure TArtSurface.SmearDown(Rows: integer);
 var
-  X, Y, Src: Integer;
+  X, Y, Src: integer;
   Dst, S: PPix;
 begin
   if Rows <= 0 then Exit;
@@ -1507,9 +1560,9 @@ begin
   Invalidate;
 end;
 
-procedure TArtSurface.CopyFrom(Src: TArtSurface; DX, DY: Integer);
+procedure TArtSurface.CopyFrom(Src: TArtSurface; DX, DY: integer);
 var
-  X, Y, W, H: Integer;
+  X, Y, W, H: integer;
   S, D: PPix;
 begin
   if Src = nil then Exit;
@@ -1532,9 +1585,9 @@ end;
 
 procedure TArtSurface.ScaleUp2From(H: TArtSurface);
 var
-  X, Y, HW, HH: Integer;
+  X, Y, HW, HH: integer;
   Src, Dst: PPix;
-  ZRow: Integer;
+  ZRow: integer;
 begin
   if H = nil then Exit;
   Verify;
@@ -1573,14 +1626,16 @@ begin
     FZOn := True;
     FZTest := False;
     FZBehind := False;
-    FZa := 0; FZb := 0; FZc := -1E30;
+    FZa := 0;
+    FZb := 0;
+    FZc := -1E30;
   end;
   Invalidate;
 end;
 
-procedure TArtSurface.CopyRegion(Src: TArtSurface; SrcX, SrcY, DX, DY, W, H: Integer);
+procedure TArtSurface.CopyRegion(Src: TArtSurface; SrcX, SrcY, DX, DY, W, H: integer);
 var
-  X, Y, X0, Y0, X1, Y1: Integer;
+  X, Y, X0, Y0, X1, Y1: integer;
   S, D: PPix;
 begin
   if Src = nil then Exit;
@@ -1592,8 +1647,7 @@ begin
   { A copy from far outside either surface copies nothing, but the
     arithmetic would overflow first, so it is refused up front.  The cursor
     overlay can ask for one from a bad projected coordinate. }
-  if (Abs(SrcX) > 1000000) or (Abs(SrcY) > 1000000) or
-     (Abs(DX) > 1000000) or (Abs(DY) > 1000000) then Exit;
+  if (Abs(SrcX) > 1000000) or (Abs(SrcY) > 1000000) or (Abs(DX) > 1000000) or (Abs(DY) > 1000000) then Exit;
   X0 := Max(0, Max(-SrcX, -DX));
   Y0 := Max(0, Max(-SrcY, -DY));
   X1 := Min(W, Min(Src.Width - SrcX, FWidth - DX));
@@ -1613,7 +1667,7 @@ end;
 
 procedure TArtSurface.Snapshot(out Buf: TBytes);
 var
-  Y: Integer;
+  Y: integer;
 begin
   SetLength(Buf, FWidth * FHeight * 4);
   for Y := 0 to FHeight - 1 do
@@ -1622,7 +1676,7 @@ end;
 
 procedure TArtSurface.Restore(const Buf: TBytes);
 var
-  Y: Integer;
+  Y: integer;
 begin
   if Length(Buf) <> FWidth * FHeight * 4 then Exit;
   for Y := 0 to FHeight - 1 do
@@ -1637,13 +1691,13 @@ begin
     FBitmap.LoadFromIntfImage(FImage);
     { Re-read where the pixels are after handing the image to the
       widgetset; nothing says the buffer cannot move, and it costs one call. }
-    FBits := PByte(FImage.GetDataLineStart(0));
+    FBits := pbyte(FImage.GetDataLineStart(0));
     FBitmapValid := True;
   end;
   Result := FBitmap;
 end;
 
-procedure TArtSurface.DrawTo(ACanvas: TCanvas; X, Y: Integer);
+procedure TArtSurface.DrawTo(ACanvas: TCanvas; X, Y: integer);
 begin
   ACanvas.Draw(X, Y, AsBitmap);
 end;
@@ -1676,13 +1730,12 @@ begin
   Result := FScratch.Canvas.TextExtent(S);
 end;
 
-procedure TArtSurface.TextOut(X, Y: Integer; const S: string; AFont: TFont;
-  const C: TPix; Alpha: Single);
+procedure TArtSurface.TextOut(X, Y: integer; const S: string; AFont: TFont; const C: TPix; Alpha: single);
 var
   Sz: TSize;
-  IX, IY: Integer;
+  IX, IY: integer;
   Col: TFPColor;
-  Cov: Single;
+  Cov: single;
 begin
   if S = '' then Exit;
   EnsureScratch;
@@ -1707,8 +1760,7 @@ begin
     for IX := 0 to FScratchImg.Width - 1 do
     begin
       Col := FScratchImg.Colors[IX, IY];
-      Cov := ((Col.red shr 8) * 0.30 + (Col.green shr 8) * 0.59 +
-              (Col.blue shr 8) * 0.11) / 255;
+      Cov := ((Col.red shr 8) * 0.30 + (Col.green shr 8) * 0.59 + (Col.blue shr 8) * 0.11) / 255;
       if Cov > 0.004 then
         BlendPixel(X + IX - 1, Y + IY - 1, C, Cov * Alpha);
     end;

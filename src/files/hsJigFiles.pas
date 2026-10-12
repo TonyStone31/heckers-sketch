@@ -12,18 +12,18 @@ interface
 uses
   Classes;
 
-function JigFileCount: Integer;
-function JigFileName(I: Integer): string;
-procedure JigFileLines(I: Integer; L: TStrings);
+function JigFileCount: integer;
+function JigFileName(I: integer): string;
+procedure JigFileLines(I: integer; L: TStrings);
 
 implementation
 
-function JigFileCount: Integer;
+function JigFileCount: integer;
 begin
   Result := 6;
 end;
 
-function JigFileName(I: Integer): string;
+function JigFileName(I: integer): string;
 begin
   case I of
     0: Result := 'star.pas';
@@ -32,8 +32,8 @@ begin
     3: Result := 'steps.sh';
     4: Result := 'steps.ps1';
     5: Result := 'body.py';
-  else
-    Result := '';
+    else
+      Result := '';
   end;
 end;
 
@@ -540,7 +540,7 @@ begin
   L.Add('print("\n".join(out))');
 end;
 
-procedure JigFileLines(I: Integer; L: TStrings);
+procedure JigFileLines(I: integer; L: TStrings);
 begin
   case I of
     0: Jig0(L);

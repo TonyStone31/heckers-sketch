@@ -14,40 +14,40 @@ uses
 
 { Cut the bore NewBore (an ekBore entity) against every other bore of the
   same solid it crosses.  Returns how many walls were divided. }
-function CutCrossingBores(D: TWorkDoc; NewBore: Integer): Integer;
+function CutCrossingBores(D: TWorkDoc; NewBore: integer): integer;
 
 { Strictly inside the tunnel's bore - not on its walls, not at its mouths. }
-function InsideBore(D: TWorkDoc; Bore: Integer; const P: TP3; Tol: Double): Boolean;
+function InsideBore(D: TWorkDoc; Bore: integer; const P: TP3; Tol: double): boolean;
 
 { How far the face can be pushed before it hits an existing tunnel wall:
   Dist if nothing is in the way, else the signed distance to the first wall.
   Push/pull stops there, like SketchUp; Drill does not use it. }
-function BoreLimit(D: TWorkDoc; Face: Integer; Dist: Double): Double;
+function BoreLimit(D: TWorkDoc; Face: integer; Dist: double): double;
 
 implementation
 
 type
   TCut = record
-    FA, FB: Integer;       { the two walls that cross }
+    FA, FB: integer;       { the two walls that cross }
     S0, S1: TP3;           { where they do }
   end;
 
-function BoreAxis(D: TWorkDoc; Bore: Integer): TP3;
+function BoreAxis(D: TWorkDoc; Bore: integer): TP3;
 begin
   Result := Norm3(Sub3(D[Bore].B, D[Bore].Poly[0]));
 end;
 
-function BoreLen(D: TWorkDoc; Bore: Integer): Double;
+function BoreLen(D: TWorkDoc; Bore: integer): double;
 begin
   Result := Dist(D[Bore].B, D[Bore].Poly[0]);
 end;
 
 { how far P is from the nearest edge of the loop, both taken in the plane }
-function DistToLoop(const P: TP3; const Loop: TP3Array): Double;
+function DistToLoop(const P: TP3; const Loop: TP3Array): double;
 var
-  I, N: Integer;
+  I, N: integer;
   A, B, E: TP3;
-  T, L: Double;
+  T, L: double;
 begin
   Result := 1E300;
   N := Length(Loop);
@@ -59,15 +59,16 @@ begin
     L := Len3(E);
     if L < 1E-12 then Continue;
     T := Dot3(Sub3(P, A), E) / (L * L);
-    if T < 0 then T := 0 else if T > 1 then T := 1;
+    if T < 0 then T := 0
+    else if T > 1 then T := 1;
     Result := Min(Result, Dist(P, Add3(A, Mul3(E, T))));
   end;
 end;
 
-function InsideBore(D: TWorkDoc; Bore: Integer; const P: TP3; Tol: Double): Boolean;
+function InsideBore(D: TWorkDoc; Bore: integer; const P: TP3; Tol: double): boolean;
 var
   Ax, Q: TP3;
-  T: Double;
+  T: double;
 begin
   Result := False;
   Ax := BoreAxis(D, Bore);
@@ -79,8 +80,7 @@ begin
 end;
 
 { on the tunnel's wall surface: along its length and on the outline }
-function OnBoreWall(D: TWorkDoc; Bore: Integer; const P: TP3; Tol: Double;
-  out T: Double): Boolean;
+function OnBoreWall(D: TWorkDoc; Bore: integer; const P: TP3; Tol: double; out T: double): boolean;
 var
   Ax, Q: TP3;
 begin
@@ -94,42 +94,49 @@ end;
 
 { A lining wall has every corner on the bore's wall surface, spread along
   its length; corners all at one depth are a face across the mouth. }
-function IsLining(D: TWorkDoc; Bore, F: Integer; Tol: Double): Boolean;
+function IsLining(D: TWorkDoc; Bore, F: integer; Tol: double): boolean;
 var
-  I: Integer;
-  T, TMin, TMax: Double;
+  I: integer;
+  T, TMin, TMax: double;
 begin
   Result := False;
   if (D[F].Kind <> ekFace) or (D[F].Grp <> D[Bore].Grp) or (Length(D[F].Poly) < 3) then Exit;
-  TMin := 1E300; TMax := -1E300;
+  TMin := 1E300;
+  TMax := -1E300;
   for I := 0 to High(D[F].Poly) do
   begin
     if not OnBoreWall(D, Bore, D[F].Poly[I], Tol, T) then Exit;
-    TMin := Min(TMin, T); TMax := Max(TMax, T);
+    TMin := Min(TMin, T);
+    TMax := Max(TMax, T);
   end;
   Result := TMax - TMin > Tol;
 end;
 
 { Where the line L0 + t*Dir enters and leaves a flat polygon, as pairs of t.
   Even-odd crossing count, in the polygon's plane. }
-procedure LineThroughPoly(const L0, Dir: TP3; const Poly: TP3Array; const N: TP3;
-  out Ts: array of Double; out Count: Integer; Tol: Double);
+procedure LineThroughPoly(const L0, Dir: TP3; const Poly: TP3Array; const N: TP3; out Ts: array of double; out Count: integer; Tol: double);
 var
   AU, AV, A, B: TP3;
-  I, J, K, M: Integer;
-  lu, lv, du, dv, pu, pv, qu, qv, eu, ev, Den, T, S, Tmp: Double;
+  I, J, K, M: integer;
+  lu, lv, du, dv, pu, pv, qu, qv, eu, ev, Den, T, S, Tmp: double;
 begin
   Count := 0;
   AxesFromNormal(N, AU, AV);
-  lu := Dot3(L0, AU); lv := Dot3(L0, AV);
-  du := Dot3(Dir, AU); dv := Dot3(Dir, AV);
+  lu := Dot3(L0, AU);
+  lv := Dot3(L0, AV);
+  du := Dot3(Dir, AU);
+  dv := Dot3(Dir, AV);
   M := Length(Poly);
   for I := 0 to M - 1 do
   begin
-    A := Poly[I]; B := Poly[(I + 1) mod M];
-    pu := Dot3(A, AU); pv := Dot3(A, AV);
-    qu := Dot3(B, AU); qv := Dot3(B, AV);
-    eu := qu - pu; ev := qv - pv;
+    A := Poly[I];
+    B := Poly[(I + 1) mod M];
+    pu := Dot3(A, AU);
+    pv := Dot3(A, AV);
+    qu := Dot3(B, AU);
+    qv := Dot3(B, AV);
+    eu := qu - pu;
+    ev := qv - pv;
     Den := du * ev - dv * eu;
     if Abs(Den) < 1E-12 then
     begin
@@ -140,11 +147,13 @@ begin
         if Count + 1 >= Length(Ts) then Exit;
         if Abs(du) > Abs(dv) then
         begin
-          Ts[Count] := (pu - lu) / du; Ts[Count + 1] := (qu - lu) / du;
+          Ts[Count] := (pu - lu) / du;
+          Ts[Count + 1] := (qu - lu) / du;
         end
         else
         begin
-          Ts[Count] := (pv - lv) / dv; Ts[Count + 1] := (qv - lv) / dv;
+          Ts[Count] := (pv - lv) / dv;
+          Ts[Count + 1] := (qv - lv) / dv;
         end;
         Inc(Count, 2);
       end;
@@ -162,19 +171,23 @@ begin
   { sorted; an even count pairs up into the stretches inside }
   for I := 0 to Count - 2 do
     for J := I + 1 to Count - 1 do
-      if Ts[J] < Ts[I] then begin Tmp := Ts[I]; Ts[I] := Ts[J]; Ts[J] := Tmp; end;
+      if Ts[J] < Ts[I] then
+      begin
+        Tmp := Ts[I];
+        Ts[I] := Ts[J];
+        Ts[J] := Tmp;
+      end;
   if Odd(Count) then Count := Count - 1;
 end;
 
 { Where two flat polygons cross: the segments of the line their planes share
   that lie inside both.  Parallel ones do not cross. }
-function PolyCross(const PA: TP3Array; NA: TP3; const PB: TP3Array; NB: TP3;
-  Tol: Double; out Segs: array of TCut; out NSegs: Integer): Boolean;
+function PolyCross(const PA: TP3Array; NA: TP3; const PB: TP3Array; NB: TP3; Tol: double; out Segs: array of TCut; out NSegs: integer): boolean;
 var
   Dir, L0: TP3;
-  dA, dB, D2, T0, T1: Double;
-  TA, TB: array[0..63] of Double;
-  CA, CB, I, J: Integer;
+  dA, dB, D2, T0, T1: double;
+  TA, TB: array[0..63] of double;
+  CA, CB, I, J: integer;
 begin
   Result := False;
   NSegs := 0;
@@ -215,10 +228,9 @@ begin
   end;
 end;
 
-function FaceCross(D: TWorkDoc; FA, FB: Integer; Tol: Double;
-  out Segs: array of TCut; out NSegs: Integer): Boolean;
+function FaceCross(D: TWorkDoc; FA, FB: integer; Tol: double; out Segs: array of TCut; out NSegs: integer): boolean;
 var
-  K: Integer;
+  K: integer;
 begin
   Result := PolyCross(D[FA].Poly, D.FaceNormal(FA), D[FB].Poly, D.FaceNormal(FB), Tol, Segs, NSegs);
   for K := 0 to NSegs - 1 do
@@ -228,16 +240,16 @@ begin
   end;
 end;
 
-function BoreLimit(D: TWorkDoc; Face: Integer; Dist: Double): Double;
+function BoreLimit(D: TWorkDoc; Face: integer; Dist: double): double;
 var
   Nm, Ax: TP3;
-  N, I, J, F, Bore, NSeg, K: Integer;
+  N, I, J, F, Bore, NSeg, K: integer;
   Side: TP3Array;
   Segs: array[0..15] of TCut;
-  Tol, Size, T, Best: Double;
-  G: Integer;
+  Tol, Size, T, Best: double;
+  G: integer;
 
-  function Along(const P: TP3): Double;
+  function Along(const P: TP3): double;
   begin
     Result := Dot3(Sub3(P, D[Face].Poly[0]), Ax);
   end;
@@ -251,10 +263,9 @@ begin
   G := D[Face].Grp;
   if G = 0 then
     for F := 0 to D.Live - 1 do
-      if (D[F].Kind = ekFace) and D[F].Solid and (D[F].Grp <> 0) and
-         (Abs(Abs(Dot3(Norm3(D.FaceNormal(F)), Norm3(D.FaceNormal(Face)))) - 1) < 1E-6) and
-         (Abs(Dot3(Norm3(D.FaceNormal(F)), Sub3(D[Face].Poly[0], D[F].Poly[0]))) < 1E-6) and
-         PointInLoop(InnerPoint(D[Face].Poly, D.FaceNormal(Face)), D[F].Poly, D.FaceNormal(F)) then
+      if (D[F].Kind = ekFace) and D[F].Solid and (D[F].Grp <> 0) and (Abs(Abs(Dot3(Norm3(D.FaceNormal(F)), Norm3(D.FaceNormal(Face)))) - 1) < 1E-6) and
+        (Abs(Dot3(Norm3(D.FaceNormal(F)), Sub3(D[Face].Poly[0], D[F].Poly[0]))) < 1E-6) and PointInLoop(InnerPoint(D[Face].Poly, D.FaceNormal(Face)),
+        D[F].Poly, D.FaceNormal(F)) then
       begin
         G := D[F].Grp;
         Break;
@@ -281,8 +292,7 @@ begin
         Side[1] := D[Face].Poly[J];
         Side[2] := Add3(D[Face].Poly[J], Mul3(Ax, Abs(Dist)));
         Side[3] := Add3(D[Face].Poly[I], Mul3(Ax, Abs(Dist)));
-        if PolyCross(Side, Cross3(Sub3(Side[1], Side[0]), Sub3(Side[3], Side[0])),
-                     D[F].Poly, D.FaceNormal(F), Tol, Segs, NSeg) then
+        if PolyCross(Side, Cross3(Sub3(Side[1], Side[0]), Sub3(Side[3], Side[0])), D[F].Poly, D.FaceNormal(F), Tol, Segs, NSeg) then
           for K := 0 to NSeg - 1 do
           begin
             T := Min(Along(Segs[K].S0), Along(Segs[K].S1));
@@ -294,8 +304,7 @@ begin
       for I := 0 to High(D[F].Poly) do
       begin
         T := Along(D[F].Poly[I]);
-        if (T > Tol) and (T < Best) and
-           PointInLoop(Sub3(D[F].Poly[I], Mul3(Ax, T)), D[Face].Poly, Nm) then
+        if (T > Tol) and (T < Best) and PointInLoop(Sub3(D[F].Poly[I], Mul3(Ax, T)), D[Face].Poly, Nm) then
           Best := T;
       end;
     end;
@@ -305,29 +314,35 @@ end;
 
 { The part of segment A-B inside the bore, as fractions from A to B.  The
   bore is treated as a convex prism, clipped against each side and mouth. }
-function SegInBore(const Loop: TP3Array; const FarOfFirst: TP3; const A, B: TP3;
-  out TA, TB: Double): Boolean;
+function SegInBore(const Loop: TP3Array; const FarOfFirst: TP3; const A, B: TP3; out TA, TB: double): boolean;
 var
   Ax, N, P0, E, Side: TP3;
-  I, M: Integer;
-  L: Double;
+  I, M: integer;
+  L: double;
 
   { keep the part of [TA,TB] on the inner side of the plane through P0 with
     outward normal N }
   procedure Clip(const P0, N: TP3);
   var
-    DA, DB: Double;
+    DA, DB: double;
   begin
     DA := Dot3(Sub3(A, P0), N);
     DB := Dot3(Sub3(B, P0), N);
-    if (DA > 0) and (DB > 0) then begin TA := 1; TB := 0; Exit; end;   { all outside }
+    if (DA > 0) and (DB > 0) then
+    begin
+      TA := 1;
+      TB := 0;
+      Exit;
+    end;   { all outside }
     if (DA <= 0) and (DB <= 0) then Exit;                              { all inside }
     if DA > 0 then TA := Max(TA, DA / (DA - DB))                      { A outside, enters }
-    else TB := Min(TB, DA / (DA - DB));                               { B outside, leaves }
+    else
+      TB := Min(TB, DA / (DA - DB));                               { B outside, leaves }
   end;
 
 begin
-  TA := 0; TB := 1;
+  TA := 0;
+  TB := 1;
   Ax := Norm3(Sub3(FarOfFirst, Loop[0]));
   L := Dist(FarOfFirst, Loop[0]);
   M := Length(Loop);
@@ -352,15 +367,14 @@ end;
 
 { Cut out the part of every edge of the solid that runs through the bore, so
   no crease is left hanging in the other tunnel's open space. }
-procedure TrimLinesInBore(D: TWorkDoc; const Loop: TP3Array; const Far: TP3;
-  G: Integer; Tol: Double);
+procedure TrimLinesInBore(D: TWorkDoc; const Loop: TP3Array; const Far: TP3; G: integer; Tol: double);
 var
-  I, N: Integer;
+  I, N: integer;
   A, B, PA, PB: TP3;
-  TA, TB: Double;
+  TA, TB: double;
   Ink: TColor;
-  Wt: Single;
-  Soft: Boolean;
+  Wt: single;
+  Soft: boolean;
 begin
   { The bore is passed by value on purpose: deleting lines shifts every index
     above, so a bore index would point at the wrong entity and crash. }
@@ -369,11 +383,14 @@ begin
   for I := N - 1 downto 0 do
   begin
     if (D[I].Kind <> ekLine) or (D[I].Grp <> G) then Continue;
-    A := D[I].A; B := D[I].B;
+    A := D[I].A;
+    B := D[I].B;
     if not SegInBore(Loop, Far, A, B, TA, TB) then Continue;
     { only a real stretch, not a touch at a wall }
     if (TB - TA) * Dist(A, B) < Tol * 10 then Continue;
-    Ink := D[I].Ink; Wt := D[I].Weight; Soft := D[I].Soft;
+    Ink := D[I].Ink;
+    Wt := D[I].Weight;
+    Soft := D[I].Soft;
     PA := Add3(A, Mul3(Sub3(B, A), TA));
     PB := Add3(A, Mul3(Sub3(B, A), TB));
     D.Delete(I);
@@ -392,28 +409,28 @@ begin
   end;
 end;
 
-function CutCrossingBores(D: TWorkDoc; NewBore: Integer): Integer;
+function CutCrossingBores(D: TWorkDoc; NewBore: integer): integer;
 type
   TReplace = record
-    Face: Integer;
+    Face: integer;
     Pieces: array of TP3Array;
   end;
 var
-  Other, F, I, J, K, G, NCuts, NSeg, NRep: Integer;
-  Tol, Size: Double;
-  LA, LB: array of Integer;
+  Other, F, I, J, K, G, NCuts, NSeg, NRep: integer;
+  Tol, Size: double;
+  LA, LB: array of integer;
   Cuts: array of TCut;
   Segs: array[0..15] of TCut;
   Reps: array of TReplace;
   Tmp: TReplace;
-  Crossed, CrossedOrd: array of Integer;
-  BoreA, BoreB, NewBoreOrd: Integer;
+  Crossed, CrossedOrd: array of integer;
+  BoreA, BoreB, NewBoreOrd: integer;
   LoopA, LoopB: TP3Array;
   FarA, FarB: TP3;
   FN: TP3;
   Ink: TColor;
 
-  procedure Note(F: Integer; var L: array of Integer; var N: Integer);
+  procedure Note(F: integer; var L: array of integer; var N: integer);
   begin
     if N >= Length(L) then Exit;
     L[N] := F;
@@ -422,9 +439,9 @@ var
 
   { every corner of the wall inside the bore or on its surface, and its
     middle inside: the whole wall is in the void }
-  function WhollyInside(F, Against: Integer): Boolean;
+  function WhollyInside(F, Against: integer): boolean;
   var
-    I: Integer;
+    I: integer;
   begin
     Result := InsideBore(D, Against, InnerPoint(D[F].Poly, D.FaceNormal(F)), Tol);
     if not Result then Exit;
@@ -433,12 +450,12 @@ var
   end;
 
   { divide wall F by the cuts across it, dropping what lies in bore Against }
-  procedure Divide(F, Against: Integer);
+  procedure Divide(F, Against: integer);
   var
     S: TSegArray;
     R: TRegionArray;
-    NS, I, M, Kept: Integer;
-    Drop: array of Boolean;
+    NS, I, M, Kept: integer;
+    Drop: array of boolean;
     Mid: TP3;
   begin
     M := Length(D[F].Poly);
@@ -529,14 +546,17 @@ begin
     if (Other = NewBore) or (D[Other].Kind <> ekBore) or (D[Other].Grp <> G) then Continue;
 
     { the walls of each }
-    SetLength(LA, D.Live); SetLength(LB, D.Live);
-    I := 0; J := 0;
+    SetLength(LA, D.Live);
+    SetLength(LB, D.Live);
+    I := 0;
+    J := 0;
     for F := 0 to D.Live - 1 do
     begin
       if IsLining(D, Other, F, Tol) then Note(F, LA, I);
       if IsLining(D, NewBore, F, Tol) then Note(F, LB, J);
     end;
-    SetLength(LA, I); SetLength(LB, J);
+    SetLength(LA, I);
+    SetLength(LB, J);
     if (Length(LA) = 0) or (Length(LB) = 0) then Continue;
 
     { every crossing between a wall of one and a wall of the other }
@@ -621,8 +641,10 @@ begin
           end;
         if BoreA < 0 then Continue;
         { both bores by value before either trim touches the list }
-        LoopA := Copy(D[BoreA].Poly, 0, Length(D[BoreA].Poly)); FarA := D[BoreA].B;
-        LoopB := Copy(D[BoreB].Poly, 0, Length(D[BoreB].Poly)); FarB := D[BoreB].B;
+        LoopA := Copy(D[BoreA].Poly, 0, Length(D[BoreA].Poly));
+        FarA := D[BoreA].B;
+        LoopB := Copy(D[BoreB].Poly, 0, Length(D[BoreB].Poly));
+        FarB := D[BoreB].B;
         TrimLinesInBore(D, LoopB, FarB, G, Tol);   { the old tunnel's creases, where the new one runs }
         TrimLinesInBore(D, LoopA, FarA, G, Tol);   { and the new one's, where the old one runs }
       end;

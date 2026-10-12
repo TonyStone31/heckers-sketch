@@ -30,12 +30,10 @@ type
     lblWhich: TLabel;
     btnGo: TBCButton;
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure HeadDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure HeadMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure HeadUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+    procedure HeadDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure HeadMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure HeadUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure GoClick(Sender: TObject);
     procedure PageLinkClick(Sender: TObject; const URL: string);
   private
@@ -70,9 +68,9 @@ implementation
 function ReleaseNotesMarkdown(const Since: string): string;
 var
   Lines, Out_: TStringList;
-  I: Integer;
+  I: integer;
   L, Title: string;
-  Keep: Boolean;
+  Keep: boolean;
 begin
   Lines := TStringList.Create;
   Out_ := TStringList.Create;
@@ -105,7 +103,8 @@ begin
       Out_.Add(L);
     end;
     if Out_.Count = 0 then Result := ''
-    else Result := Out_.Text;
+    else
+      Result := Out_.Text;
   finally
     Out_.Free;
     Lines.Free;
@@ -122,17 +121,11 @@ function ReleaseNotesStyle(const T: TTheme): string;
 
 begin
   Result :=
-    'html { scrollbar-color: ' + Hex(T.Accent) + ' ' +
-      Hex(MixPix(T.Panel, Pix(0, 0, 0), 0.25)) + '; scrollbar-width: thin }' +
-    ' body { background: ' + Hex(T.Panel) + '; color: ' + Hex(T.TextDim) +
-      '; font-size: 14px; padding: 6px }' +
-    ' h2 { color: ' + Hex(T.Accent) + '; font-size: 20px; margin-top: 20px }' +
-    ' h3 { color: ' + Hex(T.TextDim) + '; font-size: 13px; margin-top: 8px }' +
-    ' strong, b { color: ' + Hex(T.Text) + ' }' +
-    ' li { margin-bottom: 6px }' +
-    ' code { background: ' + Hex(MixPix(T.Panel, T.Text, 0.12)) + ' }' +
-    ' hr { color: ' + Hex(T.TextDim) + ' }' +
-    ' a { color: ' + Hex(T.Accent) + ' }';
+    'html { scrollbar-color: ' + Hex(T.Accent) + ' ' + Hex(MixPix(T.Panel, Pix(0, 0, 0), 0.25)) + '; scrollbar-width: thin }' +
+    ' body { background: ' + Hex(T.Panel) + '; color: ' + Hex(T.TextDim) + '; font-size: 14px; padding: 6px }' + ' h2 { color: ' +
+    Hex(T.Accent) + '; font-size: 20px; margin-top: 20px }' + ' h3 { color: ' + Hex(T.TextDim) + '; font-size: 13px; margin-top: 8px }' +
+    ' strong, b { color: ' + Hex(T.Text) + ' }' + ' li { margin-bottom: 6px }' + ' code { background: ' + Hex(MixPix(T.Panel, T.Text, 0.12)) +
+    ' }' + ' hr { color: ' + Hex(T.TextDim) + ' }' + ' a { color: ' + Hex(T.Accent) + ' }';
 end;
 
 { --- the window -------------------------------------------------------- }
@@ -156,20 +149,17 @@ begin
   ModalResult := mrOk;
 end;
 
-procedure TWhatsNewForm.HeadDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TWhatsNewForm.HeadDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if Button = mbLeft then hsDialogSkin.DragBegin(FDrag, Self);
 end;
 
-procedure TWhatsNewForm.HeadMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TWhatsNewForm.HeadMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 begin
   hsDialogSkin.DragTo(FDrag, Self);
 end;
 
-procedure TWhatsNewForm.HeadUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TWhatsNewForm.HeadUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   hsDialogSkin.DragEnd(FDrag);
 end;
@@ -180,8 +170,7 @@ begin
   if (Pos('http://', URL) = 1) or (Pos('https://', URL) = 1) then OpenURL(URL);
 end;
 
-procedure TWhatsNewForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TWhatsNewForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   { Esc and Enter close; other keys scroll the page.  With KeyPreview the
     form sees keys before the find bar, so leave them to the bar while it
@@ -189,10 +178,10 @@ begin
   if Page.FindBarVisible then Exit;
   case Key of
     VK_ESCAPE, VK_RETURN:
-      begin
-        ModalResult := mrOk;
-        Key := 0;
-      end;
+    begin
+      ModalResult := mrOk;
+      Key := 0;
+    end;
   end;
 end;
 
@@ -207,8 +196,7 @@ begin
   ActiveControl := Page;
 end;
 
-procedure TWhatsNewForm.ShowRelease(const PreviousVersion,
-  NewVersion: string);
+procedure TWhatsNewForm.ShowRelease(const PreviousVersion, NewVersion: string);
 begin
   lblTitle.Caption := 'Heckers Sketch has been updated';
   if PreviousVersion <> '' then

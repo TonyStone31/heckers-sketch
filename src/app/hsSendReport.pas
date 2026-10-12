@@ -31,9 +31,9 @@ type
     btnClose: TBCButton;
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
   private
-    FFailed, FDone: Boolean;
+    FFailed, FDone: boolean;
     FFiles: array of TSendFile;
     FFacts: TStringList;      { section TAB key TAB value, in the order given }
     FBanner, FBannerSub, FClosing: string;
@@ -43,20 +43,17 @@ type
     constructor CreateSending(AOwner: TComponent; const Title: string);
     destructor Destroy; override;
     { shows a step and holds it for Hold milliseconds }
-    procedure Stage(const AStage, ADetail: string; Percent: Integer;
-      Hold: Integer = 450);
+    procedure Stage(const AStage, ADetail: string; Percent: integer; Hold: integer = 450);
     { The file table.  Every file is listed as waiting before the first is
       sent, and its row updates as it goes; the page is redrawn each time. }
-    function AddFile(const What, Name_, Size: string;
-      State: TSendState = ssWaiting): Integer;
-    procedure FileState(Idx: Integer; State: TSendState;
-      const Encrypted: string = ''; const Why: string = '');
+    function AddFile(const What, Name_, Size: string; State: TSendState = ssWaiting): integer;
+    procedure FileState(Idx: integer; State: TSendState; const Encrypted: string = ''; const Why: string = '');
     { A summary line under the files.  The first two sections sit side by
       side; later ones run full width, for long values. }
     procedure Fact(const Section, Key, Value: string);
     { Shows the result banner and stays open until Close, so the user can
       see what went. }
-    procedure Finish(const Msg, Detail, ClosingHTML: string; OK: Boolean);
+    procedure Finish(const Msg, Detail, ClosingHTML: string; OK: boolean);
   end;
 
 
@@ -68,37 +65,19 @@ const
   { HTML rather than Markdown, for status colors, small file name text and
     side-by-side cards. }
   PAGE_CSS =
-    'body { background: #ffffff; color: #0f172a; font-size: 14px; ' +
-    '       line-height: 1.45; margin: 0; padding: 18px 22px } ' +
-    'h3 { font-size: 12px; color: #64748b; text-transform: uppercase; ' +
-    '     margin-top: 18px; margin-bottom: 6px } ' +
-    'table { width: 100%; border-collapse: collapse } ' +
-    'th { text-align: left; background: #f1f5f9; color: #475569; ' +
-    '     font-size: 12px; padding: 7px 10px; border: 1px solid #e2e8f0 } ' +
-    'td { padding: 7px 10px; border: 1px solid #e2e8f0 } ' +
-    'td.part { font-weight: bold; white-space: nowrap } ' +
-    'td.file { font-size: 12px; font-family: monospace; color: #1e293b } ' +
-    'td.num { text-align: right; color: #334155; white-space: nowrap } ' +
-    'td.key { background: #f8fafc; color: #475569; font-size: 13px; ' +
-    '         white-space: nowrap } ' +
-    'td.val { font-size: 13px } ' +
-    'td.banner { border: 0; border-radius: 8px; padding: 14px 18px; ' +
-    '            color: #ffffff } ' +
-    'td.b-ok  { background: #15803d } ' +
-    'td.b-bad { background: #b91c1c } ' +
-    'td.b-run { background: #1d4ed8 } ' +
-    'div.title { font-size: 22px; font-weight: bold } ' +
-    'div.sub { font-size: 14px; margin-top: 4px } ' +
-    '.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } ' +
-    'span.pill { border-radius: 10px; padding: 2px 10px; font-weight: bold } ' +
-    'span.wait { background: #f1f5f9; color: #64748b } ' +
-    'span.busy { background: #fef3c7; color: #92400e } ' +
-    'span.send { background: #dbeafe; color: #1d4ed8 } ' +
-    'span.ok   { background: #dcfce7; color: #15803d } ' +
-    'span.bad  { background: #fee2e2; color: #b91c1c } ' +
-    'li { margin-bottom: 4px; font-size: 13px } ' +
-    'code { font-size: 12px } ' +
-    'small { color: #64748b }';
+    'body { background: #ffffff; color: #0f172a; font-size: 14px; ' + '       line-height: 1.45; margin: 0; padding: 18px 22px } ' +
+    'h3 { font-size: 12px; color: #64748b; text-transform: uppercase; ' + '     margin-top: 18px; margin-bottom: 6px } ' +
+    'table { width: 100%; border-collapse: collapse } ' + 'th { text-align: left; background: #f1f5f9; color: #475569; ' +
+    '     font-size: 12px; padding: 7px 10px; border: 1px solid #e2e8f0 } ' + 'td { padding: 7px 10px; border: 1px solid #e2e8f0 } ' +
+    'td.part { font-weight: bold; white-space: nowrap } ' + 'td.file { font-size: 12px; font-family: monospace; color: #1e293b } ' +
+    'td.num { text-align: right; color: #334155; white-space: nowrap } ' + 'td.key { background: #f8fafc; color: #475569; font-size: 13px; ' +
+    '         white-space: nowrap } ' + 'td.val { font-size: 13px } ' + 'td.banner { border: 0; border-radius: 8px; padding: 14px 18px; ' +
+    '            color: #ffffff } ' + 'td.b-ok  { background: #15803d } ' + 'td.b-bad { background: #b91c1c } ' +
+    'td.b-run { background: #1d4ed8 } ' + 'div.title { font-size: 22px; font-weight: bold } ' + 'div.sub { font-size: 14px; margin-top: 4px } ' +
+    '.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } ' + 'span.pill { border-radius: 10px; padding: 2px 10px; font-weight: bold } ' +
+    'span.wait { background: #f1f5f9; color: #64748b } ' + 'span.busy { background: #fef3c7; color: #92400e } ' +
+    'span.send { background: #dbeafe; color: #1d4ed8 } ' + 'span.ok   { background: #dcfce7; color: #15803d } ' +
+    'span.bad  { background: #fee2e2; color: #b91c1c } ' + 'li { margin-bottom: 4px; font-size: 13px } ' + 'code { font-size: 12px } ' + 'small { color: #64748b }';
 
 constructor TSendForm.CreateSending(AOwner: TComponent; const Title: string);
 begin
@@ -136,13 +115,13 @@ const
 var
   H: TStringList;
   Sections: TStringList;
-  I, J: Integer;
+  I, J: integer;
   Sec, Line, Verdict: string;
 
-  { one section's facts: its heading and a key/value table }
+{ one section's facts: its heading and a key/value table }
   function Card(const Name_: string): string;
   var
-    K, P1, P2: Integer;
+    K, P1, P2: integer;
     L: string;
   begin
     Result := '<h3>' + HtmlEsc(Name_) + '</h3><table>';
@@ -153,8 +132,7 @@ var
       if Copy(L, 1, P1 - 1) <> Name_ then Continue;
       Delete(L, 1, P1);
       P2 := Pos(#9, L);
-      Result := Result + '<tr><td class="key">' + HtmlEsc(Copy(L, 1, P2 - 1)) +
-        '</td><td class="val">' + HtmlEsc(Copy(L, P2 + 1, MaxInt)) + '</td></tr>';
+      Result := Result + '<tr><td class="key">' + HtmlEsc(Copy(L, 1, P2 - 1)) + '</td><td class="val">' + HtmlEsc(Copy(L, P2 + 1, MaxInt)) + '</td></tr>';
     end;
     Result := Result + '</table>';
   end;
@@ -163,36 +141,31 @@ begin
   H := TStringList.Create;
   Sections := TStringList.Create;
   try
-    H.Add('<html><head><meta charset="utf-8"><style>' + PAGE_CSS +
-      '</style></head><body>');
+    H.Add('<html><head><meta charset="utf-8"><style>' + PAGE_CSS + '</style></head><body>');
 
     if FBanner <> '' then
     begin
       if not FDone then Sec := 'b-run'
-      else if FFailed then Sec := 'b-bad' else Sec := 'b-ok';
-      H.Add('<table><tr><td class="banner ' + Sec + '">' +
-        '<div class="title">' + HtmlEsc(FBanner) + '</div>' +
-        '<div class="sub">' + HtmlEsc(FBannerSub) + '</div></td></tr></table>');
+      else if FFailed then Sec := 'b-bad'
+      else
+        Sec := 'b-ok';
+      H.Add('<table><tr><td class="banner ' + Sec + '">' + '<div class="title">' + HtmlEsc(FBanner) + '</div>' + '<div class="sub">' +
+        HtmlEsc(FBannerSub) + '</div></td></tr></table>');
     end;
 
     H.Add('<h3>Files</h3><table>');
-    H.Add('<tr><th>Part</th><th>File</th><th>Size</th>' +
-      '<th>Encrypted</th><th>Status</th></tr>');
+    H.Add('<tr><th>Part</th><th>File</th><th>Size</th>' + '<th>Encrypted</th><th>Status</th></tr>');
     if Length(FFiles) = 0 then
       H.Add('<tr><td colspan="5"><small>getting ready</small></td></tr>');
     for I := 0 to High(FFiles) do
     begin
-      Verdict := '<span class="pill ' + PILL[FFiles[I].State] + '">' +
-        WORD_[FFiles[I].State] + '</span>';
+      Verdict := '<span class="pill ' + PILL[FFiles[I].State] + '">' + WORD_[FFiles[I].State] + '</span>';
       if FFiles[I].Why <> '' then
         Verdict := Verdict + '<br><small>' + HtmlEsc(FFiles[I].Why) + '</small>';
       Line := FFiles[I].Encrypted;
       if Line = '' then Line := '-';
-      H.Add('<tr><td class="part">' + HtmlEsc(FFiles[I].What) + '</td>' +
-        '<td class="file">' + HtmlEsc(FFiles[I].Name_) + '</td>' +
-        '<td class="num">' + HtmlEsc(FFiles[I].Size) + '</td>' +
-        '<td class="num">' + HtmlEsc(Line) + '</td>' +
-        '<td>' + Verdict + '</td></tr>');
+      H.Add('<tr><td class="part">' + HtmlEsc(FFiles[I].What) + '</td>' + '<td class="file">' + HtmlEsc(FFiles[I].Name_) + '</td>' +
+        '<td class="num">' + HtmlEsc(FFiles[I].Size) + '</td>' + '<td class="num">' + HtmlEsc(Line) + '</td>' + '<td>' + Verdict + '</td></tr>');
     end;
     H.Add('</table>');
 
@@ -205,8 +178,7 @@ begin
     J := 0;
     if Sections.Count >= 2 then
     begin
-      H.Add('<div class="cards"><div>' + Card(Sections[0]) + '</div><div>' +
-        Card(Sections[1]) + '</div></div>');
+      H.Add('<div class="cards"><div>' + Card(Sections[0]) + '</div><div>' + Card(Sections[1]) + '</div></div>');
       J := 2;
     end;
     for I := J to Sections.Count - 1 do H.Add(Card(Sections[I]));
@@ -227,8 +199,7 @@ begin
   Application.ProcessMessages;
 end;
 
-function TSendForm.AddFile(const What, Name_, Size: string;
-  State: TSendState): Integer;
+function TSendForm.AddFile(const What, Name_, Size: string; State: TSendState): integer;
 begin
   Result := Length(FFiles);
   SetLength(FFiles, Result + 1);
@@ -239,8 +210,7 @@ begin
   Repaint_;
 end;
 
-procedure TSendForm.FileState(Idx: Integer; State: TSendState;
-  const Encrypted: string; const Why: string);
+procedure TSendForm.FileState(Idx: integer; State: TSendState; const Encrypted: string; const Why: string);
 begin
   if (Idx < 0) or (Idx > High(FFiles)) then Exit;
   FFiles[Idx].State := State;
@@ -255,8 +225,7 @@ begin
   FFacts.Add(Section + #9 + Key + #9 + Value);
 end;
 
-procedure TSendForm.Stage(const AStage, ADetail: string; Percent: Integer;
-  Hold: Integer);
+procedure TSendForm.Stage(const AStage, ADetail: string; Percent: integer; Hold: integer);
 begin
   lblStage.Caption := AStage;
   lblDetail.Caption := ADetail;
@@ -265,7 +234,7 @@ begin
   PauseFor(Hold);
 end;
 
-procedure TSendForm.Finish(const Msg, Detail, ClosingHTML: string; OK: Boolean);
+procedure TSendForm.Finish(const Msg, Detail, ClosingHTML: string; OK: boolean);
 begin
   lblStage.Caption := Msg;
   lblDetail.Caption := Detail;
@@ -274,7 +243,9 @@ begin
   FBanner := Msg;
   FBannerSub := Detail;
   FClosing := ClosingHTML;
-  if OK then pbProgress.Value := 100 else pbProgress.Value := 0;
+  if OK then pbProgress.Value := 100
+  else
+    pbProgress.Value := 0;
   { the banner says it now, so the page takes over the labels' and bar's
     room }
   Page.SetBounds(Page.Left, lblStage.Top, Page.Width,
@@ -298,8 +269,7 @@ end;
 
 { A drawn button cannot be the default, so Enter is handled here once Close
   is enabled. }
-procedure TSendForm.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TSendForm.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 begin
   if (Key = VK_RETURN) and btnClose.Enabled then
   begin
@@ -310,7 +280,7 @@ end;
 
 procedure TSendForm.btnCloseClick(Sender: TObject);
 begin
-  ModalResult := mrOK;
+  ModalResult := mrOk;
 end;
 
 end.
