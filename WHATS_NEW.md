@@ -21,6 +21,16 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Fixed
+
+- **The help window's find box writes in ink you can see.**  It was
+  borrowing the page's text color - nearly white in the dark theme - and
+  writing it on a white box, so typing looked like it did nothing.  The
+  keys were arriving all along; now the letters and the blinking caret
+  show in black.
+
 ## v2026.10.12
 
 ### Fixed
