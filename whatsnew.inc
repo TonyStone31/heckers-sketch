@@ -24,10 +24,17 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
-    '## Next release' + LineEnding +
+    '## v2026.10.12.1' + LineEnding +
     '' + LineEnding +
     '### Fixed' + LineEnding +
     '' + LineEnding +
+    '- **Updating the program now updates the document icons with it.**  The' + LineEnding +
+    '  built-in updater replaces just the program file, which used to leave' + LineEnding +
+    '  yesterday''s icon files sitting beside it - so the icon fix never arrived' + LineEnding +
+    '  on machines that updated in-app.  The document icon now lives inside the' + LineEnding +
+    '  program itself, Windows is pointed straight at it, and Linux refreshes' + LineEnding +
+    '  the icon file beside the program on start.  With Repair at Start-up on,' + LineEnding +
+    '  everything corrects itself the first time the new version runs.' + LineEnding +
     '- **The help window''s find box writes in ink you can see.**  It was' + LineEnding +
     '  borrowing the page''s text color - nearly white in the dark theme - and' + LineEnding +
     '  writing it on a white box, so typing looked like it did nothing.  The' + LineEnding +
