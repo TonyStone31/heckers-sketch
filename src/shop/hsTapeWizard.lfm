@@ -1,7 +1,7 @@
 object TapeWizard: TTapeWizard
-  Left = 370
+  Left = 10
   Height = 560
-  Top = 145
+  Top = 10
   Width = 760
   BorderStyle = bsDialog
   Caption = 'Tape it - the offsets from a floor or ceiling and a wall'

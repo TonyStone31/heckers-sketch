@@ -1,7 +1,7 @@
 object RadiantHeatForm: TRadiantHeatForm
-  Left = 320
+  Left = 10
   Height = 700
-  Top = 140
+  Top = 10
   Width = 1100
   BorderStyle = bsDialog
   Caption = 'Heat load, flow and the boiler'

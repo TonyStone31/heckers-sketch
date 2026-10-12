@@ -1,7 +1,7 @@
 object RadiantForm: TRadiantForm
-  Left = 300
+  Left = 10
   Height = 754
-  Top = 120
+  Top = 10
   Width = 1340
   BorderStyle = bsDialog
   Caption = 'Lay out the radiant tube'

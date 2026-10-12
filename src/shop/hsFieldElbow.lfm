@@ -1,7 +1,7 @@
 object FieldElbowForm: TFieldElbowForm
-  Left = 400
+  Left = 10
   Height = 494
-  Top = 200
+  Top = 10
   Width = 820
   BorderStyle = bsDialog
   Caption = 'Elbow from field measurements'

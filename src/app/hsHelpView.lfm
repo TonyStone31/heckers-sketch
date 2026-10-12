@@ -1,7 +1,7 @@
 object HelpForm: THelpForm
-  Left = 300
+  Left = 10
   Height = 760
-  Top = 120
+  Top = 10
   Width = 1040
   Caption = 'Heckers Sketch - Help'
   ClientHeight = 760

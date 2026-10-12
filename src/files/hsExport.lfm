@@ -1,7 +1,7 @@
 object ExportDlg: TExportDlg
-  Left = 310
+  Left = 10
   Height = 604
-  Top = 123
+  Top = 10
   Width = 880
   BorderStyle = bsNone
   Caption = 'Export'

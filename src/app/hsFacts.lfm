@@ -1,7 +1,7 @@
 object FactsBox: TFactsBox
-  Left = 370
+  Left = 10
   Height = 366
-  Top = 240
+  Top = 10
   Width = 760
   BorderStyle = bsNone
   Caption = 'Facts'

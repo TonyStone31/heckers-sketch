@@ -1,7 +1,7 @@
 object AboutBox: TAboutBox
-  Left = 400
+  Left = 10
   Height = 770
-  Top = 40
+  Top = 10
   Width = 700
   BorderStyle = bsNone
   Caption = 'About Heckers Sketch'

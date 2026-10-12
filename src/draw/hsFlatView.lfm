@@ -1,7 +1,7 @@
 object FlatForm: TFlatForm
-  Left = 300
+  Left = 10
   Height = 680
-  Top = 85
+  Top = 10
   Width = 900
   Caption = 'Flat pattern'
   ClientHeight = 680

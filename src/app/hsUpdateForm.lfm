@@ -1,7 +1,7 @@
 object UpdateForm: TUpdateForm
-  Left = 420
+  Left = 10
   Height = 190
-  Top = 280
+  Top = 10
   Width = 520
   BorderIcons = []
   BorderStyle = bsDialog

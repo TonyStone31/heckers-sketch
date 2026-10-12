@@ -1,7 +1,7 @@
 object RadiantBusyForm: TRadiantBusyForm
-  Left = 520
+  Left = 10
   Height = 492
-  Top = 240
+  Top = 10
   Width = 1100
   BorderIcons = []
   Caption = 'Searching for a layout'

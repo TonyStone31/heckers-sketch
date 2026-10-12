@@ -1,7 +1,7 @@
 object AssistantSettingsForm: TAssistantSettingsForm
-  Left = 400
+  Left = 10
   Height = 420
-  Top = 200
+  Top = 10
   Width = 520
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog

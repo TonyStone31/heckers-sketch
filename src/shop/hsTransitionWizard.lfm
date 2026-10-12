@@ -1,7 +1,7 @@
 object TransitionForm: TTransitionForm
-  Left = 360
+  Left = 10
   Height = 748
-  Top = 160
+  Top = 10
   Width = 800
   BorderStyle = bsDialog
   Caption = 'Build a fitting'

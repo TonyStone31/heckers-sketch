@@ -1,7 +1,7 @@
 object SourceForm: TSourceForm
-  Left = 984
+  Left = 10
   Height = 863
-  Top = 638
+  Top = 10
   Width = 1202
   BorderStyle = bsSizeToolWin
   Caption = 'Source'

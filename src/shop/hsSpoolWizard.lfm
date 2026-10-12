@@ -1,7 +1,7 @@
 object SpoolForm: TSpoolForm
-  Left = 300
+  Left = 10
   Height = 740
-  Top = 120
+  Top = 10
   Width = 1000
   BorderStyle = bsDialog
   Caption = 'Fitter''s scratchpad - pipe spool'

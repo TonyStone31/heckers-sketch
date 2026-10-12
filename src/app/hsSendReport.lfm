@@ -1,7 +1,7 @@
 object SendForm: TSendForm
-  Left = 420
+  Left = 10
   Height = 740
-  Top = 200
+  Top = 10
   Width = 920
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog

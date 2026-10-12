@@ -1,7 +1,7 @@
 object StairForm: TStairForm
-  Left = 250
+  Left = 10
   Height = 700
-  Top = 60
+  Top = 10
   Width = 1000
   BorderStyle = bsDialog
   Caption = 'Stairs'

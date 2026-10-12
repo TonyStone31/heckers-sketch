@@ -1,7 +1,7 @@
 object AssistantForm: TAssistantForm
-  Left = 300
+  Left = 10
   Height = 700
-  Top = 120
+  Top = 10
   Width = 560
   ActiveControl = memAsk
   Caption = 'Assistant'

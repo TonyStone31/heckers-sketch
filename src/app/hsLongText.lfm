@@ -1,7 +1,7 @@
 object LongTextForm: TLongTextForm
-  Left = 250
+  Left = 10
   Height = 640
-  Top = 100
+  Top = 10
   Width = 1000
   Caption = 'Long text'
   ClientHeight = 640

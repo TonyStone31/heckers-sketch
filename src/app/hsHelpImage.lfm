@@ -1,7 +1,7 @@
 object HelpImageForm: THelpImageForm
-  Left = 200
+  Left = 10
   Height = 800
-  Top = 80
+  Top = 10
   Width = 1200
   Caption = 'Heckers Sketch - Picture'
   ClientHeight = 800

@@ -1,7 +1,7 @@
 object HelloForm: THelloForm
-  Left = 420
+  Left = 10
   Height = 670
-  Top = 200
+  Top = 10
   Width = 640
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog

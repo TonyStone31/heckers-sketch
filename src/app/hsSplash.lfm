@@ -1,7 +1,7 @@
 object SplashForm: TSplashForm
-  Left = 440
+  Left = 10
   Height = 330
-  Top = 260
+  Top = 10
   Width = 620
   BorderStyle = bsNone
   Caption = 'Heckers Sketch'
