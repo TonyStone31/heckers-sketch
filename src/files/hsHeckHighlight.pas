@@ -12,10 +12,17 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  SynEditHighlighter, SynEditHighlighterFoldBase, LazEditTextAttributes,
-  LazEditHighlighter, LazEditFoldHighlighter;
+  SynEditHighlighter, SynEditHighlighterFoldBase, SynEditTypes
+  {$ifndef HSK_LEGACY_SYNEDIT}
+  {$define HSK_LAZEDIT}
+  , LazEditTextAttributes, LazEditHighlighter, LazEditFoldHighlighter
+  {$endif};
 
 type
+  {$ifndef HSK_LAZEDIT}
+  TLazEditTextAttribute = TSynHighlighterAttributes;
+  TLazEditHighlighterAttributes = TSynHighlighterAttributes;
+  {$endif}
   THskToken = (htSpace, htComment, htKey, htProp, htName, htText, htSymbol,
     htEast, htNorth, htUp, htNumber, htColor);
 
@@ -32,6 +39,9 @@ type
     FListOpens, FListCloses: boolean;  { "key = (" and the ")" that ends it }
     FSeenEquals: boolean;
     FAxisNext: THskToken;              { the number after "x" is red, and so on }
+    {$ifndef HSK_LAZEDIT}
+    function LinePtr: PChar;
+    {$endif}
     function LineLen_: integer;
     function WordAt(P: integer; out Len: integer): string;
     function AxisOf(const W: string): THskToken;
@@ -43,9 +53,17 @@ type
   public
     class function GetLanguageName: string; override;
     constructor Create(AOwner: TComponent); override;
+    {$ifdef HSK_LAZEDIT}
     function GetTokenClassAttribute(ATkClass: TLazEditTokenClass; ATkDetails: TLazEditTokenDetails = []): TLazEditTextAttribute; override;
+    {$else}
+    function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
+    {$endif}
     function GetEol: boolean; override;
+    {$ifdef HSK_LAZEDIT}
     procedure InitForScanningLine; override;
+    {$else}
+    procedure SetLine(const NewValue: String; LineNumber: Integer); override;
+    {$endif}
     function GetToken: string; override;
     procedure GetTokenEx(out TokenStart: PChar; out TokenLength: integer); override;
     function GetTokenAttribute: TLazEditTextAttribute; override;
@@ -126,6 +144,7 @@ begin
   Result := 'Heckers Sketch 2';
 end;
 
+{$ifdef HSK_LAZEDIT}
 function TSynHsk2Syn.GetTokenClassAttribute(ATkClass: TLazEditTokenClass; ATkDetails: TLazEditTokenDetails): TLazEditTextAttribute;
 begin
   case ATkClass of
@@ -140,6 +159,26 @@ begin
       Result := nil;
   end;
 end;
+
+{$else}
+function TSynHsk2Syn.GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
+begin
+  case Index of
+    SYN_ATTR_COMMENT: Result := FAttr[htComment];
+    SYN_ATTR_IDENTIFIER: Result := FAttr[htName];
+    SYN_ATTR_KEYWORD: Result := FAttr[htKey];
+    SYN_ATTR_STRING: Result := FAttr[htText];
+    SYN_ATTR_WHITESPACE: Result := FAttr[htSpace];
+    SYN_ATTR_SYMBOL: Result := FAttr[htSymbol];
+    else Result := nil;
+  end;
+end;
+
+function TSynHsk2Syn.LinePtr: PChar;
+begin
+  Result := PChar(CurrentLineText);
+end;
+{$endif}
 
 function TSynHsk2Syn.GetFoldConfigInstance(Index: integer): TSynCustomFoldConfig;
 begin
@@ -195,7 +234,11 @@ end;
 
 { Rule 7, worked out once for the line: is there an "=" outside text and
   notes?  No, and it opens a block - unless it is "end", or the header. }
+{$ifdef HSK_LAZEDIT}
 procedure TSynHsk2Syn.InitForScanningLine;
+{$else}
+procedure TSynHsk2Syn.SetLine(const NewValue: String; LineNumber: Integer);
+{$endif}
 var
   L: PChar;
   I, N, WLen: integer;
@@ -242,8 +285,7 @@ begin
   { inside a bracketed list the lines are its items, not blocks }
   { A "begin" under the block's opening word opens nothing; the block is
     already open. }
-  FOpens := (not HasEq) and (WLen > 0) and (not FCloses) and (W <> 'heckerssketch') and (W <> 'begin') and (not FListCloses) and
-    (PtrUInt(TopCodeFoldBlockType) <> 2);
+  FOpens := (not HasEq) and (WLen > 0) and (not FCloses) and (W <> 'heckerssketch') and (W <> 'begin') and (not FListCloses) and (PtrUInt(TopCodeFoldBlockType) <> 2);
   { In a group, everything after the jig line is the jig's output and folds
     under that line.  The fold closes at the group's "end". }
   FJigLine := HasEq and (W = 'jig') and (PtrUInt(TopCodeFoldBlockType) = 1);

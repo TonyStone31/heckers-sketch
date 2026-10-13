@@ -1,6 +1,6 @@
 # Heckers Sketch
 
-A simple 3D sketching program for Windows and Linux PCs, modeled on SketchUp.
+A simple 3D sketching program for Windows, Linux and Mac, modeled on SketchUp.
 Free Pascal / Lazarus, free to use, MIT licensed.
 
 ## Get it
@@ -12,6 +12,7 @@ installer, no account.  Pick the one for your computer and run it:
 | --- | --- |
 | `heckers-sketch.exe` | Windows |
 | `heckers-sketch-linux` | Linux (`chmod +x` it first) |
+| `heckers-sketch-macos.zip` | macOS 11 or later - new, see [on a Mac](#on-a-mac) |
 
 > **This is an early beta.**  It works, I use it at work, and it is
 > changing every few days.  Expect rough edges, and expect to be asked to
@@ -30,10 +31,9 @@ from a copy it keeps beside itself.
 a program in <a href="examples/">examples/</a> rather than modeled by
 hand.</i></p>
 
-> **It is a desktop program.**  It needs a Windows or Linux computer with a
-> mouse and a keyboard.  There is no phone or tablet version, and it does not
-> run in a web browser.  There's no Mac version yet either -
-> [help wanted](#mac-builders-wanted).
+> **It is a desktop program.**  It needs a Windows, Linux or Mac computer
+> with a mouse and a keyboard.  There is no phone or tablet version, and it
+> does not run in a web browser.
 
 ---
 
@@ -117,6 +117,24 @@ run from a USB stick.  It keeps its own copy of the manual in a `help`
 folder beside itself, fetched from the matching release.
 `--help` lists the command-line switches.
 
+### On a Mac
+
+Unzip it and drag **Heckers Sketch** wherever you keep applications.  The
+app is not signed, so macOS refuses the first start: open **System
+Settings -> Privacy & Security** and choose **Open Anyway**.  A Mac
+application can't keep things beside itself, so there the settings live in
+`~/Library/Application Support/Heckers Sketch`, and drawings and exports are
+offered `~/Documents/Heckers Sketch`.
+
+<p align="center">
+  <img src="docs/media/mac.png" width="720" alt="Heckers Sketch on macOS, a box drawn and pushed up.">
+</p>
+
+The Mac build is new.  It is an Intel build, tested on macOS 15 (Sequoia);
+an Apple Silicon Mac runs it through Rosetta.  Opening a drawing by
+double-clicking it in Finder doesn't work yet - use File > Open.  If
+something is off on your Mac, [tell me](../../issues).
+
 ## What it does on the network, plainly
 
 No account, no sign-in, no tracking, and nothing that identifies you or
@@ -169,15 +187,19 @@ The program is built into `bin/`, and run from there it keeps its settings,
 drafts, examples and exports in `bin/` too, out of the way of the source.
 Developed on Linux; the Windows build is cross-compiled.
 
-### Mac builders wanted
+### macOS
 
-A macOS build has never been tried.  I don't have a Mac, so if you do and
-you'd like to have a go, I'd love the help.  It's Lazarus/LCL plus
-BGRABitmap, BGRAControls and LazInk, which are all meant to work on macOS,
-and nearly all the drawing is done in the program's own pixel buffers
-rather than through the platform, so there's a fair chance it builds
-without much trouble.  Open an issue or a pull request with how it went -
-even a list of what broke is useful.
+The Mac build is made with the released Lazarus (4.8, FPC 3.2.4) and the
+Cocoa widgetset, with the same packages registered:
+
+```sh
+./build-macos.sh        # into bin/
+./build-macos.sh app    # dist/Heckers Sketch.app and its zip
+```
+
+It looks for Lazarus in `~/Developer/lazarus`; set `LAZARUS_DIR` for
+another.  The checks pass on macOS 15 on an Intel virtual machine, which is
+the only Mac it has been run on.
 
 ## Source layout
 

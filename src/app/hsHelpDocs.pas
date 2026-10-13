@@ -78,6 +78,27 @@ implementation
 uses
   zipper, hsPaths, hsUpdater, hsNet, FileUtil;
 
+type
+  THelpUnZipper = class(TUnZipper)
+  protected
+    procedure UnZipOneFile(Item: TFullZipFileEntry); override;
+  end;
+
+procedure THelpUnZipper.UnZipOneFile(Item: TFullZipFileEntry);
+begin
+  { FPC marks a zip it wrote on a Mac as OS X, then reads the file modes
+    from the wrong half of the field and unpacks files nobody can read. }
+  if Item.OS = OS_OSX then
+  begin
+    if (Item.Attributes and $FFFF0000) <> 0 then
+      Item.Attributes := Item.Attributes shr 16;
+    Item.OS := OS_UNIX;
+  end;
+  if Item.IsLink then
+    raise Exception.Create('the help archive contains a symbolic link');
+  inherited UnZipOneFile(Item);
+end;
+
 const
   { the manual is a few megabytes; anything near these is wrong }
   MAX_FILES = 5000;
@@ -170,7 +191,7 @@ begin
   if DirectoryExists(Fresh) then DeleteDirectory(Fresh, False);
   if DirectoryExists(Old) then DeleteDirectory(Old, False);
 
-  Z := TUnZipper.Create;
+  Z := THelpUnZipper.Create;
   try
     try
       Z.FileName := ZipPath;

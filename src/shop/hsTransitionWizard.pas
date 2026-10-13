@@ -178,7 +178,7 @@ implementation
 {$R *.lfm}
 
 uses
-  hsMainForm, hsMailOut;
+  hsMainForm, hsMailOut, hsPlatformShell;
 
 { Reported from here so the screenshot and text include this dialog; the
   main window's report cannot see it. }
@@ -1130,7 +1130,7 @@ begin
   else
   begin
     ShowMessage(Err + LineEnding + LineEnding + 'The plan, the corner view and the ticket ' + 'are in ' + Dir + ' - attach them by hand.');
-    SelectInFolder(Files[0]);
+    ShowFileInFolder(Files[0]);
   end;
 end;
 
@@ -1145,7 +1145,7 @@ begin
     ShowMessage('The pictures could not be written under ' + Dir);
     Exit;
   end;
-  if SelectInFolder(Files[0]) then
+  if ShowFileInFolder(Files[0]) then
     lblProblem.Caption := 'The plan, the corner view and the ticket are in ' + Dir
   else
     ShowMessage('The plan, the corner view and the ticket are in ' + Dir + LineEnding + '(no file manager answered to show them)');

@@ -18,8 +18,10 @@ const
   { docs/help as published by the Manual workflow, for a copy with no local
     help folder. }
   MANUAL_URL = 'https://tonystone31.github.io/heckers-sketch/';
-  {$IFDEF WINDOWS}
+  {$IF DEFINED(WINDOWS)}
   ASSET_NAME = 'heckers-sketch.exe';
+  {$ELSEIF DEFINED(DARWIN)}
+  ASSET_NAME = 'heckers-sketch-macos';
   {$ELSE}
   ASSET_NAME = 'heckers-sketch-linux';
   {$ENDIF}
@@ -293,13 +295,22 @@ function Sha256Of(const Path: string): string;
 var
   F: TFileStream;
   D: TSHA256Digest;
-  I: integer;
+  Hash: TSHA256;
+  Buffer: array[0..65535] of byte;
+  I, Count: integer;
 begin
   Result := '';
   try
     F := TFileStream.Create(Path, fmOpenRead or fmShareDenyNone);
     try
-      D := TSHA256.Stream(F);
+      { not TSHA256.Stream: FPC 3.2.4's reads over its own buffer pointer }
+      Hash.Init;
+      repeat
+        Count := F.Read(Buffer, SizeOf(Buffer));
+        if Count > 0 then Hash.Update(@Buffer[0], Count);
+      until Count = 0;
+      Hash.Final;
+      D := Hash.Digest;
     finally
       F.Free;
     end;

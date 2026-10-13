@@ -104,7 +104,7 @@ implementation
 {$R *.lfm}
 
 uses
-  hsMainForm, hsMailOut;
+  hsMainForm, hsMailOut, hsPlatformShell;
 
 const
   { the six axes, then the twelve 45s, as paper advances }
@@ -605,9 +605,8 @@ begin
     begin
       C.Pen.Color := $00A05020;
       C.Brush.Style := bsClear;
-      C.Polygon([Point(B.X - (B.X - A.X) div 5 - 6, B.Y - (B.Y - A.Y) div 5 - 6), Point(B.X - (B.X - A.X) div 5 + 6, B.Y -
-        (B.Y - A.Y) div 5 + 6), Point(B.X - (B.X - A.X) div 10 + 3, B.Y - (B.Y - A.Y) div 10 + 3), Point(B.X -
-        (B.X - A.X) div 10 - 3, B.Y - (B.Y - A.Y) div 10 - 3)]);
+      C.Polygon([Point(B.X - (B.X - A.X) div 5 - 6, B.Y - (B.Y - A.Y) div 5 - 6), Point(B.X - (B.X - A.X) div 5 + 6, B.Y - (B.Y - A.Y) div 5 + 6),
+        Point(B.X - (B.X - A.X) div 10 + 3, B.Y - (B.Y - A.Y) div 10 + 3), Point(B.X - (B.X - A.X) div 10 - 3, B.Y - (B.Y - A.Y) div 10 - 3)]);
       C.Font.Color := clGray;
       C.TextOut(B.X - (B.X - A.X) div 6 + 8, B.Y - (B.Y - A.Y) div 6 + 8,
         'red. ' + NPS_NAMES[EnsureRange(FLegs[I].NewSize, 0, High(NPS_NAMES))]);
@@ -782,7 +781,7 @@ begin
   else
   begin
     ShowMessage(Err + LineEnding + LineEnding + 'The iso, the corner view and the ticket ' + 'are in ' + Dir + ' - attach them by hand.');
-    SelectInFolder(Files[0]);
+    ShowFileInFolder(Files[0]);
   end;
 end;
 
@@ -796,7 +795,7 @@ begin
     ShowMessage('The pictures could not be written under ' + Dir);
     Exit;
   end;
-  if SelectInFolder(Files[0]) then
+  if ShowFileInFolder(Files[0]) then
     lblStatus.Caption := 'The iso, the corner view and the ticket are in ' + Dir
   else
     ShowMessage('The iso, the corner view and the ticket are in ' + Dir);

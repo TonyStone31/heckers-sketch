@@ -12,7 +12,7 @@ unit hsExport;
 interface
 
 uses
-  Classes, SysUtils, Math, Types, Graphics, Controls, Forms, StdCtrls,
+  Classes, SysUtils, Math, StrUtils, Types, Graphics, Controls, Forms, StdCtrls,
   ExtCtrls, ComCtrls, Dialogs, LCLType,
   BCButton, BCPanel, BCLabel,
   hsPdf, hsSurface, hsDrawing, hsSkin, hsDialogSkin, hsFilm, hsRecorder, BCComboBox, BCFluentSlider, BGRATheme, BGRAThemeCheckBox, InkEdit;
@@ -187,8 +187,8 @@ type
     procedure WriteIt;
   public
     { what is being exported and where things go, set after the form is made }
-    procedure Setup(Doc: TWorkDoc; const V: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
-      SrcW, SrcH: integer; const Suggest: string; DirFor: TDirFor; DirKeep: TDirKeep);
+    procedure Setup(Doc: TWorkDoc; const V: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single; SrcW, SrcH: integer;
+      const Suggest: string; DirFor: TDirFor; DirKeep: TDirKeep);
   end;
 
 type
@@ -220,10 +220,10 @@ const
     ('.png', '.jpg', '.webp', '.svg', '.dxf', '.dxf', '.stl', '.scad', '.pdf');
   KIND_BLURB: array[TExportKind] of string =
     ('A picture, with the paper behind it or nothing at all.', 'A picture, smaller and slightly softened.  No transparency.',
-    'A little film of a move you record yourself - lossless, every line ' + 'as sharp as it is on screen.',
-    'The lines of this view, as vectors, for a drawing program.', 'This view, flat, as entities somebody can measure in their own CAD.',
-    'The model itself, in three dimensions, faces and all.', 'Triangles in millimeters, which is what a 3D printer wants.',
-    'A polyhedron per solid, to cut and union in OpenSCAD.', 'Paper, orientation, then print scale. Vector geometry; 10 mm margins and a scale bar. Print at 100%.');
+    'A little film of a move you record yourself - lossless, every line ' + 'as sharp as it is on screen.', 'The lines of this view, as vectors, for a drawing program.',
+    'This view, flat, as entities somebody can measure in their own CAD.', 'The model itself, in three dimensions, faces and all.',
+    'Triangles in millimeters, which is what a 3D printer wants.', 'A polyhedron per solid, to cut and union in OpenSCAD.',
+    'Paper, orientation, then print scale. Vector geometry; 10 mm margins and a scale bar. Print at 100%.');
 
   { ------------------------------------------------------------------------ }
 
@@ -796,9 +796,9 @@ begin
     H := 0;
   end;
   Fields := Format('export=%s stage=%s' + LineEnding + 'asked for=%dx%d from a %dx%d screen, size choice %d' + LineEnding +
-    'film=%d a second, loop=%s, recorded=%.1fs, axes=%s' + LineEnding + 'what it said: %s' + LineEnding + 'path=%s',
-    [KIND_NAME[FKind], FStage, W, H, FSrcW, FSrcH, cbSize.ItemIndex, FILM_FPS, BoolToStr(cbLoop.Checked, 'yes', 'no'), CamPathLength(FCam),
-    BoolToStr(cbAxes.Checked, 'yes', 'no'), FMsg, ExtractFileName(edPath.Text)]);
+    'film=%d a second, loop=%s, recorded=%.1fs, axes=%s' + LineEnding + 'what it said: %s' + LineEnding + 'path=%s', [KIND_NAME[FKind],
+    FStage, W, H, FSrcW, FSrcH, cbSize.ItemIndex, FILM_FPS, BoolToStr(cbLoop.Checked, 'yes', 'no'), CamPathLength(FCam), BoolToStr(cbAxes.Checked, 'yes', 'no'),
+    FMsg, ExtractFileName(edPath.Text)]);
   ModalResult := mrCancel;
   { The report needs a screenshot and this window is in front, so close it
     first; the main window then raises the report. }
@@ -881,7 +881,7 @@ begin
       on E: Exception do
       begin
         { Include the class name: an access violation's message says nothing useful. }
-        FMsg := Format('Could not export - %s while %s%s', [E.ClassName, FStage, specialize IfThen<string>(E.Message = '', '', ': ' + E.Message)]);
+        FMsg := Format('Could not export - %s while %s%s', [E.ClassName, FStage, StrUtils.IfThen(E.Message = '', '', ': ' + E.Message)]);
         lblHint.Caption := FMsg;
         lblTellBad.Caption := FMsg;
         lblTellBad.Visible := True;
@@ -966,10 +966,10 @@ begin
       begin
         FOpenSolid := True;
         FMsg := Format('%d triangles in %d %s, in millimeters - but this ' + 'is not a closed solid, and a printer will not take it.  The ' +
-          'edges where it is open are marked in red on the drawing.', [N, NTri, specialize IfThen<string>(NTri = 1, 'piece', 'pieces')]);
+          'edges where it is open are marked in red on the drawing.', [N, NTri, StrUtils.IfThen(NTri = 1, 'piece', 'pieces')]);
       end
       else
-        FMsg := Format('%d triangles in %d %s, in millimeters.', [N, NTri, specialize IfThen<string>(NTri = 1, 'piece', 'pieces')]);
+        FMsg := Format('%d triangles in %d %s, in millimeters.', [N, NTri, StrUtils.IfThen(NTri = 1, 'piece', 'pieces')]);
     end;
 
     exStl:
@@ -1000,8 +1000,7 @@ begin
         raise Exception.Create('there is no clip yet - press Record a move');
       if not OutSize(W, H) then raise Exception.Create('that size will not do');
       FStage := Format('drawing the frames at %dx%d', [W, H]);
-      N := SavePathFilm(FDoc, FCam, FSrcW, FSrcH, W, H, FUnits, FFont, FLabelCol, FEdgeW, FILM_FPS, cbLoop.Checked, cbAxes.Checked,
-        Fn, cbBounce.Checked, FilmSeconds);
+      N := SavePathFilm(FDoc, FCam, FSrcW, FSrcH, W, H, FUnits, FFont, FLabelCol, FEdgeW, FILM_FPS, cbLoop.Checked, cbAxes.Checked, Fn, cbBounce.Checked, FilmSeconds);
       FMsg := Format('Wrote %s - %d frames, %d x %d.', [ExtractFileName(Fn), N, W, H]);
     end;
 

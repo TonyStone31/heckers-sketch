@@ -88,6 +88,88 @@ implementation
 
 uses SysUtils, Math, hsSvg;
 
+{ fcl-pdf in FPC 3.2 keeps the paper in whole points, which puts A4 a tenth
+  of a millimeter out.  There the page entry is written here instead. }
+  {$if not declared(TPDFFloatObject)}
+  {$define WHOLE_POINT_PAPER}
+  {$endif}
+
+type
+  { A document whose pages are all one size, in mm. }
+  TSizedPDF = class(TPDFDocument)
+    {$ifdef WHOLE_POINT_PAPER}
+  protected
+    function CreatePageEntry(Parent, PageNum: integer): integer; override;
+  {$endif}
+  public
+    PageW, PageH: double;
+    constructor Create(W, H: double); reintroduce;
+    function AddSizedPage: TPDFPage;
+  end;
+
+constructor TSizedPDF.Create(W, H: double);
+begin
+  inherited Create(nil);
+  PageW := W;
+  PageH := H;
+end;
+
+function TSizedPDF.AddSizedPage: TPDFPage;
+var
+  Paper: TPDFPaper;
+begin
+  Result := Pages.AddPage;
+  Paper := Default(TPDFPaper);
+  {$ifdef WHOLE_POINT_PAPER}
+  Paper.W := Round(PageW * 72 / 25.4);
+  Paper.H := Round(PageH * 72 / 25.4);
+  {$else}
+  Paper.W := PageW * 72 / 25.4;
+  Paper.H := PageH * 72 / 25.4;
+  {$endif}
+  Result.Paper := Paper;
+end;
+
+{$ifdef WHOLE_POINT_PAPER}
+type
+  TOpenDict = class(TPDFDictionary);
+  TOpenArray = class(TPDFArray);
+
+{ The library's own, but for the MediaBox. }
+function TSizedPDF.CreatePageEntry(Parent, PageNum: integer): integer;
+var
+  Entry, Above, Resources: TPDFDictionary;
+  Box, ProcSet: TPDFArray;
+  Count: TPDFInteger;
+  W, H: string;
+begin
+  Entry := CreateGlobalXRef.Dict;
+  Result := GlobalXRefCount - 1;
+  TOpenDict(Entry).AddName('Type', 'Page');
+  TOpenDict(Entry).AddReference('Parent', Parent);
+  Above := GlobalXRefs[Parent].Dict;
+  Count := Above.ValueByName('Count') as TPDFInteger;
+  Count.Value := Count.Value + 1;
+  TOpenArray(Above.ValueByName('Kids')).AddItem(CreateReference(Result));
+  Str(PageW * 72 / 25.4: 0: 4, W);
+  Str(PageH * 72 / 25.4: 0: 4, H);
+  Box := CreateArray;
+  TOpenArray(Box).AddFreeFormArrayValues('0 0 ' + W + ' ' + H);
+  TOpenDict(Entry).AddElement('MediaBox', Box);
+  CreateAnnotEntries(PageNum, Entry);
+  Resources := CreateDictionary;
+  TOpenDict(Entry).AddElement('Resources', Resources);
+  ProcSet := CreateArray;
+  TOpenDict(Resources).AddElement('ProcSet', ProcSet);
+  TOpenArray(ProcSet).AddItem(CreateName('PDF'));
+  TOpenArray(ProcSet).AddItem(CreateName('Text'));
+  TOpenArray(ProcSet).AddItem(CreateName('ImageC'));
+  if Fonts.Count > 0 then TOpenDict(Resources).AddElement('Font', CreateDictionary);
+  if Pages[PageNum].HasImages then TOpenDict(Resources).AddElement('XObject', CreateDictionary);
+end;
+
+{$endif}
+
 { The system sans font file the export embeds, or '' when there is none. }
 function SansFontFile(Bold: boolean): string;
 begin
@@ -96,6 +178,12 @@ begin
   Result := IncludeTrailingPathDelimiter(GetEnvironmentVariable('WINDIR')) + 'Fonts\' + Result;
   if FileExists(Result) then Exit;
   {$else}
+  {$ifdef darwin}
+  if Bold then Result := '/System/Library/Fonts/Supplemental/Arial Bold.ttf'
+  else
+    Result := '/System/Library/Fonts/Supplemental/Arial.ttf';
+  if FileExists(Result) then Exit;
+  {$endif}
   if Bold then Result := '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
   else
     Result := '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
@@ -258,9 +346,8 @@ end;
 procedure SaveDrawingPDF(Doc: TWorkDoc; const V: TProjector; SrcW, SrcH: integer; U: TUnitSystem; EdgeW: single; const Path: string;
   PageW, PageH, Denominator: double; Axes: boolean);
 var
-  PDF: TPDFDocument;
+  PDF: TSizedPDF;
   Page: TPDFPage;
-  Paper: TPDFPaper;
   Writer: TPDFVectorWriter;
   PV: TProjector;
   W, H, MMUnit, Bar, BarMM, Extent: double;
@@ -282,7 +369,7 @@ begin
   PV.Ppu := MMUnit / Denominator * 96 / 25.4;
   PV.OX := W / 2 + (V.OX - SrcW / 2) * PV.Ppu / V.Ppu;
   PV.OY := H / 2 + (V.OY - SrcH / 2) * PV.Ppu / V.Ppu;
-  PDF := TPDFDocument.Create(nil);
+  PDF := TSizedPDF.Create(PageW, PageH);
   try
     PDF.Options := [poSubsetFont, poCompressFonts];
     PDF.Infos.Title := ChangeFileExt(ExtractFileName(Path), '');
@@ -290,11 +377,7 @@ begin
     PDF.Infos.CreationDate := Now;
     PDF.DefaultUnitOfMeasure := uomMillimeters;
     PDF.StartDocument;
-    Page := PDF.Pages.AddPage;
-    Paper := Default(TPDFPaper);
-    Paper.W := PageW * 72 / 25.4;
-    Paper.H := PageH * 72 / 25.4;
-    Page.Paper := Paper;
+    Page := PDF.AddSizedPage;
     PDF.Sections.AddSection.AddPage(Page);
     Writer := TPDFVectorWriter.Create(PDF, Page, PageH - PDF_MARGIN);
     try
@@ -373,7 +456,7 @@ begin
   FW := PageW;
   FH := PageH;
   FPages := TList.Create;
-  FPDF := TPDFDocument.Create(nil);
+  FPDF := TSizedPDF.Create(PageW, PageH);
   FPDF.Options := [poSubsetFont, poCompressFonts];
   FPDF.Infos.Title := Title;
   FPDF.Infos.Producer := 'Heckers Sketch';
@@ -415,14 +498,8 @@ begin
 end;
 
 function TPdfBook.NewPage: integer;
-var
-  Paper: TPDFPaper;
 begin
-  FPage := FPDF.Pages.AddPage;
-  Paper := Default(TPDFPaper);
-  Paper.W := FW * 72 / 25.4;
-  Paper.H := FH * 72 / 25.4;
-  FPage.Paper := Paper;
+  FPage := TSizedPDF(FPDF).AddSizedPage;
   FSection.AddPage(FPage);
   FPages.Add(FPage);
   Result := FPages.Count;

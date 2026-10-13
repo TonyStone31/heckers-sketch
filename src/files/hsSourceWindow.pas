@@ -190,7 +190,11 @@ type
     FForm: TSourceForm;
   public
     procedure Paint(Canvas: TCanvas; AClip: TRect; FirstLine, LastLine: integer); override;
+    {$ifdef HSK_LEGACY_SYNEDIT}
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    {$else}
     procedure MouseDown(const AnInfo: TSynEditMouseActionInfo); override;
+    {$endif}
     { Fold the jig's output under this line.  Done here because a friend of
       the editor can reach the folded view and the form cannot. }
     procedure FoldLine(Line: integer);
@@ -221,7 +225,11 @@ begin
   H := SynEdit.LineHeight;
   for I := FirstLine to LastLine do
   begin
+    {$ifdef HSK_LEGACY_SYNEDIT}
+    J := ViewedTextBuffer.DisplayView.ViewToTextIndexEx(I + ToIdx(GutterArea.TextArea.TopLine), Range);
+    {$else}
     J := ViewedTextBuffer.DisplayView.ViewToTextIndexEx(I + ToIdx(GutterArea.TextArea.TopViewedLine), Range);
+    {$endif}
     if (J < 0) or (J >= SynEdit.Lines.Count) or not FForm.IsJigLine(J) then Continue;
     R := AClip;
     R.Top := AClip.Top + (I - FirstLine) * H;
@@ -240,13 +248,24 @@ begin
   TSynEditFoldedView(FoldedTextBuffer).FoldAtTextIndex(Line);
 end;
 
+{$ifdef HSK_LEGACY_SYNEDIT}
+procedure TJigGutter.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+{$else}
+
 procedure TJigGutter.MouseDown(const AnInfo: TSynEditMouseActionInfo);
+{$endif}
 var
   J: integer;
 begin
+  {$ifdef HSK_LEGACY_SYNEDIT}
+  inherited MouseDown(Button, Shift, X, Y);
+  if (FForm = nil) or (Button <> mbLeft) then Exit;
+  J := FForm.Editor.PixelsToRowColumn(Point(X, Y)).Y - 1;
+  {$else}
   inherited MouseDown(AnInfo);
   if (FForm = nil) or (AnInfo.Button <> mbXLeft) then Exit;
   J := AnInfo.NewCaret.LinePos - 1;
+  {$endif}
   if FForm.IsJigLine(J) then FForm.RunJigAt(J);
 end;
 

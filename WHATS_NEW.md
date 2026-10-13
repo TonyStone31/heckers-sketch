@@ -21,6 +21,14 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **A Mac version.**  `heckers-sketch-macos.zip` on the release page runs on
+  macOS 11 and later.  It is new and has been tried on one Mac, so say so if
+  something is off on yours.
+
 ## v2026.10.12.1
 
 ### Fixed
