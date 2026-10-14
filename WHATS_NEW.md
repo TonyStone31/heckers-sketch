@@ -21,6 +21,13 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### Changed
+
+- The file association code is brought up to date with the FileAss
+  package, which has had fixes since the copy this program carried.
+
 ## v2026.10.13
 
 ### New

@@ -24,6 +24,13 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### Changed' + LineEnding +
+    '' + LineEnding +
+    '- The file association code is brought up to date with the FileAss' + LineEnding +
+    '  package, which has had fixes since the copy this program carried.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.13' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

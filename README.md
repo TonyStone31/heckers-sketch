@@ -168,8 +168,12 @@ Needs Lazarus, plus these packages:
 
 * **BGRABitmap** and **BGRAControls** - install both from Lazarus's Online
   Package Manager.
-* **[LazInk](https://github.com/TonyStone31/LazInk)** - clone it next to this
-  folder (`../LazInk`), and the project finds it there.
+* **[LazInk](https://github.com/TonyStone31/LazInk)**,
+  **[FileAss](https://github.com/TonyStone31/FileAss)**,
+  **[FileEye](https://github.com/TonyStone31/FileEye)** and
+  **[InfoBarToast](https://github.com/TonyStone31/InfoBarToast)** - our own
+  Lazarus packages.  Clone them next to this folder (`../LazInk`,
+  `../FileAss` and so on), and the project finds them there.
 * **[CryptoLib4Pascal](https://github.com/Xor-el/CryptoLib4Pascal)**,
   **[HashLib4Pascal](https://github.com/Xor-el/HashLib4Pascal)** and
   **[SimpleBaseLib4Pascal](https://github.com/Xor-el/SimpleBaseLib4Pascal)** -

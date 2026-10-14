@@ -27,7 +27,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
-            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -67,7 +67,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
-            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -98,7 +98,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);."/>
-            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
+            <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-fast"/>
           </SearchPaths>
           <CodeGeneration>
@@ -157,6 +157,18 @@
       <Item>
         <PackageName Value="CryptoLib4PascalPackage"/>
         <DefaultFilename Value="../CryptoLib4Pascal/CryptoLib/src/Packages/FPC/CryptoLib4PascalPackage.lpk" Prefer="True"/>
+      </Item>
+      <Item>
+        <PackageName Value="fileass_runtime"/>
+        <DefaultFilename Value="../FileAss/component/fileass_runtime.lpk" Prefer="True"/>
+      </Item>
+      <Item>
+        <PackageName Value="FileEyePkg"/>
+        <DefaultFilename Value="../FileEye/fileeyepkg.lpk" Prefer="True"/>
+      </Item>
+      <Item>
+        <PackageName Value="InfoBarToast"/>
+        <DefaultFilename Value="../InfoBarToast/infobartoast.lpk" Prefer="True"/>
       </Item>
       <Item>
         <PackageName Value="SynEdit"/>
@@ -429,7 +441,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);."/>
-      <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto;src/vendor/fileass"/>
+      <OtherUnitFiles Value="src/app;src/model;src/draw;src/files;src/shop;src/radiant;src/examples;src/vendor/webp;src/vendor/crypto"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
