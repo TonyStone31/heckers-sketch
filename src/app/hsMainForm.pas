@@ -166,9 +166,6 @@ type
     Icon: TIconKind;
   end;
 
-  { What the bar over the sheet is asking, so its answer goes the right way. }
-  TBarQuestion = (bqNone, bqCrash, bqUpdate, bqDocChanged, bqDocGone);
-
   { TMainForm }
 
   TMainForm = class(TForm)
@@ -297,7 +294,7 @@ type
     procedure SourcePick(On: boolean);
     function RunAllJigs: integer;
     procedure JigEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
-    procedure BarAnswer(Sender: TObject; Answer: TModalResult);
+    procedure BarAnswer(Sender: TObject; const Key: string; Answer: TModalResult);
     procedure SourceCenter;
     procedure RebuildInfo;
     procedure PaintInfoStep(C: TCanvas; const R: TRect; const S: string; Hot: boolean);
@@ -628,11 +625,6 @@ type
     { The newer version available, if any.  Kept, because a status line gets
       overwritten and never seen again. }
     FUpdateTag: string;
-    FBarAsks: TBarQuestion;
-    { an update found while the crash question is up waits for its answer }
-    FUpdateWaiting: string;
-    { the document the bar is asking about }
-    FBarDoc: integer;
     { one FileEye for each open file, keyed by its path (see WatchDocs) }
     FDocEyes: TStringList;
     { Shaking the mouse: direction reversals per screen axis and when they
@@ -1202,6 +1194,7 @@ type
     function AskToSave(Key: integer; const Title: string): boolean;
     function CloseDocument(Key: integer): boolean;
     function ReloadDocument(Key: integer): boolean;
+    function DocKeyOf(const Path: string): integer;
     procedure WatchDocs;
     procedure DocEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
     { document Key to its file, asking for a name when it has none or when

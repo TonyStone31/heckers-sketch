@@ -2641,12 +2641,11 @@ begin
   finally
     L.Free;
   end;
-  FBarAsks := bqCrash;
   Bar.ShowQuestion(IfThen(JustNow,
     'Something went wrong inside the program.  It is still running, and a report has been written.',
     'There is a crash report from a previous run.') +
     '  Send it?  You say what you were doing and see what is sent before anything goes.',
-    mtWarning, [mrYes, '&Send the report...', mrNo, '&Not now']);
+    mtWarning, [mrYes, 'Send the report...', mrNo, 'Not now'], 'crash');
 end;
 
 { Sent through the same postbox as a hand-written report, so no GitHub
@@ -2703,50 +2702,43 @@ begin
   pbCmd.Invalidate;
 end;
 
-{ A newer release found at startup, offered on the bar.  The bar shows one
-  question at a time, so it waits while the crash question is up. }
+{ A newer release found at startup, offered on the bar. }
 procedure TMainForm.OfferUpdate(const Version: string);
 begin
-  if Bar.Showing and (FBarAsks = bqCrash) then
-  begin
-    FUpdateWaiting := Version;
-    Exit;
-  end;
-  FUpdateWaiting := '';
-  FBarAsks := bqUpdate;
   Bar.ShowQuestion(Format('%s is out, and this is %s.  Updating restarts the program; ' +
     'your drawings, saved or not, come straight back.', [Version, CurrentVersion]),
-    mtInformation, [mrYes, '&Update now', mrNo, 'Not &now']);
+    mtInformation, [mrYes, 'Update now', mrNo, 'Not now'], 'update');
 end;
 
-procedure TMainForm.BarAnswer(Sender: TObject; Answer: TModalResult);
+{ The bar's questions, by key: crash, update, and changed: or gone: with the
+  path of an open file. }
+procedure TMainForm.BarAnswer(Sender: TObject; const Key: string; Answer: TModalResult);
 var
-  Asked: TBarQuestion;
+  Doc: Integer;
 begin
-  Asked := FBarAsks;
-  FBarAsks := bqNone;
-  case Asked of
-    bqCrash:
+  if Key = 'crash' then AnswerCrash(Answer = mrYes)
+  else if Key = 'update' then
+  begin
+    if Answer = mrYes then DoUpdate(True)
+    else
     begin
-      AnswerCrash(Answer = mrYes);
-      if FUpdateWaiting <> '' then OfferUpdate(FUpdateWaiting);
+      FCmdMsg := 'Left alone.  /update when you want it.';
+      pbCmd.Invalidate;
     end;
-    bqUpdate:
-      if Answer = mrYes then DoUpdate(True)
-      else
-      begin
-        FCmdMsg := 'Left alone.  /update when you want it.';
-        pbCmd.Invalidate;
-      end;
-    { the document may have been closed while the bar was up }
-    bqDocGone:
-      if (Answer = mrYes) and (Length(DocSheets(FBarDoc)) > 0) then SaveDocument(FBarDoc, False);
-    bqDocChanged:
-      if (Answer = mrYes) and (Length(DocSheets(FBarDoc)) > 0) and ReloadDocument(FBarDoc) then
-      begin
-        FCmdMsg := 'Loaded again - what was here and unsaved is gone; Ctrl+Z does not bring it back.';
-        pbCmd.Invalidate;
-      end;
+  end
+  else if (Answer = mrYes) and (Pos('gone:', Key) = 1) then
+  begin
+    Doc := DocKeyOf(Copy(Key, 6, MaxInt));
+    if Doc >= 0 then SaveDocument(Doc, False);
+  end
+  else if (Answer = mrYes) and (Pos('changed:', Key) = 1) then
+  begin
+    Doc := DocKeyOf(Copy(Key, 9, MaxInt));
+    if (Doc >= 0) and ReloadDocument(Doc) then
+    begin
+      FCmdMsg := 'Loaded again - what was here and unsaved is gone; Ctrl+Z does not bring it back.';
+      pbCmd.Invalidate;
+    end;
   end;
 end;
 

@@ -670,8 +670,7 @@ end;
 
 procedure TMainForm.TellAssocTrouble(const R: TFileAssResult);
 begin
-  FBarAsks := bqNone;
-  Bar.Show('File associations: ' + R.Message, mtWarning, []);
+  Bar.Show('File associations: ' + R.Message, mtWarning, [], 'assoc');
 end;
 
 { The submenu: set up, remove, keep repaired.  Registering offers this

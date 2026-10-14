@@ -289,40 +289,42 @@ begin
   end;
 end;
 
+{ The document an open file belongs to, or -1. }
+function TMainForm.DocKeyOf(const Path: string): Integer;
+var
+  I: Integer;
+begin
+  for I := 0 to High(FDrawings) do
+    if (FDrawings[I].FilePath <> '') and SameFileName(FDrawings[I].FilePath, Path) then Exit(FDrawings[I].DocKey);
+  Result := -1;
+end;
+
 { Another program changed or deleted an open file.  Nothing unsaved here: it
-  is read again.  Otherwise the bar asks. }
+  is read again.  Otherwise the bar asks, keyed by the file. }
 procedure TMainForm.DocEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
 var
-  I, Key: Integer;
+  Key: Integer;
   Nm: string;
 begin
-  Key := -1;
-  for I := 0 to High(FDrawings) do
-    if (FDrawings[I].FilePath <> '') and SameFileName(FDrawings[I].FilePath, FileName) then
-    begin
-      Key := FDrawings[I].DocKey;
-      Break;
-    end;
+  Key := DocKeyOf(FileName);
   if Key < 0 then Exit;
   Nm := ExtractFileName(FileName);
-  FBarDoc := Key;
   if Change = fcDeleted then
   begin
-    FBarAsks := bqDocGone;
+    Bar.Hide('changed:' + FileName);
     Bar.ShowQuestion(Nm + ' was deleted on disk.  Its sheets are still open here.', mtWarning,
-      [mrYes, '&Save it again']);
+      [mrYes, 'Save it again'], 'gone:' + FileName);
     Exit;
   end;
-  if (FBarAsks = bqDocGone) and Bar.Showing then Bar.Hide;
+  Bar.Hide('gone:' + FileName);
   if not DocDirty(Key) then
   begin
     if ReloadDocument(Key) then FCmdMsg := Nm + ' was changed by another program - loaded again.';
     pbCmd.Invalidate;
     Exit;
   end;
-  FBarAsks := bqDocChanged;
   Bar.ShowQuestion(Nm + ' was changed by another program.', mtWarning,
-    [mrYes, '&Load theirs', mrNo, '&Keep mine']);
+    [mrYes, 'Load theirs', mrNo, 'Keep mine'], 'changed:' + FileName);
 end;
 
 function TMainForm.CloseDocument(Key: Integer): Boolean;
