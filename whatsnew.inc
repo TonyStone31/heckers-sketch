@@ -24,7 +24,7 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
-    '## Next release' + LineEnding +
+    '## v2026.10.14' + LineEnding +
     '' + LineEnding +
     '### Changed' + LineEnding +
     '' + LineEnding +
