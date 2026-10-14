@@ -188,6 +188,143 @@ begin
   if Ans = mrYes then Result := SaveDocument(Key, False);
 end;
 
+{ The document's file was changed on disk: its sheets are read again and take
+  the old ones' places, each keeping its view.  False, with the old sheets
+  kept, if the file will not read. }
+function TMainForm.ReloadDocument(Key: Integer): Boolean;
+var
+  S: TIntArrayW;
+  Fresh, Rest: array of TDrawing;
+  Old: TDrawing;
+  First, I, K, At, Front: Integer;
+begin
+  Result := False;
+  S := DocSheets(Key);
+  if Length(S) = 0 then Exit;
+  LeaveSheet;
+  if not ReadSheets(FDrawings[S[0]].FilePath, False, First) then Exit;
+  Fresh := Copy(FDrawings, First, Length(FDrawings) - First);
+  SetLength(FDrawings, First);
+  { the sheet in front, if it is one of these, by its place in the file }
+  At := S[0];
+  Front := -1;
+  for I := 0 to High(S) do
+    if S[I] = FTabIdx then Front := I;
+  { the view stays where it was on a sheet of the same name }
+  for I := 0 to High(Fresh) do
+    for K := 0 to High(S) do
+    begin
+      Old := FDrawings[S[K]];
+      if Old.Name = Fresh[I].Name then
+      begin
+        Fresh[I].View := Old.View;
+        Fresh[I].Az := Old.Az;
+        Fresh[I].El := Old.El;
+        Fresh[I].Zoom := Old.Zoom;
+        Fresh[I].ViewX := Old.ViewX;
+        Fresh[I].ViewY := Old.ViewY;
+        Fresh[I].CamKnown := True;
+      end;
+    end;
+  Rest := nil;
+  for K := 0 to High(FDrawings) do
+    if FDrawings[K].DocKey = Key then
+    begin
+      if K = At then
+        for I := 0 to High(Fresh) do
+        begin
+          SetLength(Rest, Length(Rest) + 1);
+          Rest[High(Rest)] := Fresh[I];
+        end;
+      FDrawings[K].Free;
+    end
+    else
+    begin
+      SetLength(Rest, Length(Rest) + 1);
+      Rest[High(Rest)] := FDrawings[K];
+    end;
+  FDrawings := Rest;
+  if Front >= 0 then FTabIdx := At + Min(Front, High(Fresh))
+  else if FTabIdx > At then FTabIdx := FTabIdx + Length(Fresh) - Length(S);
+  FTabIdx := EnsureRange(FTabIdx, 0, High(FDrawings));
+  FD := FDrawings[FTabIdx];
+  FDraftSeq := -1;
+  ResetTool;
+  LayoutTabs;
+  RepaintPaper;
+  RenderInk;
+  RecomposeAll;
+  RefreshChrome;
+  Invalidate;
+  Result := True;
+end;
+
+{ One FileEye for each file that is open, made and dropped as files are
+  opened, saved under a new name and closed.  Looked at on the tick. }
+procedure TMainForm.WatchDocs;
+var
+  Want: TStringList;
+  Eye: TFileEye;
+  I: Integer;
+begin
+  Want := TStringList.Create;
+  try
+    Want.CaseSensitive := FileNameCaseSensitive;
+    for I := 0 to High(FDrawings) do
+      if (FDrawings[I].FilePath <> '') and (Want.IndexOf(FDrawings[I].FilePath) < 0) then
+        Want.Add(FDrawings[I].FilePath);
+    for I := FDocEyes.Count - 1 downto 0 do
+      if Want.IndexOf(FDocEyes[I]) < 0 then FDocEyes.Delete(I);
+    for I := 0 to Want.Count - 1 do
+      if FDocEyes.IndexOf(Want[I]) < 0 then
+      begin
+        Eye := TFileEye.Create(nil);
+        Eye.Path := Want[I];
+        Eye.OnChange := @DocEyeChange;
+        Eye.Enabled := True;
+        FDocEyes.AddObject(Want[I], Eye);
+      end;
+  finally
+    Want.Free;
+  end;
+end;
+
+{ Another program changed or deleted an open file.  Nothing unsaved here: it
+  is read again.  Otherwise the bar asks. }
+procedure TMainForm.DocEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
+var
+  I, Key: Integer;
+  Nm: string;
+begin
+  Key := -1;
+  for I := 0 to High(FDrawings) do
+    if (FDrawings[I].FilePath <> '') and SameFileName(FDrawings[I].FilePath, FileName) then
+    begin
+      Key := FDrawings[I].DocKey;
+      Break;
+    end;
+  if Key < 0 then Exit;
+  Nm := ExtractFileName(FileName);
+  FBarDoc := Key;
+  if Change = fcDeleted then
+  begin
+    FBarAsks := bqDocGone;
+    Bar.ShowQuestion(Nm + ' was deleted on disk.  Its sheets are still open here.', mtWarning,
+      [mrYes, '&Save it again']);
+    Exit;
+  end;
+  if (FBarAsks = bqDocGone) and Bar.Showing then Bar.Hide;
+  if not DocDirty(Key) then
+  begin
+    if ReloadDocument(Key) then FCmdMsg := Nm + ' was changed by another program - loaded again.';
+    pbCmd.Invalidate;
+    Exit;
+  end;
+  FBarAsks := bqDocChanged;
+  Bar.ShowQuestion(Nm + ' was changed by another program.', mtWarning,
+    [mrYes, '&Load theirs', mrNo, '&Keep mine']);
+end;
+
 function TMainForm.CloseDocument(Key: Integer): Boolean;
 var
   K, J: Integer;

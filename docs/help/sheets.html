@@ -68,6 +68,10 @@ only: Save As onto a file open in another tab is refused.</p>
 line or a block for each thing, lengths in feet and inches.  You can read it, diff it, and keep it in version
 control.  Nothing in it is compressed or binary.  Files saved by a version before 30 September - a line of numbers
 per thing - still open, and are Heck the next time they are saved.</p>
+<p>When another program changes an open file - a second copy, git, a text editor - it is loaded again, and each
+sheet keeps its view.  If there is unsaved work in it, a bar over the drawing asks first: <b>Load theirs</b> or
+<b>Keep mine</b>, and keeping yours means the next Save writes over theirs.  If the file is deleted, the bar
+offers to save it again.</p>
 
 <h2 id="closing">Closing</h2>
 <p>Closing a file - the cross on its tab, <kbd>Ctrl</kbd>+<kbd>W</kbd>, or Close This File - closes every sheet of

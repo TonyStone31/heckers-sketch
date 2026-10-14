@@ -113,6 +113,9 @@ FPushFace := -1;
 
   pbScreen.Cursor := crCross;
 
+  FDocEyes := TStringList.Create;
+  FDocEyes.OwnsObjects := True;
+  FDocEyes.CaseSensitive := FileNameCaseSensitive;
   { a jig saved in an editor makes its groups again (see JigEyeChange) }
   JigEye.Path := JigsDir;
   JigEye.Enabled := True;
@@ -236,6 +239,7 @@ begin
   SaveSettings;
   FRecent.Free;
   FExportDirs.Free;
+  FDocEyes.Free;
   FDimFont.Free;
   for I := High(FDrawings) downto 0 do
     FDrawings[I].Free;

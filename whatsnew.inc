@@ -30,6 +30,9 @@ const
     '' + LineEnding +
     '- Save a jig in your editor while its drawing is open, and the groups it' + LineEnding +
     '  makes on that sheet are made again.  Ctrl+Z puts them back.' + LineEnding +
+    '- An open drawing changed by another program - a second copy, git, a text' + LineEnding +
+    '  editor - is loaded again.  If you have unsaved work in it, a bar asks' + LineEnding +
+    '  first.  If the file is deleted, the bar offers to save it again.' + LineEnding +
     '' + LineEnding +
     '### Changed' + LineEnding +
     '' + LineEnding +

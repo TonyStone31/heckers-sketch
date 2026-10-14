@@ -388,6 +388,9 @@ begin
   finally
     L.Free;
   end;
+  { our own write is not news to the file's watcher }
+  I := FDocEyes.IndexOf(Path);
+  if I >= 0 then TFileEye(FDocEyes.Objects[I]).MarkOwnWrite(Path);
   for I := 0 to High(S) do
   begin
     FDrawings[S[I]].FilePath := Path;

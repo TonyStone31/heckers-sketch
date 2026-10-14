@@ -2738,6 +2738,15 @@ begin
         FCmdMsg := 'Left alone.  /update when you want it.';
         pbCmd.Invalidate;
       end;
+    { the document may have been closed while the bar was up }
+    bqDocGone:
+      if (Answer = mrYes) and (Length(DocSheets(FBarDoc)) > 0) then SaveDocument(FBarDoc, False);
+    bqDocChanged:
+      if (Answer = mrYes) and (Length(DocSheets(FBarDoc)) > 0) and ReloadDocument(FBarDoc) then
+      begin
+        FCmdMsg := 'Loaded again - what was here and unsaved is gone; Ctrl+Z does not bring it back.';
+        pbCmd.Invalidate;
+      end;
   end;
 end;
 

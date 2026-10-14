@@ -167,7 +167,7 @@ type
   end;
 
   { What the bar over the sheet is asking, so its answer goes the right way. }
-  TBarQuestion = (bqNone, bqCrash, bqUpdate);
+  TBarQuestion = (bqNone, bqCrash, bqUpdate, bqDocChanged, bqDocGone);
 
   { TMainForm }
 
@@ -631,6 +631,10 @@ type
     FBarAsks: TBarQuestion;
     { an update found while the crash question is up waits for its answer }
     FUpdateWaiting: string;
+    { the document the bar is asking about }
+    FBarDoc: integer;
+    { one FileEye for each open file, keyed by its path (see WatchDocs) }
+    FDocEyes: TStringList;
     { Shaking the mouse: direction reversals per screen axis and when they
       happened, so a shake decays if you stop. }
     FShX, FShY: integer;
@@ -1197,6 +1201,9 @@ type
     { Save, Don't save or Cancel about document Key; True when it may go }
     function AskToSave(Key: integer; const Title: string): boolean;
     function CloseDocument(Key: integer): boolean;
+    function ReloadDocument(Key: integer): boolean;
+    procedure WatchDocs;
+    procedure DocEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
     { document Key to its file, asking for a name when it has none or when
       AskName; True when written }
     function SaveDocument(Key: integer; AskName: boolean): boolean;

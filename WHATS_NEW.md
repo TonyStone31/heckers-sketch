@@ -27,6 +27,9 @@
 
 - Save a jig in your editor while its drawing is open, and the groups it
   makes on that sheet are made again.  Ctrl+Z puts them back.
+- An open drawing changed by another program - a second copy, git, a text
+  editor - is loaded again.  If you have unsaved work in it, a bar asks
+  first.  If the file is deleted, the bar offers to save it again.
 
 ### Changed
 

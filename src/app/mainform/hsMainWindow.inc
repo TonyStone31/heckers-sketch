@@ -420,6 +420,8 @@ begin
   end;
   { a second copy may have left a note: open its files, come to the front }
   CheckOpenRequests;
+  { a file opened, saved under a new name or closed: watch the ones open }
+  WatchDocs;
   TouchTick;
 
   FollowScreenSize;
