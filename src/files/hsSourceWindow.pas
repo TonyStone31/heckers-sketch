@@ -16,7 +16,7 @@ uses
   SynGutterLineNumber, SynEditMarkupHighAll, SynEditMarkupWordGroup, SynEditMouseCmds, LCLIntf,
   SynEditMiscProcs, LazSynEditText, SynEditFoldedView,
   BCButton, BGRATheme, BGRAThemeCheckBox, hsDrawing, hsHeckHighlight, hsJigRun, hsHeckSample, hsHeckComplete,
-  hsHeckWriter, StrUtils, hsDialogSkin, InkEdit, InkListBox;
+  hsHeckWriter, StrUtils, hsDialogSkin, InkEdit, InkListBox, FileEye;
 
 type
   TSourceAskState = procedure(out DocSeq, PickSeq: int64) of object;
@@ -47,6 +47,8 @@ type
     btnRevert: TBCButton;
     btnJigs: TBCButton;
     btnPick: TBCButton;
+    btnOutside: TBCButton;
+    OutEye: TFileEye;
     lblApply: TLabel;
     pnlApply: TPanel;
     btnUnfold: TBCButton;
@@ -70,6 +72,8 @@ type
     procedure btnRevertClick(Sender: TObject);
     procedure btnJigsClick(Sender: TObject);
     procedure btnPickClick(Sender: TObject);
+    procedure btnOutsideClick(Sender: TObject);
+    procedure OutEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
     procedure EditorChange(Sender: TObject);
     procedure btnUnfoldClick(Sender: TObject);
     procedure edtFindKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -90,6 +94,8 @@ type
     procedure pmEditorPopup(Sender: TObject);
   private
     FAll: TStringList;          { the whole sheet's text }
+    { the sheet being edited in an outside editor, and its file; '' if none }
+    FOutSheet, FOutFile: string;
     FHints: TStringList;        { where each point written as a step lands }
     FNames: TStringList;        { every named point: "line|name=place" }
     FHintWord: string;
@@ -128,6 +134,7 @@ type
     procedure JumpTo(Row: integer);
     procedure EditorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure LoadText;
+    procedure WriteOutside;
     procedure ShowRows;
     procedure ShowPicked(Scroll: boolean);
     procedure TellPicked;
@@ -207,6 +214,9 @@ var
 implementation
 
 {$R *.lfm}
+
+uses
+  hsPaths;
 
 const
   PICKED_BG = TColor($FFE2C2);   { a pale blue, under the picked lines }
@@ -464,6 +474,15 @@ begin
   FNames.Clear;
   if Assigned(OnAskSource) then
     OnAskSource(FAll, FHints, FNames, FFirst, FLast, FLineThing, Name_);
+  { the outside file follows its own sheet only; another sheet ends it }
+  if (FOutFile <> '') and (Name_ <> FOutSheet) then
+  begin
+    OutEye.Enabled := False;
+    FOutFile := '';
+    Status.Caption := '  Another sheet - editing outside has stopped.';
+  end;
+  FOutSheet := IfThen(FOutFile = '', Name_, FOutSheet);
+  if FOutFile <> '' then WriteOutside;
   if Length(FLineThing) <> FAll.Count then
   begin
     SetLength(FLineThing, FAll.Count);
@@ -1229,6 +1248,83 @@ begin
   end;
   Editor.EnsureCursorPosVisible;
   Editor.SetFocus;
+end;
+
+{ The sheet's Heck in the editor this machine opens text files with.  Each
+  save there is applied here, and changes made here are written there. }
+procedure TSourceForm.btnOutsideClick(Sender: TObject);
+var
+  Nm: string;
+  I: integer;
+begin
+  if FEdited then
+  begin
+    lblApply.Caption := 'Apply or Revert first - the outside file starts from the drawing.';
+    Exit;
+  end;
+  Nm := FOutSheet;
+  for I := 1 to Length(Nm) do
+    if not (Nm[I] in ['A'..'Z', 'a'..'z', '0'..'9', ' ', '-', '_']) then Nm[I] := '_';
+  if Trim(Nm) = '' then Nm := 'sheet';
+  ForceDirectories(AppDataDir + 'outside');
+  FOutFile := AppDataDir + 'outside' + PathDelim + Nm + '.heck.txt';
+  OutEye.Path := FOutFile;
+  OutEye.Enabled := True;
+  WriteOutside;
+  if OpenDocument(FOutFile) then
+    Status.Caption := '  Editing outside: ' + FOutFile + ' - save it there and the sheet follows.'
+  else
+    Status.Caption := '  No editor would open ' + FOutFile;
+end;
+
+{ The whole sheet's text to the outside file; its watcher is told the write
+  is ours. }
+procedure TSourceForm.WriteOutside;
+begin
+  try
+    FAll.SaveToFile(FOutFile);
+    OutEye.MarkOwnWrite(FOutFile);
+  except
+    on E: Exception do Status.Caption := '  Could not write ' + FOutFile + ': ' + E.Message;
+  end;
+end;
+
+{ The outside file was saved: applied as Apply would, the errors listed here. }
+procedure TSourceForm.OutEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
+var
+  L: TStringList;
+  ErrLine: integer;
+  Err: string;
+begin
+  if (Change = fcDeleted) or not Assigned(OnApply) then Exit;
+  if FEdited then
+  begin
+    lblApply.Caption := 'The outside file was saved - Apply or Revert here first, then save it there again.';
+    Exit;
+  end;
+  L := TStringList.Create;
+  try
+    try
+      L.LoadFromFile(FileName);
+    except
+      { still being written; the next change brings the rest }
+      Exit;
+    end;
+    if L.Text = FAll.Text then Exit;
+    if OnApply(L, ErrLine, Err) then
+    begin
+      Status.Caption := '  Applied from ' + ExtractFileName(FileName) + '.';
+      Refresh_;
+    end
+    else
+    begin
+      lstMessages.Items.Clear;
+      Say(False, ErrLine, Err);
+      Status.Caption := Format('  %s did not apply - line %d: %s', [ExtractFileName(FileName), ErrLine + 1, Err]);
+    end;
+  finally
+    L.Free;
+  end;
 end;
 
 procedure TSourceForm.btnPickClick(Sender: TObject);

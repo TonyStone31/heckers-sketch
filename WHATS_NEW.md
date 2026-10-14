@@ -30,6 +30,9 @@
 - An open drawing changed by another program - a second copy, git, a text
   editor - is loaded again.  If you have unsaved work in it, a bar asks
   first.  If the file is deleted, the bar offers to save it again.
+- Edit outside, in the source window, opens the sheet's Heck in your own
+  text editor.  Save it there and the drawing follows; change the drawing
+  and the file follows.
 
 ### Changed
 

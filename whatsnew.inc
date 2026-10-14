@@ -33,6 +33,9 @@ const
     '- An open drawing changed by another program - a second copy, git, a text' + LineEnding +
     '  editor - is loaded again.  If you have unsaved work in it, a bar asks' + LineEnding +
     '  first.  If the file is deleted, the bar offers to save it again.' + LineEnding +
+    '- Edit outside, in the source window, opens the sheet''s Heck in your own' + LineEnding +
+    '  text editor.  Save it there and the drawing follows; change the drawing' + LineEnding +
+    '  and the file follows.' + LineEnding +
     '' + LineEnding +
     '### Changed' + LineEnding +
     '' + LineEnding +

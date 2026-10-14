@@ -64,6 +64,14 @@ object SourceForm: TSourceForm
       Caption = 'Pick'
       OnClick = btnPickClick
     end
+    object btnOutside: TBCButton
+      Left = 396
+      Height = 26
+      Top = 6
+      Width = 96
+      Caption = 'Edit outside'
+      OnClick = btnOutsideClick
+    end
     object chkOnTop: TBGRAThemeCheckBox
       Left = 1108
       Height = 22
@@ -229,6 +237,11 @@ object SourceForm: TSourceForm
     Interval = 150
     OnTimer = tmrFollowTimer
     Left = 680
+    Top = 80
+  end
+  object OutEye: TFileEye
+    OnChange = OutEyeChange
+    Left = 740
     Top = 80
   end
 end
