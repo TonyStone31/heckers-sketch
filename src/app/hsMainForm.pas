@@ -37,7 +37,7 @@ uses
   hsBugReport, hsNet, hsUnfold, hsFlatView, hsTunnels, hsSendReport, hsSourceWindow, hsAssistant, hsPostcard, hsHeckWriter, hsHeckReader,
   hsJigRun, hsJigFiles, hsFittings, hsTransitionWizard, hsSpoolWizard, hsPipe,
   hsStairs, hsStairWizard, hsStringerSheet, hsHeckFile, hsRadiantData, hsRadiant, hsRadiantWizard, hsRadiantSubmittal, hsRadiantJob,
-  hsCommandText, InkPage, InkDraw, FileAssMan, FATypes;
+  hsCommandText, InkPage, InkDraw, FileAssMan, FATypes, FileEye;
 
 type
   { What the cursor may infer; Alt cycles through these, as SketchUp's line
@@ -176,6 +176,7 @@ type
     dlgSubmittal: TSaveDialog;
     dlgStringers: TSaveDialog;
     FileAss: TFileAssMan;
+    JigEye: TFileEye;
     pbCmd: TPaintBox;
     pbTabs: TPaintBox;
     pbSlice: TPaintBox;
@@ -291,6 +292,7 @@ type
     { the source window's Pick: clicks on the sheet type places into it }
     procedure SourcePick(On: boolean);
     function RunAllJigs: integer;
+    procedure JigEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
     procedure SourceCenter;
     procedure RebuildInfo;
     procedure PaintInfoStep(C: TCanvas; const R: TRect; const S: string; Hot: boolean);

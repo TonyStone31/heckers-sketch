@@ -21,6 +21,13 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- Save a jig in your editor while its drawing is open, and the groups it
+  makes on that sheet are made again.  Ctrl+Z puts them back.
+
 ## v2026.10.14
 
 ### Changed

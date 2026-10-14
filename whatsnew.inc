@@ -24,6 +24,13 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- Save a jig in your editor while its drawing is open, and the groups it' + LineEnding +
+    '  makes on that sheet are made again.  Ctrl+Z puts them back.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.14' + LineEnding +
     '' + LineEnding +
     '### Changed' + LineEnding +

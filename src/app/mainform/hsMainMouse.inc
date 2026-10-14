@@ -2288,6 +2288,46 @@ begin
   end;
 end;
 
+{ A jig in the jigs folder was saved, by an editor most likely: the groups on
+  this sheet that it makes are made again, one undo step each. }
+procedure TMainForm.JigEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
+var
+  Ids: TIntArrayW;
+  Args: TStringList;
+  I, N, Ran: Integer;
+  JigName, Err: string;
+begin
+  if (Change = fcDeleted) or (FD = nil) then Exit;
+  N := 0;
+  SetLength(Ids, FD.Doc.Live);
+  Args := TStringList.Create;
+  try
+    for I := 0 to FD.Doc.Live - 1 do
+      if (FD.Doc[I].Kind = ekPart) and (FD.Doc[I].Jig <> '') and not IsStairJig(FD.Doc[I].Jig) and
+        ParseJigSpec(FD.Doc[I].Jig, FD.Units, JigName, Args, Err) and
+        SameFileName(ExpandFileName(FindJig(JigName)), FileName) then
+      begin
+        Ids[N] := FD.Doc[I].Grp;
+        Inc(N);
+      end;
+  finally
+    Args.Free;
+  end;
+  if N = 0 then Exit;
+  Ran := 0;
+  for I := 0 to N - 1 do
+    if RunJigOf(Ids[I]) then Inc(Ran);
+  RebuildFlatFaces;
+  RenderInk;
+  RecomposeAll;
+  { a jig that failed has said why in the bar already }
+  if Ran = N then
+    FCmdMsg := Format('%s was saved - made again: %d group%s.  Ctrl+Z puts it back.',
+      [ExtractFileName(FileName), Ran, IfThen(Ran = 1, '', 's')]);
+  pbScreen.Invalidate;
+  pbCmd.Invalidate;
+end;
+
 function TMainForm.RunAllJigs: Integer;
 var
   Ids: TIntArrayW;

@@ -202,6 +202,11 @@ object MainForm: TMainForm
     Left = 564
     Top = 16
   end
+  object JigEye: TFileEye
+    OnChange = JigEyeChange
+    Left = 620
+    Top = 16
+  end
   object pmView: TPopupMenu
     Left = 8
     Top = 8

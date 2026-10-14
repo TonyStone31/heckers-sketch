@@ -113,6 +113,10 @@ FPushFace := -1;
 
   pbScreen.Cursor := crCross;
 
+  { a jig saved in an editor makes its groups again (see JigEyeChange) }
+  JigEye.Path := JigsDir;
+  JigEye.Enabled := True;
+
   tmrTick.Interval := TICK_MS;
   tmrTick.Enabled := True;
 end;
