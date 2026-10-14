@@ -31,6 +31,12 @@ const
     '- Save a jig in your editor while its drawing is open, and the groups it' + LineEnding +
     '  makes on that sheet are made again.  Ctrl+Z puts them back.' + LineEnding +
     '' + LineEnding +
+    '### Changed' + LineEnding +
+    '' + LineEnding +
+    '- A crash report, a new version and file association trouble now show in a' + LineEnding +
+    '  bar over the drawing instead of a dialog in the way.  Keep drawing and' + LineEnding +
+    '  answer when you like.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.14' + LineEnding +
     '' + LineEnding +
     '### Changed' + LineEnding +

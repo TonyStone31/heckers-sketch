@@ -670,8 +670,8 @@ end;
 
 procedure TMainForm.TellAssocTrouble(const R: TFileAssResult);
 begin
-  hsDialogSkin.UseTheme(Themes[FThemeIdx]);
-  MessageDlg('File associations', R.Message, mtWarning, [mbOK], 0);
+  FBarAsks := bqNone;
+  Bar.Show('File associations: ' + R.Message, mtWarning, []);
 end;
 
 { The submenu: set up, remove, keep repaired.  Registering offers this

@@ -37,7 +37,7 @@ uses
   hsBugReport, hsNet, hsUnfold, hsFlatView, hsTunnels, hsSendReport, hsSourceWindow, hsAssistant, hsPostcard, hsHeckWriter, hsHeckReader,
   hsJigRun, hsJigFiles, hsFittings, hsTransitionWizard, hsSpoolWizard, hsPipe,
   hsStairs, hsStairWizard, hsStringerSheet, hsHeckFile, hsRadiantData, hsRadiant, hsRadiantWizard, hsRadiantSubmittal, hsRadiantJob,
-  hsCommandText, InkPage, InkDraw, FileAssMan, FATypes, FileEye;
+  hsCommandText, InkPage, InkDraw, FileAssMan, FATypes, FileEye, InfoBar;
 
 type
   { What the cursor may infer; Alt cycles through these, as SketchUp's line
@@ -166,6 +166,9 @@ type
     Icon: TIconKind;
   end;
 
+  { What the bar over the sheet is asking, so its answer goes the right way. }
+  TBarQuestion = (bqNone, bqCrash, bqUpdate);
+
   { TMainForm }
 
   TMainForm = class(TForm)
@@ -177,6 +180,7 @@ type
     dlgStringers: TSaveDialog;
     FileAss: TFileAssMan;
     JigEye: TFileEye;
+    Bar: TInfoBar;
     pbCmd: TPaintBox;
     pbTabs: TPaintBox;
     pbSlice: TPaintBox;
@@ -293,6 +297,7 @@ type
     procedure SourcePick(On: boolean);
     function RunAllJigs: integer;
     procedure JigEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
+    procedure BarAnswer(Sender: TObject; Answer: TModalResult);
     procedure SourceCenter;
     procedure RebuildInfo;
     procedure PaintInfoStep(C: TCanvas; const R: TRect; const S: string; Hot: boolean);
@@ -623,6 +628,9 @@ type
     { The newer version available, if any.  Kept, because a status line gets
       overwritten and never seen again. }
     FUpdateTag: string;
+    FBarAsks: TBarQuestion;
+    { an update found while the crash question is up waits for its answer }
+    FUpdateWaiting: string;
     { Shaking the mouse: direction reversals per screen axis and when they
       happened, so a shake decays if you stop. }
     FShX, FShY: integer;
@@ -926,7 +934,8 @@ type
     { the face a press is on (see the body) }
     function FaceAtPress: integer;
     procedure CheckForUpdate(Loud: boolean);
-    procedure DoUpdate;
+    procedure DoUpdate(Confirmed: boolean = False);
+    procedure OfferUpdate(const Version: string);
     procedure ShowWhatsNew;
     procedure BuildTransitionWizard;
     procedure BuildSpoolWizard;
@@ -974,6 +983,7 @@ type
     procedure StartUnfold;
     procedure UnfoldAt(SX, SY: integer);
     procedure OfferCrashReport(JustNow: boolean);
+    procedure AnswerCrash(Send: boolean);
     function DocThings(const DocFile: string): integer;
     procedure Quiesce;
     function WindowShot(out B: TBitmap): boolean;

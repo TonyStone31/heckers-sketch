@@ -28,6 +28,12 @@
 - Save a jig in your editor while its drawing is open, and the groups it
   makes on that sheet are made again.  Ctrl+Z puts them back.
 
+### Changed
+
+- A crash report, a new version and file association trouble now show in a
+  bar over the drawing instead of a dialog in the way.  Keep drawing and
+  answer when you like.
+
 ## v2026.10.14
 
 ### Changed

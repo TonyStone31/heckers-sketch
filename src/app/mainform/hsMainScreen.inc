@@ -427,7 +427,7 @@ begin
       if Last <> Info.Tag then
       begin
         pbCmd.Invalidate;
-        DoUpdate;
+        OfferUpdate(Info.Tag);
         Exit;
       end;
     end;
@@ -1733,7 +1733,7 @@ end;
 
 { Fetch the update, verify it, put it in place and restart.  The drawings go
   across in the draft and the handoff. }
-procedure TMainForm.DoUpdate;
+procedure TMainForm.DoUpdate(Confirmed: Boolean);
 var
   Info: TUpdateInfo;
   Err, Why, Tmp: string;
@@ -1761,13 +1761,13 @@ begin
     FCmdMsg := 'Already up to date - ' + CurrentVersion + '.';
     Exit;
   end;
-  if MessageDlg('Update available',
+  if not Confirmed and (MessageDlg('Update available',
        Format('%s is out, and this is %s.'#13#10#13#10 +
          'It will be fetched, put in place, and the program restarted.  ' +
          'Your drawings are kept just as they are - every sheet, and ' +
          'anything not saved yet stays not saved - and come straight back.',
          [Info.Tag, CurrentVersion]),
-       mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+       mtConfirmation, [mbYes, mbNo], 0) <> mrYes) then
   begin
     FCmdMsg := 'Left alone.';
     Exit;
@@ -2621,7 +2621,37 @@ end;
 
 { A crash last time leaves a report behind.  Offer to send it, opening it
   for reading first, since it carries file paths. }
+{ A crash report on disk, from this run or the last: offered on the bar over
+  the sheet, and nothing waits for the answer (see AnswerCrash). }
 procedure TMainForm.OfferCrashReport(JustNow: Boolean);
+var
+  Fn: string;
+  L: TStringList;
+begin
+  Fn := ExtractFilePath(ExpandFileName(ParamStr(0))) + 'heckers-sketch-crash.txt';
+  if not FileExists(Fn) then Exit;
+  L := TStringList.Create;
+  try
+    try
+      L.LoadFromFile(Fn);
+    except
+      Exit;
+    end;
+    if L.Count = 0 then Exit;
+  finally
+    L.Free;
+  end;
+  FBarAsks := bqCrash;
+  Bar.ShowQuestion(IfThen(JustNow,
+    'Something went wrong inside the program.  It is still running, and a report has been written.',
+    'There is a crash report from a previous run.') +
+    '  Send it?  You say what you were doing and see what is sent before anything goes.',
+    mtWarning, [mrYes, '&Send the report...', mrNo, '&Not now']);
+end;
+
+{ Sent through the same postbox as a hand-written report, so no GitHub
+  account is needed.  Not sent, it is moved aside and not offered again. }
+procedure TMainForm.AnswerCrash(Send: Boolean);
 var
   Fn: string;
   L: TStringList;
@@ -2655,35 +2685,59 @@ begin
     except
       Exit;
     end;
-    if L.Count = 0 then Exit;
-    { Sent through the same postbox as a hand-written report, so no GitHub
-      account is needed.  Offered, not assumed. }
-    case MessageDlg(IfThen(JustNow, 'Something went wrong', 'It crashed last time'),
-           IfThen(JustNow,
-             'Something just went wrong inside the program.  It is still ' +
-             'running, and a report has been written.',
-             'There is a crash report from a previous run.') + #13#10#13#10 +
-           'Send it?  You get to say what you were doing first, and to see ' +
-           'what is being sent.  Nothing goes anywhere until you press Send.',
-           mtConfirmation, [mbYes, mbNo], 0) of
-      mrYes:
-        { Delete the local copies only after a successful send, so a failed
-          send can be retried.  Renaming onto ".sent" fails on Windows when
-          that name already exists. }
-        if ReportBug(L.Text, Fn + '.png', Fn + '.hsk') then
-        begin
-          DeleteFile(Fn);
-          DeleteFile(Fn + '.png');
-          DeleteFile(Fn + '.hsk');
-          FCmdMsg := FCmdMsg + '  It will not ask about this one again.';
-        end
-        else
-          KeepAside(Fn);
+    { Delete the local copies only after a successful send, so a failed
+      send can be retried.  Renaming onto ".sent" fails on Windows when
+      that name already exists. }
+    if Send and ReportBug(L.Text, Fn + '.png', Fn + '.hsk') then
+    begin
+      DeleteFile(Fn);
+      DeleteFile(Fn + '.png');
+      DeleteFile(Fn + '.hsk');
+      FCmdMsg := FCmdMsg + '  It will not ask about this one again.';
+    end
     else
       KeepAside(Fn);
-    end;
   finally
     L.Free;
+  end;
+  pbCmd.Invalidate;
+end;
+
+{ A newer release found at startup, offered on the bar.  The bar shows one
+  question at a time, so it waits while the crash question is up. }
+procedure TMainForm.OfferUpdate(const Version: string);
+begin
+  if Bar.Showing and (FBarAsks = bqCrash) then
+  begin
+    FUpdateWaiting := Version;
+    Exit;
+  end;
+  FUpdateWaiting := '';
+  FBarAsks := bqUpdate;
+  Bar.ShowQuestion(Format('%s is out, and this is %s.  Updating restarts the program; ' +
+    'your drawings, saved or not, come straight back.', [Version, CurrentVersion]),
+    mtInformation, [mrYes, '&Update now', mrNo, 'Not &now']);
+end;
+
+procedure TMainForm.BarAnswer(Sender: TObject; Answer: TModalResult);
+var
+  Asked: TBarQuestion;
+begin
+  Asked := FBarAsks;
+  FBarAsks := bqNone;
+  case Asked of
+    bqCrash:
+    begin
+      AnswerCrash(Answer = mrYes);
+      if FUpdateWaiting <> '' then OfferUpdate(FUpdateWaiting);
+    end;
+    bqUpdate:
+      if Answer = mrYes then DoUpdate(True)
+      else
+      begin
+        FCmdMsg := 'Left alone.  /update when you want it.';
+        pbCmd.Invalidate;
+      end;
   end;
 end;
 
