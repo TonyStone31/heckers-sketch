@@ -78,9 +78,9 @@ The manual covers all of this properly.  The short version:
   DXF, STL and OpenSCAD.
   [Printing](https://tonystone31.github.io/heckers-sketch/printing.html) ·
   [Export](https://tonystone31.github.io/heckers-sketch/export.html)
-* **Groups** - make a piece of the drawing a thing of its own, so nothing
-  else sticks to it; open it to work inside, lock it, name it, nest them,
-  and find them all in the groups panel.
+* **Groups** - make part of the drawing a separate object that other
+  geometry does not join; open it to work inside, lock it, name it, nest
+  them, and find them all in the groups panel.
   [Groups](https://tonystone31.github.io/heckers-sketch/groups.html)
 * **Files and sheets** - several drawings in tabs, saved together in one
   `.hsk` file.  Your work is also saved to a draft every few seconds.
@@ -135,7 +135,7 @@ an Apple Silicon Mac runs it through Rosetta.  Opening a drawing by
 double-clicking it in Finder doesn't work yet - use File > Open.  If
 something is off on your Mac, [tell me](../../issues).
 
-## What it does on the network, plainly
+## What it does on the network
 
 No account, no sign-in, no tracking, and nothing that identifies you or
 your machine.  Everything it does online is listed here, and `--offline`
@@ -147,9 +147,9 @@ switches all of it off:
 * **Sends a bug report when you ask it to.**  Help → Report a problem sends
   a screenshot, your note and what the program was doing; your drawing goes
   only if you tick the box.  If it crashes, it offers to send the crash
-  report.  A report is encrypted before it leaves, and travels through a
-  public file drop that throws files away after a few days - there is no
-  server behind it.
+  report.  A report is encrypted before it leaves, and is sent through a
+  public file drop that deletes files after a few days - there is no server
+  of ours behind it.
   [Reporting a problem](https://tonystone31.github.io/heckers-sketch/reporting.html)
 * **Asks, once, to send a postcard.**  On its second start it asks whether
   it may send one note saying what sort of computer it is on - the
@@ -184,7 +184,7 @@ lazbuild heckerssketch.lpi
 ```
 
 The program is built into `bin/`, and run from there it keeps its settings,
-drafts, examples and exports in `bin/` too, out of the way of the source.
+drafts, examples and exports in `bin/` too, apart from the source.
 Developed on Linux; the Windows build is cross-compiled.
 
 ### macOS
@@ -208,7 +208,7 @@ each part of the program, and every unit starts `hs`.
 
 | Folder | What is in it |
 | --- | --- |
-| `src/app/` | the window and its plumbing: `hsMainForm` (the window and the tools, its code split into include files in `src/app/mainform/`), `hsCommandText` (the command bar's colors), `hsPaths`, the splash, updates (`hsUpdater`), bug reports (`hsBugReport`, `hsSendReport`), the manual's viewer (`hsHelpView`) |
+| `src/app/` | the main window and its support code: `hsMainForm` (the window and the tools, its code split into include files in `src/app/mainform/`), `hsCommandText` (the command bar's colors), `hsPaths`, the splash, updates (`hsUpdater`), bug reports (`hsBugReport`, `hsSendReport`), the manual's viewer (`hsHelpView`) |
 | `src/model/` | the geometry: `hsDrawing` (the 3D document - geometry, snapping, hit testing, rendering), `hsFaceFinder` (edges into faces and holes), `hsImpliedFaces`, `hsTriangulate`, `hsTunnels` (the drill), `hsUnfold` (flat patterns), `hsGroupData` |
 | `src/draw/` | pixels: `hsSurface` (the software rasterizer everything is drawn with), `hsSkin`, `hsViewCube`, `hsFilm` and `hsRecorder` (pictures and WebP films) |
 | `src/files/` | Heck and the other formats: `hsHeckReader`, `hsHeckWriter`, `hsHeckFile`, the source window (`hsSourceWindow`), jigs (`hsJigRun`), `hsExport`, `hsDxf`, `hsPdf`, `hsSvg` |
