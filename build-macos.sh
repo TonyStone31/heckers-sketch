@@ -26,6 +26,9 @@ app="dist/Heckers Sketch.app"
 # first, so a build that fails leaves nothing that looks like its result
 rm -rf "$app" dist/icon.iconset dist/heckers-sketch-macos dist/heckers-sketch-macos.zip
 "$LAZBUILD" --ws=cocoa --build-mode=Release --opt="${options[*]}" heckerssketch.lpi
+# the debug information is in bin/heckers-sketch.dSYM; the symbol table is
+# another 4 MB nobody downloading it needs
+strip -S -x bin/heckers-sketch
 version=$(sed -n "s/.*APP_VERSION = '\(.*\)';.*/\1/p" version.inc)
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" dist/icon.iconset
 cp bin/heckers-sketch "$app/Contents/MacOS/"
