@@ -24,6 +24,16 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## v2026.10.19' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **Zoom in the manual and the assistant.** Ctrl+wheel, Ctrl+plus and' + LineEnding +
+    '  Ctrl+minus make the text larger or smaller, and Ctrl+0 puts it back.' + LineEnding +
+    '  Each window remembers its zoom for next time.  The other windows with' + LineEnding +
+    '  longer text - What''s new, the bug report and postcard - zoom the same' + LineEnding +
+    '  way.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.14.1' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +
