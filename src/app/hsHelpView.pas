@@ -50,6 +50,7 @@ type
     procedure btnWebClick(Sender: TObject);
     procedure PageLinkClick(Sender: TObject; const URL: string);
     procedure PageNavigate(Sender: TObject);
+    procedure PageZoom(Sender: TObject);
   public
     { the window is kept between opens and the theme may change while it
       is hidden, so it is dressed again on each open }
@@ -58,6 +59,7 @@ type
     function ThemeWord: string;
     procedure LoadThemeChoice;
     procedure SaveThemeChoice;
+    procedure LoadZoom;
     procedure CycleTheme;
     function PageWithMode(const HTML: string): string;
     procedure GoToPage(const PathOrURI: string);
@@ -110,6 +112,7 @@ end;
 procedure THelpForm.FormCreate(Sender: TObject);
 begin
   LoadThemeChoice;
+  LoadZoom;
   Dress;
   { touch drags scroll, the mouse selects; LazInk tells them apart }
   Page.DragScroll := True;
@@ -186,6 +189,38 @@ begin
     end;
   finally
     Ini.Free;
+  end;
+end;
+
+{ Ctrl+wheel, Ctrl+plus and Ctrl+minus zoom the page; the zoom is kept
+  beside the theme }
+procedure THelpForm.LoadZoom;
+var
+  Ini: TIniFile;
+begin
+  if not FileExists(ConfigFile) then Exit;
+  Ini := TIniFile.Create(ConfigFile);
+  try
+    Page.Zoom := Ini.ReadInteger('look', 'helpzoom', 100);
+  finally
+    Ini.Free;
+  end;
+end;
+
+procedure THelpForm.PageZoom(Sender: TObject);
+var
+  Ini: TIniFile;
+begin
+  if not Showing then Exit;
+  try
+    Ini := TIniFile.Create(ConfigFile);
+    try
+      Ini.WriteInteger('look', 'helpzoom', Page.Zoom);
+    finally
+      Ini.Free;
+    end;
+  except
+    { an unwritable config only costs the convenience }
   end;
 end;
 

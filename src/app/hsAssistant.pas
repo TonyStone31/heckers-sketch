@@ -47,6 +47,7 @@ type
     procedure btnSendClick(Sender: TObject);
     procedure btnClearClick(Sender: TObject);
     procedure chkGivenChange(Sender: TObject);
+    procedure ChatZoom(Sender: TObject);
     procedure chkOnTopChange(Sender: TObject);
   private
     FSettings: TAssistantSettings;
@@ -104,6 +105,7 @@ begin
   chkManual.Checked := FSettings.SendManual;
   chkSheet.Checked := FSettings.SendSheet;
   chkPicked.Checked := FSettings.SendPicked;
+  memChat.Zoom := FSettings.Zoom;
   FLoading := False;
   { a long answer's code folds to its first lines; Use this takes it to
     the source window }
@@ -390,6 +392,21 @@ procedure TAssistantForm.btnClearClick(Sender: TObject);
 begin
   memChat.Lines.Clear;
   SetLength(FHistory, 0);
+end;
+
+{ the conversation and the question box zoom together, and the zoom is kept }
+procedure TAssistantForm.ChatZoom(Sender: TObject);
+var
+  Z: integer;
+begin
+  if Sender = memAsk then Z := memAsk.Zoom
+  else
+    Z := memChat.Zoom;
+  memChat.Zoom := Z;
+  memAsk.Zoom := Z;
+  if FLoading or (FSettings.Zoom = Z) then Exit;
+  FSettings.Zoom := Z;
+  SaveAssistantSettings(FSettings);
 end;
 
 procedure TAssistantForm.chkGivenChange(Sender: TObject);

@@ -21,6 +21,16 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **Zoom in the manual and the assistant.** Ctrl+wheel, Ctrl+plus and
+  Ctrl+minus make the text larger or smaller, and Ctrl+0 puts it back.
+  Each window remembers its zoom for next time.  The other windows with
+  longer text - What's new, the bug report and postcard - zoom the same
+  way.
+
 ## v2026.10.14.1
 
 ### New

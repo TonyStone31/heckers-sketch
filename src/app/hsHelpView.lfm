@@ -197,5 +197,6 @@ object HelpForm: THelpForm
     TabOrder = 3
     OnLinkClick = PageLinkClick
     OnNavigate = PageNavigate
+    OnZoom = PageZoom
   end
 end

@@ -141,6 +141,7 @@ object AssistantForm: TAssistantForm
       TextHint = 'Ask about the sheet, or for a change to it.  Enter sends; Ctrl+Enter starts a new line.'
       WantReturns = True
       WantTabs = False
+      OnZoom = ChatZoom
     end
     object lblStatus: TInkLabel
       Tag = 1
@@ -185,5 +186,6 @@ object AssistantForm: TAssistantForm
     BorderSpacing.Right = 12
     TabOrder = 2
     WordWrap = True
+    OnZoom = ChatZoom
   end
 end

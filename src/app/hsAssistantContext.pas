@@ -20,6 +20,7 @@ type
     SendSheet: boolean;    { the whole sheet as Heck }
     SendPicked: boolean;   { which lines are picked }
     Think: boolean;        { a model that reasons may first; off answers at once }
+    Zoom: integer;         { the conversation's zoom, in percent }
   end;
 
 const
@@ -71,6 +72,7 @@ begin
   Result.SendSheet := True;
   Result.SendPicked := True;
   Result.Think := True;
+  Result.Zoom := 100;
 end;
 
 function ProviderOf(const S: TAssistantSettings): integer;
@@ -97,6 +99,7 @@ begin
       Result.SendSheet := Ini.ReadBool(SECTION, 'sendsheet', Result.SendSheet);
       Result.SendPicked := Ini.ReadBool(SECTION, 'sendpicked', Result.SendPicked);
       Result.Think := Ini.ReadBool(SECTION, 'think', Result.Think);
+      Result.Zoom := Ini.ReadInteger(SECTION, 'zoom', Result.Zoom);
     finally
       Ini.Free;
     end;
@@ -119,6 +122,7 @@ begin
       Ini.WriteBool(SECTION, 'sendsheet', S.SendSheet);
       Ini.WriteBool(SECTION, 'sendpicked', S.SendPicked);
       Ini.WriteBool(SECTION, 'think', S.Think);
+      Ini.WriteInteger(SECTION, 'zoom', S.Zoom);
     finally
       Ini.Free;
     end;
