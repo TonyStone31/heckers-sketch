@@ -110,37 +110,10 @@ object RadiantForm: TRadiantForm
       Font.Color = clGrayText
       ParentFont = False
     end
-    object lblWaste: TLabel
-      Left = 16
-      Height = 18
-      Top = 206
-      Width = 150
-      AutoSize = False
-      Caption = 'Waste on the coil'
-    end
-    object edWaste: TBCTrackbarUpdown
-      Left = 176
-      Height = 22
-      Top = 203
-      Width = 70
-      MaxValue = 50
-      MinValue = 0
-      TabOrder = 3
-      Value = 10
-      OnChange = AnyChange
-    end
-    object lblWastePct: TLabel
-      Left = 252
-      Height = 18
-      Top = 206
-      Width = 40
-      AutoSize = False
-      Caption = '%'
-    end
     object lblMaxPorts: TLabel
       Left = 16
       Height = 18
-      Top = 244
+      Top = 206
       Width = 150
       AutoSize = False
       Caption = 'Most loops a manifold'
@@ -148,7 +121,7 @@ object RadiantForm: TRadiantForm
     object edMaxPorts: TBCTrackbarUpdown
       Left = 176
       Height = 22
-      Top = 241
+      Top = 203
       Width = 70
       MaxValue = 64
       MinValue = 2
@@ -159,7 +132,7 @@ object RadiantForm: TRadiantForm
     object lblManifoldHead: TLabel
       Left = 16
       Height = 18
-      Top = 279
+      Top = 241
       Width = 420
       AutoSize = False
       Caption = 'Manifolds'
@@ -169,7 +142,7 @@ object RadiantForm: TRadiantForm
     object btnSuggest: TBCButton
       Left = 16
       Height = 32
-      Top = 303
+      Top = 265
       Width = 200
       Caption = 'Suggest manifolds'
       OnClick = btnSuggestClick
@@ -177,7 +150,7 @@ object RadiantForm: TRadiantForm
     object btnSearchAll: TBCButton
       Left = 224
       Height = 32
-      Top = 303
+      Top = 265
       Width = 212
       Caption = 'Search all zones'
       OnClick = btnSearchAllClick
@@ -186,7 +159,7 @@ object RadiantForm: TRadiantForm
       Tag = 1
       Left = 16
       Height = 54
-      Top = 343
+      Top = 305
       Width = 420
       AutoSize = False
       Caption = 'Click a zone on the plan to open its tab; drag a manifold to move it.  Right-click for more: search, square or turn it, or Not a zone - a shape left bare, brought back the same way.'
@@ -197,7 +170,7 @@ object RadiantForm: TRadiantForm
     object cbLabels: TBGRAThemeCheckBox
       Left = 16
       Height = 22
-      Top = 435
+      Top = 397
       Width = 22
       Hint = 'on the drawing - /hide labels and /show labels later'
       TabOrder = 10
@@ -205,7 +178,7 @@ object RadiantForm: TRadiantForm
     object lblLabels: TLabel
       Left = 44
       Height = 18
-      Top = 437
+      Top = 399
       Width = 226
       AutoSize = False
       Caption = 'Show the labels'
@@ -217,7 +190,7 @@ object RadiantForm: TRadiantForm
     object btnHeat: TBCButton
       Left = 276
       Height = 30
-      Top = 431
+      Top = 393
       Width = 160
       Caption = 'Heat load...'
       Hint = 'the heat each zone needs, its water, pump and pipe, and the boiler - for the submittal'
@@ -227,7 +200,7 @@ object RadiantForm: TRadiantForm
     object lblTag: TLabel
       Left = 16
       Height = 18
-      Top = 473
+      Top = 435
       Width = 80
       AutoSize = False
       Caption = 'Job name'
@@ -235,7 +208,7 @@ object RadiantForm: TRadiantForm
     object edTag: TInkEdit
       Left = 100
       Height = 28
-      Top = 467
+      Top = 429
       Width = 336
       TabOrder = 11
       OnChange = AnyChange
@@ -244,7 +217,7 @@ object RadiantForm: TRadiantForm
       Tag = 1
       Left = 100
       Height = 18
-      Top = 499
+      Top = 461
       Width = 336
       AutoSize = False
       Caption = 'the job, on the submittal - Smith residence'
@@ -254,7 +227,7 @@ object RadiantForm: TRadiantForm
     object lblProblem: TLabel
       Left = 16
       Height = 20
-      Top = 519
+      Top = 481
       Width = 420
       AutoSize = False
       Caption = ''
@@ -266,7 +239,7 @@ object RadiantForm: TRadiantForm
       Tag = 1
       Left = 16
       Height = 34
-      Top = 543
+      Top = 505
       Width = 128
       Caption = 'Build it'
       OnClick = btnBuildClick
@@ -275,7 +248,7 @@ object RadiantForm: TRadiantForm
       Tag = 2
       Left = 152
       Height = 34
-      Top = 543
+      Top = 505
       Width = 100
       Caption = 'Cancel'
       OnClick = btnCancelClick
@@ -283,7 +256,7 @@ object RadiantForm: TRadiantForm
     object btnReport: TBCButton
       Left = 260
       Height = 34
-      Top = 543
+      Top = 505
       Width = 176
       Caption = 'Report a problem...'
       OnClick = btnReportClick
@@ -291,7 +264,7 @@ object RadiantForm: TRadiantForm
     object btnExport: TBCButton
       Left = 16
       Height = 34
-      Top = 581
+      Top = 543
       Width = 200
       Caption = 'Export the submittal...'
       Hint = 'the system, the zone and loop schedules, every zone''s material list and notes, every loop set out from the walls, and the design record'
@@ -301,7 +274,7 @@ object RadiantForm: TRadiantForm
     object btnPreview: TBCButton
       Left = 224
       Height = 34
-      Top = 581
+      Top = 543
       Width = 212
       Caption = 'Preview the PDF'
       Hint = 'the submittal as it would export, opened in the PDF reader - nothing saved'

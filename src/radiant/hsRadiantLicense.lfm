@@ -1,0 +1,92 @@
+object RadiantLicenseForm: TRadiantLicenseForm
+  Left = 10
+  Height = 230
+  Top = 10
+  Width = 480
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Radiant license'
+  ClientHeight = 230
+  ClientWidth = 480
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  Position = poOwnerFormCenter
+  object pnlBody: TPanel
+    Left = 0
+    Height = 230
+    Top = 0
+    Width = 480
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 230
+    ClientWidth = 480
+    TabOrder = 0
+    object lblHead: TInkLabel
+      Left = 24
+      Height = 26
+      Top = 18
+      Width = 432
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'Radiant layouts need a license'
+      Font.Height = -19
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lblBody: TInkLabel
+      Tag = 1
+      Left = 24
+      Height = 36
+      Top = 52
+      Width = 432
+      AutoSize = False
+      Caption = 'Enter the license number that came with the radiant add-on.'
+    end
+    object lblNumber: TInkLabel
+      Left = 24
+      Height = 18
+      Top = 104
+      Width = 130
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = 'License number'
+    end
+    object edNumber: TInkEdit
+      Left = 160
+      Height = 26
+      Top = 100
+      Width = 296
+      TabOrder = 0
+    end
+    object lblVerdict: TInkLabel
+      Left = 160
+      Height = 18
+      Top = 136
+      Width = 296
+      AutoSize = False
+      VertAlign = ivaCenter
+      Caption = ''
+    end
+    object btnCancel: TBCButton
+      Tag = 2
+      Left = 228
+      Height = 32
+      Top = 178
+      Width = 110
+      Anchors = [akRight, akBottom]
+      Caption = 'Cancel'
+      OnClick = btnCancelClick
+    end
+    object btnCheck: TBCButton
+      Tag = 1
+      Left = 346
+      Height = 32
+      Top = 178
+      Width = 110
+      Anchors = [akRight, akBottom]
+      Caption = 'Check'
+      OnClick = btnCheckClick
+    end
+  end
+end

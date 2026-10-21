@@ -8,12 +8,15 @@
 material list, a heat load if you want one, and a submittal to hand in and to lay the tube from.</p></header>
 <p>Open it from <b>Shop &gt; Radiant heat layout...</b> or type <code>/radiant</code> (<code>/pex</code> and
 <code>/hydronic</code> do the same).  Select the floor first.  Nothing goes on the drawing until you press
-<b>Build it</b>, and Cancel or <kbd>Esc</kbd> leaves the drawing as it was.</p>
+<b>Build it</b>, and Cancel or <kbd>Esc</kbd> leaves the drawing as it was.  The radiant tools are an add-on:
+the first time, they ask for the license number that came with it, and once it is accepted they do not ask
+again.</p>
 
 <h2 id="what-it-does">What it does</h2>
 <p>You give it the floor and where each manifold hangs.  It lays the tube in rows at the spacing you ask for,
 parallel to the manifold's wall, in loops that go out and come back on neighboring rows.  Every loop is a round
-trip from the manifold and back, and its length - both leads included - is kept under the longest loop you allow.
+trip from the manifold and back, and its length - both leads included, plus 6 ft for the climb up the wall to the
+manifold and the tube fanned out onto the grid there - is kept under the longest loop you allow.
 No loop crosses another, and the tube stays 6" off every wall and obstacle.</p>
 <p>It does not lay one layout and stop.  It searches: it tries many layouts for each zone and keeps the best ones,
 ranked by how much of the floor they reach, how close the loop lengths come to each other, and how easy they are
@@ -42,8 +45,6 @@ first.</p>
 <tr><td>Spacing, on center</td><td>How far apart the rows are.  9" to start.</td></tr>
 <tr><td>Longest loop</td><td>The most tube in one loop, manifold and back.  Blank is the tube's own: 200 ft for
 3/8", 300 ft for 1/2", 400 ft for 5/8", 500 ft for 3/4".</td></tr>
-<tr><td>Waste on the coil</td><td>Percent added to the order.  10% to start.  It changes the order only, never the
-layout, so it needs no new search.</td></tr>
 <tr><td>Most loops a manifold</td><td>2 to 64, 12 to start - most makers stop at twelve.  A zone that wants more is
 yours to split in two; the wizard does not put a second manifold in it.</td></tr>
 <tr><td>Search until ... % of the floor covered, and the loops within ... % of each other</td><td>The goals.  A
@@ -65,7 +66,7 @@ and says so on the material list and the submittal.</p>
 <p>The plan in the middle shows the floor north up, with a compass in the corner.  Each zone is outlined, holes
 are shaded gray, and each manifold is a small numbered box - the one you are working on is yellow.  Once a zone
 is searched, every loop is drawn in its own color, so you can follow one run by eye.</p>
-<p>When the wizard opens, it puts a manifold in every zone, on a wall and a foot in from it, toward the middle of
+<p>When the wizard opens, it puts a manifold in every zone, tight to a wall, toward the middle of
 all the zones - where the boiler most likely is.  <b>Suggest manifolds</b> puts them all back there.</p>
 <h3>Tabs</h3>
 <p>Under the plan there is a tab for each zone, and <b>All zones</b> when there is more than one.  Click a zone on the
@@ -84,8 +85,12 @@ manifold takes.</li>
 </ul>
 <h3>Moving and turning a manifold</h3>
 <ul>
-<li><b>Drag</b> a manifold's box to move it.  It stays inside its own zone.</li>
-<li>Drag it within about a foot and a half of a straight wall and it turns to lie along that wall - and keeps
+<li><b>Drag</b> a manifold's box to move it.  It stays inside its own zone.  While you drag it, and while its
+zone is open, it shows its distance from its middle to the wall each way, and it lands whole inches from the
+nearer walls, so you can put it on a mark you measured.</li>
+<li>Out in the floor, away from every wall, its loops leave from its front and its back.  On a wall, from its
+front.</li>
+<li>Drag it within about a foot and a half of a straight wall and it goes tight to that wall, turned to lie along it - and keeps
 that heading when you drag it away again.  That is the quick way to turn one and then move it out into the
 floor.</li>
 <li>Right-click it for <b>Rotate manifold 90 degrees</b>, or <b>Square the manifold</b>: long side east - west,
@@ -181,7 +186,7 @@ and in feet.</li>
 <p>The material list for a zone gives the tube and spacing, the floor area, the loops, the manifold's size and about
 how much wall it takes, every loop's length, and then:</p>
 <ul>
-<li>total tube with no waste, and the order with the waste added;</li>
+<li>total tube, and for each roll size how many rolls it takes and what is left on them;</li>
 <li>ties or staples, one every 15";</li>
 <li>how many bends, and how much of the tube runs in long straights;</li>
 <li>how far out from the manifold every tube is on the grid;</li>
@@ -261,29 +266,35 @@ text if you pick a <code>.txt</code> file.  It is named for the job to start wit
 the same PDF where nothing is kept and opens it in your PDF reader, so you can look it over first.</p>
 <p>It covers the zones searched so far; a zone not searched says it has no layout.  In order:</p>
 <ul>
-<li><b>The system</b> - the tube and spacing, the longest loop allowed, the zones and manifolds, the loops, the
-floor and how much of it the tube reaches, the tube and the order, ties, the goals, how many layouts were tried in
-how long, installer friendly, and the slab.</li>
-<li><b>Material list</b> - the tube to order, the manifolds by size with the wall each takes, ties or staples, and
-the insulation under the slab.</li>
-<li><b>Zones</b> - a line each: floor, loops, manifold, wall space, tube, reached, loops within, bends, easy, and
-whether it met the goals.</li>
-<li><b>The plan</b> of every zone, north up, with a scale bar.</li>
-<li><b>A page for each zone</b> - its plan with the manifold dimensioned to the walls, a table of its loops (length,
-measurements to set out, color), what it takes, the heat, water and pump when there is a heat load, anything out of
-the ordinary (the manifold moved, rows closed up, a tight turn, short of the goals, too many loops), and how it was
-found.</li>
+<li><b>The job</b> - the slab and its overall size, the tube and spacing, the zones and manifolds, the loops, the
+floor, the tube laid, and ties.</li>
+<li><b>Material list</b> - the tube, the manifolds by size with the wall each takes, ties or staples, and the
+insulation under the slab.</li>
+<li><b>Tube by the roll</b> - for each size the tube is sold in that a loop fits on, how many rolls it takes and
+what is left on each.  A loop comes off one roll in one piece, the loops laid in order, each off the first roll that
+still has enough on it.  A roll too short for some of the loops names them.</li>
+<li><b>Zones</b> - a line each: floor, loops, manifold, wall space and tube.</li>
+<li><b>The plan</b> of every zone, north up, with the slab's overall length and width, every manifold dimensioned,
+and a scale bar.  A manifold is dimensioned from the nearer wall each way, along its wall and out from it, to its
+middle - not from a wall it is against.</li>
+<li><b>A page for each zone</b> - its plan with the manifold dimensioned, a table of its loops (length,
+color, and which roll each comes off with what is left on it after), what it takes, the heat, water and pump when
+there is a heat load, anything out of the ordinary (the manifold moved, rows closed up, a tight turn, short of the
+goals, too many loops), and how it was found.</li>
 <li><b>A setting-out sheet for every loop</b>, a loop to a page for the binder: the loop by itself in its color with
-the others faint, the dimensions to mark it out from the walls - to the first row, across the rows, to where the
-rows turn, to the far wall, each lead from its nearest wall - where the manifold goes, a warning when it takes more
-than two measurements, a scale bar, and an <b>installer checklist</b>: rows marked, tube laid and tied, both ends
-tagged, supply and return connected, pressure tested, flow set (to the design GPM when there is a heat load), then
-laid by, date and checked by.  Every loop of a zone is at the same scale.</li>
+the others faint, what should be left on the roll once it is down for each roll size (measure the tail to check the loop
+went in as drawn), the dimensions to mark it out from the walls - to the first row, across the rows, to where the
+rows turn, to the far wall, each lead from its nearest wall - the manifold's dimensions too, a warning when it takes more
+than two measurements, a scale bar, and an <b>installer checklist</b>: rows marked, tube laid and tied, what was left
+on the roll, both ends tagged, supply and return connected, pressure tested, flow set (to the design GPM when there is a heat load), then
+laid by, date and checked by.  Every loop of a zone is at the same scale.  The loops are numbered left to right
+along the manifold, standing in front of it, so the sheets go up the manifold in order.</li>
 <li><b>Heat load, water and the boiler</b>, when one is used - the design conditions, the boiler, a line for each
 zone, where the loss goes, what was asked, anything to watch (a floor short of its load, water over 120 F for a
 slab, a pump past 25 ft of head, snow melt without glycol), how it was worked out, and every table value used, with
 its source.</li>
-<li><b>Design record</b> - for each zone, when it was searched, how many layouts in how long, what happened on the
+<li><b>Design record</b> - the longest loop allowed, the goals, how much of the floor the tube reaches, installer
+friendly, a line for each zone (reached, loops within, bends, easy, goals met), and for each zone, when it was searched, how many layouts in how long, what happened on the
 way (stopped by hand, gave up, picked by hand, goals met at which layout), and the layouts it kept, the chosen one
 marked.</li>
 <li><b>How this layout was made</b> - the rules the layout keeps, in a few lines.</li>
@@ -348,7 +359,8 @@ same</td></tr>
 <tr><td>Manifold sizes</td><td>2 to 12 loops</td><td>What the makers offer</td></tr>
 <tr><td>Manifold wall space</td><td>2" between connections, supply and return side by side, and 12" for the valves
 and end caps</td><td>A rule of thumb</td></tr>
-<tr><td>Waste on the coil</td><td>10%</td><td>An estimate</td></tr>
+<tr><td>Rolls</td><td>100, 300, 500 and 1,000 ft, and 400 ft for 3/8" and 5/8"</td><td>What oxygen barrier PEX
+is commonly sold in (Uponor hePEX, Sioux Chief, BOW, the box stores)</td></tr>
 <tr><td>Ties or staples</td><td>One every 15"</td><td>An estimate</td></tr>
 <tr><td>Heat load tables</td><td>U-values, slab edge F-factors, air changes, floor output, pipe sizing</td><td>IECC 2021,
 ASHRAE Fundamentals and HVAC Applications, ASHRAE 90.1, EN 1264, ASTM F876 - listed value by value in the

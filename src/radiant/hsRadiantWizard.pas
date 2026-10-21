@@ -49,7 +49,6 @@ type
     edMaxLoop: TInkEdit;
     edSpacing: TInkEdit;
     edTag: TInkEdit;
-    edWaste: TBCTrackbarUpdown;
     edMaxPorts: TBCTrackbarUpdown;
     lblManifoldHead: TLabel;
     lblMaxLoop: TLabel;
@@ -64,9 +63,7 @@ type
     lblTitle: TLabel;
     lblTube: TLabel;
     lblUnits: TLabel;
-    lblWaste: TLabel;
     lblMaxPorts: TLabel;
-    lblWastePct: TLabel;
     memTicket: TInkMemo;
     miClearAll: TMenuItem;
     miClearZone: TMenuItem;
@@ -234,8 +231,12 @@ type
     { "Zone 2", or "Zone 2 - Kitchen" }
     function ZoneTitle(Z: integer): string;
     function WallAngle(Z: integer): double;
-    function NearestWall(Z: integer; const M: T2; out D, Angle: double; out Curved: boolean): boolean;
+    function NearestWall(Z: integer; const M: T2; out D, Angle: double; out Curved: boolean; out Foot: T2): boolean;
+    function ManifoldLoops(Z: integer): integer;
+    procedure ManifoldSize(Z: integer; out W, H: double);
     function ManifoldBox(Z: integer): T2Array;
+    procedure PaintManifoldDims(C: TCanvas; Z: integer);
+    procedure SnapToInches(Z: integer);
     function ManifoldAt(X, Y: integer): integer;
     procedure Search(const Which: array of integer);
     procedure SearchWork(Sender: TObject);
@@ -490,7 +491,6 @@ begin
   if Trim(edMaxLoop.Text) = '' then Spec.MaxLoopFt := 0
   else
     Result := Result and FeetOf(edMaxLoop.Text, FUnits, Spec.MaxLoopFt);
-  Result := Result and TryStrToFloat(Trim(edWaste.Text), Spec.WastePct);
   { the most loops a manifold takes; blank is twelve }
   if Trim(edMaxPorts.Text) = '' then Spec.MaxPorts := MANIFOLD_PORTS_MAX
   else
@@ -514,7 +514,7 @@ var
   Spec, ZS: TRadiantSpec;
   Z: integer;
   Ticket: string;
-  TotalFt, OrderFt, Worst, Lo, Hi, TotalArea, TotalUnfilled, Secs: double;
+  TotalFt, Worst, Lo, Hi, TotalArea, TotalUnfilled, Secs: double;
   Loops, I, Waiting, Tried: integer;
   HasEven: boolean;
 begin
@@ -553,7 +553,6 @@ begin
   if Spec.Tag <> '' then Ticket := Spec.Tag + LineEnding + LineEnding;
   SetLength(FZoneTicket, Length(FZones));
   TotalFt := 0;
-  OrderFt := 0;
   Loops := 0;
   TotalArea := 0;
   TotalUnfilled := 0;
@@ -572,9 +571,6 @@ begin
     end;
     if not FLayouts[Z].Ok and (lblProblem.Caption = '') then
       lblProblem.Caption := Format('%s: %s', [ZoneTitle(Z), FLayouts[Z].Why]);
-    { waste only changes the order, never the layout, so typing it after a
-      search does not need another search }
-    FLayouts[Z].OrderFt := FLayouts[Z].TotalFt * (1 + ZS.WastePct / 100);
     FZoneTicket[Z] := RadiantTicketText(ZS, FLayouts[Z], FUnits);
     { which of the layouts the search kept this is }
     if (Z <= High(FSolutions)) and (Length(FSolutions[Z]) > 1) then
@@ -583,7 +579,6 @@ begin
     if FLayouts[Z].Ok then
     begin
       TotalFt := TotalFt + FLayouts[Z].TotalFt;
-      OrderFt := OrderFt + FLayouts[Z].OrderFt;
       Loops := Loops + Length(FLayouts[Z].Loops);
       TotalArea := TotalArea + FLayouts[Z].AreaSqFt;
       TotalUnfilled := TotalUnfilled + FLayouts[Z].UnfilledSqFt;
@@ -623,7 +618,7 @@ begin
   if Length(FZones) > 1 then
   begin
     Ticket := Ticket + '===== ALL ZONES =====' + LineEnding + Format('%d of %d zones searched, %d loops', [Length(FZones) - Waiting, Length(FZones), Loops]) +
-      LineEnding + 'total tube, no waste: ' + FormatLen(TotalFt, FUnits) + LineEnding + 'order: ' + FormatLen(OrderFt, FUnits) + LineEnding;
+      LineEnding + 'total tube: ' + FormatLen(TotalFt, FUnits) + LineEnding;
     { the effort, all told }
     Secs := 0;
     Tried := 0;
@@ -678,9 +673,9 @@ begin
 end;
 
 { zone Z's wall nearest plan point M: how far, its heading in the plan's
-  frame (0 up to 180), and whether it is part of a curve.  False when the
-  zone has no walls. }
-function TRadiantForm.NearestWall(Z: integer; const M: T2; out D, Angle: double; out Curved: boolean): boolean;
+  frame (0 up to 180), whether it is part of a curve, and the point on it
+  nearest M.  False when the zone has no walls. }
+function TRadiantForm.NearestWall(Z: integer; const M: T2; out D, Angle: double; out Curved: boolean; out Foot: T2): boolean;
 var
   I, J: integer;
   A, B: T2;
@@ -690,6 +685,7 @@ begin
   D := 1E300;
   Angle := 0;
   Curved := False;
+  Foot := M;
   if (Z < 0) or (Z > High(FZones)) then Exit;
   for I := 0 to High(FZones[Z].Outline) do
   begin
@@ -706,6 +702,7 @@ begin
       Result := True;
       Angle := RadToDeg(ArcTan2(B.Y - A.Y, B.X - A.X));
       Curved := RadiantEdgeCurved(FZones[Z].Outline, I);
+      Foot := Point2(A.X + T * (B.X - A.X), A.Y + T * (B.Y - A.Y));
     end;
   end;
   { a heading, not a direction }
@@ -719,23 +716,51 @@ function TRadiantForm.WallAngle(Z: integer): double;
 var
   D: double;
   Curved: boolean;
+  Foot: T2;
 begin
   Result := 0;
   if (Z < 0) or (Z > High(FManifolds)) then Exit;
-  if not NearestWall(Z, RadiantTo2(FFrame, FManifolds[Z]), D, Result, Curved) then Exit;
+  if not NearestWall(Z, RadiantTo2(FFrame, FManifolds[Z]), D, Result, Curved, Foot) then Exit;
   { a piece of a curve is no wall to square to - its chord runs at any
     angle - so square to the sheet, whichever way is nearer }
   if Curved then Result := 90 * Round(Result / 90);
   if Result >= 180 then Result := Result - 180;
 end;
 
-{ zone Z's manifold as its box (18 by 6 inches, turned to its heading),
-  never smaller on the plan than a pointer can grab.  Kept small even so:
-  manifolds are suggested a couple of feet apart at the zones' common
-  corner, and bigger boxes hid one another. }
-function TRadiantForm.ManifoldBox(Z: integer): T2Array;
+{ the loops zone Z's manifold takes: its layout's, or the ports it was
+  suggested with }
+function TRadiantForm.ManifoldLoops(Z: integer): integer;
+begin
+  Result := 0;
+  if (Z <= High(FLayouts)) and (Z <= High(FSearched)) and FSearched[Z] and FLayouts[Z].Ok and
+    (Length(FLayouts[Z].Manifolds) > 0) then Result := FLayouts[Z].Manifolds[0].LoopCount
+  else if Z <= High(FPorts) then Result := FPorts[Z];
+  Result := Max(MANIFOLD_PORTS_MIN, Result);
+end;
+
+{ Zone Z's manifold on the plan, long side and short: 18 by 6 inches, or
+  bigger where the plan is small - long enough for its connections at
+  MANIFOLD_PX apart and fat enough for two rows of them, so it reads as a
+  manifold and a pointer can grab it.  Kept slim even so: manifolds are
+  suggested a couple of feet apart at the zones' common corner, and big
+  boxes hid one another. }
+procedure TRadiantForm.ManifoldSize(Z: integer; out W, H: double);
+const
+  MANIFOLD_PX = 6;
 var
   Spec: TRadiantSpec;
+begin
+  Spec := DefaultRadiantSpec;
+  W := Spec.ManifoldW;
+  H := Spec.ManifoldH;
+  if FSc <= 0 then Exit;
+  W := Max(W, (ManifoldLoops(Z) * MANIFOLD_PX + 10) / FSc);
+  H := Max(H, 14 / FSc);
+end;
+
+{ zone Z's manifold as its box, turned to its heading - see ManifoldSize }
+function TRadiantForm.ManifoldBox(Z: integer): T2Array;
+var
   C: T2;
   W, H, Ca, Sa: double;
   K: integer;
@@ -745,14 +770,7 @@ const
 begin
   SetLength(Result, 4);
   C := RadiantTo2(FFrame, FManifolds[Z]);
-  Spec := DefaultRadiantSpec;
-  W := Spec.ManifoldW;
-  H := Spec.ManifoldH;
-  if FSc > 0 then
-  begin
-    W := Max(W, 14 / FSc);
-    H := Max(H, 7 / FSc);
-  end;
+  ManifoldSize(Z, W, H);
   Ca := Cos(DegToRad(FAngles[Z]));
   Sa := Sin(DegToRad(FAngles[Z]));
   for K := 0 to 3 do
@@ -766,19 +784,16 @@ var
   Z: integer;
   M, C: T2;
   U, V, W, H, Ca, Sa, Slack, D, Best: double;
-  Spec: TRadiantSpec;
 begin
   Result := -1;
   if FSc <= 0 then Exit;
   M := Point2(PlanU(X), PlanV(Y));
-  Spec := DefaultRadiantSpec;
   Slack := 4 / FSc;
   Best := 1E300;
   for Z := 0 to High(FManifolds) do
   begin
     C := RadiantTo2(FFrame, FManifolds[Z]);
-    W := Max(Spec.ManifoldW, 14 / FSc);
-    H := Max(Spec.ManifoldH, 7 / FSc);
+    ManifoldSize(Z, W, H);
     Ca := Cos(DegToRad(FAngles[Z]));
     Sa := Sin(DegToRad(FAngles[Z]));
     { into the box's own axes }
@@ -1662,7 +1677,7 @@ begin
   Summarize;
 end;
 
-{ the waste or the tag: only the ticket changes }
+{ the tag: only the ticket changes }
 procedure TRadiantForm.AnyChange(Sender: TObject);
 begin
   if FListing then Exit;
@@ -1991,8 +2006,8 @@ end;
 
 procedure TRadiantForm.pbPlanMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  M: T2;
-  D, A: double;
+  M, Foot: T2;
+  D, A, H: double;
   Curved: boolean;
 begin
   if FDragManifold < 0 then Exit;
@@ -2002,11 +2017,18 @@ begin
     { a manifold stays in its own zone: a drag out of it is ignored }
     if not RadiantInside(FZones[FDragManifold].Outline, RadiantFrom2(FFrame, M.X, M.Y)) then Exit;
     FManifolds[FDragManifold] := RadiantFrom2(FFrame, M.X, M.Y);
-    { Pushed against a flat wall, it turns to lie along it and keeps that
-      heading when dragged away again - a quick way to rotate one.  Not on a
-      curve, where a chord's heading means nothing. }
-    if (FDragManifold <= High(FAngles)) and NearestWall(FDragManifold, M, D, A, Curved) and not Curved and (D <= Max(MANIFOLD_SNAP_FT, MANIFOLD_SNAP_PX / FSc)) then
+    { Pushed against a flat wall, it turns to lie along it, tight to it as a
+      manifold hangs, and keeps that heading when dragged away again - a
+      quick way to rotate one.  Not on a curve, where a chord's heading
+      means nothing. }
+    if (FDragManifold <= High(FAngles)) and NearestWall(FDragManifold, M, D, A, Curved, Foot) and not Curved and (D <= Max(MANIFOLD_SNAP_FT, MANIFOLD_SNAP_PX / FSc)) then
+    begin
       FAngles[FDragManifold] := A;
+      H := DefaultRadiantSpec.ManifoldH / 2;
+      if D > 1E-9 then
+        FManifolds[FDragManifold] := RadiantFrom2(FFrame, Foot.X + (M.X - Foot.X) * H / D, Foot.Y + (M.Y - Foot.Y) * H / D);
+    end;
+    SnapToInches(FDragManifold);
     { the old layout is gone the moment it moves, but only this zone's;
       an obstacle would clear every zone }
     if not FDragMoved then ClearZone(FDragManifold);
@@ -2087,7 +2109,7 @@ var
   Box: T2Array;
   BoxPx: TPtArr;
   Order: TIntArray;
-  K, LX, LY: integer;
+  K, LX, LY, N: integer;
   Mid, Q: T2;
   Off: double;
 
@@ -2173,6 +2195,10 @@ begin
           C.LineTo(PlanX(P.X), PlanY(P.Y));
         end;
       end;
+  { where the one being moved, or the selected one, stands: to the walls
+    round it, under the manifolds }
+  if FDragManifold >= 0 then PaintManifoldDims(C, FDragManifold)
+  else if (SelectedZone >= 0) and (SelectedZone <= High(FManifolds)) then PaintManifoldDims(C, SelectedZone);
   { manifolds last, on top, each turned the way it hangs, the selected one
     over the rest.  The number is set off toward the middle of its zone so
     four manifolds at one corner still read as four. }
@@ -2204,6 +2230,28 @@ begin
     SetLength(BoxPx, 4);
     for J := 0 to 3 do BoxPx[J] := Point(PlanX(Box[J].X), PlanY(Box[J].Y));
     C.Polygon(BoxPx);
+    { its connections: supply along one side, return along the other,
+      staggered half a pitch, a pair a loop }
+    N := ManifoldLoops(I);
+    for J := 0 to 2 * N - 1 do
+    begin
+      { along the long side, from Box[0] to Box[1]; across, a quarter in
+        from either long edge }
+      Off := ((J div 2) + 0.5 + 0.5 * (J mod 2)) / (N + 0.5);
+      Q := Point2(Box[0].X + (Box[1].X - Box[0].X) * Off, Box[0].Y + (Box[1].Y - Box[0].Y) * Off);
+      if J mod 2 = 0 then Q := Point2(Q.X + (Box[3].X - Box[0].X) * 0.3, Q.Y + (Box[3].Y - Box[0].Y) * 0.3)
+      else
+        Q := Point2(Q.X + (Box[3].X - Box[0].X) * 0.7, Q.Y + (Box[3].Y - Box[0].Y) * 0.7);
+      C.Brush.Color := clWhite;
+      C.Pen.Width := 1;
+      C.Pen.Color := clGray;
+      C.Ellipse(PlanX(Q.X) - 2, PlanY(Q.Y) - 2, PlanX(Q.X) + 3, PlanY(Q.Y) + 3);
+    end;
+    C.Pen.Width := 2;
+    C.Pen.Color := ZoneInk(I);
+    if SelectedZone = I then C.Brush.Color := clYellow
+    else
+      C.Brush.Color := clWhite;
     { the number, a little way toward the middle of its zone }
     Mid := Point2(0, 0);
     if I <= High(FZones) then
@@ -2248,6 +2296,125 @@ begin
   else
     C.TextOut(8, H - 20, Format('%d zone(s), %d loop(s) - drag a manifold, right-click to turn it', [Length(FZones), Loops]));
   PaintCompass(C, W - 34, 62);
+end;
+
+{ Zone Z's manifold dimensioned from its middle to the wall each way,
+  along its heading and square to it, so it can be put on a mark.  A wall
+  it is against (within a foot) gets none. }
+procedure TRadiantForm.PaintManifoldDims(C: TCanvas; Z: integer);
+const
+  INK = $00B06000;
+  TICK = 4;
+  { the lines along a wall it is against are set this far into the floor,
+    pixels, or they would lie on the wall }
+  SET_OFF = 14;
+var
+  K: integer;
+  M, D, Hit: T2;
+  Hits: array[0..3] of T2;
+  Lens: array[0..3] of double;
+  Poly: T2Array;
+  A, Len: double;
+  X0, Y0, X1, Y1, TX, TY, NX, NY, OX, OY, Fr: integer;
+  S: string;
+begin
+  if (Z < 0) or (Z > High(FZones)) or (Z > High(FManifolds)) or (FSc <= 0) then Exit;
+  M := RadiantTo2(FFrame, FManifolds[Z]);
+  SetLength(Poly, Length(FZones[Z].Outline));
+  for K := 0 to High(Poly) do Poly[K] := RadiantTo2(FFrame, FZones[Z].Outline[K]);
+  A := 0;
+  if Z <= High(FAngles) then A := DegToRad(FAngles[Z]);
+  { 0 and 2 along its long side, 1 and 3 square to it }
+  for K := 0 to 3 do
+  begin
+    D := Point2(Cos(A + K * Pi / 2), Sin(A + K * Pi / 2));
+    Lens[K] := -1;
+    if RayWall(Poly, M, D, Hit) then
+    begin
+      Hits[K] := Hit;
+      Lens[K] := Hypot(Hit.X - M.X, Hit.Y - M.Y);
+    end;
+  end;
+  { against a wall: the side it faces, for the set-off }
+  OX := 0;
+  OY := 0;
+  if (Lens[1] >= 0) and (Lens[3] >= 0) and (Min(Lens[1], Lens[3]) <= 1) then
+  begin
+    if Lens[1] > Lens[3] then Fr := 1
+    else
+      Fr := 3;
+    Len := Max(1E-9, Hypot(PlanX(Hits[Fr].X) - PlanX(M.X), PlanY(Hits[Fr].Y) - PlanY(M.Y)));
+    OX := Round((PlanX(Hits[Fr].X) - PlanX(M.X)) / Len * SET_OFF);
+    OY := Round((PlanY(Hits[Fr].Y) - PlanY(M.Y)) / Len * SET_OFF);
+  end;
+  C.Pen.Width := 1;
+  C.Pen.Color := INK;
+  C.Font.Color := INK;
+  for K := 0 to 3 do
+  begin
+    if Lens[K] <= 1 then Continue;
+    X0 := PlanX(M.X);
+    Y0 := PlanY(M.Y);
+    X1 := PlanX(Hits[K].X);
+    Y1 := PlanY(Hits[K].Y);
+    if K mod 2 = 0 then
+    begin
+      { from the manifold's middle out to the set-off line }
+      if (OX <> 0) or (OY <> 0) then C.Line(X0, Y0, X0 + OX, Y0 + OY);
+      Inc(X0, OX);
+      Inc(Y0, OY);
+      Inc(X1, OX);
+      Inc(Y1, OY);
+    end;
+    C.Line(X0, Y0, X1, Y1);
+    { a tick across the line at the wall }
+    NX := Round(-(Y1 - Y0) / Max(1, Hypot(X1 - X0, Y1 - Y0)) * TICK);
+    NY := Round((X1 - X0) / Max(1, Hypot(X1 - X0, Y1 - Y0)) * TICK);
+    C.Line(X1 - NX, Y1 - NY, X1 + NX, Y1 + NY);
+    S := FormatLen(Lens[K], FUnits);
+    TX := (X0 + X1) div 2 - C.TextWidth(S) div 2;
+    TY := (Y0 + Y1) div 2 - C.TextHeight(S) div 2;
+    C.Brush.Style := bsSolid;
+    C.Brush.Color := clWhite;
+    C.TextOut(TX, TY, S);
+    C.Brush.Style := bsClear;
+  end;
+end;
+
+{ Zone Z's manifold moved the least it takes to stand whole inches from
+  the nearer wall each way, along its heading and square to it - what its
+  dimensions read, and what goes on the sheets. }
+procedure TRadiantForm.SnapToInches(Z: integer);
+var
+  K, J: integer;
+  M, D, Hit, BestD: T2;
+  Poly: T2Array;
+  A, Best, L: double;
+begin
+  if (Z < 0) or (Z > High(FZones)) or (Z > High(FManifolds)) then Exit;
+  M := RadiantTo2(FFrame, FManifolds[Z]);
+  SetLength(Poly, Length(FZones[Z].Outline));
+  for K := 0 to High(Poly) do Poly[K] := RadiantTo2(FFrame, FZones[Z].Outline[K]);
+  A := 0;
+  if Z <= High(FAngles) then A := DegToRad(FAngles[Z]);
+  for K := 0 to 1 do
+  begin
+    Best := 1E300;
+    for J := 0 to 1 do
+    begin
+      D := Point2(Cos(A + (K + 2 * J) * Pi / 2), Sin(A + (K + 2 * J) * Pi / 2));
+      if RayWall(Poly, M, D, Hit) and (Hypot(Hit.X - M.X, Hit.Y - M.Y) < Best) then
+      begin
+        Best := Hypot(Hit.X - M.X, Hit.Y - M.Y);
+        BestD := D;
+      end;
+    end;
+    if Best > 1E299 then Continue;
+    L := Best - Max(1, Round(Best * 12)) / 12;
+    M := Point2(M.X + BestD.X * L, M.Y + BestD.Y * L);
+  end;
+  if RadiantInside(FZones[Z].Outline, RadiantFrom2(FFrame, M.X, M.Y)) then
+    FManifolds[Z] := RadiantFrom2(FFrame, M.X, M.Y);
 end;
 
 { Which way north is on the plan, drawn at CX, CY.  North is the drawing's
@@ -2437,7 +2604,6 @@ begin
     if Spec.MaxLoopFt > 0 then edMaxLoop.Text := FormatFloat('0.#', Spec.MaxLoopFt / (Inch * 12))
     else
       edMaxLoop.Text := '';
-    edWaste.Text := FormatFloat('0.##', Spec.WastePct);
     if Spec.MaxPorts > 0 then edMaxPorts.Text := IntToStr(Spec.MaxPorts)
     else
       edMaxPorts.Text := '';

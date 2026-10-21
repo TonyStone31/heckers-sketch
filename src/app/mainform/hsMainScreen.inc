@@ -1445,6 +1445,9 @@ var
   Loops: Integer;
   Ft: Double;
 begin
+  { licensed first - see hsRadiantLicense }
+  hsDialogSkin.UseTheme(Themes[FThemeIdx]);
+  if not RadiantUnlocked(Self) then Exit;
   { Each selected face is a zone with its own manifold (a floor drawn as one
     rectangle with lines across it is several zones); a face cut out of one
     is a hole and a no-go.  Ctrl+A or a drag both work: lines are ignored. }

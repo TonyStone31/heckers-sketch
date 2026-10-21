@@ -72,7 +72,6 @@ begin
   W.Int('tube', Ord(S.Tube));
   W.Num('spacing', S.Spacing);
   W.Num('maxloop', S.MaxLoopFt);
-  W.Num('waste', S.WastePct);
   W.Pts('manifolds', S.Manifolds);
   SetLength(Ports, Length(S.Ports));
   for I := 0 to High(S.Ports) do Ports[I] := S.Ports[I];
@@ -111,7 +110,6 @@ begin
   Result.Tube := TTubeSize(EnsureRange(N.Int('tube', Ord(Result.Tube)), 0, Ord(High(TTubeSize))));
   Result.Spacing := N.Num('spacing', Result.Spacing);
   Result.MaxLoopFt := N.Num('maxloop', 0);
-  Result.WastePct := N.Num('waste', Result.WastePct);
   Result.Manifolds := N.Pts('manifolds');
   V := N.Nums('ports');
   SetLength(Result.Ports, Length(V));
@@ -149,7 +147,9 @@ begin
   W.Int('rows', R.RowCount);
   W.Int('obstacles', R.ObstacleCount);
   W.Num('total', R.TotalFt);
-  W.Num('order', R.OrderFt);
+  { the lead at the manifold is in every loop's length; a job saved before
+    it was has none }
+  W.Num('lead', MANIFOLD_LEAD_FT);
   W.Nums('turn', [R.TurnActualIn, R.TurnMinIn, R.TurnMinPexAIn]);
   W.Int('crossings', R.Crossings);
   W.Int('cells', R.CellCount);
@@ -213,7 +213,6 @@ begin
   Result.RowCount := N.Int('rows');
   Result.ObstacleCount := N.Int('obstacles');
   Result.TotalFt := N.Num('total');
-  Result.OrderFt := N.Num('order');
   V := N.Nums('turn');
   if Length(V) >= 3 then
   begin
@@ -284,6 +283,13 @@ begin
     end;
   end;
   if not AllFriendly then SetLength(Result.LoopFriendly, 0);
+  if N.Find('lead') = nil then
+  begin
+    for I := 0 to High(Result.Loops) do Result.Loops[I].LenFt := Result.Loops[I].LenFt + MANIFOLD_LEAD_FT;
+    for I := 0 to High(Result.Manifolds) do
+      Result.Manifolds[I].Ft := Result.Manifolds[I].Ft + Result.Manifolds[I].LoopCount * MANIFOLD_LEAD_FT;
+    Result.TotalFt := Result.TotalFt + Length(Result.Loops) * MANIFOLD_LEAD_FT;
+  end;
 end;
 
 procedure PutZone(W: TDataWriter; const Zone: TRadiantZone);

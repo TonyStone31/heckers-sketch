@@ -24,6 +24,43 @@ const
     ', then "- " bullets.  Keep the bullets short.' + LineEnding +
     '-->' + LineEnding +
     '' + LineEnding +
+    '## Next release' + LineEnding +
+    '' + LineEnding +
+    '### New' + LineEnding +
+    '' + LineEnding +
+    '- **The radiant tools are an add-on** and ask for a license the first time' + LineEnding +
+    '  they are opened.' + LineEnding +
+    '- **Radiant loops are numbered along the manifold.**  Standing in front of' + LineEnding +
+    '  it, loop 1 is at the left end and the rest follow in order, so the' + LineEnding +
+    '  setting-out sheets go up the manifold one loop after another.' + LineEnding +
+    '- **Radiant tube by the roll.**  The submittal works out the rolls PEX is' + LineEnding +
+    '  sold in - 100, 300, 500 and 1,000 ft, and 400 ft for 3/8" and 5/8" - how' + LineEnding +
+    '  many, and what is left on each one, every loop in one piece.  Each loop''s sheet says what should be left on the roll once it is' + LineEnding +
+    '  down, so measuring the tail checks the loop went in as drawn.  The flat' + LineEnding +
+    '  waste percentage is gone.' + LineEnding +
+    '- **The slab''s overall size** is on the submittal''s first page and' + LineEnding +
+    '  dimensioned on the plan of every zone.' + LineEnding +
+    '- **6 ft at the manifold in every radiant loop.**  The climb up the wall' + LineEnding +
+    '  and the tube fanned out onto the grid are counted in each loop''s length,' + LineEnding +
+    '  the totals and the rolls, and against the longest loop allowed.' + LineEnding +
+    '- **The manifold starts tight to its wall**, and goes tight to a wall it is' + LineEnding +
+    '  dragged up to.' + LineEnding +
+    '- **The radiant wizard shows where the manifold is**: its distance to the' + LineEnding +
+    '  wall each way while you drag it or have its zone open, and a drag lands' + LineEnding +
+    '  it whole inches from the walls, so it can go on a mark.  The manifold' + LineEnding +
+    '  is drawn with its connections, a pair a loop.' + LineEnding +
+    '- **The manifold is dimensioned** on the plan of every zone, each zone''s page' + LineEnding +
+    '  and every loop''s sheet: from the nearer wall each way, along its wall and' + LineEnding +
+    '  out from it, and not from a wall it is against.' + LineEnding +
+    '- **The submittal puts the installer first.**  The job, the materials, the' + LineEnding +
+    '  rolls and the plans come first.  How well the layout scored and how it' + LineEnding +
+    '  was found are at the back.' + LineEnding +
+    '' + LineEnding +
+    '### Fixed' + LineEnding +
+    '' + LineEnding +
+    '- A radiant loop whose rows run at a slant, as in a round room, had no' + LineEnding +
+    '  dimensions on its setting-out sheet.' + LineEnding +
+    '' + LineEnding +
     '## v2026.10.19' + LineEnding +
     '' + LineEnding +
     '### New' + LineEnding +

@@ -36,7 +36,7 @@ uses
   hsFaceFinder, hsUpdater, hsUpdateForm, hsWhatsNew, hsPaths,
   hsBugReport, hsNet, hsUnfold, hsFlatView, hsTunnels, hsSendReport, hsSourceWindow, hsAssistant, hsPostcard, hsHeckWriter, hsHeckReader,
   hsJigRun, hsJigFiles, hsFittings, hsTransitionWizard, hsSpoolWizard, hsPipe,
-  hsStairs, hsStairWizard, hsStringerSheet, hsHeckFile, hsRadiantData, hsRadiant, hsRadiantWizard, hsRadiantSubmittal, hsRadiantJob,
+  hsStairs, hsStairWizard, hsStringerSheet, hsHeckFile, hsRadiantData, hsRadiant, hsRadiantWizard, hsRadiantLicense, hsRadiantSubmittal, hsRadiantJob,
   hsCommandText, InkPage, InkDraw, FileAssMan, FATypes, FileEye, InfoBar;
 
 type

@@ -13,7 +13,7 @@ unit hsRadiantData;
   * Slab tube centered in the pour, about 2" deep at most. R-15 under a heated
     slab at least (R-10 to R-20 by climate), edges at twice the field R-value.
 
-  Estimates, and the ticket says so: coil waste (10%) and tie/staple spacing.
+  Estimates, and the ticket says so: tie/staple spacing.
 
   Copyright (c) 2021-2026 Tony Stone - MIT, see LICENSE. }
 
@@ -61,9 +61,16 @@ const
   { but not on a try covering this much less than the best seen }
   EVEN_TWIN_WITHIN = 0.1;
 
-  { coil waste: cutting losses and the spool end too short for one more run.
-    A trade rule, not measured. }
-  WASTE_PCT_DEFAULT = 10.0;
+  { the coils oxygen barrier PEX is commonly sold in, feet, by tube size -
+    Uponor's hePEX lineup (3/8" and 5/8" add a 400), Sioux Chief, BOW and
+    the box stores carry the same; 0 is none.  A loop comes off one roll in
+    one piece, so what is left on each roll is worked out for every size a
+    loop of the job fits on (see RadiantRolls). }
+  ROLL_SIZES_FT: array[TTubeSize, 0..4] of double = (
+    (100, 300, 400, 500, 1000),
+    (100, 300, 500, 1000, 0),
+    (100, 300, 400, 500, 1000),
+    (100, 300, 500, 1000, 0));
 
   { slab defaults }
   SLAB_THICK_DEFAULT_IN = 4.0;
@@ -92,6 +99,11 @@ const
   { how far out from the manifold tube may run closer than the spacing -
     the fan from the ports onto the grid. About a foot. }
   MANIFOLD_FAN_IN = 13.0;
+  { tube in every loop that the floor plan doesn't show: up the wall to the
+    manifold and back, and the fan out of the ports onto the grid, which
+    installers angle in rather than turn square as drawn. It is part of
+    every loop's length and counts against the longest loop allowed. }
+  MANIFOLD_LEAD_FT = 6.0;
   { how far around a manifold tubes may run closer than the spacing (down to
     the port pitch) before they all have to be out on the grid }
   MANIFOLD_BREAKOUT_FT = 4.0;

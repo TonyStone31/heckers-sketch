@@ -105,8 +105,12 @@ procedure RadiantLoopStrokes(const Job: TRadiantJob; Zone, Loop: integer; out St
   the far wall. Plus any row that stops elsewhere, and each lead lane.
   Words says the same in plain lines. }
 function RadiantLoopDims(const Job: TRadiantJob; Zone, Loop: integer; out Words: TStringArray): TPlanDims;
-{ the manifold of zone Zone: its middle to the walls around it }
+{ the manifold of zone Zone set out: hung on a flat wall, its middle from
+  the nearer end of that wall; out in the floor, its middle from the nearer
+  wall each way.  None to a wall it is against. }
 function RadiantManifoldDims(const Job: TRadiantJob; Zone: integer; out Words: TStringArray): TPlanDims;
+{ the nearest wall of Poly that a ray from P along D meets, and where }
+function RayWall(const Poly: T2Array; const P, D: T2; out Hit: T2): boolean;
 { the blocks as plain text - a title underlined, tables in columns }
 function SubmittalAsText(const Blocks: TSubmittalBlocks): string;
 { #RRGGBB, for a table that names an ink }
@@ -142,11 +146,149 @@ begin
   Result := FormatFloat('0.0', F * 100) + '%';
 end;
 
+{ a length the way it is said on the job: whole feet in an imperial drawing }
+function FtWords(V: double; U: TUnitSystem): string;
+begin
+  if U = usImperial then Result := FormatFloat('#,##0', V) + ' ft'
+  else
+    Result := FormatLen(V, U);
+end;
+
+{ "A", "A and B", "A, B and C" }
+function AndList(const Items: TStringArray): string;
+var
+  K: integer;
+begin
+  Result := '';
+  for K := 0 to High(Items) do
+    if K = 0 then Result := Items[K]
+    else if K = High(Items) then Result := Result + ' and ' + Items[K]
+    else
+      Result := Result + ', ' + Items[K];
+end;
+
+{ Every laid loop's length in the order it is laid - zone by zone, loop by
+  loop.  Zs and Ls say whose each one is. }
+function JobLens(const Job: TRadiantJob; out Zs, Ls: TIntArray): TRollSizes;
+var
+  Z, L: integer;
+  Lens: TRollSizes;
+begin
+  Zs := nil;
+  Ls := nil;
+  Lens := nil;
+  for Z := 0 to High(Job.Zones) do
+    if (Z <= High(Job.Searched)) and Job.Searched[Z] and (Z <= High(Job.Layouts)) and Job.Layouts[Z].Ok then
+      for L := 0 to High(Job.Layouts[Z].Loops) do
+      begin
+        SetLength(Lens, Length(Lens) + 1);
+        Lens[High(Lens)] := Job.Layouts[Z].Loops[L].LenFt;
+        SetLength(Zs, Length(Lens));
+        Zs[High(Zs)] := Z;
+        SetLength(Ls, Length(Lens));
+        Ls[High(Ls)] := L;
+      end;
+  Result := Lens;
+end;
+
+{ those loops cut from rolls of RollFt }
+function JobRolls(const Job: TRadiantJob; RollFt: double; out Zs, Ls: TIntArray): TRadiantRolls;
+begin
+  Result := RadiantRolls(JobLens(Job, Zs, Ls), RollFt);
+end;
+
+{ the roll sizes the job's tube is sold in that one of its loops fits on }
+function JobSizes(const Job: TRadiantJob): TRollSizes;
+var
+  Zs, Ls: TIntArray;
+begin
+  Result := RadiantRollSizes(Job.Spec.Tube, JobLens(Job, Zs, Ls));
+end;
+
+{ What should be left on the roll once loop L of zone Z is down, a line for
+  each roll size of the job (JobSizes): "500 ft roll: a full roll (roll 3) -
+  188 ft left", "1,000 ft roll: roll 1, after Z1 L1 and Z1 L2 - 82 ft
+  left", or "300 ft roll: too short for this loop".  The installer
+  measures the tail to check the loop went in as drawn.  Short says it
+  without the roll size, for one size alone. }
+function RollCheck(const Job: TRadiantJob; Z, L: integer; Short: boolean = False): TStringArray;
+var
+  K, I, J: integer;
+  R: TRadiantRolls;
+  Zs, Ls: TIntArray;
+  Before: TStringArray;
+  S: string;
+  Sizes: TRollSizes;
+begin
+  Result := nil;
+  Sizes := JobSizes(Job);
+  for K := 0 to High(Sizes) do
+  begin
+    R := JobRolls(Job, Sizes[K], Zs, Ls);
+    for I := 0 to High(Zs) do
+      if (Zs[I] = Z) and (Ls[I] = L) then
+      begin
+        SetLength(Result, Length(Result) + 1);
+        if R.Roll[I] < 0 then
+        begin
+          if Short then Result[High(Result)] := 'too short'
+          else
+            Result[High(Result)] := Format('%s roll: too short for this loop', [FtWords(Sizes[K], Job.Units)]);
+          Continue;
+        end;
+        Before := nil;
+        for J := 0 to I - 1 do
+          if R.Roll[J] = R.Roll[I] then
+          begin
+            SetLength(Before, Length(Before) + 1);
+            Before[High(Before)] := Format('Z%d L%d', [Zs[J] + 1, Ls[J] + 1]);
+          end;
+        if Length(Before) = 0 then S := Format('a full roll (roll %d)', [R.Roll[I] + 1])
+        else
+          S := Format('roll %d, after %s', [R.Roll[I] + 1, AndList(Before)]);
+        if Short then Result[High(Result)] := Format('roll %d: %s left', [R.Roll[I] + 1, FtWords(R.LeftAfter[I], Job.Units)])
+        else
+          Result[High(Result)] := Format('%s roll: %s - %s left', [FtWords(Sizes[K], Job.Units), S, FtWords(R.LeftAfter[I], Job.Units)]);
+      end;
+  end;
+end;
+
+{ the slab's overall size: the box round every zone, in the plan's feet }
+function SlabBox(const Job: TRadiantJob; out Lo, Hi: T2): boolean;
+var
+  F: TRadiantFrame;
+  Z, I: integer;
+  P: T2;
+begin
+  Result := False;
+  Lo.X := 1E300;
+  Lo.Y := 1E300;
+  Hi.X := -1E300;
+  Hi.Y := -1E300;
+  if Length(Job.Zones) = 0 then Exit;
+  F := RadiantPlanFrame(Job.Zones[0].Outline);
+  for Z := 0 to High(Job.Zones) do
+    for I := 0 to High(Job.Zones[Z].Outline) do
+    begin
+      P := RadiantTo2(F, Job.Zones[Z].Outline[I]);
+      Lo.X := Min(Lo.X, P.X);
+      Lo.Y := Min(Lo.Y, P.Y);
+      Hi.X := Max(Hi.X, P.X);
+      Hi.Y := Max(Hi.Y, P.Y);
+      Result := True;
+    end;
+end;
+
 function RadiantSubmittal(const Job: TRadiantJob): TSubmittalBlocks;
 var
-  Z, I, J, N, Zones, Loops, Tried, Ports: integer;
-  Said: TStringArray;
-  Area, Bare, TubeFt, OrderFt, Secs, Cover, Spread: double;
+  Z, I, J, K, N, Zones, Loops, Tried, Ports: integer;
+  Said, Pieces, Checks: TStringArray;
+  Area, Bare, TubeFt, Secs, Cover, Spread, Left: double;
+  SlabLo, SlabHi: T2;
+  Rolls: TRadiantRolls;
+  RZ, RL: TIntArray;
+  Sizes: TRollSizes;
+  Heads: array of string;
   R: TRadiantResult;
   ZS: TRadiantSpec;
   T: TTubeFacts;
@@ -425,7 +567,6 @@ begin
   Area := 0;
   Bare := 0;
   TubeFt := 0;
-  OrderFt := 0;
   Loops := 0;
   Tried := 0;
   Secs := 0;
@@ -436,7 +577,6 @@ begin
       Area := Area + R.AreaSqFt;
       Bare := Bare + R.UnfilledSqFt;
       TubeFt := TubeFt + R.TotalFt;
-      OrderFt := OrderFt + R.TotalFt * (1 + Job.Spec.WastePct / 100);
       Loops := Loops + Length(R.Loops);
       Tried := Tried + R.Tries;
       Secs := Secs + R.SearchSecs;
@@ -447,40 +587,27 @@ begin
   Add(skPara, Format('Radiant floor heating - a tube layout for %d zone%s, prepared %s with %s.', [Zones, IfThen(Zones = 1, '', 's'),
     FormatDateTime('yyyy-mm-dd hh:nn', Job.When), Job.Made]));
 
-  Add(skHeading, 'System');
+  { what the crew needs on the slab comes first; how the layout was found,
+    and the heat load, are at the back }
+  Add(skHeading, 'The job');
   Table(['', '']);
   Row(['Floor', 'concrete slab']);
-  Row(['Tube', T.Name + ' PEX, ' + FormatFloat('0.#', Job.Spec.Spacing / Job.Spec.Inch) + '" on center']);
-  Row(['Longest loop allowed', FormatLen(MaxFt, Job.Units)]);
-  Row(['Zones and manifolds', Format('%d, one manifold each, %d loops at most', [Zones, RadiantMaxPorts(Job.Spec)])]);
-  Row(['Loops', IntToStr(Loops)]);
-  Row(['Floor to heat', FormatArea(Area, Job.Units)]);
-  if Area > 0 then Row(['Reached by the tube', Pct(1 - Bare / Area)]);
-  Row(['Tube, no waste', FormatLen(TubeFt, Job.Units)]);
-  Row(['To order', FormatLen(OrderFt, Job.Units) + Format(' (%s%% waste)', [FormatFloat('0', Job.Spec.WastePct)])]);
-  Row(['Ties or staples', Format('about %d, one every %s"', [Round(TubeFt * 12 / TIE_SPACING_IN), FormatFloat('0', TIE_SPACING_IN)])]);
-  Row(['Goals', Format('%s%% of the floor, loops within %s%% of each other', [FormatFloat('0.#', Job.Spec.GoalCoverPct), FormatFloat('0.#', Job.Spec.GoalEvenPct)])]);
-  if Tried > 0 then Row(['Design effort', Format('%d layouts tried, %s of searching', [Tried, RadiantDuration(Secs)])]);
-  { installer friendly, over every loop }
-  Easy := 0;
-  EasyN := 0;
-  for Z := 0 to Zones - 1 do
-    if Done(Z) then
-      for I := 0 to High(Job.Layouts[Z].LoopFriendly) do
-      begin
-        Easy := Easy + Job.Layouts[Z].LoopFriendly[I].Score;
-        Inc(EasyN);
-      end;
-  if EasyN > 0 then
-    Row(['Installer friendly', Format('%s of 100 - how easily each loop is set out and laid', [FormatFloat('0', Easy / EasyN)])]);
-
+  if SlabBox(Job, SlabLo, SlabHi) then
+    Row(['Slab, overall', FormatLen(SlabHi.X - SlabLo.X, Job.Units) + ' x ' + FormatLen(SlabHi.Y - SlabLo.Y, Job.Units) + ', east-west by north-south']);
   Row(['Slab', Format('%s" thick, tube %s, R-%s under it', [FormatFloat('0.#', Job.Spec.SlabThick / Job.Spec.Inch),
     IfThen(Job.Spec.TubeDepth > 0, FormatFloat('0.#', Job.Spec.TubeDepth / Job.Spec.Inch) + '" deep', 'centered'), FormatFloat('0', Job.Spec.UnderR)])]);
+  Row(['Tube', T.Name + ' PEX, ' + FormatFloat('0.#', Job.Spec.Spacing / Job.Spec.Inch) + '" on center']);
+  Row(['Zones and manifolds', Format('%d, one manifold each', [Zones])]);
+  Row(['Loops', Format('%d, numbered left to right along each manifold, standing in front of it', [Loops])]);
+  Row(['Floor to heat', FormatArea(Area, Job.Units)]);
+  Row(['Tube laid', FormatLen(TubeFt, Job.Units) + Format(', manifold to manifold - every loop''s length takes in %s ' +
+    'at the manifold, up the wall and fanned out onto the grid', [FormatLen(MANIFOLD_LEAD_FT, Job.Units)])]);
+  Row(['Ties or staples', Format('about %d, one every %s"', [Round(TubeFt * 12 / TIE_SPACING_IN), FormatFloat('0', TIE_SPACING_IN)])]);
 
   { what to buy }
   Add(skHeading, 'Material list');
   Table(['Item', 'Quantity', '']);
-  Row([T.Name + ' PEX tube', FormatLen(OrderFt, Job.Units), Format('%s laid, and %s%% for waste', [FormatLen(TubeFt, Job.Units), FormatFloat('0', Job.Spec.WastePct)])]);
+  Row([T.Name + ' PEX tube', FormatLen(TubeFt, Job.Units), 'laid - the rolls it takes are below']);
   { manifolds by size }
   for Ports := MANIFOLD_PORTS_MIN to 64 do
   begin
@@ -493,24 +620,61 @@ begin
   Row(['Ties or staples', Format('about %d', [Round(TubeFt * 12 / TIE_SPACING_IN)]), Format('one every %s" of tube', [FormatFloat('0', TIE_SPACING_IN)])]);
   Row(['Insulation under the slab', Format('R-%s', [FormatFloat('0', Job.Spec.UnderR)]), FormatArea(Area, Job.Units)]);
 
+  { the tube by the roll: a loop is never spliced, so what is left is what
+    each roll has once its loops are off, for whichever size is on hand }
+  Add(skHeading, 'Tube by the roll');
+  Add(skPara, 'A loop comes off one roll in one piece.  Lay the loops in order, each off the first roll that still has ' +
+    'enough on it.  Then what is left on each roll is as below, and each loop''s sheet says what should be left ' +
+    'once it is down - measure the tail to check the loop went in as drawn.  A loop longer than a roll size has to ' +
+    'come off a bigger roll; the rolls for the others are still worked out.');
+  Table(['Rolls of', 'Rolls', 'Tube on them', 'Left over', 'Left on each roll']);
+  Sizes := JobSizes(Job);
+  for K := 0 to High(Sizes) do
+  begin
+    Rolls := JobRolls(Job, Sizes[K], RZ, RL);
+    Left := 0;
+    Pieces := nil;
+    for I := 0 to High(Rolls.Left) do
+    begin
+      Left := Left + Rolls.Left[I];
+      SetLength(Pieces, Length(Pieces) + 1);
+      Pieces[High(Pieces)] := FtWords(Rolls.Left[I], Job.Units);
+    end;
+    Line := string.Join(', ', Pieces);
+    if Length(Pieces) > 8 then Line := string.Join(', ', Copy(Pieces, 0, 8)) + Format(' and %d more - each zone''s page has them', [Length(Pieces) - 8]);
+    { the loops it is too short for, by name while there are few }
+    Pieces := nil;
+    for I := 0 to High(Rolls.Roll) do
+      if Rolls.Roll[I] < 0 then
+      begin
+        SetLength(Pieces, Length(Pieces) + 1);
+        Pieces[High(Pieces)] := Format('Z%d L%d', [RZ[I] + 1, RL[I] + 1]);
+      end;
+    if Length(Pieces) > 4 then Line := Line + Format(' - too short for %d loops', [Length(Pieces)])
+    else if Length(Pieces) > 0 then Line := Line + ' - too short for ' + AndList(Pieces);
+    Row([FtWords(Sizes[K], Job.Units), IntToStr(Length(Rolls.Left)), FtWords(Length(Rolls.Left) * Sizes[K], Job.Units),
+      FtWords(Left, Job.Units), Line]);
+  end;
+
   Add(skHeading, 'Zones');
-  Table(['Zone', 'Floor', 'Loops', 'Manifold', 'Wall space', 'Tube', 'Reached', 'Loops within', 'Bends', 'Easy', 'Goals']);
+  Table(['Zone', 'Floor', 'Loops', 'Manifold', 'Wall space', 'Tube']);
   for Z := 0 to Zones - 1 do
     if Done(Z) then
     begin
       R := Job.Layouts[Z];
-      RadiantMeasure(R, Cover, Spread);
       if Length(R.Manifolds) > 0 then Ports := R.Manifolds[0].Ports
       else
         Ports := 0;
       Row([ZoneTitleOf(Job, Z).Replace('Zone ', ''), FormatArea(R.AreaSqFt, Job.Units), IntToStr(Length(R.Loops)), Format('%d-loop', [Ports]),
-        FormatLen(RadiantManifoldWallIn(Ports) * Job.Spec.Inch, Job.Units), FormatLen(R.TotalFt, Job.Units), Pct(Cover), Pct(Spread) +
-        ' (' + FormatLen(RadiantSpreadFt(R), Job.Units) + ')', IntToStr(R.Bends), EasyOf(R), IfThen(R.ShortOfGoals, 'short', 'met')]);
+        FormatLen(RadiantManifoldWallIn(Ports) * Job.Spec.Inch, Job.Units), FormatLen(R.TotalFt, Job.Units)]);
     end
     else
-      Row([ZoneTitleOf(Job, Z).Replace('Zone ', ''), '', '', '', '', '', '', '', '', '', 'not laid out']);
+      Row([ZoneTitleOf(Job, Z).Replace('Zone ', ''), '', '', '', '', 'not laid out']);
 
-  Add(skPlan, 'Plan - every zone, north up', -1);
+  if SlabBox(Job, SlabLo, SlabHi) then
+    Add(skPlan, Format('Plan - every zone, north up, the slab %s x %s overall', [FormatLen(SlabHi.X - SlabLo.X, Job.Units), FormatLen(SlabHi.Y - SlabLo.Y, Job.Units)]), -1)
+  else
+    Add(skPlan, 'Plan - every zone, north up', -1);
 
   { A page per zone: its plan, loops, what it takes, anything unusual, and
     a line on the search - the full record is at the back. }
@@ -530,16 +694,17 @@ begin
     else
       Ports := 0;
     Add(skPlan, ZoneTitleOf(Job, Z) + ' - north up', Z);
-    Table(['Loop', 'Length', 'Measures', 'Color'], True);
+    { the loops, left to right along the manifold, and what each roll size
+      leaves once the loop is off it }
+    Heads := ['Loop', 'Length', 'Color'];
+    for K := 0 to High(Sizes) do Heads := Concat(Heads, ['On ' + FtWords(Sizes[K], Job.Units) + ' rolls']);
+    Table(Heads);
     for I := 0 to High(R.Loops) do
-      if I <= High(R.LoopFriendly) then
-        Row([Format('Z%d L%d', [Z + 1, I + 1]), FormatLen(R.Loops[I].LenFt, Job.Units), IntToStr(R.LoopFriendly[I].Measures), InkHex(LoopInk(Z, I))])
-      else
-        Row([Format('Z%d L%d', [Z + 1, I + 1]), FormatLen(R.Loops[I].LenFt, Job.Units), '', InkHex(LoopInk(Z, I))]);
-    Table(['Zone ' + IntToStr(Z + 1), ''], True);
+      Row(Concat([Format('Z%d L%d', [Z + 1, I + 1]), FormatLen(R.Loops[I].LenFt, Job.Units), InkHex(LoopInk(Z, I))], RollCheck(Job, Z, I, True)));
+    Table(['Zone ' + IntToStr(Z + 1), '']);
     Row(['Floor', FormatArea(R.AreaSqFt, Job.Units)]);
     Row(['Manifold', Format('%d-loop, about %s of wall', [Ports, FormatLen(RadiantManifoldWallIn(Ports) * Job.Spec.Inch, Job.Units)])]);
-    Row(['Tube', FormatLen(R.TotalFt, Job.Units) + ', order ' + FormatLen(R.TotalFt * (1 + Job.Spec.WastePct / 100), Job.Units)]);
+    Row(['Tube', FormatLen(R.TotalFt, Job.Units)]);
     Row(['Ties or staples', Format('about %d', [Round(R.TotalFt * 12 / TIE_SPACING_IN)])]);
     Row(['Reached', Pct(Cover) + IfThen(R.UnfilledSqFt > 0.5, ', ' + FormatArea(R.UnfilledSqFt, Job.Units) + ' bare', '')]);
     Row(['Loops within', Pct(Spread) + ' (' + FormatLen(RadiantSpreadFt(R), Job.Units) + ')']);
@@ -587,7 +752,7 @@ begin
       set out from the walls }
     Said := nil;
     RadiantManifoldDims(Job, Z, Said);
-    if Length(Said) > 0 then Add(skPara, 'Setting out: the ' + string.Join(', the ', Said) + '.');
+    if Length(Said) > 0 then Add(skPara, 'Setting out: the manifold ' + string.Join(', ', Said) + '.');
     Add(skLoopPlans, ZoneTitleOf(Job, Z) + ' - setting out, loop by loop', Z);
     for I := 0 to High(R.Loops) do
     begin
@@ -602,6 +767,13 @@ begin
       SetLength(Result[High(Result)].Rows[N], Length(Said) + 1);
       Result[High(Result)].Rows[N][0] := Format('Z%d L%d - %s', [Z + 1, I + 1, FormatLen(R.Loops[I].LenFt, Job.Units)]);
       for J := 0 to High(Said) do Result[High(Result)].Rows[N][J + 1] := Said[J];
+      { what should be left on the roll after it }
+      Checks := RollCheck(Job, Z, I);
+      for J := 0 to High(Checks) do
+      begin
+        SetLength(Result[High(Result)].Rows[N], Length(Result[High(Result)].Rows[N]) + 1);
+        Result[High(Result)].Rows[N][High(Result[High(Result)].Rows[N])] := 'left on the roll: ' + Checks[J];
+      end;
     end;
   end;
 
@@ -614,6 +786,33 @@ begin
     'within %s%% of each other in length: set layouts first, then others tried at random until the goals ' +
     'were met or the search was stopped.  What each search did, and the layouts it kept, best first - the one ' + 'marked is the zone''s.',
     [FormatFloat('0.#', Job.Spec.GoalCoverPct), FormatFloat('0.#', Job.Spec.GoalEvenPct)]));
+  Table(['', '']);
+  Row(['Longest loop allowed', FormatLen(MaxFt, Job.Units)]);
+  Row(['Most loops a manifold', IntToStr(RadiantMaxPorts(Job.Spec))]);
+  if Area > 0 then Row(['Reached by the tube', Pct(1 - Bare / Area)]);
+  Row(['Goals', Format('%s%% of the floor, loops within %s%% of each other', [FormatFloat('0.#', Job.Spec.GoalCoverPct), FormatFloat('0.#', Job.Spec.GoalEvenPct)])]);
+  if Tried > 0 then Row(['Design effort', Format('%d layouts tried, %s of searching', [Tried, RadiantDuration(Secs)])]);
+  { installer friendly, over every loop }
+  Easy := 0;
+  EasyN := 0;
+  for Z := 0 to Zones - 1 do
+    if Done(Z) then
+      for I := 0 to High(Job.Layouts[Z].LoopFriendly) do
+      begin
+        Easy := Easy + Job.Layouts[Z].LoopFriendly[I].Score;
+        Inc(EasyN);
+      end;
+  if EasyN > 0 then
+    Row(['Installer friendly', Format('%s of 100 - how easily each loop is set out and laid', [FormatFloat('0', Easy / EasyN)])]);
+  Table(['Zone', 'Reached', 'Loops within', 'Bends', 'Easy', 'Goals']);
+  for Z := 0 to Zones - 1 do
+    if Done(Z) then
+    begin
+      R := Job.Layouts[Z];
+      RadiantMeasure(R, Cover, Spread);
+      Row([ZoneTitleOf(Job, Z).Replace('Zone ', ''), Pct(Cover), Pct(Spread) + ' (' + FormatLen(RadiantSpreadFt(R), Job.Units) + ')', IntToStr(R.Bends),
+        EasyOf(R), IfThen(R.ShortOfGoals, 'short', 'met')]);
+    end;
   for Z := 0 to Zones - 1 do
   begin
     if not Done(Z) then Continue;
@@ -641,7 +840,11 @@ begin
     'grid within the breakout given for the zone; the tube keeps ' + FormatFloat('0', EDGE_INSET_IN) +
     '" off every wall and obstacle.  Where a zone''s rows did not pair up, the rows at its far wall may have been ' +
     'closed up a little so every row has a partner - the zone''s page says so where it was done.');
-  Add(skPara, 'Loop lengths run from the manifold and back, both leads included.  The order adds the waste given.');
+  Add(skPara, 'Loop lengths run from the manifold and back, both leads included, and take in ' +
+    FormatLen(MANIFOLD_LEAD_FT, Job.Units) + ' more for the climb up the wall to the manifold and the tube fanned out ' +
+    'onto the grid, which the plan draws square.  That counts against the longest loop allowed.  Loops are numbered left to right ' +
+    'along their manifold, standing in front of it.  The rolls are worked out with the loops laid in that order, ' +
+    'zone by zone, each off the first roll that still has enough on it.');
   Add(skPara, 'Installer friendly, of 100: each loop is marked down for every reference measurement past two ' +
     'it takes to set out (where its rows stop short of a wall, and where its lead runs - the rows themselves are ' +
     'on the spacing), for turns past a plain serpentine''s, and for reaching past its own block of floor; a ' + 'zone''s is the mean of its loops''.');
@@ -773,7 +976,7 @@ function RowAngle(const Pts: T2Array): double;
 var
   Buckets: array[0..359] of double;
   I, K, Best: integer;
-  Len, Ang, BestLen: double;
+  Len, Ang, BestLen, SX, SY: double;
 begin
   for I := 0 to 359 do Buckets[I] := 0;
   for I := 1 to High(Pts) do
@@ -793,7 +996,29 @@ begin
       BestLen := Buckets[I];
       Best := I;
     end;
-  Result := Best / 360 * Pi;
+  { A bucket is half a degree wide, and rows slanted off the plan's axes
+    sit inside one, not on its edge: the angle is the runs' own, averaged
+    by length over that bucket and the two beside it (doubled, so 0 and
+    180 degrees agree).  Rounded, a slanted row's ends would differ across
+    the rows and none would be found to set out. }
+  SX := 0;
+  SY := 0;
+  for I := 1 to High(Pts) do
+  begin
+    Len := Hypot(Pts[I].X - Pts[I - 1].X, Pts[I].Y - Pts[I - 1].Y);
+    if Len < 1E-9 then Continue;
+    Ang := ArcTan2(Pts[I].Y - Pts[I - 1].Y, Pts[I].X - Pts[I - 1].X);
+    if Ang < 0 then Ang := Ang + Pi;
+    if Ang >= Pi then Ang := Ang - Pi;
+    K := Round(Ang / Pi * 360) mod 360;
+    if (Abs(K - Best) <= 1) or (Abs(K - Best) >= 359) then
+    begin
+      SX := SX + Len * Cos(2 * Ang);
+      SY := SY + Len * Sin(2 * Ang);
+    end;
+  end;
+  Result := ArcTan2(SY, SX) / 2;
+  if Result < 0 then Result := Result + Pi;
 end;
 
 { where the ray from P along D first meets the outline Poly }
@@ -1171,10 +1396,31 @@ function RadiantManifoldDims(const Job: TRadiantJob; Zone: integer; out Words: T
 var
   F: TRadiantFrame;
   Poly: T2Array;
-  Mp, Hit, D: T2;
+  Mp, Hit, D, BestHit, BestD, A, B, Foot, E: T2;
   R: TRadiantResult;
-  Ang: double;
-  K: integer;
+  Ang, Best, Gap, T, L: double;
+  K, J, N, Wall, First, Last: integer;
+const
+  MANIFOLD_NEAR_FT = 1.0;
+
+  { the outline's corner at point I goes straight on }
+  function Straight(I: integer): boolean;
+  var
+    P, Q, S: T2;
+  begin
+    P := Poly[(I + N - 1) mod N];
+    Q := Poly[I mod N];
+    S := Poly[(I + 1) mod N];
+    Result := Abs((Q.X - P.X) * (S.Y - Q.Y) - (Q.Y - P.Y) * (S.X - Q.X)) < 1E-6 * Hypot(Q.X - P.X, Q.Y - P.Y) * Hypot(S.X - Q.X, S.Y - Q.Y);
+  end;
+
+  { north, south, east or west - the first word of WallWord }
+  function Way(const V: T2): string;
+  begin
+    Result := WallWord(V);
+    Result := Copy(Result, 1, Pos(' ', Result) - 1);
+  end;
+
 begin
   Result := nil;
   Words := nil;
@@ -1182,19 +1428,83 @@ begin
   R := Job.Layouts[Zone];
   F := RadiantPlanFrame(Job.Zones[0].Outline);
   Poly := FlatIn(F, Job.Zones[Zone].Outline);
+  N := Length(Poly);
   Mp := RadiantTo2(F, R.Manifolds[0].At);
-  { along and across the zone's rows (the first loop's way), or north
-    and east }
+  { Hung on a flat wall, it is set out along that wall from the wall's
+    nearer end - the corner the tape goes from, square or slanted.  None
+    out from the wall: the drawing shows it against it. }
+  Wall := -1;
+  Gap := 1E300;
+  for K := 0 to N - 1 do
+  begin
+    A := Poly[K];
+    B := Poly[(K + 1) mod N];
+    L := Sqr(B.X - A.X) + Sqr(B.Y - A.Y);
+    if L < 1E-12 then Continue;
+    T := Max(0, Min(1, ((Mp.X - A.X) * (B.X - A.X) + (Mp.Y - A.Y) * (B.Y - A.Y)) / L));
+    if Hypot(Mp.X - A.X - T * (B.X - A.X), Mp.Y - A.Y - T * (B.Y - A.Y)) < Gap then
+    begin
+      Gap := Hypot(Mp.X - A.X - T * (B.X - A.X), Mp.Y - A.Y - T * (B.Y - A.Y));
+      Wall := K;
+      Foot := Pt2(A.X + T * (B.X - A.X), A.Y + T * (B.Y - A.Y));
+    end;
+  end;
+  if (Wall >= 0) and (Gap > 1E-6) and (Gap <= MANIFOLD_NEAR_FT + 1E-6) and not RadiantEdgeCurved(Job.Zones[Zone].Outline, Wall) then
+  begin
+    { the wall runs on through a corner that does not turn, where a line
+      between zones meets it }
+    First := Wall;
+    while Straight(First) and ((First + N - 1) mod N <> Wall) do First := (First + N - 1) mod N;
+    Last := (Wall + 1) mod N;
+    while Straight(Last) and (Last <> First) do Last := (Last + 1) mod N;
+    A := Poly[First];
+    B := Poly[Last];
+    if Hypot(Foot.X - A.X, Foot.Y - A.Y) <= Hypot(Foot.X - B.X, Foot.Y - B.Y) then E := A
+    else
+      E := B;
+    SetLength(Words, 1);
+    Words[0] := Format('against the %s', [WallWord(Pt2(Foot.X - Mp.X, Foot.Y - Mp.Y))]);
+    L := Hypot(E.X - Foot.X, E.Y - Foot.Y);
+    if L > MANIFOLD_NEAR_FT + 1E-6 then
+    begin
+      AddDim(Result, Mp, Pt2(Mp.X + E.X - Foot.X, Mp.Y + E.Y - Foot.Y), FormatLen(L, Job.Units));
+      SetLength(Words, 2);
+      Words[1] := Format('its middle %s from the %s end of that wall', [FormatLen(L, Job.Units), Way(Pt2(E.X - Foot.X, E.Y - Foot.Y))]);
+    end
+    else
+      Words[0] := Words[0] + Format(' at its %s end', [Way(Pt2(E.X - Foot.X, E.Y - Foot.Y))]);
+    Exit;
+  end;
+  { Out in the floor, or on a curve: along and across the zone's rows (the
+    first loop's way), or north and east, each way to the nearer of its
+    two walls only - that is where the tape goes from. }
   Ang := 0;
   if Length(R.Loops) > 0 then Ang := RowAngle(FlatIn(F, R.Loops[0].Pts));
-  for K := 0 to 3 do
+  for K := 0 to 1 do
   begin
-    D := Pt2(Cos(Ang + K * Pi / 2), Sin(Ang + K * Pi / 2));
-    if RayWall(Poly, Mp, D, Hit) then
+    Best := 1E300;
+    for J := 0 to 1 do
     begin
-      AddDim(Result, Mp, Hit, FormatLen(Hypot(Hit.X - Mp.X, Hit.Y - Mp.Y), Job.Units));
-      SetLength(Words, Length(Words) + 1);
-      Words[High(Words)] := Format('manifold middle %s from the %s', [FormatLen(Hypot(Hit.X - Mp.X, Hit.Y - Mp.Y), Job.Units), WallWord(D)]);
+      D := Pt2(Cos(Ang + (K + 2 * J) * Pi / 2), Sin(Ang + (K + 2 * J) * Pi / 2));
+      if RayWall(Poly, Mp, D, Hit) and (Hypot(Hit.X - Mp.X, Hit.Y - Mp.Y) < Best) then
+      begin
+        Best := Hypot(Hit.X - Mp.X, Hit.Y - Mp.Y);
+        BestHit := Hit;
+        BestD := D;
+      end;
+    end;
+    if Best > 1E299 then Continue;
+    SetLength(Words, Length(Words) + 1);
+    if Best <= MANIFOLD_NEAR_FT + 1E-6 then
+    begin
+      { said first: the wall it hangs on, then where along it }
+      Insert(Format('against the %s', [WallWord(BestD)]), Words, 0);
+      SetLength(Words, Length(Words) - 1);
+    end
+    else
+    begin
+      AddDim(Result, Mp, BestHit, FormatLen(Best, Job.Units));
+      Words[High(Words)] := Format('its middle %s from the %s', [FormatLen(Best, Job.Units), WallWord(BestD)]);
     end;
   end;
 end;
@@ -2098,10 +2408,22 @@ var
     Said: TStringArray;
     Used, Sc: double;
     Words: string;
+    Lo, Hi: T2;
   begin
     RadiantPlanStrokes(Job, Blk.Zone, St, Lb);
     if Length(St) = 0 then Exit;
     Dm := nil;
+    { every zone: the slab's overall length and width, from its corners }
+    if (Blk.Zone < 0) and SlabBox(Job, Lo, Hi) then
+    begin
+      AddDim(Dm, Pt2(Lo.X, Lo.Y), Pt2(Hi.X, Lo.Y), FormatLen(Hi.X - Lo.X, Job.Units));
+      Dm[High(Dm)].Ext := True;
+      AddDim(Dm, Pt2(Lo.X, Lo.Y), Pt2(Lo.X, Hi.Y), FormatLen(Hi.Y - Lo.Y, Job.Units));
+      Dm[High(Dm)].Ext := True;
+      { and every manifold, to set them all out from the one page }
+      for J := 0 to High(Job.Zones) do
+        Dm := Concat(Dm, RadiantManifoldDims(Job, J, Said));
+    end;
     if Blk.Zone >= 0 then
     begin
       Dm := RadiantManifoldDims(Job, Blk.Zone, Said);
@@ -2129,8 +2451,10 @@ var
     ink and the others faint, plus the set-out dimensions outside the floor. }
   procedure LoopPlans(const Blk: TSubmittalBlock);
   const
-    { page parts, mm: the heading, a checklist row, the caption line }
+    { page parts, mm: the heading, a line of the roll check, a checklist
+      row, the caption line }
     HEAD_H = 30;
+    ROLL_LINE = 4.8;
     CHECK_ROW = 6.5;
     CAPTION_H = 7;
     { the checklist as a right-hand column for a tall zone: its width and
@@ -2144,11 +2468,12 @@ var
     St: TPlanStrokes;
     Lb: TPlanLabels;
     Dm: TPlanDims;
-    Said, ManSaid, Lines: TStringArray;
+    Said, ManSaid, Lines, RollSaid: TStringArray;
     Words, S: string;
     ZS: TRadiantSpec;
     HR: THeatZoneResult;
     Checks: array of string;
+    HeadH: double;
 
     procedure Box(X, Y0: double);
     begin
@@ -2177,8 +2502,16 @@ var
     end;
     { checklist goes under the drawing, or beside it for a tall zone -
       whichever draws the loops larger }
-    NCheck := 6;
-    DrawTop := Top + HEAD_H;
+    NCheck := 7;
+    { the roll check under the heading: a line a roll size, the same sizes
+      on every loop's sheet }
+    HeadH := HEAD_H;
+    if Length(Job.Layouts[Z].Loops) > 0 then
+    begin
+      RollSaid := RollCheck(Job, Z, 0);
+      if Length(RollSaid) > 0 then HeadH := HeadH + 6.5 + Length(RollSaid) * ROLL_LINE;
+    end;
+    DrawTop := Top + HeadH;
     { One scale for every loop in the zone, the largest they all fit at, so
       the sheets of a zone line up. Worked out both with the checklist under
       and beside. }
@@ -2187,7 +2520,7 @@ var
     for L := 0 to High(Job.Layouts[Z].Loops) do
     begin
       RadiantLoopStrokes(Job, Z, L, St, Lb);
-      Dm := RadiantLoopDims(Job, Z, L, Said);
+      Dm := Concat(RadiantLoopDims(Job, Z, L, Said), RadiantManifoldDims(Job, Z, Lines));
       Sc := DrawPlan(St, Lb, Dm, Left, DrawTop, Wide, Bottom - (NCheck + 2.5) * CHECK_ROW - CAPTION_H - DrawTop, False, Used, Words, False, 0, True);
       if (Sc > 0) and ((ScMin = 0) or (Sc < ScMin)) then ScMin := Sc;
       Sc := DrawPlan(St, Lb, Dm, Left, DrawTop, Wide - SIDE_W - SIDE_GAP, Bottom - CAPTION_H - DrawTop, False, Used, Words, False, 0, True);
@@ -2223,6 +2556,19 @@ var
       Yc := Yc + 8;
       Book.Line(Left, Yc, Right, Yc, $00A0A0A0, 0.2);
       Yc := Yc + 4;
+      { what should be left on the roll, big, by the loop's length }
+      RollSaid := RollCheck(Job, Z, L);
+      if Length(RollSaid) > 0 then
+      begin
+        Book.Text(Left, Yc + 0.5, 'Left on the roll once this loop is down - measure the tail to check it:', 8.5, $00303030, True);
+        Yc := Yc + 5;
+        for K := 0 to High(RollSaid) do
+        begin
+          Book.Text(Left + 4, Yc + 0.5, RollSaid[K], 10, clBlack, True);
+          Yc := Yc + ROLL_LINE;
+        end;
+        Yc := Yc + 1.5;
+      end;
       RadiantLoopStrokes(Job, Z, L, St, Lb);
       Dm := RadiantLoopDims(Job, Z, L, Said);
       if Length(Said) > 0 then
@@ -2259,13 +2605,14 @@ var
       SetLength(Checks, NCheck);
       Checks[0] := 'Rows marked on the floor from the dimensions above';
       Checks[1] := Format('Tube laid - %s, tied every %s"', [FormatLen(Job.Layouts[Z].Loops[L].LenFt, Job.Units), FormatFloat('0', TIE_SPACING_IN)]);
-      Checks[2] := Format('Both ends tagged Z%d L%d at the manifold', [Z + 1, L + 1]);
-      Checks[3] := 'Supply and return connected to the manifold';
-      Checks[4] := 'Pressure tested at ________ psi, held ________ hours';
+      Checks[2] := 'Left on the roll after it ________ ' + IfThen(Job.Units = usImperial, 'ft', 'm');
+      Checks[3] := Format('Both ends tagged Z%d L%d at the manifold', [Z + 1, L + 1]);
+      Checks[4] := 'Supply and return connected to the manifold';
+      Checks[5] := 'Pressure tested at ________ psi, held ________ hours';
       if (Gpm > 0) and (TotalFt > 0) then
-        Checks[5] := Format('Flow set to %s GPM on its meter (design)', [FormatFloat('0.00', Gpm * Job.Layouts[Z].Loops[L].LenFt / TotalFt)])
+        Checks[6] := Format('Flow set to %s GPM on its meter (design)', [FormatFloat('0.00', Gpm * Job.Layouts[Z].Loops[L].LenFt / TotalFt)])
       else
-        Checks[5] := 'Flow set to ________ GPM on its meter';
+        Checks[6] := 'Flow set to ________ GPM on its meter';
       for K := 0 to NCheck - 1 do
       begin
         Box(CheckX, Y);

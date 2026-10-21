@@ -36,7 +36,6 @@ type
     Tube: TTubeSize;
     Spacing: double;          { world units (feet) - on center }
     MaxLoopFt: double;        { 0 = the tube's own table maximum }
-    WastePct: double;
     { the manifolds, where they stand; a loop goes to the nearest.  Extra
       is obstacles the wizard added beyond the face's own holes. }
     Manifolds: TP3Array;
@@ -125,8 +124,7 @@ type
     AreaSqFt: double;
     RowCount: integer;
     ObstacleCount: integer;
-    TotalFt: double;           { every loop, no waste }
-    OrderFt: double;           { with waste, rounded up }
+    TotalFt: double;           { every loop }
     { the turn the layout asks of the tube at each row end (the spacing, in
       inches) against what the tube can do: 8x its OD for PEX-B and PEX-C,
       6x for PEX-A.  Laid at the asked spacing either way; the ticket says
@@ -221,7 +219,7 @@ function RadiantInside(const Outline: TP3Array; const P: TP3): boolean;
   (SUGGEST_ARC_TURN, SUGGEST_ARC_RATIO).  A flat cabinet does not hang on one. }
 function RadiantEdgeCurved(const Outline: TP3Array; I: integer): boolean;
 
-{ Where a zone's manifold goes when nothing better is known: a foot in from
+{ Where a zone's manifold goes when nothing better is known: tight to
   a flat wall, at the middle or a quarter point that heats the most floor,
   nearest Toward among near ties - so a building's manifolds end up toward
   the boiler.  Not a corner: a corner has half the edge to let tubes out.
@@ -258,7 +256,7 @@ function RadiantFrom2(const F: TRadiantFrame; U, V: double): TP3;
 function RadiantLoopsNeeded(const Outline: TP3Array; const Holes: array of TP3Array; const Spec: TRadiantSpec): integer;
 
 { Where to put the manifolds and how many loops each: enough manifolds for
-  the loop count, spaced evenly along the longest wall a foot in from it.
+  the loop count, spaced evenly along the longest wall tight to it.
   A starting point to drag from, not an answer. }
 procedure RadiantSuggestManifolds(const Outline: TP3Array; const Holes: array of TP3Array; const Spec: TRadiantSpec; out At: TP3Array; out Ports: TIntArray);
 
@@ -297,9 +295,14 @@ function RadiantMeetsGoals(const R: TRadiantResult; const Spec: TRadiantSpec): b
 function RadiantUnfriendly(const R: TRadiantResult; const Spec: TRadiantSpec): boolean;
 { the most loops a manifold takes, by the spec - see MaxPorts }
 function RadiantMaxPorts(const Spec: TRadiantSpec): integer;
+{ the longest a loop may be, by the spec, and how much of that may lie on
+  the floor - the rest is the lead at the manifold (MANIFOLD_LEAD_FT) }
+function RadiantMaxLoopFt(const Spec: TRadiantSpec): double;
+function RadiantFloorMaxFt(const Spec: TRadiantSpec): double;
 { The most of a floor of AreaSqFt, percent, the spec's tube can reach:
-  every manifold's most loops, each at full tube length, at the spacing.
-  An upper bound (leads and walls ignored); 100 when it is not the limit.
+  every manifold's most loops, each at full tube length less its lead at
+  the manifold, at the spacing.  An upper bound (walls ignored); 100 when
+  it is not the limit.
   A goal past it can never be met. }
 function RadiantReachPct(AreaSqFt: double; const Spec: TRadiantSpec): double;
 { that in words for the ticket, or Short for the wizard's zone; '' when the
@@ -322,6 +325,24 @@ function RadiantDuration(Secs: double): string;
 { About how much wall a manifold of this many loops needs, inches: supply
   and return side by side a port pitch apart, plus the ends (MANIFOLD_ENDS_IN). }
 function RadiantManifoldWallIn(Ports: integer): double;
+
+{ Loops cut from rolls of one size, in the order given - the order they are
+  laid.  Each comes off the first roll opened that still has enough on it,
+  or a new roll.  A loop longer than the roll has no roll (-1) and Fits is
+  false; the rest are cut all the same. }
+type
+  TRadiantRolls = record
+    RollFt: double;
+    Fits: boolean;
+    Roll: TIntArray;                   { each loop's roll, 0 the first opened }
+    LeftAfter: array of double;        { what that roll has left once the loop is off }
+    Left: array of double;             { what each roll has left at the end }
+  end;
+  TRollSizes = array of double;
+
+function RadiantRolls(const Lens: array of double; RollFt: double): TRadiantRolls;
+{ the rolls Tube is sold in (ROLL_SIZES_FT) that the shortest of Lens fits on }
+function RadiantRollSizes(Tube: TTubeSize; const Lens: array of double): TRollSizes;
 
 { The material list and the numbers behind it, as words - the ticket. }
 function RadiantTicketText(const Spec: TRadiantSpec; const R: TRadiantResult; U: TUnitSystem): string;
@@ -761,7 +782,6 @@ begin
   Result.GoalEvenPct := 10;
   Result.Spacing := SPACING_DEFAULT_IN * Result.Inch;
   Result.MaxLoopFt := 0;
-  Result.WastePct := WASTE_PCT_DEFAULT;
   Result.ManifoldW := 18 * Result.Inch;
   Result.ManifoldH := 6 * Result.Inch;
   Result.SlabThick := SLAB_THICK_DEFAULT_IN * Result.Inch;
@@ -805,8 +825,7 @@ var
   MaxFt, Each: double;
 begin
   if (Length(Outline) < 3) or (Spec.Spacing <= 0) then Exit(0);
-  MaxFt := Spec.MaxLoopFt;
-  if MaxFt <= 0 then MaxFt := TubeOf(Spec.Tube).MaxLoopFt;
+  MaxFt := RadiantFloorMaxFt(Spec);
   Each := MaxFt * Spec.Spacing * LOOP_AREA_FACTOR;
   if Each <= 0 then Exit(0);
   Result := Max(1, Ceil(FloorArea(Outline, Holes, RadiantFrameOf(Outline)) / Each));
@@ -841,11 +860,11 @@ begin
     Vmin := Min(Vmin, P.Y);
     Vmax := Max(Vmax, P.Y);
   end;
-  { along the long wall (U is the longest edge), a foot in, each at the
+  { along the long wall (U is the longest edge), tight to it, each at the
     middle of its share of the length }
   SetLength(At, N);
   SetLength(Ports, N);
-  V := Vmin + 1;
+  V := Vmin + Spec.ManifoldH / 2;
   for I := 0 to N - 1 do
   begin
     U := Umin + (Umax - Umin) * (I + 0.5) / N;
@@ -940,8 +959,8 @@ var
     Result := Abs(RadToDeg(ArcTan2((B.X - A.X) * (C.Y - B.Y) - (B.Y - A.Y) * (C.X - B.X), (B.X - A.X) * (C.X - B.X) + (B.Y - A.Y) * (C.Y - B.Y))));
   end;
 
-  { a foot in from the point T of the way along edge I, square to it, on the
-    floor's side }
+  { the manifold's box tight to the wall at the point T of the way along
+    edge I, on the floor's side - its middle half its depth in }
   function OffWall(I: integer; T: double): TP3;
   var
     A, B, M, Nrm: TP3;
@@ -952,11 +971,12 @@ var
     M := P3(A.X + T * (B.X - A.X), A.Y + T * (B.Y - A.Y), A.Z + T * (B.Z - A.Z));
     Len := Max(1E-9, Hypot(B.X - A.X, B.Y - A.Y));
     Nrm := P3(-(B.Y - A.Y) / Len, (B.X - A.X) / Len, 0);
+    Nrm := P3(Nrm.X * Spec.ManifoldH / 2, Nrm.Y * Spec.ManifoldH / 2, 0);
     Result := P3(M.X + Nrm.X, M.Y + Nrm.Y, M.Z);
     if not RadiantInside(Zone.Outline, Result) then Result := P3(M.X - Nrm.X, M.Y - Nrm.Y, M.Z);
   end;
 
-  { a foot in from the point Frac of the way along wall W }
+  { tight to wall W, the point Frac of the way along it }
   function AlongWall(const W: TWall; Frac: double): TP3;
   var
     K, E: integer;
@@ -1190,8 +1210,7 @@ begin
   if (Spec.Spacing < SPACING_MIN_IN * Spec.Inch * 0.5) then
     Exit('That spacing is tighter than any tube can run.');
   if Length(Spec.Manifolds) = 0 then Exit('Place a manifold - or press Suggest.');
-  MaxFt := Spec.MaxLoopFt;
-  if MaxFt <= 0 then MaxFt := TubeOf(Spec.Tube).MaxLoopFt;
+  MaxFt := RadiantMaxLoopFt(Spec);
   if MaxFt < 20 then Exit('The maximum loop length has to read as a size.');
   if Spec.SlabThick <= 0 then Exit('The slab thickness has to read as a size.');
 end;
@@ -1281,6 +1300,119 @@ begin
   if Tot > 0 then StraightPct := 100 * Long / Tot
   else
     StraightPct := 0;
+end;
+
+{ Numbers the loops the way the installer meets them: along each manifold,
+  left to right standing in front of it, so the setting-out sheets go up
+  the manifold in order.  The router lays one side and then the other,
+  farthest first, which can leave loop 4 at the far end after 1 to 3 went
+  up the left.  A hooked pair stays a pair where its two still come
+  together. }
+procedure NumberAlongManifolds(var Loops: TRadiantLoopArray; const Manifolds: array of TManifoldResult; const Outline: TP3Array);
+var
+  F: TRadiantFrame;
+  Key: array of double;
+  Order_, NewAt: TIntArray;
+  Old: TRadiantLoopArray;
+  I, J, N, M, T: integer;
+  C, E, Mean, Front, Right: T2;
+  Sxx, Syy, Sxy, Ang: double;
+  Ends: T2Array;
+
+  function Before(P, Q: integer): boolean;
+  begin
+    if Loops[P].Manifold <> Loops[Q].Manifold then Result := Loops[P].Manifold < Loops[Q].Manifold
+    else
+      Result := Key[P] < Key[Q] - 1E-9;
+  end;
+
+begin
+  N := Length(Loops);
+  if N < 2 then Exit;
+  for I := 0 to N - 1 do if Length(Loops[I].Pts) < 2 then Exit;
+  F := RadiantPlanFrame(Outline);
+  SetLength(Key, N);
+  for I := 0 to N - 1 do Key[I] := 0;
+  for M := 0 to High(Manifolds) do
+  begin
+    { both ends of every loop on it, as seen from above }
+    Ends := nil;
+    for I := 0 to N - 1 do
+      if Loops[I].Manifold = M then
+      begin
+        SetLength(Ends, Length(Ends) + 2);
+        Ends[High(Ends) - 1] := RadiantTo2(F, Loops[I].Pts[0]);
+        Ends[High(Ends)] := RadiantTo2(F, Loops[I].Pts[High(Loops[I].Pts)]);
+      end;
+    if Length(Ends) < 4 then Continue;
+    { the ports' row is the line the ends lie along }
+    Mean := Point2(0, 0);
+    for J := 0 to High(Ends) do
+    begin
+      Mean.X := Mean.X + Ends[J].X / Length(Ends);
+      Mean.Y := Mean.Y + Ends[J].Y / Length(Ends);
+    end;
+    Sxx := 0;
+    Syy := 0;
+    Sxy := 0;
+    for J := 0 to High(Ends) do
+    begin
+      Sxx := Sxx + Sqr(Ends[J].X - Mean.X);
+      Syy := Syy + Sqr(Ends[J].Y - Mean.Y);
+      Sxy := Sxy + (Ends[J].X - Mean.X) * (Ends[J].Y - Mean.Y);
+    end;
+    Ang := 0.5 * ArcTan2(2 * Sxy, Sxx - Syy);
+    { the front is the side the tube lies on; facing the manifold from
+      there, the right hand is the front turned a quarter to the left }
+    C := RadiantTo2(F, Manifolds[M].At);
+    Front := Point2(0, 0);
+    for I := 0 to N - 1 do
+      if Loops[I].Manifold = M then
+        for J := 0 to High(Loops[I].Pts) do
+        begin
+          E := RadiantTo2(F, Loops[I].Pts[J]);
+          Front.X := Front.X + E.X - C.X;
+          Front.Y := Front.Y + E.Y - C.Y;
+        end;
+    Right := Point2(-Sin(Ang), Cos(Ang));
+    if Right.X * Front.X + Right.Y * Front.Y < 0 then Right := Point2(-Right.X, -Right.Y);
+    Right := Point2(-Right.Y, Right.X);
+    for I := 0 to N - 1 do
+      if Loops[I].Manifold = M then
+      begin
+        E := RadiantTo2(F, Loops[I].Pts[0]);
+        Key[I] := E.X * Right.X + E.Y * Right.Y;
+        E := RadiantTo2(F, Loops[I].Pts[High(Loops[I].Pts)]);
+        Key[I] := (Key[I] + E.X * Right.X + E.Y * Right.Y) / 2;
+      end;
+  end;
+  SetLength(Order_, N);
+  for I := 0 to N - 1 do Order_[I] := I;
+  for I := 1 to N - 1 do
+  begin
+    T := Order_[I];
+    J := I;
+    while (J > 0) and Before(T, Order_[J - 1]) do
+    begin
+      Order_[J] := Order_[J - 1];
+      Dec(J);
+    end;
+    Order_[J] := T;
+  end;
+  Old := Copy(Loops);
+  SetLength(NewAt, N);
+  for I := 0 to N - 1 do
+  begin
+    Loops[I] := Old[Order_[I]];
+    Loops[I].Couple := 0;
+    NewAt[Order_[I]] := I;
+  end;
+  for I := 0 to N - 2 do
+    if (Old[I].Couple = 1) and (Old[I + 1].Couple = -1) and (Abs(NewAt[I] - NewAt[I + 1]) = 1) then
+    begin
+      Loops[Min(NewAt[I], NewAt[I + 1])].Couple := 1;
+      Loops[Max(NewAt[I], NewAt[I + 1])].Couple := -1;
+    end;
 end;
 
 function ComputeRadiantOriented(const Outline: TP3Array; const Holes: array of TP3Array; const Spec: TRadiantSpec; WantTrace, Turn: boolean;
@@ -4121,8 +4253,7 @@ begin
   Result.Why := RadiantProblem(Outline, Spec);
   Result.Ok := Result.Why = '';
   if not Result.Ok then Exit;
-  MaxFt := Spec.MaxLoopFt;
-  if MaxFt <= 0 then MaxFt := TubeOf(Spec.Tube).MaxLoopFt;
+  MaxFt := RadiantFloorMaxFt(Spec);
   Inset := EDGE_INSET_IN * Spec.Inch;
 
   Result.TurnActualIn := Spec.Spacing / Spec.Inch;
@@ -4232,9 +4363,15 @@ begin
     Result.Manifolds[MI].LoopCount := Length(Loops) - K;
     Result.Manifolds[MI].Ports := Max(MANIFOLD_PORTS_MIN, Length(Loops) - K);
     Result.Manifolds[MI].Ft := 0;
-    for I := K to High(Loops) do Result.Manifolds[MI].Ft := Result.Manifolds[MI].Ft + Loops[I].LenFt;
+    for I := K to High(Loops) do
+    begin
+      { laid on the floor to MaxFt less the lead; the lead is part of it }
+      Loops[I].LenFt := Loops[I].LenFt + MANIFOLD_LEAD_FT;
+      Result.Manifolds[MI].Ft := Result.Manifolds[MI].Ft + Loops[I].LenFt;
+    end;
   end;
 
+  NumberAlongManifolds(Loops, Result.Manifolds, Outline);
   Result.Loops := Loops;
   Result.Trace := Trace;
   Result.CellCount := 0;
@@ -4247,7 +4384,6 @@ begin
   Result.Bends := RadiantBends(Loops, Result.StraightPct, STRAIGHT_RUN_SPACINGS * Spec.Spacing);
   Result.TotalFt := 0;
   for I := 0 to High(Loops) do Result.TotalFt := Result.TotalFt + Loops[I].LenFt;
-  Result.OrderFt := Result.TotalFt * (1 + Spec.WastePct / 100);
   if Length(Loops) = 0 then
   begin
     Result.Ok := False;
@@ -4507,14 +4643,24 @@ begin
     Result := MANIFOLD_PORTS_MAX;
 end;
 
+function RadiantMaxLoopFt(const Spec: TRadiantSpec): double;
+begin
+  Result := Spec.MaxLoopFt;
+  if Result <= 0 then Result := TubeOf(Spec.Tube).MaxLoopFt;
+end;
+
+function RadiantFloorMaxFt(const Spec: TRadiantSpec): double;
+begin
+  Result := RadiantMaxLoopFt(Spec) - MANIFOLD_LEAD_FT;
+end;
+
 function RadiantReachPct(AreaSqFt: double; const Spec: TRadiantSpec): double;
 var
   MaxFt: double;
 begin
   Result := 100;
   if (AreaSqFt <= 0) or (Spec.Spacing <= 0) then Exit;
-  MaxFt := Spec.MaxLoopFt;
-  if MaxFt <= 0 then MaxFt := TubeOf(Spec.Tube).MaxLoopFt;
+  MaxFt := RadiantFloorMaxFt(Spec);
   Result := Min(100, 100 * RadiantMaxPorts(Spec) * Max(1, Length(Spec.Manifolds)) * MaxFt * Spec.Spacing / AreaSqFt);
 end;
 
@@ -4532,9 +4678,8 @@ begin
   Result := '';
   Reach := RadiantReachPct(AreaSqFt, Spec);
   if (Reach >= 100 - 1E-9) or (Spec.GoalCoverPct <= 0) or (Spec.GoalCoverPct <= Reach * REACH_SHARE + 1E-9) then Exit;
-  MaxFt := Spec.MaxLoopFt;
-  if MaxFt <= 0 then MaxFt := TubeOf(Spec.Tube).MaxLoopFt;
-  Want := Ceil(AreaSqFt / Spec.Spacing / MaxFt - 1E-9);
+  MaxFt := RadiantMaxLoopFt(Spec);
+  Want := Ceil(AreaSqFt / Spec.Spacing / RadiantFloorMaxFt(Spec) - 1E-9);
   if Short then
     Exit(Format('Out of reach: %d loops of %s ft at %s" cover about %s%% of this floor, not %s%% - ' +
       'widen the spacing, lengthen the loop, raise the loops a manifold, or split the zone.', [RadiantMaxPorts(Spec) *
@@ -6009,19 +6154,69 @@ begin
   Result := Ceil(2 * Max(Ports, MANIFOLD_PORTS_MIN) * MANIFOLD_PORT_PITCH_IN + MANIFOLD_ENDS_IN);
 end;
 
+function RadiantRolls(const Lens: array of double; RollFt: double): TRadiantRolls;
+var
+  I, K: integer;
+begin
+  Result := Default(TRadiantRolls);
+  Result.RollFt := RollFt;
+  Result.Fits := True;
+  SetLength(Result.Roll, Length(Lens));
+  SetLength(Result.LeftAfter, Length(Lens));
+  for I := 0 to High(Lens) do
+  begin
+    if Lens[I] > RollFt + 1E-6 then
+    begin
+      Result.Fits := False;
+      Result.Roll[I] := -1;
+      Result.LeftAfter[I] := 0;
+      Continue;
+    end;
+    K := 0;
+    while (K <= High(Result.Left)) and (Result.Left[K] < Lens[I] - 1E-6) do Inc(K);
+    if K > High(Result.Left) then
+    begin
+      SetLength(Result.Left, K + 1);
+      Result.Left[K] := RollFt;
+    end;
+    Result.Left[K] := Max(0, Result.Left[K] - Lens[I]);
+    Result.Roll[I] := K;
+    Result.LeftAfter[I] := Result.Left[K];
+  end;
+end;
+
+function RadiantRollSizes(Tube: TTubeSize; const Lens: array of double): TRollSizes;
+var
+  I, K: integer;
+  Shortest: double;
+begin
+  Result := nil;
+  if Length(Lens) = 0 then Exit;
+  Shortest := Lens[0];
+  for I := 1 to High(Lens) do Shortest := Min(Shortest, Lens[I]);
+  for K := 0 to High(ROLL_SIZES_FT[Tube]) do
+    if (ROLL_SIZES_FT[Tube][K] > 0) and (Shortest <= ROLL_SIZES_FT[Tube][K] + 1E-6) then
+    begin
+      SetLength(Result, Length(Result) + 1);
+      Result[High(Result)] := ROLL_SIZES_FT[Tube][K];
+    end;
+end;
+
 function RadiantTicketText(const Spec: TRadiantSpec; const R: TRadiantResult; U: TUnitSystem): string;
 var
-  I, M: integer;
+  I, M, K, Long: integer;
+  Sizes: TRollSizes;
   T: TTubeFacts;
   Ties: integer;
-  MaxFt, Cover, Spread: double;
+  MaxFt, Cover, Spread, Left: double;
+  Lens: array of double;
+  Rolls: TRadiantRolls;
 begin
-  { World units are feet, so LenFt, TotalFt, OrderFt and MaxLoopFt need no
+  { World units are feet, so LenFt, TotalFt and MaxLoopFt need no
     converting.  Only numbers the trade says in inches (spacing, slab
     thickness) are divided by Spec.Inch. }
   T := TubeOf(Spec.Tube);
-  MaxFt := Spec.MaxLoopFt;
-  if MaxFt <= 0 then MaxFt := T.MaxLoopFt;
+  MaxFt := RadiantMaxLoopFt(Spec);
   Result := '';
   if Spec.Tag <> '' then Result := Result + Spec.Tag + LineEnding + LineEnding;
   Result := Result + 'RADIANT HEAT LAYOUT' + LineEnding;
@@ -6030,6 +6225,7 @@ begin
   Result := Result + 'floor area: ' + FormatArea(R.AreaSqFt, U) + LineEnding;
   Result := Result + 'loops: ' + IntToStr(Length(R.Loops)) + ', ' + FormatFloat('0', MaxFt) + ' ft maximum each, on ' +
     IntToStr(Length(R.Manifolds)) + ' manifold(s)' + LineEnding;
+  Result := Result + '  each length takes in ' + FormatLen(MANIFOLD_LEAD_FT, U) + ' at the manifold, up the wall and out onto the grid' + LineEnding;
   for M := 0 to High(R.Manifolds) do
   begin
     Result := Result + Format('manifold %d: a %d-loop%s', [M + 1, R.Manifolds[M].Ports, IfThen(R.Manifolds[M].LoopCount >
@@ -6076,8 +6272,21 @@ begin
   if Length(R.Loops) > 0 then
     Result := Result + Format('to lay: %d bends, %s%% of the tube in straights of %s or more', [R.Bends, FormatFloat('0', R.StraightPct),
       FormatLen(STRAIGHT_RUN_SPACINGS * Spec.Spacing, U)]) + LineEnding;
-  Result := Result + 'total tube, no waste: ' + FormatLen(R.TotalFt, U) + LineEnding;
-  Result := Result + 'order (with ' + FormatFloat('0', Spec.WastePct) + '% waste): ' + FormatLen(R.OrderFt, U) + LineEnding;
+  Result := Result + 'total tube: ' + FormatLen(R.TotalFt, U) + LineEnding;
+  { by the roll, each loop in one piece: how many, and what is left on them }
+  SetLength(Lens, Length(R.Loops));
+  for I := 0 to High(R.Loops) do Lens[I] := R.Loops[I].LenFt;
+  Sizes := RadiantRollSizes(Spec.Tube, Lens);
+  for K := 0 to High(Sizes) do
+  begin
+    Rolls := RadiantRolls(Lens, Sizes[K]);
+    Left := 0;
+    for I := 0 to High(Rolls.Left) do Left := Left + Rolls.Left[I];
+    Long := 0;
+    for I := 0 to High(Rolls.Roll) do if Rolls.Roll[I] < 0 then Inc(Long);
+    Result := Result + Format('on %s rolls: %d, %s left on them', [FormatLen(Sizes[K], U), Length(Rolls.Left), FormatLen(Left, U)]) +
+      IfThen(Long > 0, Format(' - %d loop%s longer than the roll', [Long, IfThen(Long = 1, '', 's')]), '') + LineEnding;
+  end;
   { feet x 12 = inches of run, over the tie spacing in inches }
   Ties := Round(R.TotalFt * 12 / TIE_SPACING_IN);
   Result := Result + 'ties or staples (estimate, every ' + FormatFloat('0', TIE_SPACING_IN) + '"): about ' + IntToStr(Ties) + LineEnding;

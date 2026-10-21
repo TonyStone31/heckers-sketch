@@ -21,6 +21,43 @@
 , then "- " bullets.  Keep the bullets short.
 -->
 
+## Next release
+
+### New
+
+- **The radiant tools are an add-on** and ask for a license the first time
+  they are opened.
+- **Radiant loops are numbered along the manifold.**  Standing in front of
+  it, loop 1 is at the left end and the rest follow in order, so the
+  setting-out sheets go up the manifold one loop after another.
+- **Radiant tube by the roll.**  The submittal works out the rolls PEX is
+  sold in - 100, 300, 500 and 1,000 ft, and 400 ft for 3/8" and 5/8" - how
+  many, and what is left on each one, every loop in one piece.  Each loop's sheet says what should be left on the roll once it is
+  down, so measuring the tail checks the loop went in as drawn.  The flat
+  waste percentage is gone.
+- **The slab's overall size** is on the submittal's first page and
+  dimensioned on the plan of every zone.
+- **6 ft at the manifold in every radiant loop.**  The climb up the wall
+  and the tube fanned out onto the grid are counted in each loop's length,
+  the totals and the rolls, and against the longest loop allowed.
+- **The manifold starts tight to its wall**, and goes tight to a wall it is
+  dragged up to.
+- **The radiant wizard shows where the manifold is**: its distance to the
+  wall each way while you drag it or have its zone open, and a drag lands
+  it whole inches from the walls, so it can go on a mark.  The manifold
+  is drawn with its connections, a pair a loop.
+- **The manifold is dimensioned** on the plan of every zone, each zone's page
+  and every loop's sheet: from the nearer wall each way, along its wall and
+  out from it, and not from a wall it is against.
+- **The submittal puts the installer first.**  The job, the materials, the
+  rolls and the plans come first.  How well the layout scored and how it
+  was found are at the back.
+
+### Fixed
+
+- A radiant loop whose rows run at a slant, as in a round room, had no
+  dimensions on its setting-out sheet.
+
 ## v2026.10.19
 
 ### New
