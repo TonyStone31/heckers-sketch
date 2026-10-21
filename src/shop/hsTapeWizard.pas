@@ -238,8 +238,7 @@ begin
     2:
     begin
       lblStep.Caption := 'Step 3 of 3 - what it comes to';
-      lblSay.Caption := 'These are the offsets in shop words, the way the ticket says them.  ' +
-        'Use them and they go into the form; the readings go on the ticket too.';
+      lblSay.Caption := 'These are the offsets in shop words, the way the ticket says them.  ' + 'Use them and they go into the form; the readings go on the ticket too.';
       btnNext.Caption := 'Use these';
     end;
   end;
@@ -890,8 +889,8 @@ begin
     if T.RefH = rhFloor then S := 'from the back wall'
     else
       S := 'from the front';
-    C.TextOut(50, Y, Format('%s: %s to the %s of the entry, %s to the %s of the exit', [S, FormatLen(T.RefH0, FUnits),
-      Pick(T.RefH0Top, 'front', 'back'), FormatLen(T.RefH1, FUnits), Pick(T.RefH1Top, 'front', 'back')]));
+    C.TextOut(50, Y, Format('%s: %s to the %s of the entry, %s to the %s of the exit', [S, FormatLen(T.RefH0, FUnits), Pick(T.RefH0Top, 'front', 'back'),
+      FormatLen(T.RefH1, FUnits), Pick(T.RefH1Top, 'front', 'back')]));
     Inc(Y, 22);
   end
   else
@@ -899,8 +898,8 @@ begin
     if T.RefH = rhFloor then S := 'from the floor'
     else
       S := 'from the ceiling';
-    C.TextOut(50, Y, Format('%s: %s to the %s of the entry, %s to the %s of the exit', [S, FormatLen(T.RefH0, FUnits),
-      Pick(T.RefH0Top, 'top', 'bottom'), FormatLen(T.RefH1, FUnits), Pick(T.RefH1Top, 'top', 'bottom')]));
+    C.TextOut(50, Y, Format('%s: %s to the %s of the entry, %s to the %s of the exit', [S, FormatLen(T.RefH0, FUnits), Pick(T.RefH0Top, 'top', 'bottom'),
+      FormatLen(T.RefH1, FUnits), Pick(T.RefH1Top, 'top', 'bottom')]));
     Inc(Y, 22);
   end;
   if T.RefW = rwLeft then S := 'from the left wall'

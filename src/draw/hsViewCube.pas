@@ -399,8 +399,7 @@ var
       else
         Wb := 1;
     end;
-    Result := P3(AFace.N.X + Ub * AFace.A.X + Wb * AFace.B.X, AFace.N.Y + Ub * AFace.A.Y + Wb * AFace.B.Y, AFace.N.Z +
-      Ub * AFace.A.Z + Wb * AFace.B.Z);
+    Result := P3(AFace.N.X + Ub * AFace.A.X + Wb * AFace.B.X, AFace.N.Y + Ub * AFace.A.Y + Wb * AFace.B.Y, AFace.N.Z + Ub * AFace.A.Z + Wb * AFace.B.Z);
   end;
 
 begin

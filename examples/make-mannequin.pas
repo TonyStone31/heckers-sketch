@@ -76,8 +76,8 @@ begin
     SHi := P3(-1E30, -1E30, 0);
     for I := 0 to 7 do
     begin
-      CamP := Project(CamV, P3(specialize IfThen<double>((I and 1) = 0, BLo.X, BHi.X), specialize IfThen<double>(
-        (I and 2) = 0, BLo.Y, BHi.Y), specialize IfThen<double>((I and 4) = 0, BLo.Z, BHi.Z)));
+      CamP := Project(CamV, P3(specialize IfThen<double>((I and 1) = 0, BLo.X, BHi.X), specialize IfThen<double>((I and 2) = 0, BLo.Y, BHi.Y),
+        specialize IfThen<double>((I and 4) = 0, BLo.Z, BHi.Z)));
       SLo.X := Min(SLo.X, CamP.X);
       SHi.X := Max(SHi.X, CamP.X);
       SLo.Y := Min(SLo.Y, CamP.Y);

@@ -1317,8 +1317,8 @@ var
     for K := 1 to N - 1 do
     begin
       A1 := A + K * 2 * Pi / N;
-      if not SameP(Poly[K], P3(C.X + (AU.X * Cos(A1) + AV.X * Sin(A1)) * R, C.Y + (AU.Y * Cos(A1) + AV.Y * Sin(A1)) * R,
-        C.Z + (AU.Z * Cos(A1) + AV.Z * Sin(A1)) * R)) then Exit;
+      if not SameP(Poly[K], P3(C.X + (AU.X * Cos(A1) + AV.X * Sin(A1)) * R, C.Y + (AU.Y * Cos(A1) + AV.Y * Sin(A1)) * R, C.Z + (AU.Z * Cos(A1) + AV.Z * Sin(A1)) * R)) then
+        Exit;
     end;
     Rg.C := C;
     Rg.R := R;
@@ -1821,8 +1821,8 @@ var
     end;
     { every corner at a min or max of each axis: the eight of a box }
     for I := 0 to 7 do
-      if not ((Abs(Pts[I].P.X - Lo.X) < 1E-9) or (Abs(Pts[I].P.X - Hi.X) < 1E-9)) or not ((Abs(Pts[I].P.Y - Lo.Y) < 1E-9) or
-        (Abs(Pts[I].P.Y - Hi.Y) < 1E-9)) or not ((Abs(Pts[I].P.Z - Lo.Z) < 1E-9) or (Abs(Pts[I].P.Z - Hi.Z) < 1E-9)) then Exit;
+      if not ((Abs(Pts[I].P.X - Lo.X) < 1E-9) or (Abs(Pts[I].P.X - Hi.X) < 1E-9)) or not ((Abs(Pts[I].P.Y - Lo.Y) < 1E-9) or (Abs(Pts[I].P.Y - Hi.Y) < 1E-9)) or
+        not ((Abs(Pts[I].P.Z - Lo.Z) < 1E-9) or (Abs(Pts[I].P.Z - Hi.Z) < 1E-9)) then Exit;
     if (Hi.X - Lo.X < 1E-9) or (Hi.Y - Lo.Y < 1E-9) or (Hi.Z - Lo.Z < 1E-9) then Exit;
     { each face on its own side, facing out }
     for Side := 0 to 5 do

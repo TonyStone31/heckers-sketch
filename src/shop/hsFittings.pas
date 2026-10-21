@@ -615,9 +615,9 @@ begin
     end;
     fkTee:
     begin
-      Result := Result + 'Run: ' + Ins(T.W0) + ' x ' + Ins(T.H0) + ' (width x height), ' + Ins(T.Len) + ' long' + LineEnding +
-        'Branch: ' + Ins(T.BW) + ' x ' + Ins(T.BH) + ' off the ' + LowerCase(BRANCH_NAMES[T.BranchOn]) + ', ' + Ins(T.BranchLen) +
-        ' long' + LineEnding + 'Branch starts ' + Ins(T.BranchFrom) + ' from the entry, ' + Ins(T.BranchUp);
+      Result := Result + 'Run: ' + Ins(T.W0) + ' x ' + Ins(T.H0) + ' (width x height), ' + Ins(T.Len) + ' long' + LineEnding + 'Branch: ' +
+        Ins(T.BW) + ' x ' + Ins(T.BH) + ' off the ' + LowerCase(BRANCH_NAMES[T.BranchOn]) + ', ' + Ins(T.BranchLen) + ' long' + LineEnding +
+        'Branch starts ' + Ins(T.BranchFrom) + ' from the entry, ' + Ins(T.BranchUp);
       if T.BranchOn in [bsLeft, bsRight] then Result := Result + ' up from the bottom' + LineEnding
       else
         Result := Result + ' in from the left' + LineEnding;
@@ -634,8 +634,8 @@ begin
         if T.RefH = rhFloor then Result := Result + 'Taped from the back wall: '
         else
           Result := Result + 'Taped from the front: ';
-        Result := Result + Ins(T.RefH0) + ' to the ' + Edge(T.RefH0Top, 'front', 'back') + ' of the entry, ' + Ins(T.RefH1) +
-          ' to the ' + Edge(T.RefH1Top, 'front', 'back') + ' of the exit' + LineEnding;
+        Result := Result + Ins(T.RefH0) + ' to the ' + Edge(T.RefH0Top, 'front', 'back') + ' of the entry, ' + Ins(T.RefH1) + ' to the ' +
+          Edge(T.RefH1Top, 'front', 'back') + ' of the exit' + LineEnding;
         if T.RefW = rwLeft then Result := Result + 'Taped from the left wall: '
         else
           Result := Result + 'Taped from the right wall: ';
@@ -647,8 +647,8 @@ begin
         if T.RefH = rhFloor then Result := Result + 'Taped from the floor: '
         else
           Result := Result + 'Taped from the ceiling: ';
-        Result := Result + Ins(T.RefH0) + ' to the ' + Edge(T.RefH0Top, 'top', 'bottom') + ' of the entry, ' + Ins(T.RefH1) +
-          ' to the ' + Edge(T.RefH1Top, 'top', 'bottom') + ' of the exit' + LineEnding;
+        Result := Result + Ins(T.RefH0) + ' to the ' + Edge(T.RefH0Top, 'top', 'bottom') + ' of the entry, ' + Ins(T.RefH1) + ' to the ' +
+          Edge(T.RefH1Top, 'top', 'bottom') + ' of the exit' + LineEnding;
         if T.RefW = rwLeft then Result := Result + 'Taped from the left wall: '
         else
           Result := Result + 'Taped from the right wall: ';
@@ -772,8 +772,7 @@ var
   begin
     J := (K + 1) mod 4;
     Result := Norm3(Cross3(Towards(C[0][K], C[0][J]), Towards(C[0][K], C[1][K])));
-    Mid := P3((C[0][K].X + C[0][J].X + C[1][K].X + C[1][J].X) / 4, (C[0][K].Y + C[0][J].Y + C[1][K].Y + C[1][J].Y) / 4,
-      (C[0][K].Z + C[0][J].Z + C[1][K].Z + C[1][J].Z) / 4);
+    Mid := P3((C[0][K].X + C[0][J].X + C[1][K].X + C[1][J].X) / 4, (C[0][K].Y + C[0][J].Y + C[1][K].Y + C[1][J].Y) / 4, (C[0][K].Z + C[0][J].Z + C[1][K].Z + C[1][J].Z) / 4);
     if Dot3(Result, Sub3(Mid, Center)) < 0 then
       Result := P3(-Result.X, -Result.Y, -Result.Z);
   end;

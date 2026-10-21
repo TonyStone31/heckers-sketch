@@ -403,9 +403,9 @@ begin
   Result := 'os: ' + Safely(@OSLine) + LineEnding;
   M := Safely(@MachineLine);
   if M <> '' then Result := Result + 'machine: ' + M + LineEnding;
-  Result := Result + 'cpu: ' + Safely(@CPULine) + Format(' (%d cores)', [TThread.ProcessorCount]) + LineEnding + 'ram: ' +
-    Safely(@RAMLine) + LineEnding + 'graphics: ' + Safely(@GraphicsLine) + LineEnding + 'display: ' + Safely(@DisplayLine) + LineEnding +
-    'toolkit: ' + Safely(@ToolkitLine) + LineEnding + 'locale: ' + Safely(@LocaleLine) + LineEnding;
+  Result := Result + 'cpu: ' + Safely(@CPULine) + Format(' (%d cores)', [TThread.ProcessorCount]) + LineEnding + 'ram: ' + Safely(@RAMLine) +
+    LineEnding + 'graphics: ' + Safely(@GraphicsLine) + LineEnding + 'display: ' + Safely(@DisplayLine) + LineEnding + 'toolkit: ' +
+    Safely(@ToolkitLine) + LineEnding + 'locale: ' + Safely(@LocaleLine) + LineEnding;
 end;
 
 function ProgramMemory: string;

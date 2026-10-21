@@ -35,10 +35,10 @@ end;
 
 { A new sheet.  Key < 0 makes a new untitled one-sheet document; otherwise
   the sheet is added to document Key after its last tab. }
-procedure TMainForm.NewDrawing(Key: Integer);
+procedure TMainForm.NewDrawing(Key: integer);
 var
-  N, K, Nm, At, Src: Integer;
-  Taken: Boolean;
+  N, K, Nm, At, Src: integer;
+  Taken: boolean;
   D: TDrawing;
 begin
   N := Length(FDrawings);
@@ -104,7 +104,7 @@ begin
   end;
 end;
 
-procedure TMainForm.SelectDrawing(I: Integer);
+procedure TMainForm.SelectDrawing(I: integer);
 begin
   if (I < 0) or (I > High(FDrawings)) or (I = FTabIdx) then Exit;
   LeaveSheet;
@@ -120,7 +120,7 @@ end;
 
 { The tab's cross, Ctrl+W, /close: closes the whole file the tab belongs to,
   asking about unsaved work first. }
-procedure TMainForm.CloseDrawing(I: Integer);
+procedure TMainForm.CloseDrawing(I: integer);
 begin
   if (I < 0) or (I > High(FDrawings)) then Exit;
   CloseDocument(FDrawings[I].DocKey);
@@ -128,12 +128,14 @@ end;
 
 function TMainForm.DocPath: string;
 begin
-  if FD = nil then Result := '' else Result := FD.FilePath;
+  if FD = nil then Result := ''
+  else
+    Result := FD.FilePath;
 end;
 
-function TMainForm.DocSheets(Key: Integer): TIntArrayW;
+function TMainForm.DocSheets(Key: integer): TIntArrayW;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := nil;
   for I := 0 to High(FDrawings) do
@@ -146,27 +148,26 @@ end;
 
 { A file changed since it was opened or saved has work in it, whatever is
   left on it; an untitled drawing with nothing on it has nothing to lose. }
-function TMainForm.DocDirty(Key: Integer): Boolean;
+function TMainForm.DocDirty(Key: integer): boolean;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := False;
   for I := 0 to High(FDrawings) do
-    if (FDrawings[I].DocKey = Key) and FDrawings[I].Dirty and
-       ((FDrawings[I].FilePath <> '') or (FDrawings[I].Doc.Live > 0)) then Exit(True);
+    if (FDrawings[I].DocKey = Key) and FDrawings[I].Dirty and ((FDrawings[I].FilePath <> '') or (FDrawings[I].Doc.Live > 0)) then Exit(True);
 end;
 
-function TMainForm.TabCaption(I: Integer): string;
+function TMainForm.TabCaption(I: integer): string;
 begin
   Result := FDrawings[I].DocName;
   if Length(DocSheets(FDrawings[I].DocKey)) > 1 then Result := Result + ': ' + FDrawings[I].Name;
   if DocDirty(FDrawings[I].DocKey) then Result := Result + ' *';
 end;
 
-function TMainForm.AskToSave(Key: Integer; const Title: string): Boolean;
+function TMainForm.AskToSave(Key: integer; const Title: string): boolean;
 var
   S: TIntArrayW;
-  Ans: Integer;
+  Ans: integer;
   Where: string;
 begin
   Result := True;
@@ -176,13 +177,10 @@ begin
   { bring its drawing to the front while asking }
   if FDrawings[FTabIdx].DocKey <> Key then SelectDrawing(S[0]);
   if FDrawings[S[0]].FilePath <> '' then Where := FDrawings[S[0]].FilePath
-  else Where := 'It has not been saved to a file yet.';
-  Ans := QuestionDlg(Title,
-    Format('Save the changes to "%s"?', [FDrawings[S[0]].DocName]) + LineEnding + LineEnding + Where,
-    mtConfirmation,
-    [mrYes, 'Save', 'IsDefault',
-     mrNo, 'Don''t save',
-     mrCancel, 'Cancel', 'IsCancel'], 0);
+  else
+    Where := 'It has not been saved to a file yet.';
+  Ans := QuestionDlg(Title, Format('Save the changes to "%s"?', [FDrawings[S[0]].DocName]) + LineEnding + LineEnding + Where,
+    mtConfirmation, [mrYes, 'Save', 'IsDefault', mrNo, 'Don''t save', mrCancel, 'Cancel', 'IsCancel'], 0);
   if Ans = mrCancel then Exit(False);
   { Save; a refused name or failed write keeps it open }
   if Ans = mrYes then Result := SaveDocument(Key, False);
@@ -191,12 +189,12 @@ end;
 { The document's file was changed on disk: its sheets are read again and take
   the old ones' places, each keeping its view.  False, with the old sheets
   kept, if the file will not read. }
-function TMainForm.ReloadDocument(Key: Integer): Boolean;
+function TMainForm.ReloadDocument(Key: integer): boolean;
 var
   S: TIntArrayW;
   Fresh, Rest: array of TDrawing;
   Old: TDrawing;
-  First, I, K, At, Front: Integer;
+  First, I, K, At, Front: integer;
 begin
   Result := False;
   S := DocSheets(Key);
@@ -265,7 +263,7 @@ procedure TMainForm.WatchDocs;
 var
   Want: TStringList;
   Eye: TFileEye;
-  I: Integer;
+  I: integer;
 begin
   Want := TStringList.Create;
   try
@@ -290,9 +288,9 @@ begin
 end;
 
 { The document an open file belongs to, or -1. }
-function TMainForm.DocKeyOf(const Path: string): Integer;
+function TMainForm.DocKeyOf(const Path: string): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(FDrawings) do
     if (FDrawings[I].FilePath <> '') and SameFileName(FDrawings[I].FilePath, Path) then Exit(FDrawings[I].DocKey);
@@ -303,7 +301,7 @@ end;
   is read again.  Otherwise the bar asks, keyed by the file. }
 procedure TMainForm.DocEyeChange(Sender: TObject; const FileName: string; Change: TFileEyeChange);
 var
-  Key: Integer;
+  Key: integer;
   Nm: string;
 begin
   Key := DocKeyOf(FileName);
@@ -327,9 +325,9 @@ begin
     [mrYes, 'Load theirs', mrNo, 'Keep mine'], 'changed:' + FileName);
 end;
 
-function TMainForm.CloseDocument(Key: Integer): Boolean;
+function TMainForm.CloseDocument(Key: integer): boolean;
 var
-  K, J: Integer;
+  K, J: integer;
   DocNm: string;
 begin
   Result := AskToSave(Key, 'Close');
@@ -382,7 +380,7 @@ end;
   caption, which changes (a star for unsaved work). }
 procedure TMainForm.PlaceTabs;
 var
-  I, X, W, TabH, Pad: Integer;
+  I, X, W, TabH, Pad: integer;
 begin
   SetLength(FTabRects, Length(FDrawings) + 1);   // one extra for the + button
   if not pbTabs.Visible then Exit;
@@ -393,8 +391,7 @@ begin
   UIFont(pbTabs.Canvas, 10, True, Theme.Text);
   for I := 0 to High(FDrawings) do
   begin
-    W := EnsureRange(pbTabs.Canvas.TextWidth(TabCaption(I)) + Round(44 * FUIScale),
-      Round(110 * FUIScale), Round(300 * FUIScale));
+    W := EnsureRange(pbTabs.Canvas.TextWidth(TabCaption(I)) + Round(44 * FUIScale), Round(110 * FUIScale), Round(300 * FUIScale));
     FTabRects[I] := Rect(X, 0, X + W, TabH);
     if (I < High(FDrawings)) and (FDrawings[I + 1].DocKey = FDrawings[I].DocKey) then
       Pad := Round(1 * FUIScale)
@@ -407,9 +404,9 @@ end;
 
 procedure TMainForm.pbTabsPaint(Sender: TObject);
 var
-  I, TW: Integer;
+  I, TW: integer;
   R: TRect;
-  IsCur, Hot: Boolean;
+  IsCur, Hot: boolean;
   C1, C2, Edge: TPix;
   S: string;
 begin
@@ -449,8 +446,7 @@ begin
     FCmdSkin.RoundFrame(Rect(R.Left, R.Top, R.Right, R.Bottom + Round(10 * FUIScale)),
       Round(9 * FUIScale), 1.0, Edge, 0.9);
     if IsCur then
-      FCmdSkin.RoundRect(Rect(R.Left + Round(10 * FUIScale), R.Top + Round(3 * FUIScale),
-        R.Right - Round(10 * FUIScale), R.Top + Round(6 * FUIScale)),
+      FCmdSkin.RoundRect(Rect(R.Left + Round(10 * FUIScale), R.Top + Round(3 * FUIScale), R.Right - Round(10 * FUIScale), R.Top + Round(6 * FUIScale)),
         1.5, Theme.Accent, 0.95);
     { The close cross is on the current tab, even when it is the only one;
       hiding it left no visible way to close the drawing.  Closing the last
@@ -493,13 +489,13 @@ begin
     TW := pbTabs.Canvas.TextWidth(S);
     pbTabs.Canvas.TextOut(R.Left + Round(12 * FUIScale),
       (R.Top + R.Bottom - pbTabs.Canvas.TextHeight(S)) div 2, S);
-    if TW = 0 then ;
+    if TW = 0 then;
   end;
 end;
 
-procedure TMainForm.pbTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbTabsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  I, H: Integer;
+  I, H: integer;
 begin
   H := -1;
   for I := 0 to High(FTabRects) do
@@ -524,10 +520,9 @@ begin
   end;
 end;
 
-procedure TMainForm.pbTabsMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbTabsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  I: Integer;
+  I: integer;
   R: TRect;
 begin
   if Button <> mbLeft then Exit;

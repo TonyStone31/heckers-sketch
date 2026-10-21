@@ -87,8 +87,8 @@ begin
     else if (S[J] = '-') and (J > I) and (S[J - 1] = '''') and (J < Length(S)) and IsDigit(S[J + 1]) then Inc(J)
     { 8' 10 1/2": a space between figures after the feet, or before a
       fraction }
-    else if (S[J] = ' ') and (J < Length(S)) and IsDigit(S[J + 1]) and ((Pos('''', Copy(S, I, J - I)) > 0) or
-      ((J + 2 <= Length(S)) and (Pos('/', Copy(S, J + 1, 4)) > 0) and (Pos(' ', Copy(S, J + 1, 4)) = 0))) then Inc(J)
+    else if (S[J] = ' ') and (J < Length(S)) and IsDigit(S[J + 1]) and ((Pos('''', Copy(S, I, J - I)) > 0) or ((J + 2 <= Length(S)) and
+      (Pos('/', Copy(S, J + 1, 4)) > 0) and (Pos(' ', Copy(S, J + 1, 4)) = 0))) then Inc(J)
     else
       Break;
   end;

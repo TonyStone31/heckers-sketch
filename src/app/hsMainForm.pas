@@ -924,8 +924,7 @@ type
     procedure PaintGroundGrid(Pitch: double);
     procedure PaintAxes;
     procedure PaintPushPreview(C: TCanvas);
-    procedure PaintFaceHint(C: TCanvas; Face: integer; const Col: TPix; S: TArtSurface = nil; OX: integer = 0; OY: integer = 0;
-      Edge: boolean = True; Every: integer = 2);
+    procedure PaintFaceHint(C: TCanvas; Face: integer; const Col: TPix; S: TArtSurface = nil; OX: integer = 0; OY: integer = 0; Edge: boolean = True; Every: integer = 2);
     function HintFaceNow: integer;
     { the face a press is on (see the body) }
     function FaceAtPress: integer;
@@ -1596,12 +1595,11 @@ const
 
   { one glyph per tool, for the button and for the cursor }
   TOOL_ICONS: array[TTool] of TIconKind =
-    (ikTSelect, ikTMove, ikTLine, ikTRect, ikTArc, ikTCircle, ikTPush, ikTText, ikTErase, ikTMeasure, ikDim, ikTOrbit, ikTOffset,
-    ikTRotate, ikTProtractor, ikTDrill, ikTFollow);
+    (ikTSelect, ikTMove, ikTLine, ikTRect, ikTArc, ikTCircle, ikTPush, ikTText, ikTErase, ikTMeasure, ikDim, ikTOrbit, ikTOffset, ikTRotate,
+    ikTProtractor, ikTDrill, ikTFollow);
 
   TOOL_NAMES: array[TTool] of string =
-    ('SELECT', 'MOVE', 'LINE', 'RECT', 'ARC', 'CIRCLE', 'PUSH/PULL', 'TEXT', 'ERASE', 'MEASURE', 'DIMENSION', 'ORBIT', 'OFFSET',
-    'ROTATE', 'PROTRACTOR', 'DRILL', 'REVOLVE');
+    ('SELECT', 'MOVE', 'LINE', 'RECT', 'ARC', 'CIRCLE', 'PUSH/PULL', 'TEXT', 'ERASE', 'MEASURE', 'DIMENSION', 'ORBIT', 'OFFSET', 'ROTATE', 'PROTRACTOR', 'DRILL', 'REVOLVE');
 
   { The strip shows the tools a drawing is made of; the rest wait behind
     MORE, one click away.  Fourteen buttons of equal weight scare people off.

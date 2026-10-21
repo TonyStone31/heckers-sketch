@@ -8,10 +8,9 @@
   with its view and camera, and in a session its file and document too.  The
   camera goes along so a drawing (or a report's drawing) opens as it was
   being looked at. }
-procedure TMainForm.BuildSession(L: TStrings; Session: Boolean; Key: Integer; Quick: Boolean;
-  ShownFirst: Boolean);
+procedure TMainForm.BuildSession(L: TStrings; Session: boolean; Key: integer; Quick: boolean; ShownFirst: boolean);
 var
-  I, K: Integer;
+  I, K: integer;
   Sheets: THeckSheets;
   S: THeckSheet;
 begin
@@ -35,10 +34,14 @@ begin
     S.SnapIdx := FDrawings[I].SnapIdx;
     S.View := FDrawings[I].View;
     S.CamKnown := True;
-    S.Az := FDrawings[I].Az; S.El := FDrawings[I].El; S.Zoom := FDrawings[I].Zoom;
-    S.ViewX := FDrawings[I].ViewX; S.ViewY := FDrawings[I].ViewY;
+    S.Az := FDrawings[I].Az;
+    S.El := FDrawings[I].El;
+    S.Zoom := FDrawings[I].Zoom;
+    S.ViewX := FDrawings[I].ViewX;
+    S.ViewY := FDrawings[I].ViewY;
     S.SliceOn := FDrawings[I].SliceOn;
-    S.SliceLo := FDrawings[I].SliceLo; S.SliceHi := FDrawings[I].SliceHi;
+    S.SliceLo := FDrawings[I].SliceLo;
+    S.SliceHi := FDrawings[I].SliceHi;
     S.HasSession := Session;
     S.DocKey := FDrawings[I].DocKey;
     S.FilePath := FDrawings[I].FilePath;
@@ -54,7 +57,7 @@ end;
   while that is up, otherwise on the command bar by letting messages through,
   which is why every input handler checks FBusy.  False means the skip was
   pressed. }
-function TMainForm.OnProgress(const What: string; Frac: Double): Boolean;
+function TMainForm.OnProgress(const What: string; Frac: double): boolean;
 var
   T: QWord;
 begin
@@ -92,7 +95,7 @@ end;
 { what the splash says when loading is over }
 function TMainForm.LoadedWords: string;
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   if FLoadSkipped then Exit('Skipped that drawing - starting with a clean sheet.');
   N := 0;
@@ -172,17 +175,13 @@ end;
   is unanswered work.  Declined, it is kept aside rather than thrown away. }
 procedure TMainForm.OfferRecovery;
 var
-  Ans: Integer;
+  Ans: integer;
   Aside: string;
 begin
   if not FileExists(DraftFile) then Exit;
   hsDialogSkin.UseTheme(Themes[FThemeIdx]);
-  Ans := QuestionDlg('Recover your drawings',
-    'Heckers Sketch did not close properly last time, and kept a copy of the drawings that had work not ' +
-    'saved yet.  Recover them?',
-    mtConfirmation,
-    [mrYes, 'Recover them', 'IsDefault',
-     mrNo, 'Start without them', 'IsCancel'], 0);
+  Ans := QuestionDlg('Recover your drawings', 'Heckers Sketch did not close properly last time, and kept a copy of the drawings that had work not ' +
+    'saved yet.  Recover them?', mtConfirmation, [mrYes, 'Recover them', 'IsDefault', mrNo, 'Start without them', 'IsCancel'], 0);
   if Ans = mrYes then
   begin
     RestoreDraft;
@@ -193,19 +192,18 @@ begin
   Aside := ChangeFileExt(DraftFile, '') + '-not-recovered.hsk';
   if FileExists(Aside) then DeleteFile(Aside);
   RenameFile(DraftFile, Aside);
-  FCmdMsg := 'Not recovered.  A copy is kept beside the settings as ' + ExtractFileName(Aside) +
-    ', and can be opened.';
+  FCmdMsg := 'Not recovered.  A copy is kept beside the settings as ' + ExtractFileName(Aside) + ', and can be opened.';
   pbCmd.Invalidate;
 end;
 
 { Read the draft back once OfferRecovery says to: each file with unsaved work
   as the file it was, path and sheets, still unsaved so Save writes it back. }
-function TMainForm.RestoreDraft: Boolean;
+function TMainForm.RestoreDraft: boolean;
 var
   L: TStringList;
   Aside: string;
   Ini: TIniFile;
-  First, I, N: Integer;
+  First, I, N: integer;
   Blank: TDrawing;
 begin
   Result := False;
@@ -236,8 +234,7 @@ begin
       RenameFile(DraftFile, Aside);
       Ini.WriteBool('startup', 'restoring', False);
       Ini.WriteInteger('startup', 'crashes', 0);
-      FCmdMsg := 'The last drawing would not open - it is kept beside the ' +
-        'settings as ' + ExtractFileName(Aside) + ' and can be opened.';
+      FCmdMsg := 'The last drawing would not open - it is kept beside the ' + 'settings as ' + ExtractFileName(Aside) + ' and can be opened.';
       Exit;
     end;
 
@@ -250,9 +247,8 @@ begin
       if FileExists(Aside) then DeleteFile(Aside);
       RenameFile(DraftFile, Aside);
       Ini.WriteInteger('startup', 'crashes', 0);
-      FCmdMsg := 'It crashed twice with the last drawing open, so this run ' +
-        'starts empty.  The drawing is kept as ' + ExtractFileName(Aside) +
-        ' - open it when you want it.';
+      FCmdMsg := 'It crashed twice with the last drawing open, so this run ' + 'starts empty.  The drawing is kept as ' +
+        ExtractFileName(Aside) + ' - open it when you want it.';
       Exit;
     end;
     Ini.WriteBool('startup', 'restoring', True);
@@ -263,16 +259,14 @@ begin
   { a draft is read before anything else happens, so a bad one must not
     take the program down on the way up }
   Blank := nil;
-  if (Length(FDrawings) = 1) and (FDrawings[0].FilePath = '') and not FDrawings[0].Dirty and
-     (FDrawings[0].Doc.Live = 0) then Blank := FDrawings[0];
+  if (Length(FDrawings) = 1) and (FDrawings[0].FilePath = '') and not FDrawings[0].Dirty and (FDrawings[0].Doc.Live = 0) then Blank := FDrawings[0];
   try
     try
       if not ReadSheets(DraftFile, True, First) then Exit;
     except
       on E: Exception do
       begin
-        FCmdMsg := 'The last draft would not load (' + E.ClassName +
-          ') - starting empty.';
+        FCmdMsg := 'The last draft would not load (' + E.ClassName + ') - starting empty.';
         Exit;
       end;
     end;
@@ -295,8 +289,7 @@ begin
     Aside := ChangeFileExt(DraftFile, '') + '-skipped.hsk';
     if FileExists(Aside) then DeleteFile(Aside);
     RenameFile(DraftFile, Aside);
-    FCmdMsg := 'Skipped loading the last drawing.  It is kept beside the ' +
-      'settings as ' + ExtractFileName(Aside) + ' and can be opened.';
+    FCmdMsg := 'Skipped loading the last drawing.  It is kept beside the ' + 'settings as ' + ExtractFileName(Aside) + ' and can be opened.';
     Exit;
   end;
   { the empty drawing the program started with gives way }
@@ -317,8 +310,7 @@ begin
   Result := True;
   Inc(FEditSeq);
   Trail(Format('recovered a draft: %d tabs, %d files not saved', [Length(FDrawings), N]));
-  FCmdMsg := Format('Recovered %d drawing%s - save %s to keep %s.', [N, IfThen(N = 1, '', 's'),
-    IfThen(N = 1, 'it', 'them'), IfThen(N = 1, 'it', 'them')]);
+  FCmdMsg := Format('Recovered %d drawing%s - save %s to keep %s.', [N, IfThen(N = 1, '', 's'), IfThen(N = 1, 'it', 'them'), IfThen(N = 1, 'it', 'them')]);
 end;
 
 { The jigs the program carries, put in the jigs folder by the examples' rule:
@@ -327,7 +319,7 @@ procedure TMainForm.WriteJigs;
 var
   Ini: TIniFile;
   L: TStringList;
-  I: Integer;
+  I: integer;
   Rec: string;
 begin
   try
@@ -362,7 +354,7 @@ end;
 procedure TMainForm.WriteExamples;
 var
   Ini: TIniFile;
-  I: Integer;
+  I: integer;
   Rec: string;
 begin
   try
@@ -391,11 +383,11 @@ end;
 { The example drawing (Open the Example on the menu): an etch-a-sketch to
   orbit, push and poke at.  It arrives as an unsaved drawing, not a file, so
   Ctrl+S asks where and the example on disk is never overwritten. }
-function TMainForm.LoadExample: Boolean;
+function TMainForm.LoadExample: boolean;
 var
   L: TStringList;
   Sheets: THeckSheets;
-  I, ErrLine: Integer;
+  I, ErrLine: integer;
   Err: string;
 begin
   Result := False;
@@ -434,29 +426,27 @@ begin
   Result := True;
   FitView(False);
   Trail(Format('opened the example: %d things', [FD.Doc.Live]));
-  FCmdMsg := 'This is the example drawing - orbit it, push a face, or ' +
-    'press Ctrl+N to start your own.';
+  FCmdMsg := 'This is the example drawing - orbit it, push a face, or ' + 'press Ctrl+N to start your own.';
 end;
 
 { Is a window at this place reachable?  Every monitor is asked (a monitor
   left of or above the primary has negative coordinates), and enough of the
   window must land on one to grab and drag. }
-function TMainForm.OnAScreen(L, T, W, H: Integer): Boolean;
+function TMainForm.OnAScreen(L, T, W, H: integer): boolean;
 var
-  I: Integer;
+  I: integer;
   R, X: TRect;
 begin
   Result := False;
   R := Rect(L, T, L + W, T + H);
   for I := 0 to Screen.MonitorCount - 1 do
-    if IntersectRect(X, R, Screen.Monitors[I].WorkareaRect) and
-       (X.Right - X.Left >= 160) and (X.Bottom - X.Top >= 80) then
+    if IntersectRect(X, R, Screen.Monitors[I].WorkareaRect) and (X.Right - X.Left >= 160) and (X.Bottom - X.Top >= 80) then
       Exit(True);
 end;
 
 { The drawing settings, from the section older builds called pro when they
   have not been saved under the new name yet. }
-function DrawingInt(Ini: TIniFile; const Key: string; Dflt: Integer): Integer;
+function DrawingInt(Ini: TIniFile; const Key: string; Dflt: integer): integer;
 begin
   Result := Ini.ReadInteger('drawing', Key, Ini.ReadInteger('pro', Key, Dflt));
 end;
@@ -464,7 +454,7 @@ end;
 procedure TMainForm.LoadSettings;
 var
   Ini: TIniFile;
-  WW, WH, WL, WT, I: Integer;
+  WW, WH, WL, WT, I: integer;
 begin
   FInkColor := PALETTE[0];
   FInkAuto := True;
@@ -488,8 +478,8 @@ begin
       FSourceWasOpen := Ini.ReadBool('source', 'open', False);
       FSourceOnTop := Ini.ReadBool('source', 'ontop', False);
       FSourceComplete := Ini.ReadBool('source', 'complete', True);
-      FSourceBounds := Rect(Ini.ReadInteger('source', 'left', 0), Ini.ReadInteger('source', 'top', 0),
-        Ini.ReadInteger('source', 'width', 0), Ini.ReadInteger('source', 'height', 0));
+      FSourceBounds := Rect(Ini.ReadInteger('source', 'left', 0), Ini.ReadInteger('source', 'top', 0), Ini.ReadInteger('source', 'width', 0),
+        Ini.ReadInteger('source', 'height', 0));
       FInfoOn := Ini.ReadBool('look', 'info', False);
       FGroupsOn := Ini.ReadBool('look', 'groups', True);
       FCubeCorner := EnsureRange(Ini.ReadInteger('look', 'cubecorner', 1), 0, 3);
@@ -508,8 +498,7 @@ begin
       FInkAuto := Ini.ReadBool('pen', 'inkauto', True);
       FAssocRepair := Ini.ReadBool('files', 'fixassociations', False);
       { tool names on by default, for first-timers }
-      FToolsWide := Ini.ReadBool('drawing', 'toolnames',
-        Ini.ReadBool('pro', 'toolnames', True));
+      FToolsWide := Ini.ReadBool('drawing', 'toolnames', Ini.ReadBool('pro', 'toolnames', True));
       FD.ScaleIdx := EnsureRange(DrawingInt(Ini, 'scale', 2), 0, SCALE_COUNT - 1);
       FD.SnapIdx := EnsureRange(DrawingInt(Ini, 'snap', 5), 0, SNAP_COUNT - 1);
       SetLenDenom(DrawingInt(Ini, 'precision', 16));
@@ -563,7 +552,7 @@ end;
 procedure TMainForm.SaveSettings;
 var
   Ini: TIniFile;
-  I: Integer;
+  I: integer;
 begin
   try
     ForceDirectories(ExtractFilePath(ConfigFile));
@@ -661,10 +650,11 @@ end;
 function TMainForm.AssocSuffix: string;
 begin
   case FileAss.GetRegistrationStatus of
-    fasFullyRegistered:     Result := '  -  set up';
+    fasFullyRegistered: Result := '  -  set up';
     fasPartiallyRegistered: Result := '  -  needs repair';
-    fasNotRegistered:       Result := '  -  not set up';
-  else                      Result := '';
+    fasNotRegistered: Result := '  -  not set up';
+    else
+      Result := '';
   end;
 end;
 
@@ -676,46 +666,44 @@ end;
 { The submenu: set up, remove, keep repaired.  Registering offers this
   program for .hsk and .heck files; which program is the default stays
   the user's choice, made in the system's own dialog. }
-procedure TMainForm.AssociationsPick(What: Integer);
+procedure TMainForm.AssociationsPick(What: integer);
 var
   R: TFileAssResult;
 begin
   case What of
     0:
+    begin
+      R := FileAss.RegisterAll;
+      if R.Succeeded then
+        FCmdMsg := '.hsk and .heck files now open with this program.  If ' + 'another program holds them, pick this one under Open With.'
+      else
+        TellAssocTrouble(R);
+    end;
+    1:
+    begin
+      R := FileAss.UnregisterAll;
+      if R.Succeeded then
+      begin
+        FAssocRepair := False;
+        FCmdMsg := 'File associations removed from this computer.';
+      end
+      else
+        TellAssocTrouble(R);
+    end;
+    2:
+    begin
+      FAssocRepair := not FAssocRepair;
+      if FAssocRepair then
       begin
         R := FileAss.RegisterAll;
         if R.Succeeded then
-          FCmdMsg := '.hsk and .heck files now open with this program.  If ' +
-            'another program holds them, pick this one under Open With.'
+          FCmdMsg := 'File associations get repaired at start-up - for a ' + 'portable copy whose path moves around.'
         else
           TellAssocTrouble(R);
-      end;
-    1:
-      begin
-        R := FileAss.UnregisterAll;
-        if R.Succeeded then
-        begin
-          FAssocRepair := False;
-          FCmdMsg := 'File associations removed from this computer.';
-        end
-        else
-          TellAssocTrouble(R);
-      end;
-    2:
-      begin
-        FAssocRepair := not FAssocRepair;
-        if FAssocRepair then
-        begin
-          R := FileAss.RegisterAll;
-          if R.Succeeded then
-            FCmdMsg := 'File associations get repaired at start-up - for a ' +
-              'portable copy whose path moves around.'
-          else
-            TellAssocTrouble(R);
-        end
-        else
-          FCmdMsg := 'File associations are left alone at start-up.';
-      end;
+      end
+      else
+        FCmdMsg := 'File associations are left alone at start-up.';
+    end;
   end;
   SaveSettings;
 end;
@@ -748,8 +736,12 @@ begin
         if (M.Size = R.Size) and CompareMem(M.Memory, R.Memory, M.Size) then Exit;
         ForceDirectories(ExtractFilePath(P));
         R.SaveToFile(P);
-      finally M.Free; end;
-    finally R.Free; end;
+      finally
+        M.Free;
+      end;
+    finally
+      R.Free;
+    end;
   except
     { a read-only install keeps the icons it shipped with }
   end;
@@ -764,8 +756,7 @@ var
   R: TFileAssResult;
 begin
   if not FAssocRepair then Exit;
-  if not (FileAss.GetRegistrationStatus in
-    [fasNotRegistered, fasPartiallyRegistered]) then Exit;
+  if not (FileAss.GetRegistrationStatus in [fasNotRegistered, fasPartiallyRegistered]) then Exit;
   R := FileAss.RegisterAll;
   Trail('association repair: ' + R.Message);
 end;

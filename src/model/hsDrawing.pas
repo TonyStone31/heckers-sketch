@@ -1311,8 +1311,8 @@ var
       '/': Result := DivSlash(I);
       { two dashes are always a minus - truss notation never has two in
         a row, and both are on the number pad: 6-8-0--2-4-0 }
-      '-': Result := (I > 1) and (I < Length(T)) and ((T[I + 1] = '-') or ((T[I - 1] = ' ') and (T[I + 1] = ' ') and
-          not WrittenFeetInches(I)) or (T[I - 1] = '"') or ((T[I - 1] = QUOTE1) and FeetAfter(I)));
+      '-': Result := (I > 1) and (I < Length(T)) and ((T[I + 1] = '-') or ((T[I - 1] = ' ') and (T[I + 1] = ' ') and not WrittenFeetInches(I)) or
+          (T[I - 1] = '"') or ((T[I - 1] = QUOTE1) and FeetAfter(I)));
       else
         Result := False;
     end;
@@ -2408,8 +2408,7 @@ begin
   for Q := 0 to M - 1 do
     { Back into the model, lifted along the normal to the loop's own plane.
       Ax and Bx alone land on the parallel plane through the origin. }
-    Result[Q] := P3(Ax.X * RU[Q] + Bx.X * RV[Q] + N.X * Lift, Ax.Y * RU[Q] + Bx.Y * RV[Q] + N.Y * Lift, Ax.Z *
-      RU[Q] + Bx.Z * RV[Q] + N.Z * Lift);
+    Result[Q] := P3(Ax.X * RU[Q] + Bx.X * RV[Q] + N.X * Lift, Ax.Y * RU[Q] + Bx.Y * RV[Q] + N.Y * Lift, Ax.Z * RU[Q] + Bx.Z * RV[Q] + N.Z * Lift);
 
   { An inward offset further than the shape can take turns it inside out.
     Return nothing rather than a sliver that measures wrong. }
@@ -2439,8 +2438,7 @@ begin
     AxesFromNormal(Nm, AU, AV)
   else
     PlaneAxes(Pl, AU, AV);
-  Result := P3(C.X + (AU.X * Cos(Ang) + AV.X * Sin(Ang)) * R, C.Y + (AU.Y * Cos(Ang) + AV.Y * Sin(Ang)) * R, C.Z +
-    (AU.Z * Cos(Ang) + AV.Z * Sin(Ang)) * R);
+  Result := P3(C.X + (AU.X * Cos(Ang) + AV.X * Sin(Ang)) * R, C.Y + (AU.Y * Cos(Ang) + AV.Y * Sin(Ang)) * R, C.Z + (AU.Z * Cos(Ang) + AV.Z * Sin(Ang)) * R);
 end;
 
 function ArcPoint(const C: TP3; R, Ang: double; Pl: TPlane): TP3;
@@ -2527,8 +2525,7 @@ begin
   Cs := Cos(Ang);
   Sn := Sin(Ang);
   D := Dot3(K, V) * (1 - Cs);
-  Result := P3(V.X * Cs + (K.Y * V.Z - K.Z * V.Y) * Sn + K.X * D, V.Y * Cs + (K.Z * V.X - K.X * V.Z) * Sn + K.Y * D,
-    V.Z * Cs + (K.X * V.Y - K.Y * V.X) * Sn + K.Z * D);
+  Result := P3(V.X * Cs + (K.Y * V.Z - K.Z * V.Y) * Sn + K.X * D, V.Y * Cs + (K.Z * V.X - K.X * V.Z) * Sn + K.Y * D, V.Z * Cs + (K.X * V.Y - K.Y * V.X) * Sn + K.Z * D);
 end;
 
 function RotP(const P, C, Axis: TP3; Ang: double): TP3;
@@ -4651,8 +4648,8 @@ begin
   begin
     RingCen := P3(0, 0, 0);
     for K := 0 to N - 1 do
-      RingCen := P3(RingCen.X + (Rings[S][K].X + Rings[S + 1][K].X) / (2 * N), RingCen.Y + (Rings[S][K].Y + Rings[S + 1][K].Y) /
-        (2 * N), RingCen.Z + (Rings[S][K].Z + Rings[S + 1][K].Z) / (2 * N));
+      RingCen := P3(RingCen.X + (Rings[S][K].X + Rings[S + 1][K].X) / (2 * N), RingCen.Y + (Rings[S][K].Y + Rings[S + 1][K].Y) / (2 * N),
+        RingCen.Z + (Rings[S][K].Z + Rings[S + 1][K].Z) / (2 * N));
     for K := 0 to N - 1 do
     begin
       K2 := (K + 1) mod N;
@@ -5821,8 +5818,8 @@ begin
   { A corner already rounded with a plain click still has its square corner,
     so a double-click there means trim it, not add a second arc. }
   for K := 0 to FLive - 1 do
-    if (FEnts[K].Kind = ekArc) and ((SamePt(FEnts[K].A, F.S, 1E-6) and SamePt(FEnts[K].B, F.E, 1E-6)) or
-      (SamePt(FEnts[K].A, F.E, 1E-6) and SamePt(FEnts[K].B, F.S, 1E-6))) then
+    if (FEnts[K].Kind = ekArc) and ((SamePt(FEnts[K].A, F.S, 1E-6) and SamePt(FEnts[K].B, F.E, 1E-6)) or (SamePt(FEnts[K].A, F.E, 1E-6) and
+      SamePt(FEnts[K].B, F.S, 1E-6))) then
     begin
       if Trim then TrimFillet(F);
       Exit(True);
@@ -6253,8 +6250,8 @@ begin
       if M < 3 then Continue;
       for Q := 0 to N - 1 do
         for K := 0 to M - 1 do
-          if ((Dist(A[Q], B[K]) < TOL) and (Dist(A[(Q + 1) mod N], B[(K + 1) mod M]) < TOL)) or
-            ((Dist(A[Q], B[(K + 1) mod M]) < TOL) and (Dist(A[(Q + 1) mod N], B[K]) < TOL)) then
+          if ((Dist(A[Q], B[K]) < TOL) and (Dist(A[(Q + 1) mod N], B[(K + 1) mod M]) < TOL)) or ((Dist(A[Q], B[(K + 1) mod M]) < TOL) and
+            (Dist(A[(Q + 1) mod N], B[K]) < TOL)) then
             Exit(True);
     end;
   end;
@@ -7476,8 +7473,8 @@ begin
   { wholly off one side }
   if (Max(AX, BX) < X0) or (Min(AX, BX) > X1) or (Max(AY, BY) < Y0) or (Min(AY, BY) > Y1) then
     Exit(False);
-  Result := SegsCross(AX, AY, BX, BY, X0, Y0, X1, Y0) or SegsCross(AX, AY, BX, BY, X1, Y0, X1, Y1) or SegsCross(AX,
-    AY, BX, BY, X1, Y1, X0, Y1) or SegsCross(AX, AY, BX, BY, X0, Y1, X0, Y0);
+  Result := SegsCross(AX, AY, BX, BY, X0, Y0, X1, Y0) or SegsCross(AX, AY, BX, BY, X1, Y0, X1, Y1) or SegsCross(AX, AY, BX, BY, X1, Y1, X0, Y1) or
+    SegsCross(AX, AY, BX, BY, X0, Y1, X0, Y0);
 end;
 
 { Is this screen point inside the projected loop?  Even-odd, the same rule
@@ -7582,10 +7579,8 @@ begin
     PA := Project(V, FEnts[I].A);
     PB := Project(V, FEnts[I].B);
     { out along its own direction, far enough to cross any view of it }
-    QA := P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 5000, FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) * 5000,
-      FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 5000);
-    QB := P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 5000, FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) * 5000,
-      FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 5000);
+    QA := P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 5000, FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) * 5000, FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 5000);
+    QB := P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 5000, FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) * 5000, FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 5000);
     Exit(Hits(QA, QB));
   end;
 
@@ -7639,8 +7634,8 @@ begin
       { the drawn line and its witness lines, which is what a dimension looks
         like - not the chord through the geometry it measures }
       if DimGeometry(V, FEnts[I].A, FEnts[I].B, FEnts[I].C, usImperial, DG, FEnts[I].Txt) then
-        Result := SegHitsRect(DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y, X0, Y0, X1, Y1) or SegHitsRect(DG.A.X, DG.A.Y, DG.W1.X,
-          DG.W1.Y, X0, Y0, X1, Y1) or SegHitsRect(DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y, X0, Y0, X1, Y1);
+        Result := SegHitsRect(DG.LA.X, DG.LA.Y, DG.LB.X, DG.LB.Y, X0, Y0, X1, Y1) or SegHitsRect(DG.A.X, DG.A.Y, DG.W1.X, DG.W1.Y, X0, Y0, X1, Y1) or
+          SegHitsRect(DG.B.X, DG.B.Y, DG.W2.X, DG.W2.Y, X0, Y0, X1, Y1);
     else
       { a line, and a guide point, which is a guide with no length }
       Result := Hits(FEnts[I].A, FEnts[I].B);
@@ -9403,10 +9398,10 @@ begin
         they are put away, and then it does not }
       ekGuide:
         if (not FGuidesHidden) and (Dist(FEnts[I].A, FEnts[I].B) > 1E-9) then
-          Try_(P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 2000, FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) *
-            2000, FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 2000),
-            P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 2000, FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) *
-            2000, FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 2000));
+          Try_(P3(FEnts[I].A.X + (FEnts[I].A.X - FEnts[I].B.X) * 2000, FEnts[I].A.Y + (FEnts[I].A.Y - FEnts[I].B.Y) * 2000,
+            FEnts[I].A.Z + (FEnts[I].A.Z - FEnts[I].B.Z) * 2000),
+            P3(FEnts[I].B.X + (FEnts[I].B.X - FEnts[I].A.X) * 2000, FEnts[I].B.Y + (FEnts[I].B.Y - FEnts[I].A.Y) * 2000,
+            FEnts[I].B.Z + (FEnts[I].B.Z - FEnts[I].A.Z) * 2000));
       { The outline of a face is visible geometry, so the cursor can run
         along it - faces from a revolve or an import have no lines.  A face
         that does gets found twice, for the same answer. }
@@ -11788,8 +11783,8 @@ begin
           TriSize := 1;
           for ZJ := 1 to High(FEnts[K].Poly) do
           begin
-            TDx := Abs(Nm.X * (FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) + Nm.Y * (FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) +
-              Nm.Z * (FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
+            TDx := Abs(Nm.X * (FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) + Nm.Y * (FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) + Nm.Z *
+              (FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
             if TDx > TriDev then TriDev := TDx;
             TDy := Sqrt(Sqr(FEnts[K].Poly[ZJ].X - FEnts[K].Poly[0].X) + Sqr(FEnts[K].Poly[ZJ].Y - FEnts[K].Poly[0].Y) +
               Sqr(FEnts[K].Poly[ZJ].Z - FEnts[K].Poly[0].Z));
@@ -11843,8 +11838,8 @@ begin
                 ZI3 := Tris[MI * 3 + 1];
                 ZJ := Tris[MI * 3 + 2];
                 if (ZI2 >= Length(TriPts)) or (ZI3 >= Length(TriPts)) or (ZJ >= Length(TriPts)) then Continue;
-                TriDet := (double(TriPts[ZI3].X) - TriPts[ZI2].X) * (double(TriPts[ZJ].Y) - TriPts[ZI2].Y) -
-                  (double(TriPts[ZJ].X) - TriPts[ZI2].X) * (double(TriPts[ZI3].Y) - TriPts[ZI2].Y);
+                TriDet := (double(TriPts[ZI3].X) - TriPts[ZI2].X) * (double(TriPts[ZJ].Y) - TriPts[ZI2].Y) - (double(TriPts[ZJ].X) - TriPts[ZI2].X) *
+                  (double(TriPts[ZI3].Y) - TriPts[ZI2].Y);
             { a hundredth of a square pixel: below that it is an edge-on
               sliver with no depth of its own to give, and the fitted plane
               is left to cover the pixel or two it might have owned }

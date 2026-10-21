@@ -17,10 +17,10 @@ end;
 { Open a file as a document of its own, its sheets in tabs after the others.
   If it is already open its tab comes to the front.  The untouched empty
   starting drawing gives way to it. }
-function TMainForm.OpenFile(const FileName: string): Boolean;
+function TMainForm.OpenFile(const FileName: string): boolean;
 var
   Full: string;
-  I, First, N: Integer;
+  I, First, N: integer;
   Blank: TDrawing;
 begin
   Result := False;
@@ -34,8 +34,7 @@ begin
       Exit(True);
     end;
   Blank := nil;
-  if (Length(FDrawings) = 1) and (FDrawings[0].FilePath = '') and not FDrawings[0].Dirty and
-     (FDrawings[0].Doc.Live = 0) then Blank := FDrawings[0];
+  if (Length(FDrawings) = 1) and (FDrawings[0].FilePath = '') and not FDrawings[0].Dirty and (FDrawings[0].Doc.Live = 0) then Blank := FDrawings[0];
   if not ReadSheets(Full, False, First) then Exit;
   if Blank <> nil then
   begin
@@ -49,8 +48,7 @@ begin
   ShowLoaded(First);
   RememberRecent(Full);
   N := Length(DocSheets(FDrawings[First].DocKey));
-  FCmdMsg := 'Opened ' + ExtractFileName(Full) +
-    IfThen(N > 1, Format(' - %d sheets in this file, a tab each', [N]), '');
+  FCmdMsg := 'Opened ' + ExtractFileName(Full) + IfThen(N > 1, Format(' - %d sheets in this file, a tab each', [N]), '');
   Result := True;
 end;
 
@@ -61,7 +59,7 @@ procedure TMainForm.CheckOpenRequests;
 var
   Rec: TSearchRec;
   Notes, L: TStringList;
-  I, K: Integer;
+  I, K: integer;
 begin
   if (FPopup <> POP_NONE) or FLoading then Exit;
   if GetTickCount64 < FReqPollAt then Exit;
@@ -123,20 +121,21 @@ end;
   Session: a draft or handoff carrying every open file, with a comment before
   each sheet naming its document, file and saved state.  Otherwise the file
   is one document whose sheets share its path and name. }
-function TMainForm.ReadSheets(const FileName: string; Session: Boolean; out First: Integer): Boolean;
+function TMainForm.ReadSheets(const FileName: string; Session: boolean; out First: integer): boolean;
 var
   L: TStringList;
   Sheets: THeckSheets;
-  I, K, Base, NewKey, ErrLine: Integer;
+  I, K, Base, NewKey, ErrLine: integer;
   Err: string;
   D, Was: TDrawing;
-  KeyFrom, KeyTo: array of Integer;
+  KeyFrom, KeyTo: array of integer;
 begin
   Result := False;
   First := Length(FDrawings);
   Base := First;
   Was := FD;
-  KeyFrom := nil; KeyTo := nil;
+  KeyFrom := nil;
+  KeyTo := nil;
   Sheets := nil;
   Inc(FNextDocKey);
   NewKey := FNextDocKey;
@@ -175,12 +174,11 @@ begin
       if FLoadSkipped then
       begin
         Trail('skipped loading ' + FileName);
-        FCmdMsg := 'Loading ' + ExtractFileName(FileName) +
-          ' was skipped.  The file is untouched, and can be opened.';
+        FCmdMsg := 'Loading ' + ExtractFileName(FileName) + ' was skipped.  The file is untouched, and can be opened.';
       end
       else
-        MessageDlg('Could not open', ExtractFileName(FileName) + ' will not read' +
-          IfThen(ErrLine >= 0, Format(' - line %d', [ErrLine + 1]), '') + ':' + LineEnding + LineEnding + Err,
+        MessageDlg('Could not open', ExtractFileName(FileName) + ' will not read' + IfThen(ErrLine >= 0, Format(' - line %d', [ErrLine + 1]), '') +
+          ':' + LineEnding + LineEnding + Err,
           mtError, [mbOK], 0);
       Exit(False);
     end;
@@ -204,9 +202,11 @@ begin
       D.SliceHi := Sheets[I].SliceHi;
       if Sheets[I].CamKnown then
       begin
-        D.Az := Sheets[I].Az; D.El := Sheets[I].El;
+        D.Az := Sheets[I].Az;
+        D.El := Sheets[I].El;
         D.Zoom := EnsureRange(Sheets[I].Zoom, ZOOM_MIN, ZOOM_MAX);
-        D.ViewX := Sheets[I].ViewX; D.ViewY := Sheets[I].ViewY;
+        D.ViewX := Sheets[I].ViewX;
+        D.ViewY := Sheets[I].ViewY;
         D.CamKnown := True;
       end;
       if Session and Sheets[I].HasSession then
@@ -219,8 +219,10 @@ begin
         begin
           Inc(FNextDocKey);
           D.DocKey := FNextDocKey;
-          SetLength(KeyFrom, Length(KeyFrom) + 1); KeyFrom[High(KeyFrom)] := Sheets[I].DocKey;
-          SetLength(KeyTo, Length(KeyTo) + 1); KeyTo[High(KeyTo)] := D.DocKey;
+          SetLength(KeyFrom, Length(KeyFrom) + 1);
+          KeyFrom[High(KeyFrom)] := Sheets[I].DocKey;
+          SetLength(KeyTo, Length(KeyTo) + 1);
+          KeyTo[High(KeyTo)] := D.DocKey;
         end;
         D.FilePath := Sheets[I].FilePath;
         D.DocName := Sheets[I].DocName;
@@ -253,7 +255,9 @@ begin
       else
         OnProgress('Working out the faces', -1);
       FD := FDrawings[I];
-      if AnyFace then SeedRegions else RebuildFlatFaces;
+      if AnyFace then SeedRegions
+      else
+        RebuildFlatFaces;
     end;
     FD := Was;
     FLoading := False;
@@ -266,7 +270,7 @@ end;
 
 { Show tab First with its saved camera, or framed when the file had none or
   the camera showed none of the drawing. }
-procedure TMainForm.ShowLoaded(First: Integer);
+procedure TMainForm.ShowLoaded(First: integer);
 begin
   LeaveSheet;
   FTabIdx := EnsureRange(First, 0, High(FDrawings));
@@ -309,7 +313,7 @@ end;
 
 procedure TMainForm.DoSaveAll;
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   N := 0;
   I := 0;
@@ -323,16 +327,17 @@ begin
     Inc(I);
   end;
   if N = 0 then FCmdMsg := 'Nothing to save - every file is saved.'
-  else FCmdMsg := Format('Saved %d file%s.', [N, IfThen(N = 1, '', 's')]);
+  else
+    FCmdMsg := Format('Saved %d file%s.', [N, IfThen(N = 1, '', 's')]);
   pbCmd.Invalidate;
 end;
 
-function TMainForm.SaveDocument(Key: Integer; AskName: Boolean): Boolean;
+function TMainForm.SaveDocument(Key: integer; AskName: boolean): boolean;
 var
   S: TIntArrayW;
   L: TStringList;
   Path, Tmp: string;
-  I: Integer;
+  I: integer;
 begin
   Result := False;
   S := DocSheets(Key);
@@ -346,17 +351,16 @@ begin
     dlgSave.DefaultExt := '.hsk';
     dlgSave.InitialDir := SaveDirNow;
     if Path <> '' then dlgSave.FileName := Path
-    else dlgSave.FileName := IncludeTrailingPathDelimiter(dlgSave.InitialDir) +
-      FDrawings[S[0]].DocName + '.hsk';
+    else
+      dlgSave.FileName := IncludeTrailingPathDelimiter(dlgSave.InitialDir) + FDrawings[S[0]].DocName + '.hsk';
     if not dlgSave.Execute then Exit;
     Path := ExpandFileName(dlgSave.FileName);
     { another tab's file: two documents writing one file lose one of them }
     for I := 0 to High(FDrawings) do
-      if (FDrawings[I].DocKey <> Key) and (FDrawings[I].FilePath <> '') and
-         SameFileName(FDrawings[I].FilePath, Path) then
+      if (FDrawings[I].DocKey <> Key) and (FDrawings[I].FilePath <> '') and SameFileName(FDrawings[I].FilePath, Path) then
       begin
-        MessageDlg('Could not save', ExtractFileName(Path) + ' is open in another tab.  Close it there first, ' +
-          'or save this under another name.', mtWarning, [mbOK], 0);
+        MessageDlg('Could not save', ExtractFileName(Path) + ' is open in another tab.  Close it there first, ' + 'or save this under another name.',
+          mtWarning, [mbOK], 0);
         Exit;
       end;
     FSaveDir := ExtractFileDir(Path);
@@ -401,8 +405,7 @@ begin
     left unsaved, on the next tick }
   FDraftSeq := -1;
   RememberRecent(Path);
-  FCmdMsg := 'Saved ' + ExtractFileName(Path) +
-    IfThen(Length(S) > 1, Format(' - its %d sheets', [Length(S)]), '');
+  FCmdMsg := 'Saved ' + ExtractFileName(Path) + IfThen(Length(S) > 1, Format(' - its %d sheets', [Length(S)]), '');
   LayoutTabs;
   Invalidate;
   pbCmd.Invalidate;
@@ -412,7 +415,7 @@ end;
 { the files opened and saved lately, newest first, ten of them }
 procedure TMainForm.RememberRecent(const Path: string);
 var
-  I: Integer;
+  I: integer;
 begin
   if Path = '' then Exit;
   for I := FRecent.Count - 1 downto 0 do
@@ -432,7 +435,7 @@ end;
 procedure TMainForm.DeleteSheetHere;
 var
   S: TIntArrayW;
-  I, Key: Integer;
+  I, Key: integer;
   DocNm: string;
 begin
   Key := FD.DocKey;
@@ -443,10 +446,8 @@ begin
     pbCmd.Invalidate;
     Exit;
   end;
-  if QuestionDlg('Delete this sheet',
-    Format('Delete "%s" from %s?  Its drawing goes with it, and Undo cannot bring a sheet back.',
-      [FD.Name, FD.DocName]),
-    mtConfirmation, [mrYes, 'Delete the sheet', mrCancel, 'Keep it', 'IsCancel', 'IsDefault'], 0) <> mrYes then Exit;
+  if QuestionDlg('Delete this sheet', Format('Delete "%s" from %s?  Its drawing goes with it, and Undo cannot bring a sheet back.',
+    [FD.Name, FD.DocName]), mtConfirmation, [mrYes, 'Delete the sheet', mrCancel, 'Keep it', 'IsCancel', 'IsDefault'], 0) <> mrYes then Exit;
   DocNm := FD.Name;
   LeaveSheet;
   I := FTabIdx;
@@ -482,7 +483,7 @@ begin
 end;
 
 { the platform's own color picker, started on Was }
-function TMainForm.AskColor(Was: TColor; out C: TColor): Boolean;
+function TMainForm.AskColor(Was: TColor; out C: TColor): boolean;
 var
   D: TColorDialog;
 begin
@@ -530,7 +531,7 @@ begin
   StartHelpFetch(CurrentVersion, @HelpFetchProgress, @HelpFetchDone);
 end;
 
-procedure TMainForm.HelpFetchProgress(BytesReceived, TotalBytes: Int64);
+procedure TMainForm.HelpFetchProgress(BytesReceived, TotalBytes: int64);
 begin
   if HelpForm <> nil then HelpForm.FetchProgress(BytesReceived, TotalBytes);
 end;
@@ -563,13 +564,13 @@ end;
   every solid when nothing is selected. }
 procedure TMainForm.ShowOpenEdges;
 var
-  I, J, G, NGrp, NBad: Integer;
-  Grps: array of Integer;
+  I, J, G, NGrp, NBad: integer;
+  Grps: array of integer;
   Edges: TP3Array;
 
-  procedure Want(AG: Integer);
+  procedure Want(AG: integer);
   var
-    K: Integer;
+    K: integer;
   begin
     if AG = 0 then Exit;
     for K := 0 to NGrp - 1 do
@@ -616,13 +617,10 @@ begin
   end;
 
   if NBad = 0 then
-    FCmdMsg := Format('%s closed - a slicer will take %s.',
-      [specialize IfThen<string>(NGrp = 1, 'That solid is',
-        Format('All %d solids are', [NGrp])),
-       specialize IfThen<string>(NGrp = 1, 'it', 'them')])
+    FCmdMsg := Format('%s closed - a slicer will take %s.', [specialize IfThen<string>(NGrp = 1, 'That solid is', Format('All %d solids are', [NGrp])),
+      specialize IfThen<string>(NGrp = 1, 'it', 'them')])
   else if Length(FOpenEdges) = 0 then
-    FCmdMsg := Format('%d of %d solids are open, but the edges could not be ' +
-      'pinned down - send this drawing in.', [NBad, NGrp])
+    FCmdMsg := Format('%d of %d solids are open, but the edges could not be ' + 'pinned down - send this drawing in.', [NBad, NGrp])
   else
   begin
     if NGrp = 1 then
@@ -631,9 +629,7 @@ begin
       FCmdMsg := Format('One of the %d solids is open.', [NGrp])
     else
       FCmdMsg := Format('%d of the %d solids are open.', [NBad, NGrp]);
-    FCmdMsg := FCmdMsg + Format('  %d edges are drawn in red where nothing ' +
-      'meets them - type /holes again once you have mended them.',
-      [Length(FOpenEdges) div 2]);
+    FCmdMsg := FCmdMsg + Format('  %d edges are drawn in red where nothing ' + 'meets them - type /holes again once you have mended them.', [Length(FOpenEdges) div 2]);
   end;
   pbCmd.Invalidate;
   Invalidate;
@@ -677,7 +673,7 @@ procedure TMainForm.DoExport;
 var
   Msg, Base: string;
   ExpPivot: TP3;
-  Holes: Boolean;
+  Holes: boolean;
 begin
   { the export turns about the middle of the selection, or of the drawing }
   if not FD.Doc.MiddleOf(FSel, ExpPivot) then ExpPivot := P3(0, 0, 0);
@@ -685,9 +681,8 @@ begin
   Base := 'heckers-sketch-' + FormatDateTime('yyyymmdd-hhnnss', Now);
   Msg := '';
   Holes := False;
-  if RunExport(FD.Doc, Proj, FD.Units, FDimFont, AnnotColor, FEdgeW,
-       FArt.Width, FArt.Height, Base, Themes[FThemeIdx], ExpPivot,
-       @ReportFromDialog, @ExportDirFor, @KeepExportDir, Msg, Holes, FD.ScaleIdx) then
+  if RunExport(FD.Doc, Proj, FD.Units, FDimFont, AnnotColor, FEdgeW, FArt.Width, FArt.Height, Base, Themes[FThemeIdx], ExpPivot,
+    @ReportFromDialog, @ExportDirFor, @KeepExportDir, Msg, Holes, FD.ScaleIdx) then
   begin
     FCmdMsg := Msg;
     { told the STL is not closed, the open edges are already marked on the
@@ -718,10 +713,10 @@ var
   V: TProjector;
   Full: TDrawScale;
   Lo, Hi: TP3;
-  I, Col, Row, Cols, Rows, SW, SH, PitchW, PitchH, N: Integer;
-  BX0, BY0, BX1, BY1, MinX, MinY, MaxX, MaxY: Double;
-  PageWIn, PageHIn: Double;
-  Any: Boolean;
+  I, Col, Row, Cols, Rows, SW, SH, PitchW, PitchH, N: integer;
+  BX0, BY0, BX1, BY1, MinX, MinY, MaxX, MaxY: double;
+  PageWIn, PageHIn: double;
+  Any: boolean;
   Msg: string;
 begin
   if FD.Doc.Live = 0 then
@@ -753,27 +748,36 @@ begin
   V.El := FD.El;
 
   Any := False;
-  MinX := 0; MinY := 0; MaxX := 0; MaxY := 0;
+  MinX := 0;
+  MinY := 0;
+  MaxX := 0;
+  MaxY := 0;
   for I := 0 to FD.Doc.Live - 1 do
   begin
     FD.Doc.ScreenBounds(V, I, BX0, BY0, BX1, BY1);
     if BX1 < BX0 then Continue;
     if not Any then
     begin
-      MinX := BX0; MinY := BY0; MaxX := BX1; MaxY := BY1;
+      MinX := BX0;
+      MinY := BY0;
+      MaxX := BX1;
+      MaxY := BY1;
       Any := True;
     end
     else
     begin
-      MinX := Min(MinX, BX0); MinY := Min(MinY, BY0);
-      MaxX := Max(MaxX, BX1); MaxY := Max(MaxY, BY1);
+      MinX := Min(MinX, BX0);
+      MinY := Min(MinY, BY0);
+      MaxX := Max(MaxX, BX1);
+      MaxY := Max(MaxY, BY1);
     end;
   end;
   if not Any then
   begin
     { nothing has a screen size: fall back to the model box }
     if not FD.Doc.Bounds(Lo, Hi) then Exit;
-    MinX := 0; MinY := 0;
+    MinX := 0;
+    MinY := 0;
     MaxX := (Hi.X - Lo.X) * V.Ppu;
     MaxY := (Hi.Y - Lo.Y) * V.Ppu;
   end;
@@ -813,13 +817,10 @@ begin
   Rows := Max(1, Ceil((MaxY - MinY) / PitchH));
   N := Cols * Rows;
 
-  Msg := Format('%s, %d across by %d down = %d sheets of %.1f x %.1f in.',
-    [Full.Name, Cols, Rows, N, PageWIn, PageHIn]);
+  Msg := Format('%s, %d across by %d down = %d sheets of %.1f x %.1f in.', [Full.Name, Cols, Rows, N, PageWIn, PageHIn]);
   if FD.View <> vkPlan then
-    Msg := Msg + LineEnding + LineEnding +
-      'This is the ' + IfThen(FD.View = vkIso, 'ISO', '3D') +
-      ' view, so what comes out is the picture at full size, not the part.' +
-      LineEnding + 'PLAN is the one to print a pattern from.';
+    Msg := Msg + LineEnding + LineEnding + 'This is the ' + IfThen(FD.View = vkIso, 'ISO', '3D') +
+      ' view, so what comes out is the picture at full size, not the part.' + LineEnding + 'PLAN is the one to print a pattern from.';
   if (N > MAX_SHEETS) and (PngDir <> '') then
   begin
     FCmdMsg := Format('%d tiles is past the %d limit.', [N, MAX_SHEETS]);
@@ -828,18 +829,13 @@ begin
   if N > MAX_SHEETS then
   begin
     MessageDlg('Too many sheets',
-      Msg + LineEnding + LineEnding +
-      Format('That is past the %d sheet limit.  Print it at a scale, or ' +
-        'print one piece at a time.', [MAX_SHEETS]), mtWarning, [mbOK], 0);
+      Msg + LineEnding + LineEnding + Format('That is past the %d sheet limit.  Print it at a scale, or ' + 'print one piece at a time.', [MAX_SHEETS]),
+      mtWarning, [mbOK], 0);
     Exit;
   end;
-  if (PngDir = '') and (MessageDlg('Print full size?',
-       Msg + LineEnding + LineEnding +
-       Format('Every sheet is trimmed on the marked line - the last %.1f in ' +
-         'down the right and along the bottom is a repeat of the next ' +
-         'sheet.  The sheet number is printed inside that strip.',
-         [LAP_IN]),
-       mtConfirmation, [mbYes, mbNo], 0) <> mrYes) then Exit;
+  if (PngDir = '') and (MessageDlg('Print full size?', Msg + LineEnding + LineEnding + Format('Every sheet is trimmed on the marked line - the last %.1f in ' +
+    'down the right and along the bottom is a repeat of the next ' + 'sheet.  The sheet number is printed inside that strip.', [LAP_IN]),
+    mtConfirmation, [mbYes, mbNo], 0) <> mrYes) then Exit;
 
   try
     if PngDir = '' then Printer.BeginDoc;
@@ -855,14 +851,13 @@ begin
             V.OY := -MinY - Row * PitchH;
             FD.Doc.Render(Sheet, V, FD.Units, FDimFont, Pix(20, 20, 20), FEdgeW);
             if PngDir <> '' then
-              Sheet.SaveToPNG(IncludeTrailingPathDelimiter(PngDir) +
-                Format('tile-r%dc%d.png', [Row + 1, Col + 1]))
+              Sheet.SaveToPNG(IncludeTrailingPathDelimiter(PngDir) + Format('tile-r%dc%d.png', [Row + 1, Col + 1]))
             else
             begin
               Printer.Canvas.StretchDraw(
                 Rect(0, 0, Printer.PageWidth, Printer.PageHeight), Sheet.AsBitmap);
               PrintTileMarks(Col, Row, Cols, Rows, PitchW, PitchH, SW, SH,
-                             Full.Name);
+                Full.Name);
             end;
           end;
       finally
@@ -878,26 +873,26 @@ begin
   except
     on E: Exception do
       if PngDir <> '' then FCmdMsg := 'Could not write the tiles: ' + E.Message
-      else MessageDlg('Could not print', E.Message, mtError, [mbOK], 0);
+      else
+        MessageDlg('Could not print', E.Message, mtError, [mbOK], 0);
   end;
   Invalidate;
 end;
 
 { The trim line and sheet number, drawn straight onto the page at printer
   resolution: they belong to the paper, not the drawing. }
-procedure TMainForm.PrintTileMarks(Col, Row, Cols, Rows, PitchW, PitchH,
-  SW, SH: Integer; const ScaleName: string);
+procedure TMainForm.PrintTileMarks(Col, Row, Cols, Rows, PitchW, PitchH, SW, SH: integer; const ScaleName: string);
 var
-  PX, PY: Integer;
+  PX, PY: integer;
   S: string;
 
-  { print pixels to printer pixels }
-  function AtX(V: Integer): Integer;
+{ print pixels to printer pixels }
+  function AtX(V: integer): integer;
   begin
     Result := Round(V * (Printer.PageWidth / SW));
   end;
 
-  function AtY(V: Integer): Integer;
+  function AtY(V: integer): integer;
   begin
     Result := Round(V * (Printer.PageHeight / SH));
   end;
@@ -924,8 +919,7 @@ begin
 
   Printer.Canvas.Font.Color := clGray;
   Printer.Canvas.Font.Height := -Round(Printer.YDPI / 8);   { about 9 point }
-  S := Format('%s  -  sheet %d of %d   (row %d, column %d)   %s',
-    [FD.Name, Row * Cols + Col + 1, Cols * Rows, Row + 1, Col + 1, ScaleName]);
+  S := Format('%s  -  sheet %d of %d   (row %d, column %d)   %s', [FD.Name, Row * Cols + Col + 1, Cols * Rows, Row + 1, Col + 1, ScaleName]);
   { inside the trim strip, so it is cut away with it }
   Printer.Canvas.TextOut(AtX(12),
     Printer.PageHeight - Round(Printer.YDPI / 5), S);
@@ -941,17 +935,17 @@ end;
   resolution, so 1/4" = 1'-0" is a true quarter inch; a printer that gives
   no resolution gets the picture fitted to the page.  All prints every sheet of the file, a page each
   (/print all); that is not the default. }
-procedure TMainForm.DoPrintSheets(All: Boolean);
+procedure TMainForm.DoPrintSheets(All: boolean);
 var
   Sheet: TArtSurface;
   V: TProjector;
   Lo, Hi, Mid: TP3;
-  PageWIn, PageHIn: Double;
-  SW, SH: Integer;
+  PageWIn, PageHIn: double;
+  SW, SH: integer;
   P: TPointF;
-  Scale: Double;
+  Scale: double;
   R: TRect;
-  Was, Page, NPages: Integer;
+  Was, Page, NPages: integer;
   Pages: TIntArrayW;
 begin
   if not dlgPrint.Execute then Exit;
@@ -959,66 +953,62 @@ begin
   { every sheet of the file in front, not every tab (others may be other
     files) }
   Pages := DocSheets(FD.DocKey);
-  if All then NPages := Length(Pages) else NPages := 1;
+  if All then NPages := Length(Pages)
+  else
+    NPages := 1;
   try
     Printer.BeginDoc;
     try
       for Page := 0 to NPages - 1 do
       begin
-      if All then
-      begin
+        if All then
+        begin
         { the renderer reads the sheet, scale and units off FD, so the sheet
           being printed is made current while it is drawn }
-        if Page > 0 then Printer.NewPage;
-        FTabIdx := Pages[Page];
-        FD := FDrawings[Pages[Page]];
-      end;
-      if (Printer.XDPI > 0) and (Printer.YDPI > 0) then
-      begin
-        PageWIn := Printer.PageWidth / Printer.XDPI;
-        PageHIn := Printer.PageHeight / Printer.YDPI;
-        SW := Max(64, Round(PageWIn * PRINT_DPI));
-        SH := Max(64, Round(PageHIn * PRINT_DPI));
-
-        Sheet := TArtSurface.Create(SW, SH);
-        try
-          Sheet.Clear(Pix(255, 255, 255));
-          V.Kind := FD.View;
-          V.Ppu := PixelsPerUnit(FD.Units, CurScale, PRINT_DPI);
-          V.OX := 0;
-          V.OY := 0;
-          if FD.Doc.Bounds(Lo, Hi) then
-          begin
-            Mid := P3((Lo.X + Hi.X) / 2, (Lo.Y + Hi.Y) / 2, (Lo.Z + Hi.Z) / 2);
-            P := Project(V, Mid);
-            V.OX := SW / 2 - P.X;
-            V.OY := SH / 2 - P.Y;
-          end;
-          FD.Doc.Render(Sheet, V, FD.Units, FDimFont, Pix(20, 20, 20), FEdgeW);
-          Printer.Canvas.StretchDraw(
-            Rect(0, 0, Printer.PageWidth, Printer.PageHeight), Sheet.AsBitmap);
-        finally
-          Sheet.Free;
+          if Page > 0 then Printer.NewPage;
+          FTabIdx := Pages[Page];
+          FD := FDrawings[Pages[Page]];
         end;
-        if All then
-          FCmdMsg := Format('Printed %d sheets at %s%s.',
-            [NPages, CurScale.Name,
-             IfThen(FD.Units = usImperial, ' = 1''-0"', '')])
+        if (Printer.XDPI > 0) and (Printer.YDPI > 0) then
+        begin
+          PageWIn := Printer.PageWidth / Printer.XDPI;
+          PageHIn := Printer.PageHeight / Printer.YDPI;
+          SW := Max(64, Round(PageWIn * PRINT_DPI));
+          SH := Max(64, Round(PageHIn * PRINT_DPI));
+
+          Sheet := TArtSurface.Create(SW, SH);
+          try
+            Sheet.Clear(Pix(255, 255, 255));
+            V.Kind := FD.View;
+            V.Ppu := PixelsPerUnit(FD.Units, CurScale, PRINT_DPI);
+            V.OX := 0;
+            V.OY := 0;
+            if FD.Doc.Bounds(Lo, Hi) then
+            begin
+              Mid := P3((Lo.X + Hi.X) / 2, (Lo.Y + Hi.Y) / 2, (Lo.Z + Hi.Z) / 2);
+              P := Project(V, Mid);
+              V.OX := SW / 2 - P.X;
+              V.OY := SH / 2 - P.Y;
+            end;
+            FD.Doc.Render(Sheet, V, FD.Units, FDimFont, Pix(20, 20, 20), FEdgeW);
+            Printer.Canvas.StretchDraw(
+              Rect(0, 0, Printer.PageWidth, Printer.PageHeight), Sheet.AsBitmap);
+          finally
+            Sheet.Free;
+          end;
+          if All then
+            FCmdMsg := Format('Printed %d sheets at %s%s.', [NPages, CurScale.Name, IfThen(FD.Units = usImperial, ' = 1''-0"', '')])
+          else
+            FCmdMsg := 'Printed at ' + CurScale.Name + IfThen(FD.Units = usImperial, ' = 1''-0"', '') +
+              '.  /print all does every sheet; /print full lays it out 1:1 ' + 'across pages.';
+        end
         else
-          FCmdMsg := 'Printed at ' + CurScale.Name +
-            IfThen(FD.Units = usImperial, ' = 1''-0"', '') +
-            '.  /print all does every sheet; /print full lays it out 1:1 ' +
-            'across pages.';
-      end
-      else
-      begin
-        Scale := Min(Printer.PageWidth / FArt.Width,
-                     Printer.PageHeight / FArt.Height) * 0.92;
-        R := Bounds(Round((Printer.PageWidth - FArt.Width * Scale) / 2),
-                    Round((Printer.PageHeight - FArt.Height * Scale) / 2),
-                    Round(FArt.Width * Scale), Round(FArt.Height * Scale));
-        Printer.Canvas.StretchDraw(R, FArt.AsBitmap);
-      end;
+        begin
+          Scale := Min(Printer.PageWidth / FArt.Width, Printer.PageHeight / FArt.Height) * 0.92;
+          R := Bounds(Round((Printer.PageWidth - FArt.Width * Scale) / 2), Round((Printer.PageHeight - FArt.Height * Scale) / 2),
+            Round(FArt.Width * Scale), Round(FArt.Height * Scale));
+          Printer.Canvas.StretchDraw(R, FArt.AsBitmap);
+        end;
       end;
     finally
       Printer.EndDoc;

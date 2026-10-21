@@ -12,12 +12,17 @@ begin
   FD.Doc.SetSlice(FD.SliceOn and (FD.View = vkPlan), FD.SliceLo, FD.SliceHi);
 end;
 
-procedure TMainForm.SetSlice(AOn: Boolean; ALo, AHi: Double; const Why: string);
+procedure TMainForm.SetSlice(AOn: boolean; ALo, AHi: double; const Why: string);
 var
-  T: Double;
-  N: Integer;
+  T: double;
+  N: integer;
 begin
-  if AHi < ALo then begin T := ALo; ALo := AHi; AHi := T; end;
+  if AHi < ALo then
+  begin
+    T := ALo;
+    ALo := AHi;
+    AHi := T;
+  end;
   FD.SliceOn := AOn;
   FD.SliceLo := ALo;
   FD.SliceHi := AHi;
@@ -33,12 +38,9 @@ begin
     N := FD.Doc.OutsideSlice;
     { say what is kept out, so a drawing that vanished is explained }
     if N = 0 then
-      FCmdMsg := Format('Cut %s to %s - everything is in it.',
-        [FormatLen(ALo, FD.Units), FormatLen(AHi, FD.Units)])
+      FCmdMsg := Format('Cut %s to %s - everything is in it.', [FormatLen(ALo, FD.Units), FormatLen(AHi, FD.Units)])
     else
-      FCmdMsg := Format('Cut %s to %s - %d thing%s outside it.',
-        [FormatLen(ALo, FD.Units), FormatLen(AHi, FD.Units), N,
-         IfThen(N = 1, '', 's')]);
+      FCmdMsg := Format('Cut %s to %s - %d thing%s outside it.', [FormatLen(ALo, FD.Units), FormatLen(AHi, FD.Units), N, IfThen(N = 1, '', 's')]);
   end;
   InvalidateStatus;
   pbCmd.Invalidate;
@@ -46,9 +48,9 @@ end;
 
 { Move the slice by whole snap steps.  Which: 0 slides both ends, 1 the
   bottom alone, 2 the top. }
-procedure TMainForm.NudgeSlice(Steps: Integer; Which: Integer);
+procedure TMainForm.NudgeSlice(Steps: integer; Which: integer);
 var
-  D, Lo, Hi: Double;
+  D, Lo, Hi: double;
 begin
   if Steps = 0 then Exit;
   { steps by the snap, so there is no second setting to find }
@@ -60,8 +62,11 @@ begin
   case Which of
     1: Lo := Lo + D;
     2: Hi := Hi + D;
-  else
-    begin Lo := Lo + D; Hi := Hi + D; end;
+    else
+    begin
+      Lo := Lo + D;
+      Hi := Hi + D;
+    end;
   end;
   { the bottom cannot pass the top, or the slice turns inside out under the
     wheel }
@@ -72,10 +77,10 @@ end;
 
 { "Plan from here": the clicked floor becomes the bottom of the slice and the
   top goes one story above it. }
-procedure TMainForm.PlanFromFace(Face: Integer);
+procedure TMainForm.PlanFromFace(Face: integer);
 var
-  Lo, Hi: Double;
-  K: Integer;
+  Lo, Hi: double;
+  K: integer;
   Poly: TP3Array;
 begin
   if (Face < 0) or (Face >= FD.Doc.Live) then Exit;
@@ -85,18 +90,19 @@ begin
   for K := 1 to High(Poly) do Lo := Min(Lo, Poly[K].Z);
   { One story (8' or 2.5 m), not the 4' a real cut plane uses: this is also
     the drawing plane and you want to see the whole floor. }
-  if FD.Units = usImperial then Hi := Lo + 8 else Hi := Lo + 2.5;
+  if FD.Units = usImperial then Hi := Lo + 8
+  else
+    Hi := Lo + 2.5;
   if FD.View <> vkPlan then SetView(vkPlan);
   SetSlice(True, Lo, Hi,
-    Format('Plan from %s, up to %s.  Ctrl+wheel travels up and down.',
-      [FormatLen(Lo, FD.Units), FormatLen(Hi, FD.Units)]));
+    Format('Plan from %s, up to %s.  Ctrl+wheel travels up and down.', [FormatLen(Lo, FD.Units), FormatLen(Hi, FD.Units)]));
 end;
 
 function TMainForm.SliceText: string;
 begin
   if not FD.SliceOn then Result := 'CUT  off'
-  else Result := Format('CUT  %s - %s',
-    [FormatLen(FD.SliceLo, FD.Units), FormatLen(FD.SliceHi, FD.Units)]);
+  else
+    Result := Format('CUT  %s - %s', [FormatLen(FD.SliceLo, FD.Units), FormatLen(FD.SliceHi, FD.Units)]);
 end;
 
 { ---------------------------------------------------------------------- }
@@ -108,24 +114,29 @@ end;
   every drawing program; not floating or dockable, so it cannot get lost.
   Names are on by default on purpose: nobody can tell Offset from Drill by
   pictogram.  The arrow at the bottom collapses it, and that is remembered. }
-function TMainForm.ToolStripWidth: Integer;
+function TMainForm.ToolStripWidth: integer;
 begin
   if FToolsWide then Result := Round(126 * FUIScale)
-  else Result := Round(42 * FUIScale);
+  else
+    Result := Round(42 * FUIScale);
 end;
 
 procedure TMainForm.RebuildTools;
 var
-  I, K, RowH, Gap, Y, W, Brk, BrkH, Need: Integer;
+  I, K, RowH, Gap, Y, W, Brk, BrkH, Need: integer;
 
-  procedure Add(AKind: TDeckKind; const R: TRect; AGroup, AValue: Integer;
-    const ACap, AHint: string; AIcon: TIconKind);
+  procedure Add(AKind: TDeckKind; const R: TRect; AGroup, AValue: integer; const ACap, AHint: string; AIcon: TIconKind);
   begin
     SetLength(FTools, Length(FTools) + 1);
     with FTools[High(FTools)] do
     begin
-      Kind := AKind; Bounds := R; Group := AGroup; Value := AValue;
-      Caption := ACap; Hint := AHint; Icon := AIcon;
+      Kind := AKind;
+      Bounds := R;
+      Group := AGroup;
+      Value := AValue;
+      Caption := ACap;
+      Hint := AHint;
+      Icon := AIcon;
     end;
   end;
 
@@ -149,8 +160,7 @@ begin
   BrkH := Round(8 * FUIScale);
   while RowH > Round(17 * FUIScale) do
   begin
-    Need := Round(6 * FUIScale) + Length(MAIN_TOOLS) * (RowH + Gap) +
-      Brk * BrkH + Round(4 * FUIScale) + RowH + Round(4 * FUIScale);
+    Need := Round(6 * FUIScale) + Length(MAIN_TOOLS) * (RowH + Gap) + Brk * BrkH + Round(4 * FUIScale) + RowH + Round(4 * FUIScale);
     if Need <= FShopTop then Break;
     Dec(RowH);
     if Gap > 1 then Dec(Gap);
@@ -183,16 +193,15 @@ begin
 
   { The shop at the very foot, apart, with a spanner: it is a door into the
     trade wizards, not a drawing tool, and should not look like half of MORE. }
-  Add(dkSegment, Rect(Round(4 * FUIScale), FShopTop,
-    W - Round(4 * FUIScale), FShopTop + Round(26 * FUIScale)),
+  Add(dkSegment, Rect(Round(4 * FUIScale), FShopTop, W - Round(4 * FUIScale), FShopTop + Round(26 * FUIScale)),
     GRP_POPUP, POP_SHOP, 'SHOP',
     'Sheet metal and pipe: laying a piece out flat, duct fittings, spools.',
     ikShop);
 end;
 
-function TMainForm.ToolsHit(X, Y: Integer): Integer;
+function TMainForm.ToolsHit(X, Y: integer): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(FTools) do
     if PtInRect(FTools[I].Bounds, Point(X, Y)) then Exit(I);
@@ -206,12 +215,12 @@ end;
   groups, so this is how to find them.  Painted by hand like the entity
   panel, from rows rebuilt each paint by scanning the ekPart records; a list
   kept up to date from many places would go stale. }
-function TMainForm.GroupsPanelOn: Boolean;
+function TMainForm.GroupsPanelOn: boolean;
 begin
   Result := FGroupsOn;
 end;
 
-procedure TMainForm.SetGroupsPanel(On_: Boolean);
+procedure TMainForm.SetGroupsPanel(On_: boolean);
 begin
   FGroupsOn := On_;
   FGrpSig := -1;
@@ -219,8 +228,7 @@ begin
   FGrpHotId := 0;
   Relayout;
   if FGroupsOn then
-    FCmdMsg := 'The groups are listed on the right.  Click one to pick it, ' +
-      'double-click to work inside it, untick to put it away.'
+    FCmdMsg := 'The groups are listed on the right.  Click one to pick it, ' + 'double-click to work inside it, untick to put it away.'
   else
     FCmdMsg := 'Groups panel off.  /groups brings it back.';
   InvalidateStatus;
@@ -234,19 +242,19 @@ end;
 
 procedure TMainForm.RebuildGroupRows;
 var
-  Ids, Par: array of Integer;
-  I, N: Integer;
+  Ids, Par: array of integer;
+  I, N: integer;
 
-  function Folded(Id: Integer): Boolean;
+  function Folded(Id: integer): boolean;
   var
-    K: Integer;
+    K: integer;
   begin
     Result := False;
     for K := 0 to High(FGrpFold) do
       if FGrpFold[K] = Id then Exit(True);
   end;
 
-  procedure Add(Id, Depth: Integer; Kids: Boolean);
+  procedure Add(Id, Depth: integer; Kids: boolean);
   begin
     SetLength(FGrpRows, Length(FGrpRows) + 1);
     FGrpRows[High(FGrpRows)].Id := Id;
@@ -256,10 +264,10 @@ var
     FGrpRows[High(FGrpRows)].Tick := Rect(0, 0, 0, 0);
   end;
 
-  procedure Walk(Parent, Depth: Integer);
+  procedure Walk(Parent, Depth: integer);
   var
-    K, J: Integer;
-    Kids: Boolean;
+    K, J: integer;
+    Kids: boolean;
   begin
     { a hand-edited file could loop a group into itself; nobody nests 40 deep }
     if Depth > 40 then Exit;
@@ -268,7 +276,11 @@ var
       begin
         Kids := False;
         for J := 0 to N - 1 do
-          if Par[J] = Ids[K] then begin Kids := True; Break; end;
+          if Par[J] = Ids[K] then
+          begin
+            Kids := True;
+            Break;
+          end;
         Add(Ids[K], Depth, Kids);
         if Kids and not Folded(Ids[K]) then Walk(Ids[K], Depth + 1);
       end;
@@ -295,9 +307,9 @@ begin
   Walk(0, 1);
 end;
 
-function TMainForm.GroupRowAt(Y: Integer): Integer;
+function TMainForm.GroupRowAt(Y: integer): integer;
 var
-  Top_, RowH: Integer;
+  Top_, RowH: integer;
 begin
   Result := -1;
   RowH := Round(20 * FUIScale);
@@ -308,9 +320,9 @@ begin
 end;
 
 { put away, itself or by a group it is in }
-function TMainForm.GroupPutAway(Id: Integer): Boolean;
+function TMainForm.GroupPutAway(Id: integer): boolean;
 var
-  Guard: Integer;
+  Guard: integer;
 begin
   Result := False;
   Guard := 0;
@@ -324,13 +336,13 @@ end;
 
 procedure TMainForm.pbGroupsPaint(Sender: TObject);
 var
-  I, W, H, Y, X, RowH, Pad, Ind, Box, Shown, Top_, TW: Integer;
+  I, W, H, Y, X, RowH, Pad, Ind, Box, Shown, Top_, TW: integer;
   C: TCanvas;
   S, Tag_: string;
   Picked: TIntArrayW;
-  Sel, Away: Boolean;
+  Sel, Away: boolean;
   Tri: array[0..2] of TPoint;
-  K: Integer;
+  K: integer;
 begin
   W := pbGroups.Width;
   H := pbGroups.Height;
@@ -377,7 +389,8 @@ begin
     begin
       C.Brush.Style := bsSolid;
       if Sel then C.Brush.Color := PixToColor(MixPix(Theme.PanelHi, Theme.Accent, 0.35))
-      else C.Brush.Color := PixToColor(MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.08));
+      else
+        C.Brush.Color := PixToColor(MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.08));
       C.Pen.Style := psClear;
       C.Rectangle(Pad div 2, Y, W - Pad div 2, Y + RowH);
       C.Pen.Style := psSolid;
@@ -394,8 +407,7 @@ begin
       C.Brush.Color := PixToColor(Theme.TextDim);
       C.Pen.Color := PixToColor(Theme.TextDim);
       K := Round(4 * FUIScale);
-      if (FGrpRows[I + Ord(I < High(FGrpRows))].Depth > FGrpRows[I].Depth) and
-         (I < High(FGrpRows)) then
+      if (FGrpRows[I + Ord(I < High(FGrpRows))].Depth > FGrpRows[I].Depth) and (I < High(FGrpRows)) then
       begin
         Tri[0] := Point(X, Y + RowH div 2 - K div 2);
         Tri[1] := Point(X + 2 * K, Y + RowH div 2 - K div 2);
@@ -443,14 +455,16 @@ begin
     begin
       S := 'The whole sheet';
       if FD.Doc.Context = 0 then UIFont(C, 9, True, Theme.Text)
-      else UIFont(C, 9, False, Theme.TextDim);
+      else
+        UIFont(C, 9, False, Theme.TextDim);
     end
     else
     begin
       S := FD.Doc.PartName(FGrpRows[I].Id);
       if FD.Doc.Context = FGrpRows[I].Id then UIFont(C, 9, True, Theme.Accent)
       else if Away then UIFont(C, 9, False, Theme.TextDim)
-      else UIFont(C, 9, False, Theme.Text);
+      else
+        UIFont(C, 9, False, Theme.Text);
     end;
     Tag_ := '';
     if FGrpRows[I].Id > 0 then
@@ -466,7 +480,8 @@ begin
       C.TextOut(W - Pad - C.TextWidth(Tag_), Y + (RowH - C.TextHeight('X')) div 2, Tag_);
       if FGrpRows[I].Id = FD.Doc.Context then UIFont(C, 9, True, Theme.Accent)
       else if Away then UIFont(C, 9, False, Theme.TextDim)
-      else UIFont(C, 9, False, Theme.Text);
+      else
+        UIFont(C, 9, False, Theme.Text);
     end;
     S := CutToFit(C, S, W - Pad - TW - X);
     C.TextOut(X, Y + (RowH - C.TextHeight('X')) div 2, S);
@@ -493,15 +508,13 @@ begin
     PaintPopup(C, pbScreen.Left - pbGroups.Left, pbScreen.Top - pbGroups.Top);
 end;
 
-procedure TMainForm.pbGroupsMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TMainForm.pbGroupsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  H, Id: Integer;
+  H, Id: integer;
 begin
   if FPopup <> POP_NONE then
   begin
-    H := PopupItemAt(X + pbGroups.Left - pbScreen.Left,
-                     Y + pbGroups.Top - pbScreen.Top);
+    H := PopupItemAt(X + pbGroups.Left - pbScreen.Left, Y + pbGroups.Top - pbScreen.Top);
     if (H < 0) and (FPopup = POP_CMDS) then H := FPopupHot;
     if H <> FPopupHot then
     begin
@@ -516,7 +529,9 @@ begin
   if H = FGrpHot then Exit;
   FGrpHot := H;
   { the hovered group shows its box in the drawing }
-  if H >= 0 then Id := FGrpRows[H].Id else Id := 0;
+  if H >= 0 then Id := FGrpRows[H].Id
+  else
+    Id := 0;
   if Id <> FGrpHotId then
   begin
     FGrpHotId := Id;
@@ -536,23 +551,22 @@ begin
   pbGroups.Invalidate;
 end;
 
-procedure TMainForm.pbGroupsMouseWheel(Sender: TObject; Shift: TShiftState;
-  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.pbGroupsMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
 begin
   if WheelDelta > 0 then FGrpScroll := Max(0, FGrpScroll - 3)
-  else FGrpScroll := FGrpScroll + 3;
+  else
+    FGrpScroll := FGrpScroll + 3;
   FGrpHot := -1;
   pbGroups.Invalidate;
   Handled := True;
 end;
 
-procedure TMainForm.pbGroupsMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbGroupsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  H, Row, Id, K, Which: Integer;
+  H, Row, Id, K, Which: integer;
   P: TPoint;
 
-  procedure Item(const Caption: string; Tag: Integer; Enabled: Boolean);
+  procedure Item(const Caption: string; Tag: integer; Enabled: boolean);
   var
     It: TMenuItem;
   begin
@@ -570,8 +584,7 @@ begin
     Which := FPopup;
     H := -1;
     if Button = mbLeft then
-      H := PopupItemAt(X + pbGroups.Left - pbScreen.Left,
-                       Y + pbGroups.Top - pbScreen.Top);
+      H := PopupItemAt(X + pbGroups.Left - pbScreen.Left, Y + pbGroups.Top - pbScreen.Top);
     ClosePopup;
     if H >= 0 then PopupChoose(Which, H);
     Exit;
@@ -588,8 +601,12 @@ begin
     Item('Pick It', 1, not GroupPutAway(Id));
     Item('Work Inside It', 2, not FD.Doc.PartLockedUp(Id) and not GroupPutAway(Id));
     Item('Rename...', 3, True);
-    if FD.Doc.PartLocked(Id) then Item('Unlock', 4, True) else Item('Lock', 4, True);
-    if FD.Doc.PartHidden(Id) then Item('Bring It Back', 5, True) else Item('Put It Away', 5, True);
+    if FD.Doc.PartLocked(Id) then Item('Unlock', 4, True)
+    else
+      Item('Lock', 4, True);
+    if FD.Doc.PartHidden(Id) then Item('Bring It Back', 5, True)
+    else
+      Item('Put It Away', 5, True);
     Item('-', 0, True);
     Item('Explode', 6, not FD.Doc.PartLockedUp(Id) and not GroupPutAway(Id));
     P := pbGroups.ClientToScreen(Point(X, Y));
@@ -634,9 +651,9 @@ end;
 { Pick a group from its row.  A nested group is picked as a click would pick
   it from inside its parent, so the context moves there (as SketchUp's
   Outliner does). }
-procedure TMainForm.PickGroupFromPanel(Id: Integer; Add: Boolean);
+procedure TMainForm.PickGroupFromPanel(Id: integer; Add: boolean);
 var
-  Up, K, First: Integer;
+  Up, K, First: integer;
   M: TIntArrayW;
 begin
   if Id = 0 then
@@ -668,8 +685,7 @@ begin
   begin
     if (Up > 0) and FD.Doc.PartLockedUp(Up) then
     begin
-      FCmdMsg := Format('"%s" is inside "%s", which is locked - unlock it to reach in.',
-        [FD.Doc.PartName(Id), FD.Doc.PartName(Up)]);
+      FCmdMsg := Format('"%s" is inside "%s", which is locked - unlock it to reach in.', [FD.Doc.PartName(Id), FD.Doc.PartName(Up)]);
       InvalidateStatus;
       Exit;
     end;
@@ -702,16 +718,15 @@ begin
   if FD.Doc.PartLocked(Id) then
     FCmdMsg := Format('"%s" picked - it is locked.', [FD.Doc.PartName(Id)])
   else
-    FCmdMsg := Format('"%s" picked.  Double-click its row to work inside it.',
-      [FD.Doc.PartName(Id)]);
+    FCmdMsg := Format('"%s" picked.  Double-click its row to work inside it.', [FD.Doc.PartName(Id)]);
   InvalidateStatus;
 end;
 
 { Tick or untick: on the sheet, or put away.  Nothing is lost; a put-away
   group is just not drawn, picked or snapped to (see HideGroups). }
-procedure TMainForm.ShowGroupFromPanel(Id: Integer; Shown: Boolean);
+procedure TMainForm.ShowGroupFromPanel(Id: integer; Shown: boolean);
 var
-  C_, Guard: Integer;
+  C_, Guard: integer;
 begin
   if (Id <= 0) or (FD.Doc.PartHidden(Id) = not Shown) then Exit;
   PushUndo;
@@ -739,8 +754,7 @@ begin
   if Shown then
     FCmdMsg := Format('"%s" is back.', [FD.Doc.PartName(Id)])
   else
-    FCmdMsg := Format('"%s" put away - tick it to bring it back.  Ctrl+Z undoes it.',
-      [FD.Doc.PartName(Id)]);
+    FCmdMsg := Format('"%s" put away - tick it to bring it back.  Ctrl+Z undoes it.', [FD.Doc.PartName(Id)]);
   InvalidateStatus;
   FScreenDirty := True;
   pbScreen.Invalidate;
@@ -748,7 +762,7 @@ end;
 
 procedure TMainForm.GroupsMenuClick(Sender: TObject);
 var
-  Id: Integer;
+  Id: integer;
 begin
   Id := FGrpMenuId;
   if FD.Doc.PartEnt(Id) < 0 then Exit;
@@ -756,38 +770,37 @@ begin
     1: PickGroupFromPanel(Id, False);
     2: OpenGroup(Id);
     3:
+    begin
+      { renamed in the command line, prefilled, so Enter keeps it }
+      PickGroupFromPanel(Id, False);
+      if SoleGroup = Id then
       begin
-        { renamed in the command line, prefilled, so Enter keeps it }
-        PickGroupFromPanel(Id, False);
-        if SoleGroup = Id then
-        begin
-          FInput := '/name ' + FD.Doc.PartName(Id);
-          SyncCmdList;
-          pbCmd.Invalidate;
-          pbScreen.Invalidate;
-        end;
-      end;
-    4:
-      begin
-        PushUndo;
-        FD.Doc.SetPartLocked(Id, not FD.Doc.PartLocked(Id));
-        FCmdMsg := Format('"%s" %s.', [FD.Doc.PartName(Id),
-          IfThen(FD.Doc.PartLocked(Id), 'locked', 'unlocked')]);
-        InfoChanged;
-        InvalidateStatus;
+        FInput := '/name ' + FD.Doc.PartName(Id);
+        SyncCmdList;
+        pbCmd.Invalidate;
         pbScreen.Invalidate;
       end;
+    end;
+    4:
+    begin
+      PushUndo;
+      FD.Doc.SetPartLocked(Id, not FD.Doc.PartLocked(Id));
+      FCmdMsg := Format('"%s" %s.', [FD.Doc.PartName(Id), IfThen(FD.Doc.PartLocked(Id), 'locked', 'unlocked')]);
+      InfoChanged;
+      InvalidateStatus;
+      pbScreen.Invalidate;
+    end;
     5: ShowGroupFromPanel(Id, FD.Doc.PartHidden(Id));
     6:
-      begin
-        PickGroupFromPanel(Id, False);
-        if SoleGroup = Id then ExplodeGroups;
-      end;
+    begin
+      PickGroupFromPanel(Id, False);
+      if SoleGroup = Id then ExplodeGroups;
+    end;
   end;
   GroupsChanged;
 end;
 
-function TMainForm.InfoPanelWidth: Integer;
+function TMainForm.InfoPanelWidth: integer;
 begin
   if not (FInfoOn or FGroupsOn) then Exit(0);
   Result := Round(212 * FUIScale);
@@ -798,11 +811,11 @@ end;
   searches, so a stepper never drifts from its row. }
 procedure TMainForm.RebuildInfo;
 var
-  InfoMoveB: Boolean;
-  I, K, NL, NA, NF, NT, ND, NG, G: Integer;
+  InfoMoveB: boolean;
+  I, K, NL, NA, NF, NT, ND, NG, G: integer;
   M: TIntArrayW;
   E: TWorkEnt;
-  TotL, TotA: Double;
+  TotL, TotA: double;
   Lo, Hi: TP3;
   MatCol: TColor;
 
@@ -811,18 +824,28 @@ var
     SetLength(FInfoRows, Length(FInfoRows) + 1);
     with FInfoRows[High(FInfoRows)] do
     begin
-      Caption := S; Value := ''; Act := iaNone; Ent := -1; Head := True;
-      Minus := Rect(0, 0, 0, 0); Plus := Minus;
+      Caption := S;
+      Value := '';
+      Act := iaNone;
+      Ent := -1;
+      Head := True;
+      Minus := Rect(0, 0, 0, 0);
+      Plus := Minus;
     end;
   end;
 
-  procedure Row(const C, V: string; A: TInfoAct = iaNone; AEnt: Integer = -1);
+  procedure Row(const C, V: string; A: TInfoAct = iaNone; AEnt: integer = -1);
   begin
     SetLength(FInfoRows, Length(FInfoRows) + 1);
     with FInfoRows[High(FInfoRows)] do
     begin
-      Caption := C; Value := V; Act := A; Ent := AEnt; Head := False;
-      Minus := Rect(0, 0, 0, 0); Plus := Minus;
+      Caption := C;
+      Value := V;
+      Act := A;
+      Ent := AEnt;
+      Head := False;
+      Minus := Rect(0, 0, 0, 0);
+      Plus := Minus;
     end;
   end;
 
@@ -832,15 +855,14 @@ var
       plXZ: Result := 'upright, XZ';
       plYZ: Result := 'on the side, YZ';
       plFree: Result := 'on a face';
-    else
-      Result := 'flat, XY';
+      else
+        Result := 'flat, XY';
     end;
   end;
 
   function Place(const P: TP3): string;
   begin
-    Result := FormatLen(P.X, FD.Units) + ', ' + FormatLen(P.Y, FD.Units) +
-      ', ' + FormatLen(P.Z, FD.Units);
+    Result := FormatLen(P.X, FD.Units) + ', ' + FormatLen(P.Y, FD.Units) + ', ' + FormatLen(P.Z, FD.Units);
   end;
 
 begin
@@ -852,15 +874,27 @@ begin
   begin
     Head('THIS SHEET');
     Row('Things', IntToStr(FD.Doc.Live));
-    NL := 0; NA := 0; NF := 0; NT := 0; ND := 0; NG := 0;
+    NL := 0;
+    NA := 0;
+    NF := 0;
+    NT := 0;
+    ND := 0;
+    NG := 0;
     TotL := 0;
     TotA := 0;
     for I := 0 to FD.Doc.Live - 1 do
       case FD.Doc[I].Kind of
-        ekLine: if FD.Doc[I].Dim then Inc(ND) else
-                begin Inc(NL); TotL := TotL + Dist(FD.Doc[I].A, FD.Doc[I].B); end;
+        ekLine: if FD.Doc[I].Dim then Inc(ND)
+          else
+          begin
+            Inc(NL);
+            TotL := TotL + Dist(FD.Doc[I].A, FD.Doc[I].B);
+          end;
         ekArc: Inc(NA);
-        ekFace: begin Inc(NF); TotA := TotA + FD.Doc.FaceArea(I); end;
+        ekFace: begin
+          Inc(NF);
+          TotA := TotA + FD.Doc.FaceArea(I);
+        end;
         ekText: Inc(NT);
         ekDim: Inc(ND);
         ekGuide: Inc(NG);
@@ -889,17 +923,18 @@ begin
       Row('Inside', FD.Doc.PartName(FD.Doc.PartParent(G)));
     { its total line length including reference lines (a radiant loop is all
       reference line, and port to port is the number wanted), and its box }
-    NL := 0; TotL := 0;
+    NL := 0;
+    TotL := 0;
     for K := 0 to High(M) do
       if FD.Doc[M[K]].Kind = ekLine then
       begin
-        Inc(NL); TotL := TotL + Dist(FD.Doc[M[K]].A, FD.Doc[M[K]].B);
+        Inc(NL);
+        TotL := TotL + Dist(FD.Doc[M[K]].A, FD.Doc[M[K]].B);
       end;
     if NL > 0 then Row('Lines', IntToStr(NL) + '   ' + FormatLen(TotL, FD.Units));
     if FD.Doc.PartBounds(G, Lo, Hi) then
       if Abs(Hi.Z - Lo.Z) > 1E-6 then
-        Row('Size', FormatLen(Hi.X - Lo.X, FD.Units) + ' x ' + FormatLen(Hi.Y - Lo.Y, FD.Units) +
-          ' x ' + FormatLen(Hi.Z - Lo.Z, FD.Units))
+        Row('Size', FormatLen(Hi.X - Lo.X, FD.Units) + ' x ' + FormatLen(Hi.Y - Lo.Y, FD.Units) + ' x ' + FormatLen(Hi.Z - Lo.Z, FD.Units))
       else
         Row('Size', FormatLen(Hi.X - Lo.X, FD.Units) + ' x ' + FormatLen(Hi.Y - Lo.Y, FD.Units));
     Head('');
@@ -915,7 +950,12 @@ begin
   if Length(FSel) > 1 then
   begin
     Head(Format('%d THINGS PICKED', [Length(FSel)]));
-    NL := 0; NA := 0; NF := 0; NT := 0; ND := 0; NG := 0;
+    NL := 0;
+    NA := 0;
+    NF := 0;
+    NT := 0;
+    ND := 0;
+    NG := 0;
     TotL := 0;
     TotA := 0;
     for K := 0 to High(FSel) do
@@ -923,9 +963,15 @@ begin
       I := FSel[K];
       if (I < 0) or (I >= FD.Doc.Live) then Continue;
       case FD.Doc[I].Kind of
-        ekLine: begin Inc(NL); TotL := TotL + Dist(FD.Doc[I].A, FD.Doc[I].B); end;
+        ekLine: begin
+          Inc(NL);
+          TotL := TotL + Dist(FD.Doc[I].A, FD.Doc[I].B);
+        end;
         ekArc: Inc(NA);
-        ekFace: begin Inc(NF); TotA := TotA + FD.Doc.FaceArea(I); end;
+        ekFace: begin
+          Inc(NF);
+          TotA := TotA + FD.Doc.FaceArea(I);
+        end;
         ekText: Inc(NT);
         ekDim: Inc(ND);
         ekGuide: Inc(NG);
@@ -944,8 +990,7 @@ begin
     if (NF > 0) or (NL + NA + NT + ND > 0) then Head('');
     if NF > 0 then
     begin
-      Row('Material', Format('Paint %d face%s...',
-        [NF, specialize IfThen<string>(NF = 1, '', 's')]), iaMaterial, -1);
+      Row('Material', Format('Paint %d face%s...', [NF, specialize IfThen<string>(NF = 1, '', 's')]), iaMaterial, -1);
       Row('', 'Back to default', iaUnpaint, -1);
     end;
     if NL + NA + NT + ND > 0 then
@@ -964,100 +1009,104 @@ begin
 
   case E.Kind of
     ekLine:
-      begin
-        Head(IfThen(E.Dim, 'DIMENSION', 'LINE'));
-        Row('Length', FormatLen(Dist(E.A, E.B), FD.Units));
+    begin
+      Head(IfThen(E.Dim, 'DIMENSION', 'LINE'));
+      Row('Length', FormatLen(Dist(E.A, E.B), FD.Units));
         { says in words whether the length can be typed (SketchUp grays the
           field) }
-        if not E.Dim then
-          if FD.Doc.LineLengthEnd(I, InfoMoveB) then
-            Row('', 'type a length, Enter')
-          else
-            Row('', 'joined at both ends - fixed');
-        Row('From', Place(E.A));
-        Row('To', Place(E.B));
-        Row('Width', Format('%d px', [Round(Max(1, E.Weight))]), iaWidth, I);
-        Row('Color', 'Change...', iaColor, I);
-        Row('Crease', IfThen(E.Soft, 'Bring back', 'Soften'), iaSoft, I);
-        if E.Grp <> 0 then Row('Part of', Format('solid %d', [E.Grp]))
-        else Row('Part of', 'nothing - a loose edge');
-      end;
+      if not E.Dim then
+        if FD.Doc.LineLengthEnd(I, InfoMoveB) then
+          Row('', 'type a length, Enter')
+        else
+          Row('', 'joined at both ends - fixed');
+      Row('From', Place(E.A));
+      Row('To', Place(E.B));
+      Row('Width', Format('%d px', [Round(Max(1, E.Weight))]), iaWidth, I);
+      Row('Color', 'Change...', iaColor, I);
+      Row('Crease', IfThen(E.Soft, 'Bring back', 'Soften'), iaSoft, I);
+      if E.Grp <> 0 then Row('Part of', Format('solid %d', [E.Grp]))
+      else
+        Row('Part of', 'nothing - a loose edge');
+    end;
     ekArc:
-      begin
-        if Abs(Abs(E.Sweep) - 2 * Pi) < 1E-9 then Head('CIRCLE') else Head('ARC');
-        Row('Radius', FormatLen(E.R, FD.Units));
-        Row('Center', Place(E.C));
-        if Abs(Abs(E.Sweep) - 2 * Pi) > 1E-9 then
-          Row('Sweep', FormatAngle(RadToDeg(Abs(E.Sweep))));
-        { sides can be changed after drawing }
-        Row('Sides', IntToStr(ArcSteps(E)), iaSides, I);
-        Row('Plane', PlaneWord(E.Plane));
-        Row('Width', Format('%d px', [Round(Max(1, E.Weight))]), iaWidth, I);
-        Row('Color', 'Change...', iaColor, I);
-        Row('Crease', IfThen(E.Soft, 'Bring back', 'Soften'), iaSoft, I);
-      end;
+    begin
+      if Abs(Abs(E.Sweep) - 2 * Pi) < 1E-9 then Head('CIRCLE')
+      else
+        Head('ARC');
+      Row('Radius', FormatLen(E.R, FD.Units));
+      Row('Center', Place(E.C));
+      if Abs(Abs(E.Sweep) - 2 * Pi) > 1E-9 then
+        Row('Sweep', FormatAngle(RadToDeg(Abs(E.Sweep))));
+      { sides can be changed after drawing }
+      Row('Sides', IntToStr(ArcSteps(E)), iaSides, I);
+      Row('Plane', PlaneWord(E.Plane));
+      Row('Width', Format('%d px', [Round(Max(1, E.Weight))]), iaWidth, I);
+      Row('Color', 'Change...', iaColor, I);
+      Row('Crease', IfThen(E.Soft, 'Bring back', 'Soften'), iaSoft, I);
+    end;
     ekFace:
-      begin
-        Head('FACE');
-        Row('Area', FormatArea(FD.Doc.FaceArea(I), FD.Units));
-        Row('Corners', IntToStr(Length(E.Poly)));
-        if Length(E.Holes) > 0 then
-          Row('Windows', IntToStr(Length(E.Holes)));
-        if E.Solid then Row('Part of', Format('solid %d', [E.Grp]))
-        else Row('Part of', 'nothing - a loose face');
+    begin
+      Head('FACE');
+      Row('Area', FormatArea(FD.Doc.FaceArea(I), FD.Units));
+      Row('Corners', IntToStr(Length(E.Poly)));
+      if Length(E.Holes) > 0 then
+        Row('Windows', IntToStr(Length(E.Holes)));
+      if E.Solid then Row('Part of', Format('solid %d', [E.Grp]))
+      else
+        Row('Part of', 'nothing - a loose face');
         { faces are painted, not inked: the material row says whether it has
           the default or a chosen color }
-        if FD.Doc.Material(I, MatCol) then
-        begin
-          Row('Material', 'Change...', iaMaterial, I);
-          Row('', 'Back to default', iaUnpaint, I);
-        end
-        else
-          Row('Material', 'Paint...', iaMaterial, I);
-        Head('');
-        Row('Turn it over', 'Reverse', iaReverse, I);
-      end;
+      if FD.Doc.Material(I, MatCol) then
+      begin
+        Row('Material', 'Change...', iaMaterial, I);
+        Row('', 'Back to default', iaUnpaint, I);
+      end
+      else
+        Row('Material', 'Paint...', iaMaterial, I);
+      Head('');
+      Row('Turn it over', 'Reverse', iaReverse, I);
+    end;
     ekText:
-      begin
-        Head('NOTE');
-        Row('Says', E.Txt);
-        Row('At', Place(E.A));
-        Row('Size', Format('%d%%', [Round(FD.Doc.NoteSize(I) * 100)]),
-          iaNoteSize, I);
-        Row('Color', 'Change...', iaColor, I);
-      end;
+    begin
+      Head('NOTE');
+      Row('Says', E.Txt);
+      Row('At', Place(E.A));
+      Row('Size', Format('%d%%', [Round(FD.Doc.NoteSize(I) * 100)]),
+        iaNoteSize, I);
+      Row('Color', 'Change...', iaColor, I);
+    end;
     ekDim:
-      begin
-        Head('DIMENSION');
-        Row('Measures', FormatLen(Dist(E.A, E.B), FD.Units));
-        if E.Txt <> '' then Row('Written', E.Txt);
-        Row('From', Place(E.A));
-        Row('To', Place(E.B));
-        Row('Color', 'Change...', iaColor, I);
-      end;
+    begin
+      Head('DIMENSION');
+      Row('Measures', FormatLen(Dist(E.A, E.B), FD.Units));
+      if E.Txt <> '' then Row('Written', E.Txt);
+      Row('From', Place(E.A));
+      Row('To', Place(E.B));
+      Row('Color', 'Change...', iaColor, I);
+    end;
     ekGuide:
+    begin
+      if Dist(E.A, E.B) < 1E-9 then
       begin
-        if Dist(E.A, E.B) < 1E-9 then
-        begin
-          Head('GUIDE POINT');
-          Row('At', Place(E.A));
-        end
-        else
-        begin
-          Head('GUIDE LINE');
-          Row('Through', Place(E.A));
-        end;
-        Head('');
-        Row('Delete takes it', 'or /guides for all');
+        Head('GUIDE POINT');
+        Row('At', Place(E.A));
+      end
+      else
+      begin
+        Head('GUIDE LINE');
+        Row('Through', Place(E.A));
       end;
-  else
-    Head('SOMETHING');
+      Head('');
+      Row('Delete takes it', 'or /guides for all');
+    end;
+    else
+      Head('SOMETHING');
   end;
 end;
 
 procedure TMainForm.pbInfoPaint(Sender: TObject);
 var
-  I, W, H, Y, RowH, Pad, StepW, VX: Integer;
+  I, W, H, Y, RowH, Pad, StepW, VX: integer;
   C: TCanvas;
   R: TRect;
   S: string;
@@ -1107,11 +1156,9 @@ begin
     begin
       { a number: two steppers at the right edge, the figure to their left so
         it does not move as it changes width }
-      FInfoRows[I].Plus := Rect(W - Pad - StepW, Y + Round(2 * FUIScale),
-        W - Pad, Y + RowH - Round(2 * FUIScale));
-      FInfoRows[I].Minus := Rect(FInfoRows[I].Plus.Left - StepW - Round(3 * FUIScale),
-        FInfoRows[I].Plus.Top, FInfoRows[I].Plus.Left - Round(3 * FUIScale),
-        FInfoRows[I].Plus.Bottom);
+      FInfoRows[I].Plus := Rect(W - Pad - StepW, Y + Round(2 * FUIScale), W - Pad, Y + RowH - Round(2 * FUIScale));
+      FInfoRows[I].Minus := Rect(FInfoRows[I].Plus.Left - StepW - Round(3 * FUIScale), FInfoRows[I].Plus.Top, FInfoRows[I].Plus.Left -
+        Round(3 * FUIScale), FInfoRows[I].Plus.Bottom);
       PaintInfoStep(C, FInfoRows[I].Minus, '-', FInfoHot = I * 2);
       PaintInfoStep(C, FInfoRows[I].Plus, '+', FInfoHot = I * 2 + 1);
       UIFont(C, 9, True, Theme.Text);
@@ -1124,13 +1171,11 @@ begin
       { a yes/no or an action: one button naming what pressing it does }
       S := FInfoRows[I].Value;
       UIFont(C, 9, True, Theme.Text);
-      FInfoRows[I].Plus := Rect(W - Pad - C.TextWidth(S) - Round(14 * FUIScale),
-        Y + Round(2 * FUIScale), W - Pad, Y + RowH - Round(2 * FUIScale));
+      FInfoRows[I].Plus := Rect(W - Pad - C.TextWidth(S) - Round(14 * FUIScale), Y + Round(2 * FUIScale), W - Pad, Y + RowH - Round(2 * FUIScale));
       FInfoRows[I].Minus := Rect(0, 0, 0, 0);
       PaintInfoStep(C, FInfoRows[I].Plus, S, FInfoHot = I * 2 + 1);
       { the current color as a swatch where the value would go }
-      if (FInfoRows[I].Act in [iaColor, iaMaterial]) and
-         (FInfoRows[I].Ent >= 0) and (FInfoRows[I].Ent < FD.Doc.Live) then
+      if (FInfoRows[I].Act in [iaColor, iaMaterial]) and (FInfoRows[I].Ent >= 0) and (FInfoRows[I].Ent < FD.Doc.Live) then
       begin
         C.Brush.Style := bsSolid;
         if FInfoRows[I].Act = iaMaterial then
@@ -1167,13 +1212,13 @@ begin
 end;
 
 { one of the small square buttons beside a changeable value }
-procedure TMainForm.PaintInfoStep(C: TCanvas; const R: TRect;
-  const S: string; Hot: Boolean);
+procedure TMainForm.PaintInfoStep(C: TCanvas; const R: TRect; const S: string; Hot: boolean);
 var
   Bg: TPix;
 begin
   if Hot then Bg := MixPix(Theme.PanelHi, Theme.Accent, 0.45)
-  else Bg := MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.10);
+  else
+    Bg := MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.10);
   C.Brush.Style := bsSolid;
   C.Brush.Color := PixToColor(Bg);
   C.Pen.Color := PixToColor(MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.25));
@@ -1182,14 +1227,14 @@ begin
   C.Brush.Style := bsClear;
   UIFont(C, 10, True, Theme.Text);
   C.TextOut((R.Left + R.Right - C.TextWidth(S)) div 2,
-            (R.Top + R.Bottom - C.TextHeight(S)) div 2, S);
+    (R.Top + R.Bottom - C.TextHeight(S)) div 2, S);
 end;
 
 { The stepper under the cursor: row*2 for minus, row*2+1 for plus, or -1.
   The rects come from the painter. }
-function TMainForm.InfoHit(X, Y: Integer): Integer;
+function TMainForm.InfoHit(X, Y: integer): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := -1;
   for I := 0 to High(FInfoRows) do
@@ -1200,16 +1245,14 @@ begin
     end;
 end;
 
-procedure TMainForm.pbInfoMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TMainForm.pbInfoMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  H: Integer;
+  H: integer;
 begin
   { an open list over the panel still tracks hover here }
   if FPopup <> POP_NONE then
   begin
-    H := PopupItemAt(X + pbInfo.Left - pbScreen.Left,
-                     Y + pbInfo.Top - pbScreen.Top);
+    H := PopupItemAt(X + pbInfo.Left - pbScreen.Left, Y + pbInfo.Top - pbScreen.Top);
     if (H < 0) and (FPopup = POP_CMDS) then H := FPopupHot;
     if H <> FPopupHot then
     begin
@@ -1237,11 +1280,10 @@ begin
   end;
 end;
 
-procedure TMainForm.pbInfoMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbInfoMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  H, Row, N, K, Which: Integer;
-  Up: Boolean;
+  H, Row, N, K, Which: integer;
+  Up: boolean;
   Picked: TColor;
 begin
   { and a press picks a list row rather than reaching the panel }
@@ -1250,8 +1292,7 @@ begin
     Which := FPopup;
     H := -1;
     if Button = mbLeft then
-      H := PopupItemAt(X + pbInfo.Left - pbScreen.Left,
-                       Y + pbInfo.Top - pbScreen.Top);
+      H := PopupItemAt(X + pbInfo.Left - pbScreen.Left, Y + pbInfo.Top - pbScreen.Top);
     ClosePopup;
     if H >= 0 then PopupChoose(Which, H);
     Exit;
@@ -1264,132 +1305,131 @@ begin
 
   case FInfoRows[Row].Act of
     iaSides:
-      begin
-        if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
-        N := ArcSteps(FD.Doc[FInfoRows[Row].Ent]);
-        { same steps and limits as the + and - keys }
-        if Up then N := Min(360, N + 1) else N := Max(3, N - 1);
-        PushUndo;
-        FD.Doc.SetArcSides(FInfoRows[Row].Ent, N);
-        RebuildFlatFaces;
-        FCmdMsg := Format('%d sides.', [N]);
-      end;
+    begin
+      if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
+      N := ArcSteps(FD.Doc[FInfoRows[Row].Ent]);
+      { same steps and limits as the + and - keys }
+      if Up then N := Min(360, N + 1)
+      else
+        N := Max(3, N - 1);
+      PushUndo;
+      FD.Doc.SetArcSides(FInfoRows[Row].Ent, N);
+      RebuildFlatFaces;
+      FCmdMsg := Format('%d sides.', [N]);
+    end;
     iaSoft:
-      begin
-        if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
-        PushUndo;
-        N := Ord(not FD.Doc[FInfoRows[Row].Ent].Soft);
-        FD.Doc.SetSoft(FInfoRows[Row].Ent, N <> 0);
-        FCmdMsg := specialize IfThen<string>(N <> 0, 'Edge softened.',
-          'Edge brought back.');
-      end;
+    begin
+      if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
+      PushUndo;
+      N := Ord(not FD.Doc[FInfoRows[Row].Ent].Soft);
+      FD.Doc.SetSoft(FInfoRows[Row].Ent, N <> 0);
+      FCmdMsg := specialize IfThen<string>(N <> 0, 'Edge softened.', 'Edge brought back.');
+    end;
     iaNoteSize:
-      begin
-        if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
-        PushUndo;
-        if Up then
-          FD.Doc.SetNoteSize(FInfoRows[Row].Ent,
-            FD.Doc.NoteSize(FInfoRows[Row].Ent) * 1.25)
-        else
-          FD.Doc.SetNoteSize(FInfoRows[Row].Ent,
-            FD.Doc.NoteSize(FInfoRows[Row].Ent) / 1.25);
-        FCmdMsg := Format('Text at %d%% of normal.',
-          [Round(FD.Doc.NoteSize(FInfoRows[Row].Ent) * 100)]);
-      end;
+    begin
+      if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
+      PushUndo;
+      if Up then
+        FD.Doc.SetNoteSize(FInfoRows[Row].Ent,
+          FD.Doc.NoteSize(FInfoRows[Row].Ent) * 1.25)
+      else
+        FD.Doc.SetNoteSize(FInfoRows[Row].Ent,
+          FD.Doc.NoteSize(FInfoRows[Row].Ent) / 1.25);
+      FCmdMsg := Format('Text at %d%% of normal.', [Round(FD.Doc.NoteSize(FInfoRows[Row].Ent) * 100)]);
+    end;
     iaWidth:
+    begin
+      if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
+      { through the widths the LINE WIDTH list offers }
+      N := Round(Max(1, FD.Doc[FInfoRows[Row].Ent].Weight));
+      K := 0;
+      while (K < High(PEN_SIZES)) and (PEN_SIZES[K] < N) do Inc(K);
+      if Up then
       begin
-        if (FInfoRows[Row].Ent < 0) or (FInfoRows[Row].Ent >= FD.Doc.Live) then Exit;
-        { through the widths the LINE WIDTH list offers }
-        N := Round(Max(1, FD.Doc[FInfoRows[Row].Ent].Weight));
-        K := 0;
-        while (K < High(PEN_SIZES)) and (PEN_SIZES[K] < N) do Inc(K);
-        if Up then
-        begin
-          if PEN_SIZES[K] <= N then K := Min(High(PEN_SIZES), K + 1);
-        end
-        else if K > 0 then
-          Dec(K);
-        PushUndo;
-        FD.Doc.SetWeight(FInfoRows[Row].Ent, PEN_SIZES[K]);
-        FCmdMsg := Format('%d px.', [PEN_SIZES[K]]);
-      end;
+        if PEN_SIZES[K] <= N then K := Min(High(PEN_SIZES), K + 1);
+      end
+      else if K > 0 then
+        Dec(K);
+      PushUndo;
+      FD.Doc.SetWeight(FInfoRows[Row].Ent, PEN_SIZES[K]);
+      FCmdMsg := Format('%d px.', [PEN_SIZES[K]]);
+    end;
     iaColor:
-      begin
+    begin
         { with several picked there is no one color to start from, so the
           dialog opens on the current pen }
-        if FInfoRows[Row].Ent < 0 then
-        begin
-          if not AskColor(FInkColor, Picked) then Exit;
-          PushUndo;
-          K := InkSelectedThings(Picked);
-          FCmdMsg := Format('%d thing%s recolored.',
-            [K, specialize IfThen<string>(K = 1, '', 's')]);
-          RenderInk;
-          RecomposeAll;
-          RebuildInfo;
-          pbInfo.Invalidate;
-          pbScreen.Invalidate;
-          pbCmd.Invalidate;
-          Exit;
-        end;
-        if FInfoRows[Row].Ent >= FD.Doc.Live then Exit;
-        if not AskColor(FD.Doc[FInfoRows[Row].Ent].Ink, Picked) then Exit;
-        PushUndo;
-        FD.Doc.SetInk(FInfoRows[Row].Ent, Picked);
-        FCmdMsg := 'Color changed.  The LINE COLOR button still sets what you draw next.';
-      end;
-    iaMaterial:
+      if FInfoRows[Row].Ent < 0 then
       begin
-        if FInfoRows[Row].Ent >= FD.Doc.Live then Exit;
+        if not AskColor(FInkColor, Picked) then Exit;
+        PushUndo;
+        K := InkSelectedThings(Picked);
+        FCmdMsg := Format('%d thing%s recolored.', [K, specialize IfThen<string>(K = 1, '', 's')]);
+        RenderInk;
+        RecomposeAll;
+        RebuildInfo;
+        pbInfo.Invalidate;
+        pbScreen.Invalidate;
+        pbCmd.Invalidate;
+        Exit;
+      end;
+      if FInfoRows[Row].Ent >= FD.Doc.Live then Exit;
+      if not AskColor(FD.Doc[FInfoRows[Row].Ent].Ink, Picked) then Exit;
+      PushUndo;
+      FD.Doc.SetInk(FInfoRows[Row].Ent, Picked);
+      FCmdMsg := 'Color changed.  The LINE COLOR button still sets what you draw next.';
+    end;
+    iaMaterial:
+    begin
+      if FInfoRows[Row].Ent >= FD.Doc.Live then Exit;
         { start from the current material, or the default it looks like
           (always the default with several picked) }
-        if (FInfoRows[Row].Ent < 0) or
-           not FD.Doc.Material(FInfoRows[Row].Ent, Picked) then
-          Picked := PixToColor(Pix($FA, $FA, $F6));
-        if not AskColor(Picked, Picked) then Exit;
-        PushUndo;
-        K := PaintSelectedFaces(FInfoRows[Row].Ent, Picked, True);
-        if K > 1 then
-          FCmdMsg := Format('%d faces painted.', [K])
-        else
-          FCmdMsg := 'Face painted.  The LINE COLOR button still sets what you draw next.';
-      end;
+      if (FInfoRows[Row].Ent < 0) or not FD.Doc.Material(FInfoRows[Row].Ent, Picked) then
+        Picked := PixToColor(Pix($FA, $FA, $F6));
+      if not AskColor(Picked, Picked) then Exit;
+      PushUndo;
+      K := PaintSelectedFaces(FInfoRows[Row].Ent, Picked, True);
+      if K > 1 then
+        FCmdMsg := Format('%d faces painted.', [K])
+      else
+        FCmdMsg := 'Face painted.  The LINE COLOR button still sets what you draw next.';
+    end;
     iaUnpaint:
-      begin
-        if FInfoRows[Row].Ent >= FD.Doc.Live then Exit;
-        PushUndo;
-        K := PaintSelectedFaces(FInfoRows[Row].Ent, clNone, False);
-        if K > 1 then
-          FCmdMsg := Format('%d faces back to the default material.', [K])
-        else
-          FCmdMsg := 'Back to the default material.';
-      end;
+    begin
+      if FInfoRows[Row].Ent >= FD.Doc.Live then Exit;
+      PushUndo;
+      K := PaintSelectedFaces(FInfoRows[Row].Ent, clNone, False);
+      if K > 1 then
+        FCmdMsg := Format('%d faces back to the default material.', [K])
+      else
+        FCmdMsg := 'Back to the default material.';
+    end;
     { group rows carry the group id in Ent, not an entity }
     iaPartOpen: OpenGroup(FInfoRows[Row].Ent);
     iaPartLock:
-      begin
-        PushUndo;
-        FD.Doc.SetPartLocked(FInfoRows[Row].Ent, not FD.Doc.PartLocked(FInfoRows[Row].Ent));
-        if FD.Doc.PartLocked(FInfoRows[Row].Ent) then FCmdMsg := 'Locked.' else FCmdMsg := 'Unlocked.';
-      end;
+    begin
+      PushUndo;
+      FD.Doc.SetPartLocked(FInfoRows[Row].Ent, not FD.Doc.PartLocked(FInfoRows[Row].Ent));
+      if FD.Doc.PartLocked(FInfoRows[Row].Ent) then FCmdMsg := 'Locked.'
+      else
+        FCmdMsg := 'Unlocked.';
+    end;
     iaPartExplode: ExplodeGroups;
     iaPartHide: HideGroups(True, '');
     iaPartRename:
-      begin
-        { the command bar, prefilled with the name }
-        FInput := '/name ' + FD.Doc.PartName(FInfoRows[Row].Ent);
-        SyncCmdList;
-        FCmdMsg := 'Type the name and press Enter.';
-      end;
+    begin
+      { the command bar, prefilled with the name }
+      FInput := '/name ' + FD.Doc.PartName(FInfoRows[Row].Ent);
+      SyncCmdList;
+      FCmdMsg := 'Type the name and press Enter.';
+    end;
     iaReverse:
-      begin
-        PushUndo;
-        K := ReverseSelectedFaces;
-        FCmdMsg := Format('%d face%s turned over.',
-          [K, specialize IfThen<string>(K = 1, '', 's')]);
-      end;
-  else
-    Exit;
+    begin
+      PushUndo;
+      K := ReverseSelectedFaces;
+      FCmdMsg := Format('%d face%s turned over.', [K, specialize IfThen<string>(K = 1, '', 's')]);
+    end;
+    else
+      Exit;
   end;
 
   RenderInk;
@@ -1402,9 +1442,9 @@ end;
 
 procedure TMainForm.pbToolsPaint(Sender: TObject);
 var
-  I, W, H, IconSz, TxtX, ArrY: Integer;
+  I, W, H, IconSz, TxtX, ArrY: integer;
   It: TDeckItem;
-  Sel, Hot: Boolean;
+  Sel, Hot: boolean;
   C1, C2, Edge, Fg: TPix;
   R, IR: TRect;
   S: string;
@@ -1438,10 +1478,8 @@ begin
     end;
     FToolSkin.RoundRectV(R, Round(4 * FUIScale), C1, C2);
     FToolSkin.RoundFrame(R, Round(4 * FUIScale), 1.0, Edge);
-    IR := Rect(R.Left + Round(6 * FUIScale),
-               (R.Top + R.Bottom - IconSz) div 2,
-               R.Left + Round(6 * FUIScale) + IconSz,
-               (R.Top + R.Bottom + IconSz) div 2);
+    IR := Rect(R.Left + Round(6 * FUIScale), (R.Top + R.Bottom - IconSz) div 2, R.Left + Round(6 * FUIScale) +
+      IconSz, (R.Top + R.Bottom + IconSz) div 2);
     PaintIcon(FToolSkin, It.Icon, IR, Fg);
   end;
 
@@ -1480,15 +1518,16 @@ begin
 
   { says what it does to the strip, not to the names }
   UIFont(pbTools.Canvas, 9, False, Theme.TextDim);
-  if FToolsWide then S := '<  COLLAPSE' else S := '>';
+  if FToolsWide then S := '<  COLLAPSE'
+  else
+    S := '>';
   pbTools.Canvas.TextOut(Round(8 * FUIScale),
     ArrY - pbTools.Canvas.TextHeight(S) div 2, S);
 end;
 
-procedure TMainForm.pbToolsMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TMainForm.pbToolsMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  H: Integer;
+  H: integer;
 begin
   H := ToolsHit(X, Y);
   if H <> FHotTool then
@@ -1502,17 +1541,13 @@ begin
   begin
     FChromeTip := FTools[H].Caption;
     FChromeTipBody := FTools[H].Hint;
-    FChromeTipY := (FTools[H].Bounds.Top + FTools[H].Bounds.Bottom) div 2
-                   + pbTools.Top - pbScreen.Top;
+    FChromeTipY := (FTools[H].Bounds.Top + FTools[H].Bounds.Bottom) div 2 + pbTools.Top - pbScreen.Top;
   end
   else if H = -2 then
   begin
     FChromeTip := IfThen(FToolsWide, 'COLLAPSE', 'EXPAND');
-    FChromeTipBody := IfThen(FToolsWide,
-      'Put the names away and give the width to the drawing.',
-      'Show the tool names again.');
-    FChromeTipY := pbTools.Height - Round(20 * FUIScale)
-                   + pbTools.Top - pbScreen.Top;
+    FChromeTipBody := IfThen(FToolsWide, 'Put the names away and give the width to the drawing.', 'Show the tool names again.');
+    FChromeTipY := pbTools.Height - Round(20 * FUIScale) + pbTools.Top - pbScreen.Top;
   end
   else
   begin
@@ -1534,10 +1569,9 @@ begin
   pbScreen.Invalidate;
 end;
 
-procedure TMainForm.pbToolsMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbToolsMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  H: Integer;
+  H: integer;
 begin
   if Button <> mbLeft then Exit;
   H := ToolsHit(X, Y);
@@ -1562,7 +1596,8 @@ begin
   else if FTools[H].Group = GRP_POPUP then
     { clicking the open one shuts it, as menu buttons do everywhere else }
     if FPopup = FTools[H].Value then ClosePopup
-    else OpenPopup(FTools[H].Value);
+    else
+      OpenPopup(FTools[H].Value);
 end;
 
 { ---------------------------------------------------------------------- }
@@ -1574,9 +1609,9 @@ end;
   writes it at the drawing's precision.  The arrows step by the snap.
   Typing goes to the command bar, as everything else typed does
   (see EditDimUnder). }
-function TMainForm.SliceFieldRect(Which: Integer): TRect;
+function TMainForm.SliceFieldRect(Which: integer): TRect;
 var
-  LabW, Pad, FW: Integer;
+  LabW, Pad, FW: integer;
 begin
   Pad := Round(4 * FUIScale);
   LabW := Round(34 * FUIScale);
@@ -1584,13 +1619,12 @@ begin
   if Which = 1 then
     Result := Rect(LabW + Pad, 1, LabW + Pad + FW, pbSlice.Height - 1)
   else
-    Result := Rect(LabW + 2 * Pad + FW, 1, LabW + 2 * Pad + 2 * FW,
-                   pbSlice.Height - 1);
+    Result := Rect(LabW + 2 * Pad + FW, 1, LabW + 2 * Pad + 2 * FW, pbSlice.Height - 1);
 end;
 
-function TMainForm.SliceZoneAt(X, Y: Integer): Integer;
+function TMainForm.SliceZoneAt(X, Y: integer): integer;
 var
-  I, ArrW: Integer;
+  I, ArrW: integer;
   R: TRect;
 begin
   Result := -1;
@@ -1603,7 +1637,8 @@ begin
       if X >= R.Right - ArrW then
       begin
         if Y < (R.Top + R.Bottom) div 2 then Exit(2 + I)   // 3 up-lo, 4 up-hi
-        else Exit(4 + I);                                   // 5 dn-lo, 6 dn-hi
+        else
+          Exit(4 + I);                                   // 5 dn-lo, 6 dn-hi
       end;
       Exit(I);
     end;
@@ -1613,7 +1648,7 @@ end;
 
 procedure TMainForm.pbSlicePaint(Sender: TObject);
 var
-  W, H, I, ArrW, MidY, CX: Integer;
+  W, H, I, ArrW, MidY, CX: integer;
   R: TRect;
   S: string;
   Body, Edge: TPix;
@@ -1642,7 +1677,8 @@ begin
     if FSliceEdit = I then
     begin
       if LightChrome then Body := MixPix(Pix(255, 255, 255), Theme.Accent, 0.12)
-      else Body := MixPix(Theme.Accent, Pix(0, 0, 0), 0.55);
+      else
+        Body := MixPix(Theme.Accent, Pix(0, 0, 0), 0.55);
     end
     else if FHotSlice = I then Body := MixPix(Body, Theme.Accent, 0.10);
     FSliceSkin.RoundRect(R, Round(3 * FUIScale), Body);
@@ -1660,7 +1696,8 @@ begin
   begin
     R := SliceFieldRect(I);
     if I = 1 then S := FormatLen(FD.SliceLo, FD.Units)
-    else S := FormatLen(FD.SliceHi, FD.Units);
+    else
+      S := FormatLen(FD.SliceHi, FD.Units);
     if FSliceEdit = I then S := FInput + '_';
     if not FD.SliceOn then
       UIFont(pbSlice.Canvas, 9, False, Theme.TextDim)
@@ -1675,18 +1712,15 @@ begin
     pbSlice.Canvas.Brush.Style := bsSolid;
     pbSlice.Canvas.Brush.Color := PixToColor(Theme.TextDim);
     pbSlice.Canvas.Pen.Color := PixToColor(Theme.TextDim);
-    pbSlice.Canvas.Polygon([Point(CX - 4, MidY - 2), Point(CX + 4, MidY - 2),
-                            Point(CX, MidY - 7)]);
-    pbSlice.Canvas.Polygon([Point(CX - 4, MidY + 2), Point(CX + 4, MidY + 2),
-                            Point(CX, MidY + 7)]);
+    pbSlice.Canvas.Polygon([Point(CX - 4, MidY - 2), Point(CX + 4, MidY - 2), Point(CX, MidY - 7)]);
+    pbSlice.Canvas.Polygon([Point(CX - 4, MidY + 2), Point(CX + 4, MidY + 2), Point(CX, MidY + 7)]);
     pbSlice.Canvas.Brush.Style := bsClear;
   end;
 end;
 
-procedure TMainForm.pbSliceMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TMainForm.pbSliceMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  Z: Integer;
+  Z: integer;
 begin
   Z := SliceZoneAt(X, Y);
   if Z <> FHotSlice then
@@ -1705,10 +1739,9 @@ begin
   end;
 end;
 
-procedure TMainForm.pbSliceMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbSliceMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  Z: Integer;
+  Z: integer;
 begin
   if Button <> mbLeft then Exit;
   Z := SliceZoneAt(X, Y);
@@ -1718,45 +1751,47 @@ begin
     5: NudgeSlice(-1, 1);
     6: NudgeSlice(-1, 2);
     1, 2:
-      begin
-        { typed in the command bar, like a dimension's text }
-        FSliceEdit := Z;
-        FInput := '';
-        if Z = 1 then
-          FCmdMsg := 'Type the bottom of the slice - the height you draw at.  Esc leaves it.'
-        else
-          FCmdMsg := 'Type the top of the slice.  Esc leaves it.';
-        pbSlice.Invalidate;
-        pbCmd.Invalidate;
-      end;
+    begin
+      { typed in the command bar, like a dimension's text }
+      FSliceEdit := Z;
+      FInput := '';
+      if Z = 1 then
+        FCmdMsg := 'Type the bottom of the slice - the height you draw at.  Esc leaves it.'
+      else
+        FCmdMsg := 'Type the top of the slice.  Esc leaves it.';
+      pbSlice.Invalidate;
+      pbCmd.Invalidate;
+    end;
     0:
       { the label switches the whole feature on or off }
       if FD.SliceOn then SetSlice(False, FD.SliceLo, FD.SliceHi)
-      else SetSlice(True, FD.SliceLo, FD.SliceHi);
+      else
+        SetSlice(True, FD.SliceLo, FD.SliceHi);
   end;
 end;
 
-procedure TMainForm.pbSliceMouseWheel(Sender: TObject; Shift: TShiftState;
-  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.pbSliceMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
 var
-  Z, Steps: Integer;
+  Z, Steps: integer;
 begin
   Handled := True;
-  if WheelDelta > 0 then Steps := 1 else Steps := -1;
+  if WheelDelta > 0 then Steps := 1
+  else
+    Steps := -1;
   Z := SliceZoneAt(MousePos.X, MousePos.Y);
   case Z of
     1, 3, 5: NudgeSlice(Steps, 1);
     2, 4, 6: NudgeSlice(Steps, 2);
-  else
-    NudgeSlice(Steps, 0);
+    else
+      NudgeSlice(Steps, 0);
   end;
 end;
 
 { take what was typed into one of the two fields }
 procedure TMainForm.CommitSliceEdit;
 var
-  W: Integer;
-  V: Double;
+  W: integer;
+  V: double;
 begin
   W := FSliceEdit;
   FSliceEdit := 0;
@@ -1777,14 +1812,14 @@ begin
   end;
   FInput := '';
   if W = 1 then SetSlice(True, V, Max(V, FD.SliceHi))
-  else SetSlice(True, Min(FD.SliceLo, V), V);
+  else
+    SetSlice(True, Min(FD.SliceLo, V), V);
   pbSlice.Invalidate;
 end;
 
 { The slash button: starts a command with the list up; pressing it again
   puts the list away.  Right-click offers to copy the message or input. }
-procedure TMainForm.pbCmdMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbCmdMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
   It: TMenuItem;
   Pt: TPoint;
@@ -1824,10 +1859,9 @@ begin
   pbScreen.Invalidate;
 end;
 
-procedure TMainForm.pbCmdMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TMainForm.pbCmdMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  Was: Boolean;
+  Was: boolean;
 begin
   Was := FCmdArrowHot;
   FCmdArrowHot := PtInRect(FCmdArrow, Point(X, Y));
@@ -1848,16 +1882,16 @@ end;
   its own box.  Rows two and three are the message, drawn by LazInk so it
   wraps and is colored (right-click copies it); the keys that apply now
   follow it and drop out of sight when the message needs both lines. }
-procedure TMainForm.CmdRows(out Pad, Row1, Row: Integer);
+procedure TMainForm.CmdRows(out Pad, Row1, Row: integer);
 begin
   Pad := Round(5 * FUIScale);
   Row1 := Round(24 * FUIScale);
   Row := Round(18 * FUIScale);
 end;
 
-function TMainForm.CmdBarHeight: Integer;
+function TMainForm.CmdBarHeight: integer;
 var
-  Pad, Row1, Row: Integer;
+  Pad, Row1, Row: integer;
 begin
   CmdRows(Pad, Row1, Row);
   Result := Pad + Row1 + Round(3 * FUIScale) + 2 * Row + Pad + Round(4 * FUIScale);
@@ -1867,21 +1901,20 @@ end;
   the right edge, in the bar's coordinates }
 procedure TMainForm.PlaceCmdMsg;
 var
-  Pad, Row1, Row: Integer;
+  Pad, Row1, Row: integer;
 begin
   CmdRows(Pad, Row1, Row);
   { the tool pill sits left of the message rows, in a column as wide as the
     longest tool name, so messages start in one place }
   UIFont(pbCmd.Canvas, 10, True, Theme.Accent);
   FCmdPillW := pbCmd.Canvas.TextWidth('PROTRACTOR') + Round(18 * FUIScale);
-  FCmdMsgR := Rect(Round(56 * FUIScale) + FCmdPillW + Round(10 * FUIScale), Pad + Row1 + Round(5 * FUIScale),
-    Max(Round(96 * FUIScale), pbCmd.Width - Round(24 * FUIScale)),
-    Pad + Row1 + Round(5 * FUIScale) + 2 * Row);
+  FCmdMsgR := Rect(Round(56 * FUIScale) + FCmdPillW + Round(10 * FUIScale), Pad + Row1 + Round(5 * FUIScale), Max(Round(96 * FUIScale),
+    pbCmd.Width - Round(24 * FUIScale)), Pad + Row1 + Round(5 * FUIScale) + 2 * Row);
 end;
 
 { Whether the chrome is pale (Light theme), so "sunk" things go lighter
   rather than darker. }
-function TMainForm.LightChrome: Boolean;
+function TMainForm.LightChrome: boolean;
 begin
   Result := (Theme.Panel.R + Theme.Panel.G + Theme.Panel.B) > 3 * 140;
 end;
@@ -1892,20 +1925,22 @@ end;
 function TMainForm.FieldPix: TPix;
 begin
   if LightChrome then Result := MixPix(Theme.Panel, Pix(255, 255, 255), 0.75)
-  else Result := MixPix(Theme.Panel, Pix(0, 0, 0), 0.30);
+  else
+    Result := MixPix(Theme.Panel, Pix(0, 0, 0), 0.30);
 end;
 
 function TMainForm.FieldEdgePix: TPix;
 begin
   if LightChrome then Result := MixPix(Theme.Panel, Pix(0, 0, 0), 0.22)
-  else Result := MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.10);
+  else
+    Result := MixPix(Theme.PanelHi, Pix(255, 255, 255), 0.10);
 end;
 
 { The colors of the bar's text, from the theme.  Bright marks are darkened
   on a light panel. }
 function TMainForm.CmdPalette: TCmdPalette;
 var
-  Light: Boolean;
+  Light: boolean;
 
   function Hex(const C: TPix): string;
   begin
@@ -1915,7 +1950,8 @@ var
   function Mark(const C: TPix): string;
   begin
     if Light then Result := Hex(MixPix(C, Pix(0, 0, 0), 0.40))
-    else Result := Hex(C);
+    else
+      Result := Hex(C);
   end;
 
 begin
@@ -1940,22 +1976,22 @@ begin
   case FSnapKind of
     snEndpoint, snCenter: Result := Pix(60, 210, 90);
     snMidpoint, snSubMid: Result := Pix(90, 220, 235);
-    snOnEdge:             Result := Pix(235, 70, 70);
-    snOnFace:             Result := Pix(70, 130, 240);
-    snQuadrant:           Result := Pix(90, 235, 120);
-    snOnAxis:             Result := AxisPix(FSnapAxis);
-    snOrigin:             Result := Pix(250, 210, 60);
-    snCross:              Result := Pix(215, 120, 240);
-  else
-    Result := Theme.Accent;
+    snOnEdge: Result := Pix(235, 70, 70);
+    snOnFace: Result := Pix(70, 130, 240);
+    snQuadrant: Result := Pix(90, 235, 120);
+    snOnAxis: Result := AxisPix(FSnapAxis);
+    snOrigin: Result := Pix(250, 210, 60);
+    snCross: Result := Pix(215, 120, 240);
+    else
+      Result := Theme.Accent;
   end;
 end;
 
 procedure TMainForm.pbCmdPaint(Sender: TObject);
 var
-  W, H, X, TW, I, Pad, Row1, Row, Y1, IL, IW: Integer;
+  W, H, X, TW, I, Pad, Row1, Row, Y1, IL, IW: integer;
   S, M, Before, CaretCol: string;
-  SumV, SumW: Double;
+  SumV, SumW: double;
   P: TCmdPalette;
   Opt: THTMLOptions;
   Well, SnapCol: TPix;
@@ -1974,24 +2010,22 @@ begin
   FCmdSkin.Clear(Pix(0, 0, 0));
   FCmdSkin.CopyRegion(FShell, pbCmd.Left, pbCmd.Top, 0, 0, W, H);
   PaintPanel(FCmdSkin, Rect(0, 0, W, H), Theme, Round(10 * FUIScale));
-  FCmdSkin.RoundRect(Rect(Round(6 * FUIScale), Round(6 * FUIScale),
-    Round(10 * FUIScale), H - Round(6 * FUIScale)), 2, Theme.Accent, 0.9);
+  FCmdSkin.RoundRect(Rect(Round(6 * FUIScale), Round(6 * FUIScale), Round(10 * FUIScale), H - Round(6 * FUIScale)), 2, Theme.Accent, 0.9);
   if FCmdMsgR.Right > FCmdMsgR.Left then
-    FCmdSkin.RoundRect(Rect(FCmdMsgR.Left - Round(6 * FUIScale), FCmdMsgR.Top - Round(3 * FUIScale),
-      FCmdMsgR.Right + Round(6 * FUIScale), FCmdMsgR.Bottom + Round(3 * FUIScale)),
+    FCmdSkin.RoundRect(Rect(FCmdMsgR.Left - Round(6 * FUIScale), FCmdMsgR.Top - Round(3 * FUIScale), FCmdMsgR.Right + Round(6 * FUIScale),
+      FCmdMsgR.Bottom + Round(3 * FUIScale)),
       Round(6 * FUIScale), Well, 1.0);
   { on a pale panel a near-white well needs an edge to be seen }
   if LightChrome and (FCmdMsgR.Right > FCmdMsgR.Left) then
-    FCmdSkin.RoundFrame(Rect(FCmdMsgR.Left - Round(6 * FUIScale), FCmdMsgR.Top - Round(3 * FUIScale),
-      FCmdMsgR.Right + Round(6 * FUIScale), FCmdMsgR.Bottom + Round(3 * FUIScale)),
+    FCmdSkin.RoundFrame(Rect(FCmdMsgR.Left - Round(6 * FUIScale), FCmdMsgR.Top - Round(3 * FUIScale), FCmdMsgR.Right + Round(6 * FUIScale),
+      FCmdMsgR.Bottom + Round(3 * FUIScale)),
       Round(6 * FUIScale), 1.0, FieldEdgePix);
   FCmdSkin.DrawTo(C, 0, 0);
   P := CmdPalette;
 
   { The slash button: pressing it types the slash and brings up the list,
     just as typing one does.  A way in for anybody not using the keyboard. }
-  FCmdArrow := Rect(Round(16 * FUIScale), Y1 + Round(1 * FUIScale),
-                    Round(44 * FUIScale), Y1 + Row1 - Round(1 * FUIScale));
+  FCmdArrow := Rect(Round(16 * FUIScale), Y1 + Round(1 * FUIScale), Round(44 * FUIScale), Y1 + Row1 - Round(1 * FUIScale));
   C.Brush.Style := bsSolid;
   if FCmdArrowHot or (FPopup = POP_CMDS) then
     C.Brush.Color := PixToColor(Theme.Accent)
@@ -2074,8 +2108,7 @@ begin
     M := MarkTyped(FInput, P) + Painted(P.Command, '', False);
     Before := M;
     { a typed sum (8' + 8") shows its total as you type (see ParseLen) }
-    if ParseLen(FInput, FD.Units, SumV) and
-       (not ParseLenPlain(FInput, FD.Units, SumW) or (Abs(SumV - SumW) > 1E-9)) then
+    if ParseLen(FInput, FD.Units, SumV) and (not ParseLenPlain(FInput, FD.Units, SumW) or (Abs(SumV - SumW) > 1E-9)) then
       M := M + Painted(P.Dim, '   = ') + Painted(P.Number, FormatLen(SumV, FD.Units), True);
   end
   else
@@ -2096,13 +2129,13 @@ begin
   end;
   { the typing box next to the slash, as wide as its content, the prompt
     after it }
-  IW := EnsureRange(DrawCmdRuns(C, 0, 0, Row1, MaxInt, 12, True, M, True) +
-    Round(24 * FUIScale), FCmdPillW + Round(10 * FUIScale) + Round(220 * FUIScale), W * 2 div 5);
+  IW := EnsureRange(DrawCmdRuns(C, 0, 0, Row1, MaxInt, 12, True, M, True) + Round(24 * FUIScale), FCmdPillW + Round(10 * FUIScale) + Round(220 * FUIScale), W * 2 div 5);
   IL := X;
   C.Brush.Style := bsSolid;
   C.Brush.Color := PixToColor(Well);
   if FInput <> '' then C.Pen.Color := PixToColor(Theme.Accent)
-  else C.Pen.Color := PixToColor(FieldEdgePix);
+  else
+    C.Pen.Color := PixToColor(FieldEdgePix);
   C.RoundRect(IL, Y1 + Round(1 * FUIScale), IL + IW, Y1 + Row1 - Round(1 * FUIScale),
     Round(8 * FUIScale), Round(8 * FUIScale));
   C.Brush.Style := bsClear;
@@ -2110,13 +2143,11 @@ begin
   if (GetTickCount64 div 500) mod 2 = 0 then
   begin
     I := IL + Round(12 * FUIScale);
-    if Before <> '' then I := Min(I + DrawCmdRuns(C, 0, 0, Row1, MaxInt, 12, True, Before, True),
-      IL + IW - Round(8 * FUIScale));
+    if Before <> '' then I := Min(I + DrawCmdRuns(C, 0, 0, Row1, MaxInt, 12, True, Before, True), IL + IW - Round(8 * FUIScale));
     UIFont(C, 12, False, Theme.Text, True);
     TW := C.TextHeight('Ag');
     C.Brush.Style := bsSolid;
-    C.Brush.Color := RGBToColor(StrToInt('$' + Copy(CaretCol, 2, 2)), StrToInt('$' + Copy(CaretCol, 4, 2)),
-      StrToInt('$' + Copy(CaretCol, 6, 2)));
+    C.Brush.Color := RGBToColor(StrToInt('$' + Copy(CaretCol, 2, 2)), StrToInt('$' + Copy(CaretCol, 4, 2)), StrToInt('$' + Copy(CaretCol, 6, 2)));
     C.FillRect(I, Y1 + (Row1 - TW) div 2, I + Max(1, Round(FUIScale)), Y1 + (Row1 + TW) div 2);
     C.Brush.Style := bsClear;
   end;
@@ -2138,16 +2169,16 @@ begin
     cursor's mark (as the cursor chip and SketchUp's status line read). }
   M := '';
   if (FD <> nil) and (FD.Doc.Context <> 0) then
-    M := Painted(P.Dim, 'in ') + Painted(P.Name, '"' + FD.Doc.PartName(FD.Doc.Context) + '"', True) +
-      Painted(P.Dim, '  ');
+    M := Painted(P.Dim, 'in ') + Painted(P.Name, '"' + FD.Doc.PartName(FD.Doc.Context) + '"', True) + Painted(P.Dim, '  ');
   { an axis lock in its axis color, parallel/perpendicular in SketchUp's
     magenta, otherwise the mark's color }
   if FAxisLock in [0..2] then SnapCol := AxisPix(FAxisLock)
   else if FParPerp in [1, 2] then SnapCol := Pix(220, 80, 220)
-  else SnapCol := SnapMarkPix;
+  else
+    SnapCol := SnapMarkPix;
   if (SnapSays <> '') then
-    M := M + '<b><font color="' + Format('#%.2x%.2x%.2x', [SnapCol.R, SnapCol.G, SnapCol.B]) +
-      '">' + HtmlEsc(SnapSays) + '</font></b>' + Painted(P.Dim, '  ' + #$E2#$80#$BA + '  ');
+    M := M + '<b><font color="' + Format('#%.2x%.2x%.2x', [SnapCol.R, SnapCol.G, SnapCol.B]) + '">' + HtmlEsc(SnapSays) + '</font></b>' +
+      Painted(P.Dim, '  ' + #$E2#$80#$BA + '  ');
   M := M + MarkMessage(PromptForTool, P);
   DrawCmdRuns(C, X, Y1, Row1, IL, 11, False, M);
   PaintCmdMsg(C, P);
@@ -2155,8 +2186,7 @@ end;
 
 { One line of the bar's markup, ending in an ellipsis at MaxX when it does
   not fit.  Returns the width it took (or would take, with Measure). }
-function TMainForm.DrawCmdRuns(C: TCanvas; X, Y, H, MaxX, Size: Integer;
-  Mono: Boolean; const M: string; Measure: Boolean): Integer;
+function TMainForm.DrawCmdRuns(C: TCanvas; X, Y, H, MaxX, Size: integer; Mono: boolean; const M: string; Measure: boolean): integer;
 var
   Opt: THTMLOptions;
   R: TRect;
@@ -2189,9 +2219,10 @@ begin
   if (FInput = '') and (ModifierTip <> '') then
   begin
     { dimmer than the message: plain words dim, keys still as keys }
-    Tip := StringReplace(MarkMessage(ModifierTip, P), '<font color="' + P.Text + '">',
-      '<font color="' + P.Dim + '">', [rfReplaceAll]);
-    if M <> '' then M := M + '<br>' + Tip else M := Tip;
+    Tip := StringReplace(MarkMessage(ModifierTip, P), '<font color="' + P.Text + '">', '<font color="' + P.Dim + '">', [rfReplaceAll]);
+    if M <> '' then M := M + '<br>' + Tip
+    else
+      M := Tip;
   end;
   if M = '' then Exit;
   UIFont(C, 11, False, Theme.Text);

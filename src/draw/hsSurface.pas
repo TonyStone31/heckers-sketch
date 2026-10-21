@@ -391,16 +391,14 @@ begin
   begin
     Inc(GRepairs);
     if Assigned(OnSurfaceRepair) then
-      OnSurfaceRepair(Format('surface guard hit: %d (%s), stride %s', [FGuard, AsDouble(FGuard), specialize IfThen<string>(St =
-        FStride, 'untouched', 'also wrong')]));
+      OnSurfaceRepair(Format('surface guard hit: %d (%s), stride %s', [FGuard, AsDouble(FGuard), specialize IfThen<string>(St = FStride, 'untouched', 'also wrong')]));
     FGuard := GUARD_WORD;
   end;
   if (P <> FBits) or (St <> FStride) then
   begin
     Inc(GRepairs);
     if Assigned(OnSurfaceRepair) then
-      OnSurfaceRepair(Format('surface repaired: stride %d (%s) -> %d, bits %s', [FStride, AsDouble(FStride), St,
-        specialize IfThen<string>(P = FBits, 'same', 'moved')]));
+      OnSurfaceRepair(Format('surface repaired: stride %d (%s) -> %d, bits %s', [FStride, AsDouble(FStride), St, specialize IfThen<string>(P = FBits, 'same', 'moved')]));
     FBits := P;
     FStride := St;
   end;

@@ -72,8 +72,8 @@ const
     'td.part { font-weight: bold; white-space: nowrap } ' + 'td.file { font-size: 12px; font-family: monospace; color: #1e293b } ' +
     'td.num { text-align: right; color: #334155; white-space: nowrap } ' + 'td.key { background: #f8fafc; color: #475569; font-size: 13px; ' +
     '         white-space: nowrap } ' + 'td.val { font-size: 13px } ' + 'td.banner { border: 0; border-radius: 8px; padding: 14px 18px; ' +
-    '            color: #ffffff } ' + 'td.b-ok  { background: #15803d } ' + 'td.b-bad { background: #b91c1c } ' +
-    'td.b-run { background: #1d4ed8 } ' + 'div.title { font-size: 22px; font-weight: bold } ' + 'div.sub { font-size: 14px; margin-top: 4px } ' +
+    '            color: #ffffff } ' + 'td.b-ok  { background: #15803d } ' + 'td.b-bad { background: #b91c1c } ' + 'td.b-run { background: #1d4ed8 } ' +
+    'div.title { font-size: 22px; font-weight: bold } ' + 'div.sub { font-size: 14px; margin-top: 4px } ' +
     '.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px } ' + 'span.pill { border-radius: 10px; padding: 2px 10px; font-weight: bold } ' +
     'span.wait { background: #f1f5f9; color: #64748b } ' + 'span.busy { background: #fef3c7; color: #92400e } ' +
     'span.send { background: #dbeafe; color: #1d4ed8 } ' + 'span.ok   { background: #dcfce7; color: #15803d } ' +

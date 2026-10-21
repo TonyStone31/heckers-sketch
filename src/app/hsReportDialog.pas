@@ -112,8 +112,7 @@ begin
   try
     if Crashed then
       F.lblSay.Caption := 'It crashed last time.  What were you doing when it ' + 'went?  A line or two is plenty - the crash report itself is ' +
-        'attached automatically, along with what the program was doing and ' + 'what machine this is - RAM, processor, graphics, operating system; ' +
-        'nothing about you.';
+        'attached automatically, along with what the program was doing and ' + 'what machine this is - RAM, processor, graphics, operating system; ' + 'nothing about you.';
     F.memNote.Text := Note;
 
     { NThings counts the drawing that will actually be sent, which after a

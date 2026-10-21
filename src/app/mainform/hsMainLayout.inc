@@ -6,22 +6,22 @@
 
 { A drawing board keeps its chrome small.  Relayout, RebuildShell and
   FormPaint all use these, so they must come from here. }
-function TMainForm.TitleHeight: Integer;
+function TMainForm.TitleHeight: integer;
 begin
   Result := Round(34 * FUIScale);
 end;
 
-function TMainForm.ChromeMargin: Integer;
+function TMainForm.ChromeMargin: integer;
 begin
   Result := Round(8 * FUIScale);
 end;
 
 procedure TMainForm.Relayout;
 var
-  M, TitleH, Bezel, CmdH, TabsH: Integer;
-  ToolW: Integer;
+  M, TitleH, Bezel, CmdH, TabsH: integer;
+  ToolW: integer;
   BezelR: TRect;
-  InfoW, ColH, GrpH: Integer;
+  InfoW, ColH, GrpH: integer;
 begin
   if not FBooted then Exit;
 
@@ -52,8 +52,7 @@ begin
     pbTabs.SetBounds(M, TitleH, Max(120, ClientWidth - 2 * M), TabsH);
   { the command bar sits on the window's floor; the drawing has the rest }
   pbCmd.SetBounds(M, ClientHeight - M - CmdH, ClientWidth - 2 * M, CmdH);
-  BezelR := Rect(M, TitleH + TabsH + Round(4 * FUIScale), ClientWidth - M,
-    pbCmd.Top - Round(10 * FUIScale));
+  BezelR := Rect(M, TitleH + TabsH + Round(4 * FUIScale), ClientWidth - M, pbCmd.Top - Round(10 * FUIScale));
   PlaceCmdMsg;
 
   { The tool strip takes space from the bezel so it never covers the drawing. }
@@ -110,7 +109,7 @@ end;
 
 procedure TMainForm.RebuildShell;
 var
-  M, TitleH, Bezel, CmdH, TabsH: Integer;
+  M, TitleH, Bezel, CmdH, TabsH: integer;
   BezelR: TRect;
 begin
   M := ChromeMargin;
@@ -119,28 +118,24 @@ begin
   CmdH := CmdBarHeight;
   TabsH := Round(22 * FUIScale);
 
-  BezelR := Rect(M, TitleH + TabsH + Round(4 * FUIScale), ClientWidth - M,
-    ClientHeight - M - CmdH - Round(10 * FUIScale));
+  BezelR := Rect(M, TitleH + TabsH + Round(4 * FUIScale), ClientWidth - M, ClientHeight - M - CmdH - Round(10 * FUIScale));
   { the same shift Relayout makes, or the frame is drawn in the wrong place }
   if ToolStripWidth > 0 then
     BezelR.Left := BezelR.Left + ToolStripWidth + Round(6 * FUIScale);
 
   PaintShell(FShell, Theme);
   PaintBezel(FShell, BezelR, Theme, Round(5 * FUIScale));
-  PaintScreenWell(FShell, Rect(BezelR.Left + Bezel, BezelR.Top + Bezel,
-    BezelR.Right - Bezel, BezelR.Bottom - Bezel), Round(3 * FUIScale));
+  PaintScreenWell(FShell, Rect(BezelR.Left + Bezel, BezelR.Top + Bezel, BezelR.Right - Bezel, BezelR.Bottom - Bezel), Round(3 * FUIScale));
   FShell.Touch;
 end;
 
-procedure TMainForm.ResizeSurfaces(AW, AH: Integer);
+procedure TMainForm.ResizeSurfaces(AW, AH: integer);
 begin
   AW := Max(1, AW);
   AH := Max(1, AH);
   { Check every surface, not just FArt: if they ever got out of step, an
     FArt-only check would never put them back. }
-  if (FArt.Width = AW) and (FArt.Height = AH) and
-     (FPaper.Width = AW) and (FPaper.Height = AH) and
-     (FInk.Width = AW) and (FInk.Height = AH) then Exit;
+  if (FArt.Width = AW) and (FArt.Height = AH) and (FPaper.Width = AW) and (FPaper.Height = AH) and (FInk.Width = AW) and (FInk.Height = AH) then Exit;
 
   FPaper.SetSize(AW, AH);
   FArt.SetSize(AW, AH);
@@ -158,27 +153,25 @@ end;
   where the depth buffer says the face is in front; WashFace uses the same
   rules.  With S given, draw into that surface (its corner at OX, OY on
   screen) instead: that is how the wash gets into the cursor square. }
-procedure TMainForm.PaintFaceHint(C: TCanvas; Face: Integer; const Col: TPix;
-  S: TArtSurface; OX, OY: Integer; Edge: Boolean; Every: Integer);
+procedure TMainForm.PaintFaceHint(C: TCanvas; Face: integer; const Col: TPix; S: TArtSurface; OX, OY: integer; Edge: boolean; Every: integer);
 var
   Pts: TPointFArray;
   HPts: array of TPointFArray;
   Ink: TArtSurface;
   Look, Nm, AU, AV, O, W: TP3;
   SO, SU, SV: TPointF;
-  Det, DU, DV, D0, PU, PV, Dp, Zb: Double;
-  Deep: Boolean;
-  I, H, K, N, X, Y, X0, Y0, X1, Y1, Step, NX, XEnd: Integer;
-  Inside: Boolean;
+  Det, DU, DV, D0, PU, PV, Dp, Zb: double;
+  Deep: boolean;
+  I, H, K, N, X, Y, X0, Y0, X1, Y1, Step, NX, XEnd: integer;
+  Inside: boolean;
   { a row never crosses more loops than this }
-  XS: array[0..255] of Double;
-  Xt: Double;
+  XS: array[0..255] of double;
+  Xt: double;
 
-  { where this row crosses that loop, added to the list }
-  procedure Cross(const P: TPointFArray; PY: Integer;
-    var Xs: array of Double; var NX: Integer);
+{ where this row crosses that loop, added to the list }
+  procedure Cross(const P: TPointFArray; PY: integer; var Xs: array of double; var NX: integer);
   var
-    K, L, M: Integer;
+    K, L, M: integer;
   begin
     M := Length(P);
     if M < 3 then Exit;
@@ -187,8 +180,7 @@ var
     begin
       if ((P[K].Y > PY) <> (P[L].Y > PY)) and (NX <= High(Xs)) then
       begin
-        Xs[NX] := (P[L].X - P[K].X) * (PY - P[K].Y) /
-                  (P[L].Y - P[K].Y) + P[K].X;
+        Xs[NX] := (P[L].X - P[K].X) * (PY - P[K].Y) / (P[L].Y - P[K].Y) + P[K].X;
         Inc(NX);
       end;
       L := K;
@@ -211,18 +203,27 @@ begin
       HPts[H][I] := ScreenOf(FD.Doc[Face].Holes[H][I]);
   end;
 
-  X0 := MaxInt; Y0 := MaxInt; X1 := -MaxInt; Y1 := -MaxInt;
+  X0 := MaxInt;
+  Y0 := MaxInt;
+  X1 := -MaxInt;
+  Y1 := -MaxInt;
   for I := 0 to N - 1 do
   begin
-    X0 := Min(X0, Round(Pts[I].X)); X1 := Max(X1, Round(Pts[I].X));
-    Y0 := Min(Y0, Round(Pts[I].Y)); Y1 := Max(Y1, Round(Pts[I].Y));
+    X0 := Min(X0, Round(Pts[I].X));
+    X1 := Max(X1, Round(Pts[I].X));
+    Y0 := Min(Y0, Round(Pts[I].Y));
+    Y1 := Max(Y1, Round(Pts[I].Y));
   end;
-  X0 := Max(X0, 0); Y0 := Max(Y0, 0);
-  X1 := Min(X1, pbScreen.Width - 1); Y1 := Min(Y1, pbScreen.Height - 1);
+  X0 := Max(X0, 0);
+  Y0 := Max(Y0, 0);
+  X1 := Min(X1, pbScreen.Width - 1);
+  Y1 := Min(Y1, pbScreen.Height - 1);
   if S <> nil then
   begin
-    X0 := Max(X0, OX); Y0 := Max(Y0, OY);
-    X1 := Min(X1, OX + S.Width - 1); Y1 := Min(Y1, OY + S.Height - 1);
+    X0 := Max(X0, OX);
+    Y0 := Max(Y0, OY);
+    X1 := Min(X1, OX + S.Width - 1);
+    Y1 := Min(Y1, OY + S.Height - 1);
   end;
   if (X1 <= X0) or (Y1 <= Y0) then Exit;
 
@@ -231,8 +232,13 @@ begin
     directions, invert the 2x2, and each dot costs two multiplies. }
   Ink := FInk;
   Deep := (Ink <> nil) and Ink.DepthOn and (Length(FD.Doc[Face].Poly) >= 3);
-  Det := 0; D0 := 0; DU := 0; DV := 0;
-  SO := PtF(0, 0); SU := PtF(0, 0); SV := PtF(0, 0);
+  Det := 0;
+  D0 := 0;
+  DU := 0;
+  DV := 0;
+  SO := PtF(0, 0);
+  SU := PtF(0, 0);
+  SV := PtF(0, 0);
   if Deep then
   begin
     Look := ViewDir(Proj);
@@ -241,9 +247,11 @@ begin
     O := FD.Doc[Face].Poly[0];
     SO := ScreenOf(O);
     W := Add3(O, AU);
-    SU := ScreenOf(W); SU := PtF(SU.X - SO.X, SU.Y - SO.Y);
+    SU := ScreenOf(W);
+    SU := PtF(SU.X - SO.X, SU.Y - SO.Y);
     W := Add3(O, AV);
-    SV := ScreenOf(W); SV := PtF(SV.X - SO.X, SV.Y - SO.Y);
+    SV := ScreenOf(W);
+    SV := PtF(SV.X - SO.X, SV.Y - SO.Y);
     Det := SU.X * SV.Y - SU.Y * SV.X;
     Deep := Abs(Det) > 1E-6;
     D0 := Dot3(O, Look);
@@ -298,7 +306,8 @@ begin
         end;
         if Inside then
           if S <> nil then S.BlendPixel(X - OX, Y - OY, Col, 1)
-          else C.Pixels[X, Y] := PixToColor(Col);
+          else
+            C.Pixels[X, Y] := PixToColor(Col);
         Inc(X, Step);
       end;
       Inc(I, 2);
@@ -345,7 +354,7 @@ end;
 function TMainForm.CursorOnPlane(const N, P0: TP3): TP3;
 var
   O, Dir: TP3;
-  Den, T: Double;
+  Den, T: double;
 begin
   O := WorldAt(FMouseSX, FMouseSY);
   Result := O;
@@ -359,13 +368,13 @@ end;
 { How far in or out the cursor is from the face outline, in the face plane.
   Outside is positive (grows); inside is negative (a duct wall).  A typed
   number sets the size; the cursor still says which way. }
-function TMainForm.OffsetDistance: Double;
+function TMainForm.OffsetDistance: double;
 var
   Loop: TP3Array;
   N, P, A, B, W, V: TP3;
-  I, J, Cnt: Integer;
-  Best, D, T, L2: Double;
-  Snapped: Boolean;
+  I, J, Cnt: integer;
+  Best, D, T, L2: double;
+  Snapped: boolean;
 begin
   Result := 0;
   if (FOffFace < 0) or (FOffFace >= FD.Doc.Live) then Exit;
@@ -376,8 +385,7 @@ begin
   { When snapped (a guide, guide point, corner, edge middle) the offset is
     measured exactly to that point dropped onto the face plane, not rounded
     to the snap step.  A guide at 8" must give an 8" offset, as in SketchUp. }
-  Snapped := FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid,
-    snOnEdge, snOrigin];
+  Snapped := FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid, snOnEdge, snOrigin];
   if Snapped then
   begin
     P := FCur;
@@ -397,39 +405,43 @@ begin
     W := Sub3(P, A);
     L2 := V.X * V.X + V.Y * V.Y + V.Z * V.Z;
     if L2 < 1E-18 then T := 0
-    else T := EnsureRange((W.X * V.X + W.Y * V.Y + W.Z * V.Z) / L2, 0, 1);
+    else
+      T := EnsureRange((W.X * V.X + W.Y * V.Y + W.Z * V.Z) / L2, 0, 1);
     D := Dist(P, P3(A.X + V.X * T, A.Y + V.Y * T, A.Z + V.Z * T));
     if D < Best then Best := D;
   end;
 
-  if PointInLoop(P, Loop, N) then Result := -Best else Result := Best;
+  if PointInLoop(P, Loop, N) then Result := -Best
+  else
+    Result := Best;
   if (not Snapped) and (SnapStep > 0) then Result := Round(Result / SnapStep) * SnapStep;
 
   { a typed thickness wins on size; the cursor still says in or out }
   if (FInput <> '') and ParseLen(FInput, FD.Units, D) then
   begin
-    if Result < 0 then Result := -Abs(D) else Result := Abs(D);
+    if Result < 0 then Result := -Abs(D)
+    else
+      Result := Abs(D);
   end;
 end;
 
 { the loop the offset would lay down, for the preview }
 function TMainForm.OffsetPreview: TP3Array;
 var
-  D: Double;
+  D: double;
 begin
   Result := nil;
   if (FOffFace < 0) or (FOffFace >= FD.Doc.Live) then Exit;
   D := OffsetDistance;
   if Abs(D) < 1E-9 then Exit;
-  Result := OffsetLoop(FD.Doc[FOffFace].Poly, FD.Doc.FaceNormal(FOffFace), D,
-    not FOffsetRaw);
+  Result := OffsetLoop(FD.Doc[FOffFace].Poly, FD.Doc.FaceNormal(FOffFace), D, not FOffsetRaw);
 end;
 
 procedure TMainForm.CommitOffset;
 var
   R: TP3Array;
-  I, Cnt, Was: Integer;
-  D: Double;
+  I, Cnt, Was: integer;
+  D: double;
 begin
   D := OffsetDistance;
   R := OffsetPreview;
@@ -437,8 +449,7 @@ begin
   if Cnt < 3 then
   begin
     if Abs(D) > 1E-9 then
-      FCmdMsg := 'That takes it in further than it will go - ' +
-        FormatLen(Abs(D), FD.Units) + ' turns the face inside out.'
+      FCmdMsg := 'That takes it in further than it will go - ' + FormatLen(Abs(D), FD.Units) + ' turns the face inside out.'
     else
       FCmdMsg := 'Move in or out from the face first, or type a thickness.';
     Exit;
@@ -451,10 +462,8 @@ begin
   RebuildFlatFaces;
   RenderInk;
   RecomposeAll;
-  FCmdMsg := Format('Offset %s %s   %d face%s now',
-    [FormatLen(Abs(D), FD.Units),
-     specialize IfThen<string>(D < 0, 'in', 'out'),
-     FaceCount, specialize IfThen<string>(FaceCount = 1, '', 's')]);
+  FCmdMsg := Format('Offset %s %s   %d face%s now', [FormatLen(Abs(D), FD.Units), specialize IfThen<string>(D < 0, 'in', 'out'),
+    FaceCount, specialize IfThen<string>(FaceCount = 1, '', 's')]);
   if FaceCount = Was then
     FCmdMsg := FCmdMsg + ' - nothing new closed';
   FOffFace := -1;
@@ -465,9 +474,9 @@ end;
 { Right-click a dimension and write over its figure: a nominal size, a cut
   length allowing for a fitting, FIELD VERIFY.  On an isometric the written
   figure is the drawing.  Clearing the box goes back to the measurement. }
-procedure TMainForm.EditDimUnder(X, Y: Integer);
+procedure TMainForm.EditDimUnder(X, Y: integer);
 var
-  I: Integer;
+  I: integer;
 begin
   I := FD.Doc.HitTest(Proj, X, Y, 10 * FUIScale);
   if (I < 0) or (FD.Doc[I].Kind <> ekDim) then Exit;
@@ -475,8 +484,7 @@ begin
     hide the drawing just when you want to see it. }
   FDimEdit := I;
   FInput := FD.Doc[I].Txt;
-  FCmdMsg := 'Type what this dimension should say, then Enter.  ' +
-    'Empty goes back to the measured length;  Esc leaves it alone.';
+  FCmdMsg := 'Type what this dimension should say, then Enter.  ' + 'Empty goes back to the measured length;  Esc leaves it alone.';
   pbCmd.Invalidate;
   pbScreen.Invalidate;
 end;
@@ -484,17 +492,18 @@ end;
 { Paint the shown face, or every picked face when the shown one is among
   them (as SketchUp's bucket does).  If it is not in the selection, only it
   changes.  Painting False strips back to the default. }
-function TMainForm.PaintSelectedFaces(Shown: Integer; C: TColor;
-  Painting: Boolean): Integer;
+function TMainForm.PaintSelectedFaces(Shown: integer; C: TColor; Painting: boolean): integer;
 var
-  I: Integer;
-  InSel: Boolean;
+  I: integer;
+  InSel: boolean;
 
-  procedure One(K: Integer);
+  procedure One(K: integer);
   begin
     if (K < 0) or (K >= FD.Doc.Live) then Exit;
     if FD.Doc[K].Kind <> ekFace then Exit;
-    if Painting then FD.Doc.SetMaterial(K, C) else FD.Doc.ClearMaterial(K);
+    if Painting then FD.Doc.SetMaterial(K, C)
+    else
+      FD.Doc.ClearMaterial(K);
     Inc(Result);
   end;
 
@@ -516,9 +525,9 @@ end;
 
 { The pen color of everything picked that is drawn with a pen.  Faces are
   painted (PaintSelectedFaces) and guides are not offered. }
-function TMainForm.InkSelectedThings(C: TColor): Integer;
+function TMainForm.InkSelectedThings(C: TColor): integer;
 var
-  I, K: Integer;
+  I, K: integer;
 begin
   Result := 0;
   for I := 0 to High(FSel) do
@@ -538,9 +547,9 @@ end;
 { Turns over every picked face.  The program guesses which way a new face
   faces and cannot always be right (two back-to-back walls); this is the
   user's way to say. }
-function TMainForm.ReverseSelectedFaces: Integer;
+function TMainForm.ReverseSelectedFaces: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := 0 to High(FSel) do
@@ -553,7 +562,7 @@ begin
 end;
 
 { the one picked dimension, or -1; a length typed at two would have to guess }
-function TMainForm.SelectedDim: Integer;
+function TMainForm.SelectedDim: integer;
 begin
   Result := -1;
   if Length(FSel) <> 1 then Exit;
@@ -562,7 +571,7 @@ begin
 end;
 
 { the one picked line (a drawn edge, not a dimension), or -1 }
-function TMainForm.SelectedLine: Integer;
+function TMainForm.SelectedLine: integer;
 begin
   Result := -1;
   if Length(FSel) <> 1 then Exit;
@@ -574,11 +583,11 @@ end;
 { Pick a line, type a length, Enter (SketchUp's Entity Info length).  Which
   end moves follows SketchUp's rule (TWorkDoc.LineLengthEnd), and the
   message says which. }
-function TMainForm.ApplyLineLength(NewLen: Double): Boolean;
+function TMainForm.ApplyLineLength(NewLen: double): boolean;
 var
-  I: Integer;
-  Was: Double;
-  MoveB: Boolean;
+  I: integer;
+  Was: double;
+  MoveB: boolean;
 begin
   Result := False;
   I := SelectedLine;
@@ -586,8 +595,7 @@ begin
   Was := Dist(FD.Doc[I].A, FD.Doc[I].B);
   if not FD.Doc.LineLengthEnd(I, MoveB) then
   begin
-    FCmdMsg := 'That line is joined at both ends, so its length cannot be ' +
-      'typed - move one of its ends instead, the way SketchUp does.';
+    FCmdMsg := 'That line is joined at both ends, so its length cannot be ' + 'typed - move one of its ends instead, the way SketchUp does.';
     Result := True;
     Exit;
   end;
@@ -604,28 +612,25 @@ begin
   RecomposeAll;
   Invalidate;
   InvalidateStatus;
-  FCmdMsg := Format('%s -> %s, the free end moved.',
-    [FormatLen(Was, FD.Units), FormatLen(NewLen, FD.Units)]);
+  FCmdMsg := Format('%s -> %s, the free end moved.', [FormatLen(Was, FD.Units), FormatLen(NewLen, FD.Units)]);
   Result := True;
 end;
 
 { Pick a dimension, type what it should read, and the drawing moves.  The
   end that gives is the one it was drawn to (the second click); the message
   says so and how to move the other end instead. }
-function TMainForm.ApplyDimResize(NewLen: Double; MoveB: Boolean): Boolean;
+function TMainForm.ApplyDimResize(NewLen: double; MoveB: boolean): boolean;
 var
-  I: Integer;
-  Was: Double;
+  I: integer;
+  Was: double;
 begin
   Result := False;
   I := SelectedDim;
   if I < 0 then Exit;
   { stretching along a radius would pull the circle out of round }
-  if (Pos('<>', FD.Doc[I].Txt) > 0) and
-     ((Copy(FD.Doc[I].Txt, 1, 2) = 'R ') or (Copy(FD.Doc[I].Txt, 1, 4) = 'DIA ')) then
+  if (Pos('<>', FD.Doc[I].Txt) > 0) and ((Copy(FD.Doc[I].Txt, 1, 2) = 'R ') or (Copy(FD.Doc[I].Txt, 1, 4) = 'DIA ')) then
   begin
-    FCmdMsg := 'A radius or a diameter cannot resize its curve yet - draw ' +
-      'the circle again at the size you want.';
+    FCmdMsg := 'A radius or a diameter cannot resize its curve yet - draw ' + 'the circle again at the size you want.';
     Exit;
   end;
   Was := Dist(FD.Doc[I].A, FD.Doc[I].B);
@@ -653,24 +658,21 @@ begin
   Invalidate;
   InvalidateStatus;
   if MoveB then
-    FCmdMsg := Format('%s -> %s, from the end it was drawn to.  ' +
-      '"/resize %s start" moves the other end instead.',
-      [FormatLen(Was, FD.Units), FormatLen(NewLen, FD.Units),
-       FormatLen(NewLen, FD.Units)])
+    FCmdMsg := Format('%s -> %s, from the end it was drawn to.  ' + '"/resize %s start" moves the other end instead.',
+      [FormatLen(Was, FD.Units), FormatLen(NewLen, FD.Units), FormatLen(NewLen, FD.Units)])
   else
-    FCmdMsg := Format('%s -> %s, from the end it was drawn from.',
-      [FormatLen(Was, FD.Units), FormatLen(NewLen, FD.Units)]);
+    FCmdMsg := Format('%s -> %s, from the end it was drawn from.', [FormatLen(Was, FD.Units), FormatLen(NewLen, FD.Units)]);
   Result := True;
 end;
 
 { What the right button offers, built fresh each time. }
 procedure TMainForm.FillCanvasMenu;
 var
-  I, Faces: Integer;
+  I, Faces: integer;
   JobId: string;
   M: TMenuItem;
 
-  procedure Add(const Caption: string; Tag: Integer);
+  procedure Add(const Caption: string; Tag: integer);
   var
     It: TMenuItem;
   begin
@@ -698,7 +700,8 @@ begin
   Add('Close Group', 12);
   pmCanvas.Items[pmCanvas.Items.Count - 1].Enabled := FD.Doc.Context <> 0;
   if (SoleGroup > 0) and FD.Doc.PartLocked(SoleGroup) then Add('Unlock Group', 13)
-  else Add('Lock Group', 13);
+  else
+    Add('Lock Group', 13);
   pmCanvas.Items[pmCanvas.Items.Count - 1].Enabled := Length(SelectedGroups) > 0;
   Add('Explode Group', 14);
   pmCanvas.Items[pmCanvas.Items.Count - 1].Enabled := Length(SelectedGroups) > 0;
@@ -730,7 +733,8 @@ begin
   pmCanvas.Items.Add(M);
 
   if Faces > 1 then Add(Format('Reverse %d Faces', [Faces]), 1)
-  else Add('Reverse Face', 1);
+  else
+    Add('Reverse Face', 1);
   pmCanvas.Items[pmCanvas.Items.Count - 1].Enabled := Faces > 0;
 
   { one click instead of two numbers: a clicked floor says all the slice
@@ -772,23 +776,25 @@ begin
   pmCanvas.Items.Add(M);
 
   if Length(FSel) > 1 then Add(Format('Erase %d Things', [Length(FSel)]), 2)
-  else Add('Erase', 2);
+  else
+    Add('Erase', 2);
   pmCanvas.Items[pmCanvas.Items.Count - 1].Enabled := Length(FSel) > 0;
 end;
 
 procedure TMainForm.CanvasMenuClick(Sender: TObject);
 var
-  N: Integer;
+  N: integer;
 begin
   case (Sender as TMenuItem).Tag of
     1:
-      begin
-        PushUndo;
-        N := ReverseSelectedFaces;
-        if N = 1 then FCmdMsg := 'Face turned over.'
-        else FCmdMsg := Format('%d faces turned over.', [N]);
-        InvalidateStatus;
-      end;
+    begin
+      PushUndo;
+      N := ReverseSelectedFaces;
+      if N = 1 then FCmdMsg := 'Face turned over.'
+      else
+        FCmdMsg := Format('%d faces turned over.', [N]);
+      InvalidateStatus;
+    end;
     2: DeleteSelection;
     10: MakeGroup;
     11: OpenGroup(SoleGroup);
@@ -796,23 +802,23 @@ begin
     13: LockGroups(not ((SoleGroup > 0) and FD.Doc.PartLocked(SoleGroup)));
     14: ExplodeGroups;
     15:
+    begin
+      if RunJigOf(SoleGroup) then
       begin
-        if RunJigOf(SoleGroup) then
-        begin
-          RebuildFlatFaces;
-          if IsStairJig(FD.Doc.PartJig(SoleGroup)) then FCmdMsg := 'The stairs are built again.'
-          else FCmdMsg := 'The jig was run again.';
-        end;
-        RenderInk;
-        RecomposeAll;
-        pbScreen.Invalidate;
-        pbCmd.Invalidate;
+        RebuildFlatFaces;
+        if IsStairJig(FD.Doc.PartJig(SoleGroup)) then FCmdMsg := 'The stairs are built again.'
+        else
+          FCmdMsg := 'The jig was run again.';
       end;
+      RenderInk;
+      RecomposeAll;
+      pbScreen.Invalidate;
+      pbCmd.Invalidate;
+    end;
     16: ShowSource;
     17: BuildStairWizard;
     21:
-      if (FGuideMenuEnt >= 0) and (FGuideMenuEnt < FD.Doc.Live) and
-         (FD.Doc[FGuideMenuEnt].Kind = ekGuide) then
+      if (FGuideMenuEnt >= 0) and (FGuideMenuEnt < FD.Doc.Live) and (FD.Doc[FGuideMenuEnt].Kind = ekGuide) then
       begin
         PushUndo;
         { only that one: a guide line's points stay, they were laid on their
@@ -836,21 +842,19 @@ begin
     22: StringerSheetOf(SoleGroup);
     19: PrintSubmittalAgain(SoleGroup);
     7:
-      begin
-        FD.Doc.GuidesHidden := not FD.Doc.GuidesHidden;
-        FCmdMsg := IfThen(FD.Doc.GuidesHidden,
-          'Guides put away.  They are still in the drawing.',
-          'Guides back.');
-        RenderInk;
-        RecomposeAll;
-      end;
+    begin
+      FD.Doc.GuidesHidden := not FD.Doc.GuidesHidden;
+      FCmdMsg := IfThen(FD.Doc.GuidesHidden, 'Guides put away.  They are still in the drawing.', 'Guides back.');
+      RenderInk;
+      RecomposeAll;
+    end;
     8:
-      begin
-        PushUndo;
-        FCmdMsg := Format('Cleared %d guides.', [FD.Doc.ClearGuides]);
-        RenderInk;
-        RecomposeAll;
-      end;
+    begin
+      PushUndo;
+      FCmdMsg := Format('Cleared %d guides.', [FD.Doc.ClearGuides]);
+      RenderInk;
+      RecomposeAll;
+    end;
     4:
       for N := 0 to High(FSel) do
         if FD.Doc[FSel[N]].Kind = ekFace then
@@ -859,12 +863,12 @@ begin
           Break;
         end;
     3:
-      begin
-        SelectNone;
-        FCmdMsg := 'Nothing selected.';
-        FScreenDirty := True;
-        InvalidateStatus;
-      end;
+    begin
+      SelectNone;
+      FCmdMsg := 'Nothing selected.';
+      FScreenDirty := True;
+      InvalidateStatus;
+    end;
     5: CenterSelection;
     6: CornerSelection;
   end;
@@ -876,8 +880,8 @@ end;
 procedure TMainForm.CenterSelection;
 var
   Mid, Lo, Hi: TP3;
-  Idx: array of Integer;
-  I: Integer;
+  Idx: array of integer;
+  I: integer;
 begin
   if not FD.Doc.SpanOf(FSel, Lo, Hi) then
   begin
@@ -920,7 +924,7 @@ end;
   highlight sits on the first row, which Enter takes. }
 procedure TMainForm.SyncCmdList;
 var
-  H: Integer;
+  H: integer;
 begin
   if Copy(FInput, 1, 1) <> '/' then
   begin
@@ -933,14 +937,14 @@ begin
   { only what survived the filter }
   FPopupN := Length(FCmdOrder);
   { and the panel shrinks to fit }
-  H := Min(FPopupN * Round(22 * FUIScale) + Round(12 * FUIScale),
-           PopupMaxHeight(POP_CMDS));
-  FPopupR := Rect(FPopupR.Left, FPopupR.Bottom - H, FPopupR.Right,
-                  FPopupR.Bottom);
+  H := Min(FPopupN * Round(22 * FUIScale) + Round(12 * FUIScale), PopupMaxHeight(POP_CMDS));
+  FPopupR := Rect(FPopupR.Left, FPopupR.Bottom - H, FPopupR.Right, FPopupR.Bottom);
   if FPopupR.Top < 4 then
     FPopupR := Rect(FPopupR.Left, 4, FPopupR.Right, 4 + H);
   FPopupTop := 0;
-  if FPopupN > 0 then FPopupHot := 0 else FPopupHot := -1;
+  if FPopupN > 0 then FPopupHot := 0
+  else
+    FPopupHot := -1;
   FScreenDirty := True;
   pbScreen.Invalidate;
 end;
@@ -948,16 +952,16 @@ end;
 { up and down the list, scrolling to follow the highlight }
 procedure TMainForm.MoveCmdHighlight(Key: word);
 var
-  Rows, Step: Integer;
+  Rows, Step: integer;
 begin
   if Length(FCmdOrder) = 0 then Exit;
-  Rows := Max(1, (FPopupR.Bottom - FPopupR.Top - Round(12 * FUIScale)) div
-                 Max(1, Round(22 * FUIScale)));
+  Rows := Max(1, (FPopupR.Bottom - FPopupR.Top - Round(12 * FUIScale)) div Max(1, Round(22 * FUIScale)));
   case Key of
-    VK_UP:    Step := -1;
-    VK_DOWN:  Step := 1;
+    VK_UP: Step := -1;
+    VK_DOWN: Step := 1;
     VK_PRIOR: Step := -Rows;
-  else        Step := Rows;
+    else
+      Step := Rows;
   end;
   FPopupHot := EnsureRange(FPopupHot + Step, 0, High(FCmdOrder));
   if FPopupHot < FPopupTop then FPopupTop := FPopupHot;
@@ -967,10 +971,10 @@ begin
   pbScreen.Invalidate;
 end;
 
-function TMainForm.ExactCmd(const S: string): Boolean;
+function TMainForm.ExactCmd(const S: string): boolean;
 var
   W: string;
-  I: Integer;
+  I: integer;
 begin
   W := LowerCase(Trim(S));
   if Copy(W, 1, 1) = '/' then W := Copy(W, 2, MaxInt);
@@ -980,23 +984,22 @@ begin
 end;
 
 { the row a word runs, by its name or one of its other words; -1 if none }
-function TMainForm.CmdIndex(const W: string): Integer;
+function TMainForm.CmdIndex(const W: string): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(CMD_LIST) do
-    if (CMD_LIST[I].Name = W) or
-       (Pos(' ' + W + ' ', ' ' + CMD_LIST[I].Also + ' ') > 0) then
+    if (CMD_LIST[I].Name = W) or (Pos(' ' + W + ' ', ' ' + CMD_LIST[I].Also + ' ') > 0) then
       Exit(I);
   Result := -1;
 end;
 
 { When the row was found by one of its other words, that word, so the row
   can say why it is there (/tape finds /measure). }
-function TMainForm.CmdAliasFor(Idx: Integer; const Want: string): string;
+function TMainForm.CmdAliasFor(Idx: integer; const Want: string): string;
 var
   Words: TStringList;
-  K: Integer;
+  K: integer;
 begin
   Result := '';
   if (Want = '') or (Idx < 0) or (Idx > High(CMD_LIST)) then Exit;
@@ -1046,8 +1049,8 @@ end;
   With nothing typed: recently used first, then alphabetical. }
 procedure TMainForm.BuildCmdOrder;
 var
-  I, N: Integer;
-  Used: array of Boolean;
+  I, N: integer;
+  Used: array of boolean;
   Parts: TStringList;
   Want: string;
 
@@ -1055,7 +1058,7 @@ var
     A command's own name ranks a step ahead of its other words (see Rank),
     so "/reb" picks rebuild before reface (alias rebuildfaces).  Recency
     only orders rows within a rank. }
-  function RankWord(const Name: string): Integer;
+  function RankWord(const Name: string): integer;
   begin
     if Name = Want then Exit(0);
     if Copy(Name, 1, Length(Want)) = Want then Exit(2);
@@ -1065,10 +1068,10 @@ var
 
   { the best of the row's name and, a step behind, its other words; -1 if
     neither matches }
-  function Rank(M: Integer): Integer;
+  function Rank(M: integer): integer;
   var
     Words: TStringList;
-    K, R: Integer;
+    K, R: integer;
   begin
     if Want = '' then Exit(0);
     Result := RankWord(CMD_LIST[M].Name);
@@ -1089,9 +1092,9 @@ var
     end;
   end;
 
-  procedure Sweep(Pass: Integer);
+  procedure Sweep(Pass: integer);
   var
-    K, M: Integer;
+    K, M: integer;
   begin
     { recently used first, in the order used }
     Parts := TStringList.Create;
@@ -1101,8 +1104,7 @@ var
       Parts.DelimitedText := FCmdRecent;
       for K := 0 to Parts.Count - 1 do
         for M := 0 to High(CMD_LIST) do
-          if (not Used[M]) and (CMD_LIST[M].Name = Trim(Parts[K])) and
-             (Rank(M) = Pass) then
+          if (not Used[M]) and (CMD_LIST[M].Name = Trim(Parts[K])) and (Rank(M) = Pass) then
           begin
             FCmdOrder[N] := M;
             Used[M] := True;
@@ -1143,7 +1145,7 @@ const
   KEEP = 8;
 var
   Parts: TStringList;
-  I: Integer;
+  I: integer;
 begin
   Parts := TStringList.Create;
   try
@@ -1165,8 +1167,8 @@ end;
 procedure TMainForm.CornerSelection;
 var
   Lo, Hi: TP3;
-  Idx: array of Integer;
-  I: Integer;
+  Idx: array of integer;
+  I: integer;
 begin
   if not FD.Doc.SpanOf(FSel, Lo, Hi) then
   begin
@@ -1196,15 +1198,11 @@ begin
   RecomposeAll;
   FScreenDirty := True;
   if Length(FSel) > 0 then
-    FCmdMsg := Format('Moved %d things into the corner at 0,0,0 - %s by %s ' +
-      'by %s from there.', [Length(FSel),
-      FormatLen(Hi.X - Lo.X, FD.Units), FormatLen(Hi.Y - Lo.Y, FD.Units),
-      FormatLen(Hi.Z - Lo.Z, FD.Units)])
+    FCmdMsg := Format('Moved %d things into the corner at 0,0,0 - %s by %s ' + 'by %s from there.',
+      [Length(FSel), FormatLen(Hi.X - Lo.X, FD.Units), FormatLen(Hi.Y - Lo.Y, FD.Units), FormatLen(Hi.Z - Lo.Z, FD.Units)])
   else
-    FCmdMsg := Format('Moved the whole drawing into the corner at 0,0,0 - ' +
-      '%s by %s by %s from there.',
-      [FormatLen(Hi.X - Lo.X, FD.Units), FormatLen(Hi.Y - Lo.Y, FD.Units),
-       FormatLen(Hi.Z - Lo.Z, FD.Units)]);
+    FCmdMsg := Format('Moved the whole drawing into the corner at 0,0,0 - ' + '%s by %s by %s from there.',
+      [FormatLen(Hi.X - Lo.X, FD.Units), FormatLen(Hi.Y - Lo.Y, FD.Units), FormatLen(Hi.Z - Lo.Z, FD.Units)]);
   InvalidateStatus;
   Invalidate;
 end;
@@ -1213,9 +1211,9 @@ end;
   whatever the tool (right-click retypes it).  The measure tool offers its
   guide menu.  Otherwise, with the select tool, pick what is under the
   cursor as SketchUp does and offer what can be done to it. }
-procedure TMainForm.RightClickAt(X, Y: Integer);
+procedure TMainForm.RightClickAt(X, Y: integer);
 var
-  I: Integer;
+  I: integer;
   P: TPoint;
 begin
   I := FD.Doc.HitTest(Proj, X, Y, 10 * FUIScale);
@@ -1263,13 +1261,13 @@ end;
 { The measure tool's right-click: erase the guide point or guide line under
   the cursor, the menu saying which first.  The select tool and eraser leave
   guides alone. }
-procedure TMainForm.GuideMenuAt(X, Y: Integer);
+procedure TMainForm.GuideMenuAt(X, Y: integer);
 var
-  I: Integer;
+  I: integer;
   P: TPoint;
   M: TMenuItem;
 
-  procedure Add(const Caption: string; Tag: Integer; Enabled: Boolean = True);
+  procedure Add(const Caption: string; Tag: integer; Enabled: boolean = True);
   var
     It: TMenuItem;
   begin
@@ -1290,12 +1288,14 @@ begin
   pmCanvas.Items.Clear;
   if I < 0 then Add('No guide here', 0, False)
   else if Dist(FD.Doc[I].A, FD.Doc[I].B) < 1E-9 then Add('Erase This Guide Point', 21)
-  else Add('Erase This Guide Line', 21);
+  else
+    Add('Erase This Guide Line', 21);
   M := TMenuItem.Create(pmCanvas);
   M.Caption := '-';
   pmCanvas.Items.Add(M);
   if FD.Doc.GuidesHidden then Add(Format('Show %d Guides', [FD.Doc.GuideCount]), 7, FD.Doc.GuideCount > 0)
-  else Add(Format('Hide %d Guides', [FD.Doc.GuideCount]), 7, FD.Doc.GuideCount > 0);
+  else
+    Add(Format('Hide %d Guides', [FD.Doc.GuideCount]), 7, FD.Doc.GuideCount > 0);
   M := TMenuItem.Create(pmCanvas);
   M.Caption := '-';
   pmCanvas.Items.Add(M);
@@ -1312,7 +1312,7 @@ end;
 { Put what was typed on the dimension; called from Enter. }
 procedure TMainForm.CommitDimNote;
 var
-  I: Integer;
+  I: integer;
   Note: string;
 begin
   I := FDimEdit;
@@ -1331,17 +1331,18 @@ begin
   RecomposeAll;
   Invalidate;
   if Note = '' then FCmdMsg := 'Back to the measured length.'
-  else FCmdMsg := 'Dimension reads "' + Note + '".';
+  else
+    FCmdMsg := 'Dimension reads "' + Note + '".';
 end;
 
 { How far the push would go.  The drag says which way along the normal; a
   typed number only says how far. }
-function TMainForm.PushDistance: Double;
+function TMainForm.PushDistance: double;
 var
-  L, Move, Len2, DirX, DirY, Flush: Double;
+  L, Move, Len2, DirX, DirY, Flush: double;
   Nm, Other, A, B: TP3;
   PA, PN: TPointF;
-  HF: Integer;
+  HF: integer;
 begin
   Result := 0;
   if FPushFace < 0 then Exit;
@@ -1366,15 +1367,16 @@ begin
   if (FInput <> '') and ParseLen(FInput, FD.Units, L) then
   begin
     { the number says how far, the drag still says which way }
-    if Move < 0 then Result := -L else Result := L;
+    if Move < 0 then Result := -L
+    else
+      Result := L;
     Exit;
   end;
 
   { Rest on a point or edge and the pull goes exactly to its distance from
     the face along the normal: hover the far side of a box and the push
     stops flush, as in SketchUp.  A point in the face plane is ignored. }
-  if FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid,
-                   snOnEdge, snOrigin] then
+  if FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid, snOnEdge, snOrigin] then
   begin
     Flush := (FCur.X - FP1.X) * Nm.X + (FCur.Y - FP1.Y) * Nm.Y + (FCur.Z - FP1.Z) * Nm.Z;
     if Abs(Flush) > 1E-6 then
@@ -1387,8 +1389,7 @@ begin
   { Rest on another parallel face and the pull lines the two up exactly.
     That is how a row of windows comes out flush with no numbers typed. }
   HF := InContextFace(FaceAtPress);
-  if (HF >= 0) and (HF <> FPushFace) and (Length(FD.Doc[HF].Poly) > 0) and
-     (Length(FD.Doc[FPushFace].Poly) > 0) then
+  if (HF >= 0) and (HF <> FPushFace) and (Length(FD.Doc[HF].Poly) > 0) and (Length(FD.Doc[FPushFace].Poly) > 0) then
   begin
     Other := FD.Doc.FaceNormal(HF);
     if Abs(Nm.X * Other.X + Nm.Y * Other.Y + Nm.Z * Other.Z) > 0.9995 then
@@ -1416,8 +1417,8 @@ end;
 procedure TMainForm.PaintPushPreview(C: TCanvas);
 var
   E: TWorkEnt;
-  I, N, Ax: Integer;
-  R: Double;
+  I, N, Ax: integer;
+  R: double;
   Nm, Q: TP3;
   PA, PB: TPointF;
   Col: TPix;
@@ -1439,7 +1440,9 @@ begin
   if Abs(Nm.X) > 0.9 then Ax := 0
   else if Abs(Nm.Y) > 0.9 then Ax := 1
   else if Abs(Nm.Z) > 0.9 then Ax := 2;
-  if Ax >= 0 then Col := AxisPix(Ax) else Col := Theme.Accent;
+  if Ax >= 0 then Col := AxisPix(Ax)
+  else
+    Col := Theme.Accent;
 
   { the walls that would be built }
   C.Pen.Style := psDot;
@@ -1448,8 +1451,7 @@ begin
   for I := 0 to N - 1 do
   begin
     PA := ScreenOf(E.Poly[I]);
-    PB := ScreenOf(P3(E.Poly[I].X + Nm.X * R, E.Poly[I].Y + Nm.Y * R,
-                      E.Poly[I].Z + Nm.Z * R));
+    PB := ScreenOf(P3(E.Poly[I].X + Nm.X * R, E.Poly[I].Y + Nm.Y * R, E.Poly[I].Z + Nm.Z * R));
     C.MoveTo(Round(PA.X), Round(PA.Y));
     C.LineTo(Round(PB.X), Round(PB.Y));
   end;
@@ -1457,14 +1459,12 @@ begin
   { the face where it would land }
   C.Pen.Style := psSolid;
   C.Pen.Width := Max(2, Round(2 * FUIScale));
-  Q := P3(E.Poly[N - 1].X + Nm.X * R, E.Poly[N - 1].Y + Nm.Y * R,
-          E.Poly[N - 1].Z + Nm.Z * R);
+  Q := P3(E.Poly[N - 1].X + Nm.X * R, E.Poly[N - 1].Y + Nm.Y * R, E.Poly[N - 1].Z + Nm.Z * R);
   PA := ScreenOf(Q);
   C.MoveTo(Round(PA.X), Round(PA.Y));
   for I := 0 to N - 1 do
   begin
-    Q := P3(E.Poly[I].X + Nm.X * R, E.Poly[I].Y + Nm.Y * R,
-            E.Poly[I].Z + Nm.Z * R);
+    Q := P3(E.Poly[I].X + Nm.X * R, E.Poly[I].Y + Nm.Y * R, E.Poly[I].Z + Nm.Z * R);
     PB := ScreenOf(Q);
     C.LineTo(Round(PB.X), Round(PB.Y));
   end;
@@ -1476,51 +1476,48 @@ end;
   onto the ground and the lattice is ruled over that.  Pitch matches the
   paper grid so crossings are snap points.  Capped and dropped when the view
   is too flat to be worth it. }
-procedure TMainForm.PaintGroundGrid(Pitch: Double);
+procedure TMainForm.PaintGroundGrid(Pitch: double);
 const
   MAX_LINES = 160;
   { how far apart lattice lines must be on screen to be worth ruling }
   MIN_PX = 12;
 var
-  I, N, Drawn, Missed: Integer;
+  I, N, Drawn, Missed: integer;
   Lo, Hi: TP3;
   C: array[0..3] of TP3;
-  Fade, Heavy, A: Double;
-  X0, X1, Y0, Y1, V, PitchX, PitchY, Area, LX, LY: Double;
+  Fade, Heavy, A: double;
+  X0, X1, Y0, Y1, V, PitchX, PitchY, Area, LX, LY: double;
   PA, PB, UX, UY, Org: TPointF;
   Col: TPix;
 
   { the next step up that keeps the crossings on round numbers: two, five,
     ten, twenty, fifty times the pitch the paper grid picked }
-  function Coarser(Cur, Base: Double): Double;
+  function Coarser(Cur, Base: double): double;
   var
-    K: Double;
+    K: double;
   begin
     K := Cur / Base;
     if K < 1.5 then Result := Base * 2
     else if K < 3.5 then Result := Base * 5
-    else Result := Cur * 2;
+    else
+      Result := Cur * 2;
   end;
 
   { Both ends off the same side of the window, so no part of it is visible.
     The ruled box is bigger than the window when the camera is turned, so
     many lines miss the glass. }
-  function Offscreen(const A, B: TPointF): Boolean;
+  function Offscreen(const A, B: TPointF): boolean;
   begin
-    Result := ((A.X < 0) and (B.X < 0)) or
-              ((A.Y < 0) and (B.Y < 0)) or
-              ((A.X > FPaper.Width) and (B.X > FPaper.Width)) or
-              ((A.Y > FPaper.Height) and (B.Y > FPaper.Height));
+    Result := ((A.X < 0) and (B.X < 0)) or ((A.Y < 0) and (B.Y < 0)) or ((A.X > FPaper.Width) and (B.X > FPaper.Width)) or
+      ((A.Y > FPaper.Height) and (B.Y > FPaper.Height));
   end;
 
   { the ground point under a screen point, or False when the camera is too
     flat for there to be one worth having }
-  function Ground(SX, SY: Double; out P: TP3): Boolean;
+  function Ground(SX, SY: double; out P: TP3): boolean;
   begin
     P := Unproject(Proj, SX, SY, plXY, P3(0, 0, 0));
-    Result := not (IsNan(P.X) or IsNan(P.Y) or IsInfinite(P.X) or
-                   IsInfinite(P.Y)) and
-              (Abs(P.X) < 1E6) and (Abs(P.Y) < 1E6);
+    Result := not (IsNan(P.X) or IsNan(P.Y) or IsInfinite(P.X) or IsInfinite(P.Y)) and (Abs(P.X) < 1E6) and (Abs(P.Y) < 1E6);
   end;
 
 begin
@@ -1534,8 +1531,10 @@ begin
   Hi := C[0];
   for I := 1 to 3 do
   begin
-    Lo.X := Min(Lo.X, C[I].X);  Hi.X := Max(Hi.X, C[I].X);
-    Lo.Y := Min(Lo.Y, C[I].Y);  Hi.Y := Max(Hi.Y, C[I].Y);
+    Lo.X := Min(Lo.X, C[I].X);
+    Hi.X := Max(Hi.X, C[I].X);
+    Lo.Y := Min(Lo.Y, C[I].Y);
+    Hi.Y := Max(Hi.Y, C[I].Y);
   end;
 
   { Only the positive quarter, where both axes are drawn solid; nobody draws
@@ -1545,8 +1544,7 @@ begin
   if (Hi.X <= Lo.X) or (Hi.Y <= Lo.Y) then Exit;
 
   { a low camera makes the box enormous; give up past the cap }
-  if ((Hi.X - Lo.X) / Pitch > MAX_LINES * 40) or
-     ((Hi.Y - Lo.Y) / Pitch > MAX_LINES * 40) then Exit;
+  if ((Hi.X - Lo.X) / Pitch > MAX_LINES * 40) or ((Hi.Y - Lo.Y) / Pitch > MAX_LINES * 40) then Exit;
 
   { Rule it at a pitch that can be seen.  A tilted orthographic view squashes
     one family of lines by the cosine of the tilt, so the world pitch can
@@ -1604,7 +1602,8 @@ begin
     else
     begin
       if Abs(V / PitchX - Round(V / PitchX / 5) * 5) < 1E-6 then A := Heavy
-      else A := Fade;
+      else
+        A := Fade;
       FPaper.HairLine(PA.X, PA.Y, PB.X, PB.Y, Col, A);
       Inc(Drawn);
     end;
@@ -1622,7 +1621,8 @@ begin
     else
     begin
       if Abs(V / PitchY - Round(V / PitchY / 5) * 5) < 1E-6 then A := Heavy
-      else A := Fade;
+      else
+        A := Fade;
       FPaper.HairLine(PA.X, PA.Y, PB.X, PB.Y, Col, A);
       Inc(Drawn);
     end;
@@ -1650,8 +1650,8 @@ const
   AXIS_TAG_OUT = 60;
   AXIS_TAG_STEP = 18;
 var
-  K, N, NPlaced: Integer;
-  Len, T0, T1, Step, A, B2: Double;
+  K, N, NPlaced: integer;
+  Len, T0, T1, Step, A, B2: double;
   B: TP3;
   PO, PB, D: TPointF;
   Col: TPix;
@@ -1661,13 +1661,13 @@ var
     outlined in black so it reads over line and grid.  When orbiting can
     make two axes point the same way, a label that would overlap another
     moves further out.  Skipped when it would land off the paper. }
-  procedure Tag(Sg: Integer; const S: string);
+  procedure Tag(Sg: integer; const S: string);
   var
     Sz: TSize;
-    X, Y, Out_: Double;
-    TX, TY, OX, OY, Try_, J: Integer;
+    X, Y, Out_: double;
+    TX, TY, OX, OY, Try_, J: integer;
     Box: TRect;
-    Clear: Boolean;
+    Clear: boolean;
   begin
     Sz := FPaper.TextExtent(S, FDimFont);
     Out_ := AXIS_TAG_OUT * FUIScale;
@@ -1675,12 +1675,12 @@ var
     begin
       X := PO.X + Sg * D.X * Out_;
       Y := PO.Y + Sg * D.Y * Out_;
-      TX := Round(X - Sz.cx / 2); TY := Round(Y - Sz.cy / 2);
+      TX := Round(X - Sz.cx / 2);
+      TY := Round(Y - Sz.cy / 2);
       Box := Rect(TX - 4, TY - 2, TX + Sz.cx + 4, TY + Sz.cy + 2);
       Clear := True;
       for J := 0 to NPlaced - 1 do
-        if (Box.Left < Placed[J].Right) and (Placed[J].Left < Box.Right) and
-           (Box.Top < Placed[J].Bottom) and (Placed[J].Top < Box.Bottom) then Clear := False;
+        if (Box.Left < Placed[J].Right) and (Placed[J].Left < Box.Right) and (Box.Top < Placed[J].Bottom) and (Placed[J].Top < Box.Bottom) then Clear := False;
       if Clear then Break;
       Out_ := Out_ + AXIS_TAG_STEP * FUIScale;
     end;
@@ -1713,7 +1713,8 @@ begin
     case K of
       0: B.X := 1;
       1: B.Y := 1;
-    else B.Z := 1;
+      else
+        B.Z := 1;
     end;
     PB := ScreenOf(B);
     Len := Sqrt(Sqr(PB.X - PO.X) + Sqr(PB.Y - PO.Y));
@@ -1723,14 +1724,13 @@ begin
     D := PtF((PB.X - PO.X) / Len, (PB.Y - PO.Y) / Len);
 
     { the piece of the infinite line that is actually on the paper }
-    if not ClipToBox(PO.X, PO.Y, D.X, D.Y, FPaper.Width, FPaper.Height,
-                     T0, T1) then Continue;
+    if not ClipToBox(PO.X, PO.Y, D.X, D.Y, FPaper.Width, FPaper.Height, T0, T1) then Continue;
 
     { forwards from the origin, solid }
     A := Max(T0, 0);
     if T1 > A then
       FPaper.Line(PO.X + D.X * A, PO.Y + D.Y * A,
-                  PO.X + D.X * T1, PO.Y + D.Y * T1, 1.8, Col, 0.55);
+        PO.X + D.X * T1, PO.Y + D.Y * T1, 1.8, Col, 0.55);
 
     { backwards, dashed, measured from the origin so the dashes do not crawl
       as you pan }
@@ -1744,8 +1744,8 @@ begin
         A := -N * Step;
         if A <= B2 then
           FPaper.Line(PO.X - D.X * (N * Step), PO.Y - D.Y * (N * Step),
-                      PO.X - D.X * (N * Step + 6), PO.Y - D.Y * (N * Step + 6),
-                      1.4, Col, 0.42);
+            PO.X - D.X * (N * Step + 6), PO.Y - D.Y * (N * Step + 6),
+            1.4, Col, 0.42);
         Inc(N);
         { far from the origin that is a lot of unseen dashes; stop }
         if N > 4000 then Break;
@@ -1791,7 +1791,7 @@ end;
 procedure TMainForm.RepaintPaper;
 var
   Key: string;
-  GridPitch: Double;
+  GridPitch: double;
   T0, TBase, TGrid: QWord;
   Sig: TPaperSig;
 begin
@@ -1808,46 +1808,44 @@ begin
   try
   { The fill does not move with the camera, so it is made once per theme
     and size and copied.  Copying also keeps the grain from crawling. }
-  Key := Format('%d %d %d', [FThemeIdx, FPaper.Width, FPaper.Height]);
-  if (FPaperBase = nil) or (Key <> FPaperBaseKey) then
-  begin
-    if FPaperBase = nil then
-      FPaperBase := TArtSurface.Create(FPaper.Width, FPaper.Height)
-    else
-      FPaperBase.SetSize(FPaper.Width, FPaper.Height);
-    PaintScreenPaper(FPaperBase, Theme);
-    FPaperBaseKey := Key;
-  end;
-  FPaper.CopyRegion(FPaperBase, 0, 0, 0, 0, FPaper.Width, FPaper.Height);
-  TBase := GetTickCount64;
-  if FShowGrid then
-  begin
+    Key := Format('%d %d %d', [FThemeIdx, FPaper.Width, FPaper.Height]);
+    if (FPaperBase = nil) or (Key <> FPaperBaseKey) then
+    begin
+      if FPaperBase = nil then
+        FPaperBase := TArtSurface.Create(FPaper.Width, FPaper.Height)
+      else
+        FPaperBase.SetSize(FPaper.Width, FPaper.Height);
+      PaintScreenPaper(FPaperBase, Theme);
+      FPaperBaseKey := Key;
+    end;
+    FPaper.CopyRegion(FPaperBase, 0, 0, 0, 0, FPaper.Width, FPaper.Height);
+    TBase := GetTickCount64;
+    if FShowGrid then
+    begin
     { The pitch steps through the scale bar's round numbers (an inch,
       three, six, a foot, five feet) so the lattice stays a comfortable
       size at any zoom. }
-    GridPitch := NiceBarLength(Ppu, 14 * FUIScale, 60 * FUIScale, FD.Units);
+      GridPitch := NiceBarLength(Ppu, 14 * FUIScale, 60 * FUIScale, FD.Units);
     { Never finer than the snap step, or some crossings cannot be landed
       on.  Every snap divides a foot exactly, so any pitch at or above it
       keeps crossings snappable. }
-    if GridPitch < SnapStep then GridPitch := SnapStep;
-    GridPitch := GridPitch * Ppu;
-    case FD.View of
+      if GridPitch < SnapStep then GridPitch := SnapStep;
+      GridPitch := GridPitch * Ppu;
+      case FD.View of
       { Plan is ruled like paper.  Iso and 3D get a floor in the red-green
         plane that turns with the camera; ruling the walls too reads as
         paper, not a floor. }
-      vkPlan: PaintMeasuredGrid(FPaper, Theme, GridPitch, FD.ViewX, FD.ViewY, 5);
-      vkIso, vkOrbit: PaintGroundGrid(GridPitch / Ppu);
+        vkPlan: PaintMeasuredGrid(FPaper, Theme, GridPitch, FD.ViewX, FD.ViewY, 5);
+        vkIso, vkOrbit: PaintGroundGrid(GridPitch / Ppu);
+      end;
     end;
-  end;
-  TGrid := GetTickCount64;
-  PaintAxes;
-  { where the paper's time really goes (numbers in TODO-archive.md) }
-  if FTimings then
-  begin
-    TimingLine(Format('paper: painted %d, skipped %d - base %d, grid %d, axes %d',
-      [FPaperPaints, FPaperSkips, TBase - T0, TGrid - TBase,
-       GetTickCount64 - TGrid]));
-  end;
+    TGrid := GetTickCount64;
+    PaintAxes;
+    { where the paper's time really goes (numbers in TODO-archive.md) }
+    if FTimings then
+    begin
+      TimingLine(Format('paper: painted %d, skipped %d - base %d, grid %d, axes %d', [FPaperPaints, FPaperSkips, TBase - T0, TGrid - TBase, GetTickCount64 - TGrid]));
+    end;
   finally
     FMsPaper := FMsPaper + (GetTickCount64 - T0);
   end;
@@ -1880,33 +1878,32 @@ var
 begin
   T0 := GetTickCount64;
   try
-  FD.Doc.Quick := FCameraMoving and FQuickFrames;
+    FD.Doc.Quick := FCameraMoving and FQuickFrames;
   { Half resolution only pays when fill is the cost (zoomed in on a big
     drawing) and loses a little otherwise.  So the first moving frame is
     full size, and if it was slow the rest of the move is drawn at half.  A
     still frame resets it. }
-  if not FD.Doc.Quick then FMoveHalf := False;
-  Half := nil;
-  if FMoveHalf then Half := FInkHalf;
-  FInk.QuickFill := FD.Doc.Quick;
-  FInk.ClearTransparent;
+    if not FD.Doc.Quick then FMoveHalf := False;
+    Half := nil;
+    if FMoveHalf then Half := FInkHalf;
+    FInk.QuickFill := FD.Doc.Quick;
+    FInk.ClearTransparent;
   { A fault while drawing would recur every frame and make the program
     impossible to start.  So drawing stops and says so; saving, undo and
     everything else still work. }
-  if FRenderBroken then Exit;
-  try
-    if FD.Doc.Live > 0 then
-      FD.Doc.Render(FInk, Proj, FD.Units, FDimFont, AnnotColor, FEdgeW, Half);
+    if FRenderBroken then Exit;
+    try
+      if FD.Doc.Live > 0 then
+        FD.Doc.Render(FInk, Proj, FD.Units, FDimFont, AnnotColor, FEdgeW, Half);
       if FD.Doc.Quick and not FMoveHalf and (GetTickCount64 - T0 > 25) then
         FMoveHalf := True;
-  except
-    on E: Exception do
-    begin
-      FRenderBroken := True;
-      FCmdMsg := 'Something in this drawing will not draw (' + E.ClassName +
-        ').  Ctrl+Z, or save it and send it in - nothing is lost.';
+    except
+      on E: Exception do
+      begin
+        FRenderBroken := True;
+        FCmdMsg := 'Something in this drawing will not draw (' + E.ClassName + ').  Ctrl+Z, or save it and send it in - nothing is lost.';
+      end;
     end;
-  end;
   finally
     FMsRender := FMsRender + (GetTickCount64 - T0);
   end;

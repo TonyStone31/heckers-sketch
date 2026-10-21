@@ -16,12 +16,12 @@ end;
 
 { Pixels per world unit on screen.  The drawing scale sets the true size and
   FD.Zoom only magnifies it, so zooming never changes what prints. }
-function TMainForm.Ppu: Double;
+function TMainForm.Ppu: double;
 begin
   Result := PixelsPerUnit(FD.Units, CurScale, Screen.PixelsPerInch) * FD.Zoom;
 end;
 
-function TMainForm.SnapStep: Double;
+function TMainForm.SnapStep: double;
 begin
   Result := SnapValue(FD.Units, FD.SnapIdx);
 end;
@@ -41,7 +41,7 @@ begin
   Result := Project(Proj, P);
 end;
 
-function TMainForm.WorldAt(SX, SY: Double): TP3;
+function TMainForm.WorldAt(SX, SY: double): TP3;
 var
   Base: TP3;
 begin
@@ -62,7 +62,7 @@ end;
 function RectCorners(const A, B: TP3; Pl: TPlane): TP3Array;
 var
   FO, FU, FV, FN, D: TP3;
-  Du, Dv: Double;
+  Du, Dv: double;
 begin
   Result := nil;
   SetLength(Result, 4);
@@ -76,27 +76,26 @@ begin
     Dv := D.X * FV.X + D.Y * FV.Y + D.Z * FV.Z;
     Result[0] := A;
     Result[1] := P3(A.X + FU.X * Du, A.Y + FU.Y * Du, A.Z + FU.Z * Du);
-    Result[2] := P3(Result[1].X + FV.X * Dv, Result[1].Y + FV.Y * Dv,
-                    Result[1].Z + FV.Z * Dv);
+    Result[2] := P3(Result[1].X + FV.X * Dv, Result[1].Y + FV.Y * Dv, Result[1].Z + FV.Z * Dv);
     Result[3] := P3(A.X + FV.X * Dv, A.Y + FV.Y * Dv, A.Z + FV.Z * Dv);
     Exit;
   end;
   case Pl of
     plXZ:
-      begin
-        Result[0] := P3(A.X, A.Y, A.Z);
-        Result[1] := P3(B.X, A.Y, A.Z);
-        Result[2] := P3(B.X, A.Y, B.Z);
-        Result[3] := P3(A.X, A.Y, B.Z);
-      end;
+    begin
+      Result[0] := P3(A.X, A.Y, A.Z);
+      Result[1] := P3(B.X, A.Y, A.Z);
+      Result[2] := P3(B.X, A.Y, B.Z);
+      Result[3] := P3(A.X, A.Y, B.Z);
+    end;
     plYZ:
-      begin
-        Result[0] := P3(A.X, A.Y, A.Z);
-        Result[1] := P3(A.X, B.Y, A.Z);
-        Result[2] := P3(A.X, B.Y, B.Z);
-        Result[3] := P3(A.X, A.Y, B.Z);
-      end;
-  else
+    begin
+      Result[0] := P3(A.X, A.Y, A.Z);
+      Result[1] := P3(A.X, B.Y, A.Z);
+      Result[2] := P3(A.X, B.Y, B.Z);
+      Result[3] := P3(A.X, A.Y, B.Z);
+    end;
+    else
     begin
       Result[0] := P3(A.X, A.Y, A.Z);
       Result[1] := P3(B.X, A.Y, A.Z);
@@ -107,7 +106,7 @@ begin
 end;
 
 { the two side lengths of that rectangle, in the plane's own order }
-procedure RectSides(const A, B: TP3; Pl: TPlane; out W, H: Double);
+procedure RectSides(const A, B: TP3; Pl: TPlane; out W, H: double);
 var
   FO, FU, FV, FN, D: TP3;
 begin
@@ -120,15 +119,25 @@ begin
     Exit;
   end;
   case Pl of
-    plXZ: begin W := Abs(B.X - A.X); H := Abs(B.Z - A.Z); end;
-    plYZ: begin W := Abs(B.Y - A.Y); H := Abs(B.Z - A.Z); end;
-  else    begin W := Abs(B.X - A.X); H := Abs(B.Y - A.Y); end;
+    plXZ: begin
+      W := Abs(B.X - A.X);
+      H := Abs(B.Z - A.Z);
+    end;
+    plYZ: begin
+      W := Abs(B.Y - A.Y);
+      H := Abs(B.Z - A.Z);
+    end;
+    else
+    begin
+      W := Abs(B.X - A.X);
+      H := Abs(B.Y - A.Y);
+    end;
   end;
 end;
 
 function TMainForm.SnapToGrid(const P: TP3): TP3;
 var
-  S: Double;
+  S: double;
 begin
   S := SnapStep;
   if S <= 0 then
@@ -140,27 +149,27 @@ end;
 { Points on the drawing beat the grid, as in SketchUp.  Failing a direct hit,
   the cursor is pulled into line with a point sharing one of its coordinates,
   and a guide is shown back to it. }
-function TMainForm.ResolveSnapRaw(SX, SY: Double): TP3;
+function TMainForm.ResolveSnapRaw(SX, SY: double): TP3;
 var
   Hit: TSnapHit;
   Pts: TP3Array;
-  I, BestAxis, Near: Integer;
-  Tol, Best, KeepTol: Double;
-  PrevGuide: Boolean;
+  I, BestAxis, Near: integer;
+  Tol, Best, KeepTol: double;
+  PrevGuide: boolean;
   PrevFrom: TP3;
   W, Wf, AxRef, AxPt, EdgeP, EdgeA, EdgeB, MidP, AxSnapP: TP3;
   SP: TPointF;
-  PtOK: Boolean;
-  PtPx, AxPx: Double;
-  AxIdx, EdgeI, AxSnapK: Integer;
+  PtOK: boolean;
+  PtPx, AxPx: double;
+  AxIdx, EdgeI, AxSnapK: integer;
 
   { An alignment is only shown when the point differs in exactly one
     direction, so the guide is a clean axis-parallel line.  (In plan every
     point shares Z, so allowing two would drag the guide to stray corners.) }
   procedure Consider(const C: TP3);
   var
-    DX, DY, DZ, Score: Double;
-    Big: Integer;
+    DX, DY, DZ, Score: double;
+    Big: integer;
   begin
     DX := Abs(W.X - C.X);
     DY := Abs(W.Y - C.Y);
@@ -178,7 +187,8 @@ var
     Score := DX + DY + DZ;
     if DX > Tol then Score := Score - DX
     else if DY > Tol then Score := Score - DY
-    else Score := Score - DZ;
+    else
+      Score := Score - DZ;
 
     if Score < Best then
     begin
@@ -192,26 +202,27 @@ var
     coordinates, the third can still be pulled level with a held point.
     This is what closes a rectangle square: run along red from the top
     corner and land on the X of the corner you rested on earlier. }
-  procedure AlignFree(var Q: TP3; FreeAxis: Integer);
+  procedure AlignFree(var Q: TP3; FreeAxis: integer);
   var
-    I: Integer;
+    I: integer;
     APts: TP3Array;
-    Cur, BestOff: Double;
+    Cur, BestOff: double;
     BestPt: TP3;
-    Got: Boolean;
+    Got: boolean;
 
-    function Coord(const C: TP3): Double;
+    function Coord(const C: TP3): double;
     begin
       case FreeAxis of
         0: Result := C.X;
         1: Result := C.Y;
-      else Result := C.Z;
+        else
+          Result := C.Z;
       end;
     end;
 
-    function TryLevel(const C: TP3; Tol: Double): Boolean;
+    function TryLevel(const C: TP3; Tol: double): boolean;
     var
-      Off: Double;
+      Off: double;
     begin
       Result := False;
       Off := Abs(Coord(C) - Cur) * Ppu;
@@ -247,7 +258,8 @@ var
     case FreeAxis of
       0: Q.X := BestPt.X;
       1: Q.Y := BestPt.Y;
-    else Q.Z := BestPt.Z;
+      else
+        Q.Z := BestPt.Z;
     end;
     FGuide := True;
     FGuideFrom := BestPt;
@@ -258,12 +270,12 @@ var
     Measured on screen against the axis as drawn, not in model space: in
     iso or 3D, unprojecting pins one coordinate to the working plane, so a
     model-space test can never see blue (risers came out as diagonals). }
-  procedure DirTry(const R, AD0: TP3; Kind: Integer);
+  procedure DirTry(const R, AD0: TP3; Kind: integer);
   var
-    Off, Along, T, LenSq: Double;
+    Off, Along, T, LenSq: double;
     PR, PA: TPointF;
     AD: TP3;
-    UX, UY, VX, VY: Double;
+    UX, UY, VX, VY: double;
   begin
     AD := Norm3(AD0);
     if Sqr(AD.X) + Sqr(AD.Y) + Sqr(AD.Z) < 0.5 then Exit;
@@ -303,24 +315,27 @@ var
 
   { where the axis through R crosses the edge A-B, if they actually meet:
     the point on the edge }
-  function AxisMeetsEdge(const R: TP3; Axis: Integer; const A, B: TP3;
-    out P: TP3): Boolean;
+  function AxisMeetsEdge(const R: TP3; Axis: integer; const A, B: TP3; out P: TP3): boolean;
   var
     D, E, W: TP3;
-    A2, B2, D2, DD, EE, DE, T, U, Den: Double;
+    A2, B2, D2, DD, EE, DE, T, U, Den: double;
   begin
     Result := False;
     case Axis of
       0: D := P3(1, 0, 0);
       1: D := P3(0, 1, 0);
-    else D := P3(0, 0, 1);
+      else
+        D := P3(0, 0, 1);
     end;
     E := Sub3(B, A);
     W := Sub3(A, R);
-    DD := Dot3(D, D); EE := Dot3(E, E); DE := Dot3(D, E);
+    DD := Dot3(D, D);
+    EE := Dot3(E, E);
+    DE := Dot3(D, E);
     Den := DD * EE - DE * DE;
     if (EE < 1E-18) or (Abs(Den) < 1E-12 * DD * EE) then Exit;   { parallel }
-    A2 := Dot3(D, W); B2 := Dot3(E, W);
+    A2 := Dot3(D, W);
+    B2 := Dot3(E, W);
     T := (A2 * EE - B2 * DE) / Den;         { along the axis }
     U := (A2 * DE - B2 * DD) / Den;         { along the edge, 0..1 }
     if (U < -1E-9) or (U > 1 + 1E-9) then Exit;
@@ -370,8 +385,7 @@ begin
   { Still holding the last point?  A point is taken from close in and
     released from much further out, so a small slide does not drop it (as in
     SketchUp).  Only real points; a grid intersection has nothing to stick to. }
-  if FStickOn and (FStickKind in [snEndpoint, snMidpoint, snCenter, snCross,
-                                  snSubMid]) then
+  if FStickOn and (FStickKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid]) then
   begin
     SP := ScreenOf(FStickPt);
     if Sqr(SX - SP.X) + Sqr(SY - SP.Y) <= Sqr(STICK_PX * FUIScale) then
@@ -393,8 +407,7 @@ begin
   { A definite point right under the cursor wins outright.  Piece midpoints
     do not count: they appear at every quarter point of split lines and would
     steal the cursor. }
-  if PtOK and (PtPx <= LOCK_PX) and
-     (Hit.Kind in [snEndpoint, snCross, snCenter, snMidpoint, snOrigin]) then
+  if PtOK and (PtPx <= LOCK_PX) and (Hit.Kind in [snEndpoint, snCross, snCenter, snMidpoint, snOrigin]) then
   begin
     FSnapKind := Hit.Kind;
     FStickOn := True;
@@ -415,15 +428,12 @@ begin
     Edge).  It beats the guides, since real geometry is more definite than
     an alignment to something far off, but it loses to any named point
     within reach, or line middles become nearly impossible to hit. }
-  if (not PtOK) and
-     FD.Doc.EdgeUnder(Proj, SX, SY, EDGE_PX * FUIScale, EdgeP,
-                      EdgeA, EdgeB, EdgeI) then
+  if (not PtOK) and FD.Doc.EdgeUnder(Proj, SX, SY, EDGE_PX * FUIScale, EdgeP, EdgeA, EdgeB, EdgeI) then
   begin
     { The edge's middle is worked out here, not cached: face outline sides
       are not in the snap cache (too many to project on every camera move),
       and the edge under the cursor is already known, so it costs nothing. }
-    MidP := P3((EdgeA.X + EdgeB.X) / 2, (EdgeA.Y + EdgeB.Y) / 2,
-               (EdgeA.Z + EdgeB.Z) / 2);
+    MidP := P3((EdgeA.X + EdgeB.X) / 2, (EdgeA.Y + EdgeB.Y) / 2, (EdgeA.Z + EdgeB.Z) / 2);
     SP := ScreenOf(MidP);
     if Sqr(SX - SP.X) + Sqr(SY - SP.Y) <= Sqr(LOCK_PX * FUIScale) then
     begin
@@ -445,8 +455,7 @@ begin
       FParPerp := 0;
       AxisTry(FP1);
       if FLockOn then AxisTry(FLockPt);
-      if (AxIdx >= 0) and (AxIdx <= 2) and
-         AxisMeetsEdge(AxRef, AxIdx, EdgeA, EdgeB, MidP) then
+      if (AxIdx >= 0) and (AxIdx <= 2) and AxisMeetsEdge(AxRef, AxIdx, EdgeA, EdgeB, MidP) then
       begin
         FAxisLock := AxIdx;
         FAxisFrom := AxRef;
@@ -462,8 +471,7 @@ begin
     and friends).  Below real geometry, above alignment guides.  This is all
     an empty sheet has to snap to, and it is what lets Z read a real height:
     otherwise the cursor is pinned to the working plane. }
-  if (not PtOK) and (FInferMode = imAll) and
-     AxisSnap(Proj, SX, SY, EDGE_PX * FUIScale, AxSnapP, AxSnapK) then
+  if (not PtOK) and (FInferMode = imAll) and AxisSnap(Proj, SX, SY, EDGE_PX * FUIScale, AxSnapP, AxSnapK) then
   begin
     FSnapKind := snOnAxis;
     FSnapAxis := AxSnapK;
@@ -499,19 +507,18 @@ begin
     nearest the corner (SketchUp's rule), so square stays square.  A corner
     on the axis projects to itself.  Parallel/perpendicular guides simply
     give way to the point. }
-  if PtOK and (AxIdx >= 0) and (AxIdx <= 2) and
-     (Hit.Kind in [snEndpoint, snCross, snCenter, snMidpoint, snOrigin]) then
+  if PtOK and (AxIdx >= 0) and (AxIdx <= 2) and (Hit.Kind in [snEndpoint, snCross, snCenter, snMidpoint, snOrigin]) then
   begin
     AxPt := AxRef;
     case AxIdx of
       0: AxPt.X := Hit.P.X;
       1: AxPt.Y := Hit.P.Y;
-    else AxPt.Z := Hit.P.Z;
+      else
+        AxPt.Z := Hit.P.Z;
     end;
     FSnapFromPt := True;
   end
-  else if PtOK and (AxIdx >= 3) and
-     (Hit.Kind in [snEndpoint, snCross, snCenter, snMidpoint, snOrigin]) then
+  else if PtOK and (AxIdx >= 3) and (Hit.Kind in [snEndpoint, snCross, snCenter, snMidpoint, snOrigin]) then
     AxIdx := -1;
 
   if AxIdx >= 3 then
@@ -531,11 +538,23 @@ begin
     { The distance along the axis snaps to the grid, unless a corner set it;
       the other two coordinates come from the reference, which puts it
       exactly on the axis. }
-    if FSnapFromPt then W := AxPt else W := SnapToGrid(AxPt);
+    if FSnapFromPt then W := AxPt
+    else
+      W := SnapToGrid(AxPt);
     case AxIdx of
-      0: begin W.Y := AxRef.Y; W.Z := AxRef.Z; end;
-      1: begin W.X := AxRef.X; W.Z := AxRef.Z; end;
-    else begin W.X := AxRef.X; W.Y := AxRef.Y; end;
+      0: begin
+        W.Y := AxRef.Y;
+        W.Z := AxRef.Z;
+      end;
+      1: begin
+        W.X := AxRef.X;
+        W.Z := AxRef.Z;
+      end;
+      else
+      begin
+        W.X := AxRef.X;
+        W.Y := AxRef.Y;
+      end;
     end;
     FAxisLock := AxIdx;
     FAxisFrom := AxRef;
@@ -607,28 +626,26 @@ end;
   ground and would pull the point sideways off it. }
 function TMainForm.HeldToFace(const P: TP3): TP3;
 var
-  D: Double;
+  D: double;
 begin
   Result := P;
   if not FPlaneFromFace then Exit;
-  D := (P.X - FFacePt.X) * FFaceNm.X + (P.Y - FFacePt.Y) * FFaceNm.Y +
-       (P.Z - FFacePt.Z) * FFaceNm.Z;
+  D := (P.X - FFacePt.X) * FFaceNm.X + (P.Y - FFacePt.Y) * FFaceNm.Y + (P.Z - FFacePt.Z) * FFaceNm.Z;
   Result := P3(P.X - FFaceNm.X * D, P.Y - FFaceNm.Y * D, P.Z - FFaceNm.Z * D);
 end;
 
-function TMainForm.ResolveSnapAt(SX, SY: Double): TP3;
+function TMainForm.ResolveSnapAt(SX, SY: double): TP3;
 var
-  HF: Integer;
+  HF: integer;
   HP, N, Raw: TP3;
-  RU1, RV1, RU2, RV2: Double;
+  RU1, RV1, RU2, RV2: double;
 begin
   Result := ResolveSnapRaw(SX, SY);
   { Held to the face, except when the point came from an axis lock or a named
     point.  Those are more definite than a held plane: standing a gable up
     off the floor follows blue as SketchUp does, and an endpoint aimed at
     must not be flattened onto some other plane. }
-  if (FAxisLock < 0) and not (FSnapKind in [snEndpoint, snMidpoint, snCenter,
-       snCross, snSubMid, snOrigin, snQuadrant]) then
+  if (FAxisLock < 0) and not (FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid, snOrigin, snQuadrant]) then
     Result := HeldToFace(Result);
   { A plane locked with the arrows is deliberate, so even an endpoint off it
     does not win; it would stop the outline closing.  Only an axis lock,
@@ -654,12 +671,14 @@ begin
     if (RU1 <= 1E-9) and (RU2 > 1E-9) then
       case FD.Plane of
         plYZ: Result.Y := Raw.Y;
-      else    Result.X := Raw.X;
+        else
+          Result.X := Raw.X;
       end;
     if (RV1 <= 1E-9) and (RV2 > 1E-9) then
       case FD.Plane of
         plXY: Result.Y := Raw.Y;
-      else    Result.Z := Raw.Z;
+        else
+          Result.Z := Raw.Z;
       end;
   end;
 
@@ -678,28 +697,30 @@ begin
   Result := Pix($44, $48, $52);
 end;
 
-procedure TMainForm.UIFont(C: TCanvas; Size: Integer; Bold: Boolean;
-  const Col: TPix; Mono: Boolean);
+procedure TMainForm.UIFont(C: TCanvas; Size: integer; Bold: boolean; const Col: TPix; Mono: boolean);
 begin
   {$IFDEF WINDOWS}
   if Mono then C.Font.Name := 'Consolas' else C.Font.Name := 'Segoe UI';
   {$ELSE}
-    {$IFDEF DARWIN}
+  {$IFDEF DARWIN}
     if Mono then C.Font.Name := 'Menlo' else C.Font.Name := 'Helvetica Neue';
-    {$ELSE}
-    if Mono then C.Font.Name := 'Monospace' else C.Font.Name := 'Sans';
-    {$ENDIF}
+  {$ELSE}
+  if Mono then C.Font.Name := 'Monospace'
+  else
+    C.Font.Name := 'Sans';
+  {$ENDIF}
   {$ENDIF}
   C.Font.Height := -Round(Size * FUIScale);
-  if Bold then C.Font.Style := [fsBold] else C.Font.Style := [];
+  if Bold then C.Font.Style := [fsBold]
+  else
+    C.Font.Style := [];
   C.Font.Color := PixToColor(Col);
   C.Brush.Style := bsClear;
 end;
 
-function TMainForm.TrackedText(C: TCanvas; X, Y: Integer; const S: string;
-  Tracking: Integer): Integer;
+function TMainForm.TrackedText(C: TCanvas; X, Y: integer; const S: string; Tracking: integer): integer;
 var
-  I, X0: Integer;
+  I, X0: integer;
 begin
   X0 := X;
   for I := 1 to Length(S) do

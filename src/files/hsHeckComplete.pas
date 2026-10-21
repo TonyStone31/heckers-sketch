@@ -332,8 +332,8 @@ var
           Nm := ChangeFileExt(R.Name, '');
           Ext := LowerCase(ExtractFileExt(R.Name));
           if (Nm = '') or (Nm[1] = '.') then Continue;
-          if not ((Ext = '.sh') or (Ext = '.py') or (Ext = '.pl') or (Ext = '.pas') or (Ext = '.ps1') or (Ext = '.bat') or
-            (Ext = '.cmd') or (Ext = '.exe') or (Ext = '')) then Continue;
+          if not ((Ext = '.sh') or (Ext = '.py') or (Ext = '.pl') or (Ext = '.pas') or (Ext = '.ps1') or (Ext = '.bat') or (Ext = '.cmd') or
+            (Ext = '.exe') or (Ext = '')) then Continue;
           if Seen.IndexOf(Nm) >= 0 then Continue;
           Seen.Add(Nm);
           if (Pfx = '') or (Pos(LowerCase(Pfx), LowerCase(Nm)) = 1) then

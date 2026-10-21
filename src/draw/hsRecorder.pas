@@ -23,8 +23,8 @@ var
   RecentWalks: string = '';
 
 { Open the recording room.  True if a clip was made and kept. }
-function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
-  SrcW, SrcH: integer; Axes: boolean; const Pivot: TP3; out Cam: TCamPath): boolean;
+function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single; SrcW, SrcH: integer;
+  Axes: boolean; const Pivot: TP3; out Cam: TCamPath): boolean;
 
 implementation
 
@@ -673,8 +673,8 @@ begin
   ModalResult := mrCancel;
 end;
 
-function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single;
-  SrcW, SrcH: integer; Axes: boolean; const Pivot: TP3; out Cam: TCamPath): boolean;
+function RecordMove(Doc: TWorkDoc; const Start: TProjector; U: TUnitSystem; AFont: TFont; const LabelCol: TPix; EdgeW: single; SrcW, SrcH: integer;
+  Axes: boolean; const Pivot: TP3; out Cam: TCamPath): boolean;
 var
   W: TRecordWin;
 begin

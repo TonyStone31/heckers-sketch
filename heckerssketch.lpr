@@ -72,9 +72,8 @@ var
       Application.Initialize;
       LCLStarted := True;
     end;
-    Result := QuestionDlg('Heckers Sketch', 'The update is in place, but the copy it replaces has not closed yet - ' +
-      'it may be waiting for an answer.' + LineEnding + LineEnding + 'Close it, then press Keep waiting.', mtInformation,
-      [mrRetry, 'Keep waiting', 'IsDefault', mrCancel, 'Give up', 'IsCancel'], 0) = mrRetry;
+    Result := QuestionDlg('Heckers Sketch', 'The update is in place, but the copy it replaces has not closed yet - ' + 'it may be waiting for an answer.' +
+      LineEnding + LineEnding + 'Close it, then press Keep waiting.', mtInformation, [mrRetry, 'Keep waiting', 'IsDefault', mrCancel, 'Give up', 'IsCancel'], 0) = mrRetry;
   end;
 
   { --no-splash: for anything driving the program from a script }

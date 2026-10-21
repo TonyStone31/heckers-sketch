@@ -18,7 +18,7 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
-  I: Integer;
+  I: integer;
   A: string;
 begin
   Application.OnException := @ReportCrash;
@@ -102,7 +102,7 @@ begin
   FHoverEnt := -1;
   FTool := ptSelect;
   FDirLock := -1;
-FPushFace := -1;
+  FPushFace := -1;
   FReplayFace := -1;
   FOffFace := -1;
   FHoverFace := -1;
@@ -153,10 +153,10 @@ end;
 
 { How many files have unsaved work.  A sheet nobody touched does not count;
   the starting example arrives with hundreds of entities. }
-function TMainForm.AnyDirty: Integer;
+function TMainForm.AnyDirty: integer;
 var
-  I, K: Integer;
-  Seen: Boolean;
+  I, K: integer;
+  Seen: boolean;
 begin
   Result := 0;
   for I := 0 to High(FDrawings) do
@@ -172,11 +172,11 @@ end;
 { Closing the window asks about each file with unsaved work: Save, Don't
   save, or Cancel (window stays open).  Once all are answered the window
   closes clean and nothing is restored next time; Don't save means don't. }
-procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 var
-  I, K: Integer;
-  Keys: array of Integer;
-  Seen: Boolean;
+  I, K: integer;
+  Keys: array of integer;
+  Seen: boolean;
 begin
   CanClose := True;
   { an update is taking over and already has the drawings (see DoUpdate) }
@@ -217,9 +217,9 @@ begin
 end;
 
 { --blank on the command line (see where it is used) }
-function AskedForBlank: Boolean;
+function AskedForBlank: boolean;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := False;
   for I := 1 to ParamCount do
@@ -228,7 +228,7 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 var
-  I: Integer;
+  I: integer;
 begin
   { A clean exit drops the draft; it is only for a crash or a pulled plug.
     Handing over to an update, or any other exit, writes it so the work can
@@ -263,8 +263,8 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 var
-  I: Integer;
-  Opened: Boolean;
+  I: integer;
+  Opened: boolean;
 begin
   if FBooted then Exit;
   FBooted := True;
@@ -334,9 +334,9 @@ end;
   launcher is not a person.  Unknown arguments are ignored, never fatal. }
 procedure TMainForm.ApplyCommandLine;
 var
-  I, X: Integer;
+  I, X: integer;
   A, V: string;
-  W, H: Integer;
+  W, H: integer;
 begin
   for I := 1 to ParamCount do
   begin
@@ -373,7 +373,7 @@ begin
           Position := poScreenCenter;
         end;
       end;
-    end
+    end;
     { --help is answered in the program file, before any of this exists }
   end;
 end;

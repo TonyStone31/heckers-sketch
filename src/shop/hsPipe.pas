@@ -355,8 +355,8 @@ var
     for K := 0 to PIPE_SIDES - 1 do
     begin
       Ang := 2 * Pi * K / PIPE_SIDES;
-      Pts[K] := P3(At.X + (U.X * Cos(Ang) + V.X * Sin(Ang)) * Dia / 2, At.Y + (U.Y * Cos(Ang) + V.Y * Sin(Ang)) * Dia /
-        2, At.Z + (U.Z * Cos(Ang) + V.Z * Sin(Ang)) * Dia / 2);
+      Pts[K] := P3(At.X + (U.X * Cos(Ang) + V.X * Sin(Ang)) * Dia / 2, At.Y + (U.Y * Cos(Ang) + V.Y * Sin(Ang)) * Dia / 2, At.Z +
+        (U.Z * Cos(Ang) + V.Z * Sin(Ang)) * Dia / 2);
     end;
   end;
 
@@ -458,8 +458,8 @@ begin
         begin
           FOD := NPS_FLANGE_OD[EnsureRange(Size[I], 0, High(NPS_FLANGE_OD))] * Inch(S);
           Disc(Path[I], A, FOD, FLANGE_THICK_IN * Inch(S));
-          Disc(P3(Path[I].X + A.X * FLANGE_THICK_IN * Inch(S), Path[I].Y + A.Y * FLANGE_THICK_IN * Inch(S), Path[I].Z +
-            A.Z * FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
+          Disc(P3(Path[I].X + A.X * FLANGE_THICK_IN * Inch(S), Path[I].Y + A.Y * FLANGE_THICK_IN * Inch(S), Path[I].Z + A.Z *
+            FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
         end;
         RunStart := I + 1;
       end;
@@ -481,8 +481,8 @@ begin
   OD := NPS_OD[SizeOfLeg(S, High(S.Legs))] * Inch(S);
   FOD := NPS_FLANGE_OD[SizeOfLeg(S, High(S.Legs))] * Inch(S);
   case S.Ends[1] of
-    peFlange: Disc(P3(P1.X - A.X * FLANGE_THICK_IN * Inch(S), P1.Y - A.Y * FLANGE_THICK_IN * Inch(S), P1.Z - A.Z *
-        FLANGE_THICK_IN * Inch(S)), A, FOD, FLANGE_THICK_IN * Inch(S));
+    peFlange: Disc(P3(P1.X - A.X * FLANGE_THICK_IN * Inch(S), P1.Y - A.Y * FLANGE_THICK_IN * Inch(S), P1.Z - A.Z * FLANGE_THICK_IN * Inch(S)), A,
+        FOD, FLANGE_THICK_IN * Inch(S));
     peCap:
     begin
       CircleAt(P1, A, OD, Circle);
@@ -562,8 +562,8 @@ begin
   for I := 0 to High(S.Legs) do
   begin
     if S.Legs[I].Has then
-      Result := Result + Format('  %d. %s  %s %s  (c-c %s, cut %s)', [I + 1, DirName(S.Legs[I].Dir), Ins(S.Legs[I].Len),
-        MeasureWords(S, I), Ins(CCLength(S, I)), Ins(Max(0, CutLength(S, I)))])
+      Result := Result + Format('  %d. %s  %s %s  (c-c %s, cut %s)', [I + 1, DirName(S.Legs[I].Dir), Ins(S.Legs[I].Len), MeasureWords(S, I),
+        Ins(CCLength(S, I)), Ins(Max(0, CutLength(S, I)))])
     else
       Result := Result + Format('  %d. %s  ? - no length yet', [I + 1, DirName(S.Legs[I].Dir)]);
     case S.Legs[I].After of

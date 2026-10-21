@@ -7,39 +7,42 @@
 { Would the current camera show any of the drawing?  Asked of a camera read
   from a file or handoff before trusting it: the projected bounds must land
   near the paper and be more than a few pixels across. }
-function TMainForm.CameraShowsSomething: Boolean;
+function TMainForm.CameraShowsSomething: boolean;
 var
   Lo, Hi, C: TP3;
   P: TPointF;
-  K: Integer;
-  MinX, MinY, MaxX, MaxY, Margin: Double;
+  K: integer;
+  MinX, MinY, MaxX, MaxY, Margin: double;
 begin
   Result := True;
   if FD.Zoom <= ZOOM_MIN * 1.01 then Exit(False);
   if not FD.Doc.Bounds(Lo, Hi) then Exit;
-  MinX := 1E30; MinY := 1E30; MaxX := -1E30; MaxY := -1E30;
+  MinX := 1E30;
+  MinY := 1E30;
+  MaxX := -1E30;
+  MaxY := -1E30;
   for K := 0 to 7 do
   begin
-    C := P3(IfThen(K and 1 = 0, Lo.X, Hi.X), IfThen(K and 2 = 0, Lo.Y, Hi.Y),
-            IfThen(K and 4 = 0, Lo.Z, Hi.Z));
+    C := P3(IfThen(K and 1 = 0, Lo.X, Hi.X), IfThen(K and 2 = 0, Lo.Y, Hi.Y), IfThen(K and 4 = 0, Lo.Z, Hi.Z));
     P := Project(Proj, C);
     if IsNan(P.X) or IsNan(P.Y) or IsInfinite(P.X) or IsInfinite(P.Y) then Exit(False);
-    MinX := Min(MinX, P.X); MaxX := Max(MaxX, P.X);
-    MinY := Min(MinY, P.Y); MaxY := Max(MaxY, P.Y);
+    MinX := Min(MinX, P.X);
+    MaxX := Max(MaxX, P.X);
+    MinY := Min(MinY, P.Y);
+    MaxY := Max(MaxY, P.Y);
   end;
   { smaller than a fingertip: zoomed out to nothing }
   if Max(MaxX - MinX, MaxY - MinY) < 6 then Exit(False);
   { or panned off; a few screens away is still findable by hand }
   Margin := 3 * Max(FArt.Width, FArt.Height);
-  if (MaxX < -Margin) or (MaxY < -Margin) or
-     (MinX > FArt.Width + Margin) or (MinY > FArt.Height + Margin) then Exit(False);
+  if (MaxX < -Margin) or (MaxY < -Margin) or (MinX > FArt.Width + Margin) or (MinY > FArt.Height + Margin) then Exit(False);
 end;
 
-procedure TMainForm.ZoomAt(Factor: Double; AnchorSX, AnchorSY: Double);
+procedure TMainForm.ZoomAt(Factor: double; AnchorSX, AnchorSY: double);
 var
   W: TP3;
   P: TPointF;
-  NewZoom: Double;
+  NewZoom: double;
 begin
   NewZoom := EnsureRange(FD.Zoom * Factor, ZOOM_MIN, ZOOM_MAX);
   if NewZoom = FD.Zoom then Exit;
@@ -58,9 +61,9 @@ begin
   ViewMoved;
 end;
 
-procedure TMainForm.SetScaleIdx(I: Integer);
+procedure TMainForm.SetScaleIdx(I: integer);
 var
-  CX, CY: Double;
+  CX, CY: double;
   W: TP3;
   P: TPointF;
 begin
@@ -80,7 +83,7 @@ begin
   Invalidate;
 end;
 
-procedure TMainForm.PanBy(DX, DY: Double);
+procedure TMainForm.PanBy(DX, DY: double);
 begin
   FD.ViewX := FD.ViewX + DX;
   FD.ViewY := FD.ViewY + DY;
@@ -128,18 +131,15 @@ end;
   when there is a window to watch and the change is worth seeing, so you
   keep track of where things are.  Not while loading, not in a paper mode,
   and not for a tiny nudge. }
-procedure TMainForm.FitView(Travel: Boolean = True);
+procedure TMainForm.FitView(Travel: boolean = True);
 var
   Lo, Hi, Mid: TP3;
   P: TPointF;
-  BaseP, W, H, Z, NewZoom: Double;
-  FitZ, FitX, FitY: Double;
+  BaseP, W, H, Z, NewZoom: double;
+  FitZ, FitX, FitY: double;
 begin
-  if Travel and FBooted and (FD <> nil) and
-     (FD.View = vkOrbit) and
-     (FGlideT = 0) and FitTarget(False, FD.Az, FD.El, FitZ, FitX, FitY) and
-     ((Abs(FitZ - FD.Zoom) > 0.02 * Max(1, FD.Zoom)) or
-      (Abs(FitX - FD.ViewX) > 4) or (Abs(FitY - FD.ViewY) > 4)) then
+  if Travel and FBooted and (FD <> nil) and (FD.View = vkOrbit) and (FGlideT = 0) and FitTarget(False, FD.Az, FD.El, FitZ, FitX, FitY) and
+    ((Abs(FitZ - FD.Zoom) > 0.02 * Max(1, FD.Zoom)) or (Abs(FitX - FD.ViewX) > 4) or (Abs(FitY - FD.ViewY) > 4)) then
   begin
     GlideCamera(FD.Az, FD.El, FitZ, FitX, FitY);
     if FGlideT > 0 then Exit;
@@ -157,17 +157,17 @@ begin
     BaseP := PixelsPerUnit(FD.Units, CurScale, Screen.PixelsPerInch);
     case FD.View of
       vkIso:
-        begin
-          W := Max((Abs(Hi.X - Lo.X) + Abs(Hi.Y - Lo.Y)) * ISO_COS, 1E-6);
-          H := Max((Hi.X - Lo.X + Hi.Y - Lo.Y) * ISO_SIN + (Hi.Z - Lo.Z), 1E-6);
-        end;
+      begin
+        W := Max((Abs(Hi.X - Lo.X) + Abs(Hi.Y - Lo.Y)) * ISO_COS, 1E-6);
+        H := Max((Hi.X - Lo.X + Hi.Y - Lo.Y) * ISO_SIN + (Hi.Z - Lo.Z), 1E-6);
+      end;
       vkOrbit:
-        begin
-          { the diagonal is a safe bound from any camera angle }
-          W := Max(Sqrt(Sqr(Hi.X - Lo.X) + Sqr(Hi.Y - Lo.Y) + Sqr(Hi.Z - Lo.Z)), 1E-6);
-          H := W;
-        end;
-    else
+      begin
+        { the diagonal is a safe bound from any camera angle }
+        W := Max(Sqrt(Sqr(Hi.X - Lo.X) + Sqr(Hi.Y - Lo.Y) + Sqr(Hi.Z - Lo.Z)), 1E-6);
+        H := W;
+      end;
+      else
       begin
         W := Max(Hi.X - Lo.X, 1E-6);
         H := Max(Hi.Y - Lo.Y, 1E-6);
@@ -200,15 +200,14 @@ end;
 
 { Park on a named camera.  Free orbiting sets FViewPreset to -1, so the next
   press starts again at the corner view. }
-procedure TMainForm.ApplyViewPreset(I: Integer);
+procedure TMainForm.ApplyViewPreset(I: integer);
 var
-  N: Integer;
-  Turn: Boolean;
-  FitZ, FitX, FitY: Double;
+  N: integer;
+  Turn: boolean;
+  FitZ, FitX, FitY: double;
 begin
   N := Length(VIEW_PRESETS);
-  Turn := (FD <> nil) and (FD.View = vkOrbit) and
-          (VIEW_PRESETS[((I mod N) + N) mod N].View = vkOrbit) and FBooted;
+  Turn := (FD <> nil) and (FD.View = vkOrbit) and (VIEW_PRESETS[((I mod N) + N) mod N].View = vkOrbit) and FBooted;
   FViewPreset := ((I mod N) + N) mod N;
   FD.View := VIEW_PRESETS[FViewPreset].View;
   { One 3D view to another glides; a change of view kind (into or out of
@@ -217,8 +216,7 @@ begin
   begin
     { a preset reframes, so the glide aims at the final framing instead of
       popping into it on arrival }
-    if FitTarget(Length(FSel) > 0, VIEW_PRESETS[FViewPreset].Az,
-         VIEW_PRESETS[FViewPreset].El, FitZ, FitX, FitY) then
+    if FitTarget(Length(FSel) > 0, VIEW_PRESETS[FViewPreset].Az, VIEW_PRESETS[FViewPreset].El, FitZ, FitX, FitY) then
       GlideCamera(VIEW_PRESETS[FViewPreset].Az, VIEW_PRESETS[FViewPreset].El,
         FitZ, FitX, FitY)
     else
@@ -236,17 +234,16 @@ begin
   Relayout;
   FCmdMsg := VIEW_PRESETS[FViewPreset].Name + ' view.';
   if FD.View = vkPlan then
-    FCmdMsg := FCmdMsg + '  CUT, top right, slices it - Ctrl+wheel travels ' +
-      'up and down.';
+    FCmdMsg := FCmdMsg + '  CUT, top right, slices it - Ctrl+wheel travels ' + 'up and down.';
   { the glide carries the framing; a change of view kind still snaps to fit }
   if FGlideT = 0 then FitView(False);
   pbSlice.Invalidate;
   pbCmd.Invalidate;
 end;
 
-procedure TMainForm.CycleViewPreset(Step: Integer);
+procedure TMainForm.CycleViewPreset(Step: integer);
 var
-  N, I: Integer;
+  N, I: integer;
 begin
   { Off the presets (a paper mode or orbited free), either direction goes to
     the first corner; on them, step round the camera presets. }
@@ -276,8 +273,8 @@ begin
   case V of
     vkPlan: FCmdMsg := 'Plan view.';
     vkIso: FCmdMsg := 'Isometric view.';
-  else
-    FCmdMsg := '3D view - middle-drag to orbit.';
+    else
+      FCmdMsg := '3D view - middle-drag to orbit.';
   end;
   pbCmd.Invalidate;
 end;

@@ -4,10 +4,9 @@
 { mouse on the screen                                                       }
 { ======================================================================== }
 
-procedure TMainForm.pbScreenMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbScreenMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  I, Which: Integer;
+  I, Which: integer;
 begin
   if FBusy then Exit;
   { a press supersedes motion not yet serviced }
@@ -116,8 +115,7 @@ begin
   if ((FTool = ptMove) and (FStage = 1)) or ((FTool = ptRotate) and (FStage = 2)) then
     FMoveCopy := ssCtrl in Shift;
 
-  if (GetTickCount64 - FClickT < 450) and (Abs(X - FClickX) < 5) and
-     (Abs(Y - FClickY) < 5) then
+  if (GetTickCount64 - FClickT < 450) and (Abs(X - FClickX) < 5) and (Abs(Y - FClickY) < 5) then
     Inc(FClickN)
   else
     FClickN := 1;
@@ -148,16 +146,13 @@ begin
     Exit;
   end;
   FCur := ResolveSnapAt(X, Y);
-  Trail(Format('press %s stage=%d at %d,%d  world %s,%s,%s  snap=%d',
-    [TOOL_NAMES[FTool], FStage, X, Y,
-     FormatLen(FCur.X, FD.Units), FormatLen(FCur.Y, FD.Units),
-     FormatLen(FCur.Z, FD.Units), Ord(FSnapKind)]));
+  Trail(Format('press %s stage=%d at %d,%d  world %s,%s,%s  snap=%d', [TOOL_NAMES[FTool], FStage, X, Y, FormatLen(FCur.X, FD.Units),
+    FormatLen(FCur.Y, FD.Units), FormatLen(FCur.Z, FD.Units), Ord(FSnapKind)]));
   Act(Format('press %.6f %.6f %.6f', [FCur.X, FCur.Y, FCur.Z], DotFS));
   { For a line run, and for push/pull, drill and offset, the press does
     not decide: it may be a click, or a hold that strains and cancels.
     Known when the button comes up or the hold breaks. }
-  if (FTool in [ptLine, ptRect, ptCircle, ptArc, ptPush, ptDrill,
-                ptOffset]) and (FStage >= 1) then
+  if (FTool in [ptLine, ptRect, ptCircle, ptArc, ptPush, ptDrill, ptOffset]) and (FStage >= 1) then
   begin
     FHoldOn := True;
     FHoldT := 0;
@@ -186,7 +181,7 @@ end;
 
 function TMainForm.ActsText: string;
 var
-  I, First, N: Integer;
+  I, First, N: integer;
 begin
   Result := '';
   N := FActsN;
@@ -204,17 +199,16 @@ const
   MARK = 'to replay';
 var
   L, Body: TStringList;
-  I: Integer;
+  I: integer;
   Fn: string;
-  Inside: Boolean;
+  Inside: boolean;
 begin
   Fn := Trim(FileName);
   if Fn = '' then Fn := 'replay.txt';
   if not FileExists(Fn) then Fn := ExtractFilePath(ParamStr(0)) + Fn;
   if not FileExists(Fn) then
   begin
-    FCmdMsg := 'No such file: ' + Trim(FileName) +
-      '  - /replay <a report .txt, or a file of session lines>';
+    FCmdMsg := 'No such file: ' + Trim(FileName) + '  - /replay <a report .txt, or a file of session lines>';
     pbCmd.Invalidate;
     Exit;
   end;
@@ -266,17 +260,17 @@ end;
   entry points the mouse feeds, so nothing depends on window size.  Stops
   at the first line it does not understand; a replay that silently diverges
   is worse than one that stops. }
-function TMainForm.ReplayActs(const Script: string): Integer;
+function TMainForm.ReplayActs(const Script: string): integer;
 var
   L: TStringList;
   P: TStringList;
-  I: Integer;
+  I: integer;
   Cmd, Rest: string;
   T: TTool;
-  Fired: Boolean;
+  Fired: boolean;
   SP: TPointF;
 
-  function Num(K: Integer): Double;
+  function Num(K: integer): double;
   begin
     if not TryStrToFloat(P[K], Result, DotFS) then Result := 0;
   end;
@@ -344,7 +338,8 @@ begin
         if SameText(Rest, 'PLAN') then SetView(vkPlan)
         else if SameText(Rest, 'ISO') then SetView(vkIso)
         else if SameText(Rest, '3D') then SetView(vkOrbit)
-        else Fired := False;
+        else
+          Fired := False;
       end
       else if (Cmd = 'scale') and (P.Count >= 2) then
         SetScaleIdx(StrToIntDef(P[1], FD.ScaleIdx))
@@ -377,7 +372,7 @@ end;
 
 function TMainForm.TrailText: string;
 var
-  I, First, N: Integer;
+  I, First, N: integer;
 begin
   Result := '';
   N := FTrailN;
@@ -392,9 +387,9 @@ const
   NAMES: array[TEntKind] of string =
     ('lines', 'arcs', 'notes', 'dims', 'faces', 'guides', 'bore', 'groups');
 var
-  N: array[TEntKind] of Integer;
+  N: array[TEntKind] of integer;
   K: TEntKind;
-  I: Integer;
+  I: integer;
 begin
   for K := Low(TEntKind) to High(TEntKind) do N[K] := 0;
   for I := 0 to FD.Doc.Live - 1 do
@@ -462,11 +457,8 @@ end;
 function TMainForm.MachineText: string;
 begin
   try
-    Result := SystemFacts +
-      'program memory: ' + ProgramMemory + LineEnding +
-      Format('program: up %d s, threads=%s, quick frames=%s',
-        [(GetTickCount64 - FStartedAt) div 1000, BoolToStr(FThreads, True),
-         BoolToStr(FQuickFrames, True)]) + LineEnding;
+    Result := SystemFacts + 'program memory: ' + ProgramMemory + LineEnding + Format('program: up %d s, threads=%s, quick frames=%s',
+      [(GetTickCount64 - FStartedAt) div 1000, BoolToStr(FThreads, True), BoolToStr(FQuickFrames, True)]) + LineEnding;
   except
     on E: Exception do Result := 'machine facts failed: ' + E.ClassName + LineEnding;
   end;
@@ -477,51 +469,30 @@ begin
   { names, not numbers, so a report reads without the source open; nothing
     about the person or the machine }
   Result :=
-    Format('tool=%s stage=%d view=%s plane=%s', [TOOL_NAMES[FTool],
-      FStage, VIEW_NAMES[FD.View], PlaneName]) + LineEnding +
-    Format('mouse=%d,%d  cursor=%s,%s,%s  snap=%d axislock=%d held=%d',
-      [FMouseSX, FMouseSY, FormatLen(FCur.X, FD.Units),
-       FormatLen(FCur.Y, FD.Units), FormatLen(FCur.Z, FD.Units),
-       Ord(FSnapKind), FAxisLock, Ord(FPlaneHeld)]) + LineEnding +
-    Format('entities=%d (%s)  sheets=%d tab=%d  selected=%d doomed=%d',
-      [FD.Doc.Live, KindCounts, Length(FDrawings), FTabIdx,
-       Length(FSel), Length(FDoomed)]) + LineEnding +
-    Format('pushface=%d offface=%d hoverent=%d hoverface=%d lock=%d ' +
-      'holding=%d scale=%s snapstep=%s zoom=%s',
-      [FPushFace, FOffFace, FHoverEnt, FHoverFace, Ord(FLockOn),
-       Ord(FHoldOn), CurScale.Name, FormatLen(SnapStep, FD.Units),
-       FormatFloat('0.00', FD.Zoom)]) + LineEnding +
-    Format('units=%s screen=%dx%d scaling=%s portable=%s net=%s',
-      [hsDrawing.UnitName(FD.Units), pbScreen.Width, pbScreen.Height,
-       FormatFloat('0.00', FUIScale),
-       specialize IfThen<string>(IsPortable, 'yes', 'no'),
-       NetBackend]) + LineEnding +
+    Format('tool=%s stage=%d view=%s plane=%s', [TOOL_NAMES[FTool], FStage, VIEW_NAMES[FD.View], PlaneName]) + LineEnding +
+    Format('mouse=%d,%d  cursor=%s,%s,%s  snap=%d axislock=%d held=%d', [FMouseSX, FMouseSY, FormatLen(FCur.X, FD.Units),
+    FormatLen(FCur.Y, FD.Units), FormatLen(FCur.Z, FD.Units), Ord(FSnapKind), FAxisLock, Ord(FPlaneHeld)]) + LineEnding +
+    Format('entities=%d (%s)  sheets=%d tab=%d  selected=%d doomed=%d', [FD.Doc.Live, KindCounts, Length(FDrawings), FTabIdx, Length(FSel), Length(FDoomed)]) +
+    LineEnding + Format('pushface=%d offface=%d hoverent=%d hoverface=%d lock=%d ' + 'holding=%d scale=%s snapstep=%s zoom=%s',
+    [FPushFace, FOffFace, FHoverEnt, FHoverFace, Ord(FLockOn), Ord(FHoldOn), CurScale.Name, FormatLen(SnapStep, FD.Units), FormatFloat('0.00', FD.Zoom)]) +
+    LineEnding + Format('units=%s screen=%dx%d scaling=%s portable=%s net=%s', [hsDrawing.UnitName(FD.Units), pbScreen.Width,
+    pbScreen.Height, FormatFloat('0.00', FUIScale), specialize IfThen<string>(IsPortable, 'yes', 'no'), NetBackend]) + LineEnding +
     { where the camera stood: many view faults only reproduce at the angle }
-    Format('camera az=%.2f el=%.2f zoom=%.3f at %.1f,%.1f',
-      [RadToDeg(FD.Az), RadToDeg(FD.El), FD.Zoom, FD.ViewX, FD.ViewY]) +
-      LineEnding +
+    Format('camera az=%.2f el=%.2f zoom=%.3f at %.1f,%.1f', [RadToDeg(FD.Az), RadToDeg(FD.El), FD.Zoom, FD.ViewX, FD.ViewY]) + LineEnding +
     { the surfaces and whether they agree with each other and the window,
       for compositor crashes }
-    Format('art=%dx%d/%d paper=%dx%d/%d ink=%dx%d/%d ' +
-      'repairs=%d%s',
-      [FArt.Width, FArt.Height, FArt.Stride,
-       FPaper.Width, FPaper.Height, FPaper.Stride,
-       FInk.Width, FInk.Height, FInk.Stride,
-       TArtSurface.Repairs,
+    Format('art=%dx%d/%d paper=%dx%d/%d ink=%dx%d/%d ' + 'repairs=%d%s', [FArt.Width, FArt.Height, FArt.Stride, FPaper.Width,
+    FPaper.Height, FPaper.Stride, FInk.Width, FInk.Height, FInk.Stride, TArtSurface.Repairs,
        { this document's borrowed depth buffer was freed at some point (an
          export's surface); harmless now, but worth a second look }
-       specialize IfThen<string>(FD.Doc.LastSurfDied,
-         ' borrowed-depth-was-freed', '')]) + LineEnding +
+    specialize IfThen<string>(FD.Doc.LastSurfDied, ' borrowed-depth-was-freed', '')]) + LineEnding +
     { slow frames since start: count, worst, and the last one's breakdown;
       the individual lines are in the log below }
-    IfThen(FSlowN = 0, 'frames: none over 40ms',
-      Format('frames: %d over 40ms, worst %dms, last was %s',
-        [FSlowN, FSlowWorst, FSlowLast])) + LineEnding +
-    'what was happening, most recent last:' + LineEnding + TrailText +
+    IfThen(FSlowN = 0, 'frames: none over 40ms', Format('frames: %d over 40ms, worst %dms, last was %s', [FSlowN, FSlowWorst, FSlowLast])) +
+    LineEnding + 'what was happening, most recent last:' + LineEnding + TrailText +
     { the same session in world coordinates, to replay against the drawing
       below; recorded only from this window's own handlers }
-    LineEnding + 'the same session, to replay - /replay after loading the ' +
-    'drawing below:' + LineEnding + ActsText;
+    LineEnding + 'the same session, to replay - /replay after loading the ' + 'drawing below:' + LineEnding + ActsText;
 end;
 
 { Everything else about how the program was being used: startup, window and
@@ -549,14 +520,16 @@ var
     R := R + Line + LineEnding;
   end;
 
-  function YN(B: Boolean): string;
+  function YN(B: boolean): string;
   begin
-    if B then Result := 'on' else Result := 'off';
+    if B then Result := 'on'
+    else
+      Result := 'off';
   end;
 
   function Args: string;
   var
-    I, Eq: Integer;
+    I, Eq: integer;
     A: string;
   begin
     Result := '';
@@ -569,8 +542,7 @@ var
       begin
         { a switch's value is kept unless it looks like a path }
         Eq := Pos('=', A);
-        if (Eq > 0) and ((Pos('/', A) > 0) or (Pos('\', A) > 0) or
-           (Pos(':', Copy(A, Eq, MaxInt)) > 0)) then
+        if (Eq > 0) and ((Pos('/', A) > 0) or (Pos('\', A) > 0) or (Pos(':', Copy(A, Eq, MaxInt)) > 0)) then
           A := Copy(A, 1, Eq) + '<file>';
       end;
       Result := Result + ' ' + A;
@@ -580,9 +552,9 @@ var
 
   function SelKinds: string;
   var
-    N: array[TEntKind] of Integer;
+    N: array[TEntKind] of integer;
     K: TEntKind;
-    I: Integer;
+    I: integer;
   begin
     for K := Low(TEntKind) to High(TEntKind) do N[K] := 0;
     for I := 0 to High(FSel) do
@@ -597,7 +569,7 @@ var
 
   function Forms_: string;
   var
-    I: Integer;
+    I: integer;
   begin
     Result := '';
     for I := 0 to Screen.CustomFormCount - 1 do
@@ -610,81 +582,56 @@ var
   end;
 
 var
-  I, J, Groups, G, Grps: Integer;
-  Known: Boolean;
+  I, J, Groups, G, Grps: integer;
+  Known: boolean;
   D: TDrawing;
   M: TMonitor;
-  Seen: array of Integer;
+  Seen: array of integer;
 begin
   R := '';
   try
     Add('started with:' + Args);
-    Add(Format('run tag=%s  updated from=%s  whats new shown=%s  ' +
-      'draft restored=%s (age %d)  crash offered=%s  offline=%s',
-      [FRunTag, specialize IfThen<string>(FUpdatedFrom = '', '-', FUpdatedFrom),
-       YN(FWhatsNewShown), YN(FRestored), FDraftAge, YN(FCrashToOffer),
-       YN(NetOffline)]));
-    Add(Format('update seen=%s  help pages=%s%s  drawing file=%s  ' +
-      'threads=%s  timings=%s',
-      [specialize IfThen<string>(FUpdateTag = '', '-', FUpdateTag),
-       specialize IfThen<string>(LocalHelpVersion = '', 'none', LocalHelpVersion),
-       specialize IfThen<string>(HelpFetching <> nil, ' (fetching)', ''),
-       specialize IfThen<string>(DocPath = '', 'never saved', 'saved as ' +
-         ExtractFileExt(DocPath)),
-       YN(FThreads), YN(FTimings)]));
+    Add(Format('run tag=%s  updated from=%s  whats new shown=%s  ' + 'draft restored=%s (age %d)  crash offered=%s  offline=%s',
+      [FRunTag, specialize IfThen<string>(FUpdatedFrom = '', '-', FUpdatedFrom), YN(FWhatsNewShown), YN(FRestored), FDraftAge, YN(FCrashToOffer), YN(NetOffline)]));
+    Add(Format('update seen=%s  help pages=%s%s  drawing file=%s  ' + 'threads=%s  timings=%s',
+      [specialize IfThen<string>(FUpdateTag = '', '-', FUpdateTag), specialize IfThen<string>(LocalHelpVersion = '', 'none', LocalHelpVersion),
+      specialize IfThen<string>(HelpFetching <> nil, ' (fetching)', ''), specialize IfThen<string>(DocPath = '', 'never saved',
+      'saved as ' + ExtractFileExt(DocPath)), YN(FThreads), YN(FTimings)]));
   except
     on E: Exception do Add('start facts failed: ' + E.ClassName);
   end;
 
   try
-    Add(Format('window: %s  %d,%d %dx%d  state=%d  client %dx%d  ' +
-      'drawing area %dx%d  tools wide=%s  info panel=%s',
-      [FILL_NAMES[Ord(FFill)], Left, Top, Width, Height, Ord(WindowState),
-       ClientWidth, ClientHeight, pbScreen.Width, pbScreen.Height,
-       YN(FToolsWide), YN(FInfoOn)]));
+    Add(Format('window: %s  %d,%d %dx%d  state=%d  client %dx%d  ' + 'drawing area %dx%d  tools wide=%s  info panel=%s',
+      [FILL_NAMES[Ord(FFill)], Left, Top, Width, Height, Ord(WindowState), ClientWidth, ClientHeight, pbScreen.Width, pbScreen.Height, YN(FToolsWide), YN(FInfoOn)]));
     M := Monitor;
     if M <> nil then
-      Add(Format('on monitor %d of %d: %d,%d %dx%d at %d dpi (screen says %d)' +
-        ', primary=%s',
-        [M.MonitorNum + 1, Screen.MonitorCount, M.Left, M.Top, M.Width,
-         M.Height, M.PixelsPerInch, Screen.PixelsPerInch, YN(M.Primary)]));
+      Add(Format('on monitor %d of %d: %d,%d %dx%d at %d dpi (screen says %d)' + ', primary=%s', [M.MonitorNum + 1,
+        Screen.MonitorCount, M.Left, M.Top, M.Width, M.Height, M.PixelsPerInch, Screen.PixelsPerInch, YN(M.Primary)]));
     Add('forms showing:' + Forms_);
   except
     on E: Exception do Add('window facts failed: ' + E.ClassName);
   end;
 
   try
-    Add(Format('look: theme=%s grid=%s edge width=%d ink=%s%s ' +
-      'rounded to 1/%d  circle sides=%d arc sides=%d',
-      [Theme.Name, YN(FShowGrid), FEdgeW, IntToHex(ColorToRGB(FInkColor), 6),
-       specialize IfThen<string>(FInkAuto, ' (auto)', ''),
-       FLenDenom, FSidesCircle, FSidesArc]));
-    Add(Format('view cube=%s corner=%s fit to selection=%s hot=%s ' +
-      'dragging=%s  glide=%.2f  orbit snap target=%s  preset=%d',
-      [YN(FCubeOn), CORNER_NAMES[FCubeCorner and 3], YN(FCubeFitSel),
-       YN(FCubeHasHot), YN(FCubeDrag), FGlideT, YN(FSnapHasHot),
-       FViewPreset]));
+    Add(Format('look: theme=%s grid=%s edge width=%d ink=%s%s ' + 'rounded to 1/%d  circle sides=%d arc sides=%d',
+      [Theme.Name, YN(FShowGrid), FEdgeW, IntToHex(ColorToRGB(FInkColor), 6), specialize IfThen<string>(FInkAuto, ' (auto)', ''),
+      FLenDenom, FSidesCircle, FSidesArc]));
+    Add(Format('view cube=%s corner=%s fit to selection=%s hot=%s ' + 'dragging=%s  glide=%.2f  orbit snap target=%s  preset=%d',
+      [YN(FCubeOn), CORNER_NAMES[FCubeCorner and 3], YN(FCubeFitSel), YN(FCubeHasHot), YN(FCubeDrag), FGlideT, YN(FSnapHasHot), FViewPreset]));
   except
     on E: Exception do Add('look facts failed: ' + E.ClassName);
   end;
 
   try
-    Add(Format('tool options: tape leaves=%s erase=%s move copy=%s ' +
-      'rigid=%s detach=%s dirlock=%d last push=%s last radius=%s ' +
-      'fillet pending=%s',
-      [TAPE_NAMES[Max(0, Min(3, FTapeDrop))], ERASE_NAMES[Max(0, Min(2, FEraseMode))], YN(FMoveCopy),
-       YN(FMoveRigid), YN(FDetachMove), FDirLock,
-       FormatLen(FLastPush, FD.Units), FormatLen(FLastFilletR, FD.Units),
-       YN(FFilletPending)]));
-    Add(Format('going on: typed="%s" popup=%d clicks=%d boxing=%s ' +
-      'panning=%s orbiting=%s erasing=%s moving=%s busy=%s ' +
-      'loading=%s dim edit=%d cut edit=%d camera moving=%s',
-      [FInput, FPopup, FClickN, YN(FBoxing), YN(FPanning), YN(FOrbiting),
-       YN(FErasing2), YN(FMovePending), YN(FBusy),
-       YN(FLoading), FDimEdit, FSliceEdit, YN(FCameraMoving)]));
+    Add(Format('tool options: tape leaves=%s erase=%s move copy=%s ' + 'rigid=%s detach=%s dirlock=%d last push=%s last radius=%s ' +
+      'fillet pending=%s', [TAPE_NAMES[Max(0, Min(3, FTapeDrop))], ERASE_NAMES[Max(0, Min(2, FEraseMode))], YN(FMoveCopy),
+      YN(FMoveRigid), YN(FDetachMove), FDirLock, FormatLen(FLastPush, FD.Units), FormatLen(FLastFilletR, FD.Units), YN(FFilletPending)]));
+    Add(Format('going on: typed="%s" popup=%d clicks=%d boxing=%s ' + 'panning=%s orbiting=%s erasing=%s moving=%s busy=%s ' +
+      'loading=%s dim edit=%d cut edit=%d camera moving=%s', [FInput, FPopup, FClickN, YN(FBoxing), YN(FPanning), YN(FOrbiting),
+      YN(FErasing2), YN(FMovePending), YN(FBusy), YN(FLoading), FDimEdit, FSliceEdit, YN(FCameraMoving)]));
     Add(Format('bar said: "%s"', [FCmdMsg]));
-    Add(Format('touch: seen=%s mode=%s down=%s points=%d',
-      [YN(FTouchOn), TOUCH_NAMES[FTouchMode], YN(FTouchDown), FTouchCount]));
+    Add(Format('touch: seen=%s mode=%s down=%s points=%d', [YN(FTouchOn), TOUCH_NAMES[FTouchMode], YN(FTouchDown), FTouchCount]));
     Add('selected:' + SelKinds);
   except
     on E: Exception do Add('tool facts failed: ' + E.ClassName);
@@ -714,17 +661,11 @@ begin
         end;
       end;
       { the name too: it is what the person sees on the tab }
-      Add(Format('  sheet %d%s "%s": things=%d solids=%d open group=%d modified=%s view=%s ' +
-        'plane=%s units=%s scale=%s snap=%s zoom=%.3f az=%.1f el=%.1f ' +
-        'cut=%s (%s to %s) guides=%s undo=%d redo=%d',
-        [I + 1, specialize IfThen<string>(I = FTabIdx, ' (showing)', ''),
-         D.Name, D.Doc.Live, Groups, D.Doc.Context, YN(D.Dirty), VIEW_NAMES[D.View], PLANE_NAMES[D.Plane],
-         hsDrawing.UnitName(D.Units), ScaleTable(D.Units, D.ScaleIdx).Name,
-         SnapName(D.Units, D.SnapIdx), D.Zoom, RadToDeg(D.Az),
-         RadToDeg(D.El), YN(D.SliceOn), FormatLen(D.SliceLo, D.Units),
-         FormatLen(D.SliceHi, D.Units),
-         specialize IfThen<string>(D.Doc.GuidesHidden, 'hidden', 'shown'),
-         D.UndoTop, D.RedoTop]));
+      Add(Format('  sheet %d%s "%s": things=%d solids=%d open group=%d modified=%s view=%s ' + 'plane=%s units=%s scale=%s snap=%s zoom=%.3f az=%.1f el=%.1f ' +
+        'cut=%s (%s to %s) guides=%s undo=%d redo=%d', [I + 1, specialize IfThen<string>(I = FTabIdx, ' (showing)', ''), D.Name,
+        D.Doc.Live, Groups, D.Doc.Context, YN(D.Dirty), VIEW_NAMES[D.View], PLANE_NAMES[D.Plane], hsDrawing.UnitName(D.Units),
+        ScaleTable(D.Units, D.ScaleIdx).Name, SnapName(D.Units, D.SnapIdx), D.Zoom, RadToDeg(D.Az), RadToDeg(D.El), YN(D.SliceOn),
+        FormatLen(D.SliceLo, D.Units), FormatLen(D.SliceHi, D.Units), specialize IfThen<string>(D.Doc.GuidesHidden, 'hidden', 'shown'), D.UndoTop, D.RedoTop]));
     end;
   except
     on E: Exception do Add('sheet facts failed: ' + E.ClassName);
@@ -759,7 +700,7 @@ procedure TMainForm.ReportCrash(Sender: TObject; E: Exception);
 var
   F: TextFile;
   Path: string;
-  I: Integer;
+  I: integer;
   Now64: QWord;
 begin
   Quiesce;
@@ -774,8 +715,7 @@ begin
   Inc(FWoundCount);
   if FWoundCount > 3 then
   begin
-    FCmdMsg := 'Still failing.  Save with Ctrl+S and restart - the reports ' +
-      'are already written.';
+    FCmdMsg := 'Still failing.  Save with Ctrl+S and restart - the reports ' + 'are already written.';
     if pbCmd <> nil then pbCmd.Invalidate;
     Exit;
   end;
@@ -783,10 +723,12 @@ begin
   Path := ExtractFilePath(ParamStr(0)) + CRASH_LOG;
   try
     AssignFile(F, Path);
-    if FileExists(Path) then Append(F) else Rewrite(F);
+    if FileExists(Path) then Append(F)
+    else
+      Rewrite(F);
     try
       WriteLn(F, '---- ', DateTimeToStr(Now), ' ', APP_NAME, ' ',
-    CurrentVersion, ' built ', BUILD_STAMP);
+        CurrentVersion, ' built ', BUILD_STAMP);
       WriteLn(F, E.ClassName, ': ', E.Message);
       Write(F, DiagnosticText);
       Write(F, SettingsText);
@@ -801,7 +743,7 @@ begin
     end;
     { the drawing beside the report, under its own name, so the next crash
       does not overwrite it }
-      SaveCrashDoc(Path);
+    SaveCrashDoc(Path);
     { and the drawing area as it was; whether to send it is asked at the next
       start }
     try
@@ -828,29 +770,21 @@ begin
   if FWoundCount < 3 then FCrashToOffer := True;
   if FWoundCount >= 3 then
     MessageDlg(APP_NAME,
-      'That is the third time in a minute.' + LineEnding + LineEnding +
-      'Something is wrong that dismissing this will not fix.  Save what you ' +
-      'have with Ctrl+S and start the program again - it will offer to send ' +
-      'the reports, and they are what gets this mended.' + LineEnding +
-      LineEnding +
-      'It will stop interrupting you now.  Everything it has been asked to ' +
-      'write is already written.',
+      'That is the third time in a minute.' + LineEnding + LineEnding + 'Something is wrong that dismissing this will not fix.  Save what you ' +
+      'have with Ctrl+S and start the program again - it will offer to send ' + 'the reports, and they are what gets this mended.' +
+      LineEnding + LineEnding + 'It will stop interrupting you now.  Everything it has been asked to ' + 'write is already written.',
       mtError, [mbOK], 0)
   else
     MessageDlg(APP_NAME,
-      E.ClassName + ': ' + E.Message + LineEnding + LineEnding +
-      'Written next to the program:' + LineEnding +
-      '  ' + ExtractFileName(Path) + '   - what happened' + LineEnding +
-      '  ' + ExtractFileName(Path) + '.hsk   - the drawing it happened to' +
-      LineEnding + LineEnding +
-      'Both together say exactly where this went wrong.  The drawing is ' +
-      'your own work, so take a look before sending it anywhere.',
+      E.ClassName + ': ' + E.Message + LineEnding + LineEnding + 'Written next to the program:' + LineEnding + '  ' +
+      ExtractFileName(Path) + '   - what happened' + LineEnding + '  ' + ExtractFileName(Path) + '.hsk   - the drawing it happened to' +
+      LineEnding + LineEnding + 'Both together say exactly where this went wrong.  The drawing is ' + 'your own work, so take a look before sending it anywhere.',
       mtError, [mbOK], 0);
 end;
 
 { Motion handler: record and return.  Nothing here may paint, allocate,
   hit-test or snap.  See ServiceMotion, which the tick calls. }
-procedure TMainForm.pbScreenMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbScreenMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 begin
   if FBusy then Exit;
   FMoveX := X;
@@ -865,11 +799,11 @@ procedure TMainForm.ServiceMotion;
 var
   HeldU, HeldV: TP3;
   SpeedNow: QWord;
-  SpeedInst: Double;
-  X, Y, HF: Integer;
+  SpeedInst: double;
+  X, Y, HF: integer;
   HP, HN, HoverP: TP3;
   OP: TPointF;
-  NewAz, NewEl: Double;
+  NewAz, NewEl: double;
 begin
   if not FMovePending then Exit;
   FMovePending := False;
@@ -902,7 +836,8 @@ begin
     end;
     { a hand on the shape, a plain arrow in the margin }
     if FCubeHasHot then pbScreen.Cursor := crHandPoint
-    else pbScreen.Cursor := crDefault;
+    else
+      pbScreen.Cursor := crDefault;
     Exit;
   end;
   if FCubeCursor then
@@ -944,8 +879,7 @@ begin
   begin
     { where letting go with Ctrl would snap, worked out every move so the cube
       and status line can show it before you commit }
-    FSnapHasHot := FOrbiting and (ssCtrl in FMoveShift) and
-                   OrbitSnapTarget(FSnapHot);
+    FSnapHasHot := FOrbiting and (ssCtrl in FMoveShift) and OrbitSnapTarget(FSnapHot);
     if FOrbiting and not (ssShift in FMoveShift) then
     begin
       { Drag right and the model follows the cursor round, like a turntable.
@@ -968,9 +902,7 @@ begin
       if FOrbitAnchored then
       begin
         OP := ScreenOf(FOrbitPivot);
-        if (not (IsNan(OP.X) or IsNan(OP.Y) or
-                 IsInfinite(OP.X) or IsInfinite(OP.Y))) and
-           (Abs(OP.X) < 1E6) and (Abs(OP.Y) < 1E6) then
+        if (not (IsNan(OP.X) or IsNan(OP.Y) or IsInfinite(OP.X) or IsInfinite(OP.Y))) and (Abs(OP.X) < 1E6) and (Abs(OP.Y) < 1E6) then
         begin
           FD.ViewX := FD.ViewX + (FOrbitAnchor.X - OP.X);
           FD.ViewY := FD.ViewY + (FOrbitAnchor.Y - OP.Y);
@@ -1015,8 +947,7 @@ begin
   end;
 
   { a hand that has moved lets go of what it was resting on }
-  if FNoLockUntilMoved and
-     ((Abs(X - FHoldX) > 6) or (Abs(Y - FHoldY) > 6)) then
+  if FNoLockUntilMoved and ((Abs(X - FHoldX) > 6) or (Abs(Y - FHoldY) > 6)) then
     FNoLockUntilMoved := False;
 
   if FStage = 0 then FPlaneFromFace := False;
@@ -1026,18 +957,14 @@ begin
     FaceTheCamera;
   { an arrow-held plane keeps its direction but still passes through a
     face under the cursor that faces the same way }
-  if (FStage = 0) and FPlaneHeld and (FD.Plane <> plFree) and
-     (FTool in [ptLine, ptRect, ptCircle, ptArc]) and
-     FD.Doc.FaceUnder(Proj, X, Y, HF, HP) then
+  if (FStage = 0) and FPlaneHeld and (FD.Plane <> plFree) and (FTool in [ptLine, ptRect, ptCircle, ptArc]) and FD.Doc.FaceUnder(Proj, X, Y, HF, HP) then
   begin
     HN := Norm3(FD.Doc.FaceNormal(HF));
     PlaneAxes(FD.Plane, HeldU, HeldV);
     if Abs(Abs(Dot3(Norm3(Cross3(HeldU, HeldV)), HN)) - 1) < 1E-3 then
       FCur := HP;
   end;
-  if (FStage = 0) and not FPlaneHeld and
-     (FTool in [ptLine, ptRect, ptCircle, ptArc]) and
-     FD.Doc.FaceUnder(Proj, X, Y, HF, HP) then
+  if (FStage = 0) and not FPlaneHeld and (FTool in [ptLine, ptRect, ptCircle, ptArc]) and FD.Doc.FaceUnder(Proj, X, Y, HF, HP) then
   begin
     HN := FD.Doc.FaceNormal(HF);
     { A face square to an axis gets the matching flat plane (faster, and
@@ -1062,9 +989,7 @@ begin
     or upright (as SketchUp appears to), before the snap resolves.  A face
     under the first point or an arrow lock wins, and a drag under about a
     sixth of an inch is a twitch, not a direction. }
-  if (FStage >= 1) and not FPlaneHeld and not FPlaneFromFace and
-     (FD.View = vkOrbit) and
-     (FTool in [ptLine, ptRect, ptCircle, ptArc]) then
+  if (FStage >= 1) and not FPlaneHeld and not FPlaneFromFace and (FD.View = vkOrbit) and (FTool in [ptLine, ptRect, ptCircle, ptArc]) then
   begin
     OP := ScreenOf(FP1);
     if Sqr(X - OP.X) + Sqr(Y - OP.Y) >= Sqr(14 * FUIScale) then
@@ -1075,9 +1000,7 @@ begin
 
   { a snapped point that belongs to a face adopts that face's plane too,
     or arcs end up behind the box }
-  if (FStage = 0) and not FPlaneHeld and
-     (FTool in [ptLine, ptRect, ptCircle, ptArc]) and
-     (FSnapKind in [snEndpoint, snCross, snMidpoint, snSubMid]) then
+  if (FStage = 0) and not FPlaneHeld and (FTool in [ptLine, ptRect, ptCircle, ptArc]) and (FSnapKind in [snEndpoint, snCross, snMidpoint, snSubMid]) then
   begin
     HF := FD.Doc.FaceThrough(FCur);
     if HF >= 0 then
@@ -1123,8 +1046,7 @@ begin
     else
     begin
       { EdgeUnder, not HitEdge, so a face outline counts too }
-      FHoverEdgeOK := FD.Doc.EdgeUnder(Proj, X, Y, 9 * FUIScale,
-        HoverP, FHoverEdgeA, FHoverEdgeB, FHoverEnt);
+      FHoverEdgeOK := FD.Doc.EdgeUnder(Proj, X, Y, 9 * FUIScale, HoverP, FHoverEdgeA, FHoverEdgeB, FHoverEnt);
       if FHoverEdgeOK and (FD.Doc[FHoverEnt].Kind = ekGuide) then
       begin
         { a guide is infinite; "all of it" means nothing }
@@ -1141,8 +1063,7 @@ begin
     go onto (SketchUp washes it and shows its points). }
   if (FTool in [ptPush, ptDrill, ptOffset, ptFollow]) and (FStage = 0) then
     FHoverFace := FD.Doc.HitFace(Proj, X, Y)
-  else if (FTool in [ptLine, ptRect, ptCircle, ptArc]) and (FStage = 0) and
-          not FPlaneHeld then
+  else if (FTool in [ptLine, ptRect, ptCircle, ptArc]) and (FStage = 0) and not FPlaneHeld then
     FHoverFace := FD.Doc.HitFace(Proj, X, Y)
   else
     FHoverFace := -1;
@@ -1155,23 +1076,22 @@ end;
   started over empty space dragged the whole model across to meet the
   mouse.  SketchUp keeps the canvas center fixed instead; this differs only
   when panned off center, and was kept on purpose. }
-procedure TMainForm.AnchorOrbit(SX, SY: Integer);
+procedure TMainForm.AnchorOrbit(SX, SY: integer);
 var
   P: TPointF;
 begin
   P := ScreenOf(FOrbitPivot);
-  FOrbitAnchored := not (IsNan(P.X) or IsNan(P.Y) or
-                         IsInfinite(P.X) or IsInfinite(P.Y)) and
-                    (Abs(P.X) < 1E6) and (Abs(P.Y) < 1E6);
+  FOrbitAnchored := not (IsNan(P.X) or IsNan(P.Y) or IsInfinite(P.X) or IsInfinite(P.Y)) and (Abs(P.X) < 1E6) and (Abs(P.Y) < 1E6);
   if FOrbitAnchored then FOrbitAnchor := P
-  else FOrbitAnchor := PtF(SX, SY);
+  else
+    FOrbitAnchor := PtF(SX, SY);
 end;
 
 { Orbit rate by where the press went down: slow over the middle third,
   faster toward the rim, growing with distance squared, like a trackball. }
-function TMainForm.OrbitGainAt(SX, SY: Integer): Double;
+function TMainForm.OrbitGainAt(SX, SY: integer): double;
 var
-  R, RMax, T: Double;
+  R, RMax, T: double;
 begin
   R := Sqrt(Sqr(SX - pbScreen.Width / 2) + Sqr(SY - pbScreen.Height / 2));
   RMax := Min(pbScreen.Width, pbScreen.Height) / 2;
@@ -1202,7 +1122,8 @@ begin
   if Abs(Dot3(N, D)) >= EDGE_ON then Exit;
   if (Abs(D.Z) >= Abs(D.Y)) and (Abs(D.Z) >= Abs(D.X)) then FD.Plane := plXY
   else if Abs(D.Y) >= Abs(D.X) then FD.Plane := plXZ
-  else FD.Plane := plYZ;
+  else
+    FD.Plane := plYZ;
   FPlaneHeld := False;
   FCur := PivotAt(0, 0);
   FCmdMsg := 'Looking along that plane - the shape goes on the one facing you.';
@@ -1211,24 +1132,23 @@ end;
 { What the view turns about.  An empty sheet turns about the origin: the
   working-plane crossing can come back a billion feet away when the camera
   swings through level. }
-function TMainForm.PivotAt(SX, SY: Integer): TP3;
+function TMainForm.PivotAt(SX, SY: integer): TP3;
 var
-  F: Integer;
+  F: integer;
   P, Lo, Hi: TP3;
   Pts: TP3Array;
 
-  function Sane(const Q: TP3): Boolean;
+  function Sane(const Q: TP3): boolean;
   begin
-    Result := not (IsNan(Q.X) or IsNan(Q.Y) or IsNan(Q.Z) or
-                   IsInfinite(Q.X) or IsInfinite(Q.Y) or IsInfinite(Q.Z)) and
-              (Abs(Q.X) < 1E7) and (Abs(Q.Y) < 1E7) and (Abs(Q.Z) < 1E7);
+    Result := not (IsNan(Q.X) or IsNan(Q.Y) or IsNan(Q.Z) or IsInfinite(Q.X) or IsInfinite(Q.Y) or IsInfinite(Q.Z)) and
+      (Abs(Q.X) < 1E7) and (Abs(Q.Y) < 1E7) and (Abs(Q.Z) < 1E7);
   end;
 
   { A point that is not absurd is not necessarily one you could grab: it
     must project near the glass.  A working plane nearly edge-on to the
     camera gives crossings millions of feet away; on an empty drawing that
     was the only candidate. }
-  function Grabbable(const Q: TP3): Boolean;
+  function Grabbable(const Q: TP3): boolean;
   var
     S: TPointF;
   begin
@@ -1237,8 +1157,7 @@ var
     S := ScreenOf(Q);
     if IsNan(S.X) or IsNan(S.Y) or IsInfinite(S.X) or IsInfinite(S.Y) then
       Exit;
-    Result := (Abs(S.X) < 8 * pbScreen.Width) and
-              (Abs(S.Y) < 8 * pbScreen.Height);
+    Result := (Abs(S.X) < 8 * pbScreen.Width) and (Abs(S.Y) < 8 * pbScreen.Height);
   end;
 
 begin
@@ -1276,18 +1195,18 @@ end;
   The shop, the tools behind MORE, and the command list.  Each hangs off the
   button or prompt that opened it. }
 
-function TMainForm.PopupCount(Which: Integer): Integer;
+function TMainForm.PopupCount(Which: integer): integer;
 begin
   case Which of
     POP_SHOP: Result := 5;
     POP_MORE: Result := Length(MORE_TOOLS);
     POP_CMDS: Result := Length(CMD_LIST);
-  else
-    Result := 0;
+    else
+      Result := 0;
   end;
 end;
 
-function TMainForm.PopupCaption(Which, I: Integer): string;
+function TMainForm.PopupCaption(Which, I: integer): string;
 begin
   case Which of
     POP_SHOP:
@@ -1297,8 +1216,8 @@ begin
         2: Result := 'Fitter''s ISO spool scratchpad';
         3: Result := 'Radiant heat layout...';
         4: Result := 'Stair calculator...';
-      else
-        Result := '';
+        else
+          Result := '';
       end;
     POP_MORE:
       if (I >= 0) and (I <= High(MORE_TOOLS)) then
@@ -1310,12 +1229,12 @@ begin
         Result := '/' + CMD_LIST[FCmdOrder[I]].Name
       else
         Result := '';
-  else
-    Result := '';
+    else
+      Result := '';
   end;
 end;
 
-procedure TMainForm.PopupChoose(Which, I: Integer);
+procedure TMainForm.PopupChoose(Which, I: integer);
 begin
   case Which of
     POP_SHOP:
@@ -1351,16 +1270,16 @@ end;
 
 { How tall a list may get.  The command list is capped at half the window so
   the model stays visible; the rest scrolls. }
-function TMainForm.PopupMaxHeight(Which: Integer): Integer;
+function TMainForm.PopupMaxHeight(Which: integer): integer;
 begin
   Result := pbScreen.Height - 20;
   if Which = POP_CMDS then
     Result := Min(Result, Max(Round(180 * FUIScale), pbScreen.Height div 2));
 end;
 
-procedure TMainForm.OpenPopup(Which: Integer);
+procedure TMainForm.OpenPopup(Which: integer);
 var
-  N, I, W, H, RowH, LeftX, Bottom, TopY, RightMost: Integer;
+  N, I, W, H, RowH, LeftX, Bottom, TopY, RightMost: integer;
   B: TRect;
 begin
   N := PopupCount(Which);
@@ -1436,14 +1355,13 @@ begin
   pbScreen.Update;
 end;
 
-function TMainForm.PopupItemAt(SX, SY: Integer): Integer;
+function TMainForm.PopupItemAt(SX, SY: integer): integer;
 var
-  RowH: Integer;
+  RowH: integer;
 begin
   Result := -1;
   if FPopup = POP_NONE then Exit;
-  if (SX < FPopupR.Left) or (SX > FPopupR.Right) or
-     (SY < FPopupR.Top) or (SY > FPopupR.Bottom) then Exit;
+  if (SX < FPopupR.Left) or (SX > FPopupR.Right) or (SY < FPopupR.Top) or (SY > FPopupR.Bottom) then Exit;
   RowH := Round(22 * FUIScale);
   Result := (SY - FPopupR.Top - Round(6 * FUIScale)) div RowH + FPopupTop;
   if (Result < FPopupTop) or (Result >= FPopupN) then Result := -1;
@@ -1453,9 +1371,9 @@ end;
   it.  True means the wheel was ours even if nothing scrolled.  The
   highlight stays put (scrolling is looking, not choosing), except for the
   row under the pointer. }
-function TMainForm.ScrollPopup(Lines, SX, SY: Integer): Boolean;
+function TMainForm.ScrollPopup(Lines, SX, SY: integer): boolean;
 var
-  RowH, Rows, Was, Hot: Integer;
+  RowH, Rows, Was, Hot: integer;
 begin
   Result := FPopup <> POP_NONE;
   if not Result then Exit;
@@ -1473,9 +1391,9 @@ end;
 
 { a small badge of the current tool, through a scratch surface for
   antialiasing }
-procedure TMainForm.PaintToolGlyph(C: TCanvas; AX, AY: Integer);
+procedure TMainForm.PaintToolGlyph(C: TCanvas; AX, AY: integer);
 var
-  Sz: Integer;
+  Sz: integer;
   Col: TPix;
 begin
   Sz := Round(18 * FUIScale);
@@ -1489,11 +1407,11 @@ end;
 { A list, drawn wherever it lands.  DX, DY shift it from screen coordinates
   to the canvas being painted: zero for the screen, the offset to the
   entity panel when part of the list hangs over it (see pbInfoPaint). }
-procedure TMainForm.PaintPopup(C: TCanvas; DX: Integer = 0; DY: Integer = 0);
+procedure TMainForm.PaintPopup(C: TCanvas; DX: integer = 0; DY: integer = 0);
 var
-  I, RowH, Y, Cur: Integer;
+  I, RowH, Y, Cur: integer;
   R, PR: TRect;
-  Sel: Boolean;
+  Sel: boolean;
   S: string;
 begin
   if FPopup = POP_NONE then Exit;
@@ -1513,8 +1431,7 @@ begin
   begin
     Y := PR.Top + Round(6 * FUIScale) + (I - FPopupTop) * RowH;
     if Y + RowH > PR.Bottom then Break;
-    R := Rect(PR.Left + Round(4 * FUIScale), Y,
-      PR.Right - Round(4 * FUIScale), Y + RowH - 1);
+    R := Rect(PR.Left + Round(4 * FUIScale), Y, PR.Right - Round(4 * FUIScale), Y + RowH - 1);
     { the current choice is lit }
     Sel := I = Cur;
     if Sel then
@@ -1530,7 +1447,8 @@ begin
 
     S := PopupCaption(FPopup, I);
     if Sel then UIFont(C, 10, True, OnPix(Theme.Accent))
-    else UIFont(C, 10, False, Theme.Text);
+    else
+      UIFont(C, 10, False, Theme.Text);
     C.TextOut(R.Left + Round(8 * FUIScale),
       R.Top + (RowH - C.TextHeight('X')) div 2, S);
 
@@ -1550,7 +1468,8 @@ begin
         UIFont(C, 10, False, Theme.Accent, True);
       end
       else if Sel then UIFont(C, 10, False, OnPix(Theme.Accent))
-      else UIFont(C, 10, False, Theme.TextDim);
+      else
+        UIFont(C, 10, False, Theme.TextDim);
       C.TextOut(R.Left + Round(120 * FUIScale),
         R.Top + (RowH - C.TextHeight('X')) div 2, S);
     end;
@@ -1562,23 +1481,19 @@ begin
     I := (PR.Bottom - PR.Top - Round(12 * FUIScale)) div RowH;
     C.Brush.Style := bsSolid;
     C.Brush.Color := PixToColor(MixPix(Theme.Panel, Pix(0, 0, 0), 0.25));
-    C.FillRect(Rect(PR.Right - Round(6 * FUIScale), PR.Top + 4,
-                    PR.Right - Round(2 * FUIScale), PR.Bottom - 4));
+    C.FillRect(Rect(PR.Right - Round(6 * FUIScale), PR.Top + 4, PR.Right - Round(2 * FUIScale), PR.Bottom - 4));
     C.Brush.Color := PixToColor(Theme.Accent);
-    Y := PR.Top + 4 +
-      Round((PR.Bottom - PR.Top - 8) * FPopupTop / FPopupN);
-    C.FillRect(Rect(PR.Right - Round(6 * FUIScale), Y,
-                    PR.Right - Round(2 * FUIScale),
-                    Y + Max(16, Round((PR.Bottom - PR.Top - 8) *
-                                      I / FPopupN))));
+    Y := PR.Top + 4 + Round((PR.Bottom - PR.Top - 8) * FPopupTop / FPopupN);
+    C.FillRect(Rect(PR.Right - Round(6 * FUIScale), Y, PR.Right - Round(2 * FUIScale), Y +
+      Max(16, Round((PR.Bottom - PR.Top - 8) * I / FPopupN))));
   end;
   C.Brush.Style := bsClear;
   C.Pen.Width := 1;
 end;
 
-function TMainForm.IsSelected(I: Integer): Boolean;
+function TMainForm.IsSelected(I: integer): boolean;
 var
-  K: Integer;
+  K: integer;
 begin
   Result := True;
   for K := 0 to High(FSel) do
@@ -1591,10 +1506,10 @@ end;
 procedure TMainForm.EnsureSelLayer;
 var
   Key: string;
-  AY, K: Integer;
+  AY, K: integer;
   Hi: TPointFArray;
-  W: Single;
-  Sum, X: Int64;
+  W: single;
+  Sum, X: int64;
   P: TProjector;
 begin
   Sum := 0;
@@ -1602,15 +1517,15 @@ begin
   for K := 0 to High(FSel) do
   begin
     Sum := Sum + FSel[K];
-    X := X xor (Int64(FSel[K]) * (K + 1));
+    X := X xor (int64(FSel[K]) * (K + 1));
   end;
-  Key := Format('%p|%d|%d|%d|%d|%.6f|%.6f|%.6f|%.3f|%.3f|%d|%d|%d|%.3f',
-    [Pointer(FD.Doc), FD.Doc.FEditSeq, Length(FSel), Sum, X, FD.Az, FD.El, FD.Zoom, FD.ViewX, FD.ViewY,
-     Ord(FD.View), FArt.Width, FArt.Height, FUIScale]);
+  Key := Format('%p|%d|%d|%d|%d|%.6f|%.6f|%.6f|%.3f|%.3f|%d|%d|%d|%.3f', [Pointer(FD.Doc), FD.Doc.FEditSeq, Length(FSel), Sum, X, FD.Az,
+    FD.El, FD.Zoom, FD.ViewX, FD.ViewY, Ord(FD.View), FArt.Width, FArt.Height, FUIScale]);
   if (FSelLayer <> nil) and (Key = FSelLayerKey) then Exit;
   FShotOK := False;                { the selection moved: the shot is stale }
   if FSelLayer = nil then FSelLayer := TArtSurface.Create(FArt.Width, FArt.Height)
-  else FSelLayer.SetSize(FArt.Width, FArt.Height);
+  else
+    FSelLayer.SetSize(FArt.Width, FArt.Height);
   FSelLayer.ClearTransparent;
   W := Max(3, Round(3 * FUIScale));
   P := Proj;
@@ -1651,10 +1566,10 @@ end;
   lifts (a tap); a second finger arriving means a gesture.  Two fingers pan
   by their middle and zoom by their spread.  When one of two lifts, the
   other is ignored until it lifts too, so it does not draw. }
-procedure TMainForm.OnTouch(Kind: TTouchKind; Seq: Pointer; SX, SY: Double);
+procedure TMainForm.OnTouch(Kind: TTouchKind; Seq: Pointer; SX, SY: double);
 var
   P: TPoint;
-  I, K, N: Integer;
+  I, K, N: integer;
 begin
   if FBusy then Exit;
   Inc(FTouchCount);
@@ -1663,41 +1578,40 @@ begin
   for K := 0 to High(FTouches) do
     if FTouches[K].Seq = Seq then I := K;
   if FTimings then
-    TimingLine(Format('touch %d at %.0f,%.0f finger %d of %d mode %d',
-      [Ord(Kind), P.X, P.Y, I, Length(FTouches), Ord(FTouchMode)]));
+    TimingLine(Format('touch %d at %.0f,%.0f finger %d of %d mode %d', [Ord(Kind), P.X, P.Y, I, Length(FTouches), Ord(FTouchMode)]));
   case Kind of
     tkBegin:
+    begin
+      if I < 0 then
       begin
-        if I < 0 then
-        begin
-          SetLength(FTouches, Length(FTouches) + 1);
-          I := High(FTouches);
-          FTouches[I].Seq := Seq;
-          FTouches[I].X0 := P.X;
-          FTouches[I].Y0 := P.Y;
-          FTouches[I].T0 := GetTickCount64;
-        end;
-        FTouches[I].X := P.X;
-        FTouches[I].Y := P.Y;
-        N := Length(FTouches);
-        if N = 1 then
-        begin
-          FTouchMode := tmPending;
-          FTouchDown := False;
-          { hover first, so the snap and readout are for this spot }
-          pbScreenMouseMove(pbScreen, [], P.X, P.Y);
-        end
-        else if (N = 2) and (FTouchMode in [tmPending, tmMouse]) then
-        begin
-          if FTouchDown then
-          begin
-            pbScreenMouseUp(pbScreen, mbLeft, [ssLeft], FTouches[0].X, FTouches[0].Y);
-            FTouchDown := False;
-          end;
-          FTouchMode := tmGesture;
-          GestureStart;
-        end;
+        SetLength(FTouches, Length(FTouches) + 1);
+        I := High(FTouches);
+        FTouches[I].Seq := Seq;
+        FTouches[I].X0 := P.X;
+        FTouches[I].Y0 := P.Y;
+        FTouches[I].T0 := GetTickCount64;
       end;
+      FTouches[I].X := P.X;
+      FTouches[I].Y := P.Y;
+      N := Length(FTouches);
+      if N = 1 then
+      begin
+        FTouchMode := tmPending;
+        FTouchDown := False;
+        { hover first, so the snap and readout are for this spot }
+        pbScreenMouseMove(pbScreen, [], P.X, P.Y);
+      end
+      else if (N = 2) and (FTouchMode in [tmPending, tmMouse]) then
+      begin
+        if FTouchDown then
+        begin
+          pbScreenMouseUp(pbScreen, mbLeft, [ssLeft], FTouches[0].X, FTouches[0].Y);
+          FTouchDown := False;
+        end;
+        FTouchMode := tmGesture;
+        GestureStart;
+      end;
+    end;
     tkUpdate:
       if I >= 0 then
       begin
@@ -1737,11 +1651,11 @@ begin
               FTouchDown := False;
             end;
           tmGesture:
-            begin
-              { the full frame comes when the camera settles }
-              FLastWheel := GetTickCount64;
-              FTouchMode := tmSpent;
-            end;
+          begin
+            { the full frame comes when the camera settles }
+            FLastWheel := GetTickCount64;
+            FTouchMode := tmSpent;
+          end;
         end;
         for K := I to High(FTouches) - 1 do FTouches[K] := FTouches[K + 1];
         SetLength(FTouches, Length(FTouches) - 1);
@@ -1766,8 +1680,7 @@ end;
 { from the tick: a finger held still long enough is a press, not a tap }
 procedure TMainForm.TouchTick;
 begin
-  if (FTouchMode = tmPending) and (Length(FTouches) > 0) and
-     (GetTickCount64 - FTouches[0].T0 > 180) then
+  if (FTouchMode = tmPending) and (Length(FTouches) > 0) and (GetTickCount64 - FTouches[0].T0 > 180) then
     TouchSendDown;
 end;
 
@@ -1781,7 +1694,7 @@ end;
 
 procedure TMainForm.GestureMove;
 var
-  MX, MY, D: Double;
+  MX, MY, D: double;
 begin
   if Length(FTouches) < 2 then Exit;
   MX := (FTouches[0].X + FTouches[1].X) / 2;
@@ -1820,7 +1733,7 @@ end;
 { drop anything in the selection that is not in this sheet }
 procedure TMainForm.PruneSelection;
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   N := 0;
   for I := 0 to High(FSel) do
@@ -1838,7 +1751,7 @@ end;
 
 procedure TMainForm.BeginBulkSelect;
 var
-  K: Integer;
+  K: integer;
 begin
   SetLength(FSelBulk, FD.Doc.Live);
   for K := 0 to High(FSelBulk) do FSelBulk[K] := False;
@@ -1853,9 +1766,9 @@ begin
   SetLength(FSelBulk, 0);
 end;
 
-procedure TMainForm.SelectAdd(I: Integer);
+procedure TMainForm.SelectAdd(I: integer);
 var
-  T, K: Integer;
+  T, K: integer;
   M: TIntArrayW;
 begin
   if (I < 0) or (I >= FD.Doc.Live) then Exit;
@@ -1876,7 +1789,7 @@ begin
   for K := 0 to High(M) do SelectAddOne(M[K]);
 end;
 
-procedure TMainForm.SelectAddOne(I: Integer);
+procedure TMainForm.SelectAddOne(I: integer);
 begin
   if I < 0 then Exit;
   if FSelBulkOn and (I < Length(FSelBulk)) then
@@ -1890,9 +1803,9 @@ begin
   FScreenDirty := True;
 end;
 
-procedure TMainForm.SelectRemove(I: Integer);
+procedure TMainForm.SelectRemove(I: integer);
 var
-  T, K: Integer;
+  T, K: integer;
   M: TIntArrayW;
 begin
   if (I < 0) or (I >= FD.Doc.Live) then Exit;
@@ -1906,9 +1819,9 @@ begin
   for K := 0 to High(M) do SelectRemoveOne(M[K]);
 end;
 
-procedure TMainForm.SelectRemoveOne(I: Integer);
+procedure TMainForm.SelectRemoveOne(I: integer);
 var
-  K, J: Integer;
+  K, J: integer;
 begin
   for K := 0 to High(FSel) do
     if FSel[K] = I then
@@ -1920,12 +1833,14 @@ begin
     end;
 end;
 
-procedure TMainForm.SelectToggle(I: Integer);
+procedure TMainForm.SelectToggle(I: integer);
 begin
-  if IsSelected(I) then SelectRemove(I) else SelectAdd(I);
+  if IsSelected(I) then SelectRemove(I)
+  else
+    SelectAdd(I);
 end;
 
-procedure TMainForm.SelectOnly(I: Integer);
+procedure TMainForm.SelectOnly(I: integer);
 begin
   SetLength(FSel, 0);
   SelectAdd(I);
@@ -1966,10 +1881,8 @@ begin
     SourceForm.PopupMode := pmExplicit;
     SourceForm.PopupParent := Self;
     { beside the main window if there is room, else over its right half }
-    if (FSourceBounds.Right > 200) and (FSourceBounds.Bottom > 150) and
-       (FSourceBounds.Left + FSourceBounds.Right > Screen.DesktopLeft + 40) and
-       (FSourceBounds.Left < Screen.DesktopLeft + Screen.DesktopWidth - 40) and
-       (FSourceBounds.Top < Screen.DesktopTop + Screen.DesktopHeight - 40) then
+    if (FSourceBounds.Right > 200) and (FSourceBounds.Bottom > 150) and (FSourceBounds.Left + FSourceBounds.Right > Screen.DesktopLeft + 40) and
+      (FSourceBounds.Left < Screen.DesktopLeft + Screen.DesktopWidth - 40) and (FSourceBounds.Top < Screen.DesktopTop + Screen.DesktopHeight - 40) then
       { where it was left, if that is still on a screen }
       SourceForm.SetBounds(FSourceBounds.Left, FSourceBounds.Top, FSourceBounds.Right, FSourceBounds.Bottom)
     else
@@ -1994,26 +1907,24 @@ end;
   the window asks several times a second.  The hash is meant to wrap, so
   overflow checks are off. }
 {$push}{$Q-}{$R-}
-procedure TMainForm.SourceAskState(out DocSeq, PickSeq: Int64);
+procedure TMainForm.SourceAskState(out DocSeq, PickSeq: int64);
 var
-  I: Integer;
+  I: integer;
 begin
   DocSeq := 0;
   PickSeq := 0;
   if FD = nil then Exit;
   { the text does not change when a group is opened or left, and writing
     it costs a second or two on a big drawing }
-  DocSeq := Int64(PtrUInt(FD)) xor (Int64(FD.Doc.ContentSeq) shl 20) xor
-            (Int64(FD.Doc.Live) shl 8) xor (Int64(FD.UndoTop) shl 40) xor
-            (Int64(FD.RedoTop) shl 50);
+  DocSeq := int64(PtrUInt(FD)) xor (int64(FD.Doc.ContentSeq) shl 20) xor (int64(FD.Doc.Live) shl 8) xor (int64(FD.UndoTop) shl 40) xor
+    (int64(FD.RedoTop) shl 50);
   PickSeq := Length(FSel);
   for I := 0 to High(FSel) do
     PickSeq := (PickSeq * 1000003) xor FSel[I];
 end;
 {$pop}
 
-procedure TMainForm.SourceAskSource(L, Hints, Names: TStrings;
-  out First, Last, LineThing: TIntArrayW; out SheetName: string);
+procedure TMainForm.SourceAskSource(L, Hints, Names: TStrings; out First, Last, LineThing: TIntArrayW; out SheetName: string);
 var
   T0: QWord;
 begin
@@ -2030,7 +1941,7 @@ end;
 
 procedure TMainForm.SourceAskPicked(out Picked: TIntArrayW);
 var
-  I: Integer;
+  I: integer;
 begin
   SetLength(Picked, Length(FSel));
   for I := 0 to High(FSel) do Picked[I] := FSel[I];
@@ -2041,7 +1952,7 @@ end;
   group is not picked. }
 procedure TMainForm.SourcePickThings(const Things: TIntArrayW);
 var
-  I: Integer;
+  I: integer;
   M: TIntArrayW;
   T0, T1: QWord;
 begin
@@ -2069,7 +1980,7 @@ end;
 
 { /hide notes, /show notes: the notes out of the drawing's way for a look,
   and back - still saved either way }
-procedure TMainForm.ShowNotes(On: Boolean);
+procedure TMainForm.ShowNotes(On: boolean);
 begin
   if FD = nil then Exit;
   FD.Doc.NotesHidden := not On;
@@ -2078,7 +1989,8 @@ begin
   RecomposeAll;
   FScreenDirty := True;
   if On then FCmdMsg := 'Notes shown again.'
-  else FCmdMsg := 'Notes put away for now - /show notes brings them back.  They are still saved.';
+  else
+    FCmdMsg := 'Notes put away for now - /show notes brings them back.  They are still saved.';
   InvalidateStatus;
   pbScreen.Invalidate;
 end;
@@ -2101,8 +2013,7 @@ begin
     SourceAskSource(Cur, nil, nil, First, Last, LineThing, Sheet);
     Msg := 'From the assistant: look it over, then Apply.  Revert puts the sheet''s own text back.';
     if L.Count * 2 < Cur.Count then
-      Msg := Format('From the assistant: %d lines, and the sheet is %d.  Apply makes the ' +
-        'sheet exactly this - is it all there?', [L.Count, Cur.Count]);
+      Msg := Format('From the assistant: %d lines, and the sheet is %d.  Apply makes the ' + 'sheet exactly this - is it all there?', [L.Count, Cur.Count]);
     SourceForm.LoadEdited(Code, Msg);
     SourceForm.BringToFront;
   finally
@@ -2113,7 +2024,7 @@ end;
 
 { The source window's text read as Apply would, into a scratch drawing
   that is thrown away: whether it reads, and where it does not. }
-function TMainForm.SourceCheck(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
+function TMainForm.SourceCheck(L: TStrings; out ErrLine: integer; out Err: string): boolean;
 var
   T: TWorkDoc;
 begin
@@ -2131,7 +2042,7 @@ end;
 
 { Apply the source window's text to the drawing.  Read into a scratch
   drawing first, so a fault leaves this one untouched. }
-function TMainForm.SourceApply(L: TStrings; out ErrLine: Integer; out Err: string): Boolean;
+function TMainForm.SourceApply(L: TStrings; out ErrLine: integer; out Err: string): boolean;
 var
   T: TWorkDoc;
 begin
@@ -2163,7 +2074,7 @@ end;
 { Run a group's jig again.  Its output is read into a scratch drawing
   first; only if that works is the group's content replaced, in one undo
   step. }
-function TMainForm.RunJigOf(PartId: Integer): Boolean;
+function TMainForm.RunJigOf(PartId: integer): boolean;
 var
   SF: TStairFrame;
   SS: TStairSpec;
@@ -2172,8 +2083,8 @@ var
   Out_: TStringList;
   T: TWorkDoc;
   M: TIntArrayW;
-  Doomed: array of Boolean;
-  I, ErrLine, WasStamp, Rec: Integer;
+  Doomed: array of boolean;
+  I, ErrLine, WasStamp, Rec: integer;
 begin
   Result := False;
   if FD = nil then Exit;
@@ -2252,14 +2163,14 @@ end;
   straight there in plan and iso }
 procedure TMainForm.SourceCenter;
 var
-  FitZ, FitX, FitY: Double;
+  FitZ, FitX, FitY: double;
 begin
   if (FD = nil) or (Length(FSel) = 0) then Exit;
   if FitTarget(True, FD.Az, FD.El, FitZ, FitX, FitY) then
     GlideCamera(FD.Az, FD.El, FitZ, FitX, FitY);
 end;
 
-procedure TMainForm.SourcePick(On: Boolean);
+procedure TMainForm.SourcePick(On: boolean);
 begin
   FTextPick := On;
   if On then
@@ -2273,7 +2184,7 @@ begin
   pbCmd.Invalidate;
 end;
 
-function TMainForm.RunJigOfThing(Thing: Integer): Boolean;
+function TMainForm.RunJigOfThing(Thing: integer): boolean;
 begin
   Result := False;
   if (FD = nil) or (Thing < 0) or (Thing >= FD.Doc.Live) then Exit;
@@ -2294,7 +2205,7 @@ procedure TMainForm.JigEyeChange(Sender: TObject; const FileName: string; Change
 var
   Ids: TIntArrayW;
   Args: TStringList;
-  I, N, Ran: Integer;
+  I, N, Ran: integer;
   JigName, Err: string;
 begin
   if (Change = fcDeleted) or (FD = nil) then Exit;
@@ -2303,9 +2214,8 @@ begin
   Args := TStringList.Create;
   try
     for I := 0 to FD.Doc.Live - 1 do
-      if (FD.Doc[I].Kind = ekPart) and (FD.Doc[I].Jig <> '') and not IsStairJig(FD.Doc[I].Jig) and
-        ParseJigSpec(FD.Doc[I].Jig, FD.Units, JigName, Args, Err) and
-        SameFileName(ExpandFileName(FindJig(JigName)), FileName) then
+      if (FD.Doc[I].Kind = ekPart) and (FD.Doc[I].Jig <> '') and not IsStairJig(FD.Doc[I].Jig) and ParseJigSpec(FD.Doc[I].Jig,
+        FD.Units, JigName, Args, Err) and SameFileName(ExpandFileName(FindJig(JigName)), FileName) then
       begin
         Ids[N] := FD.Doc[I].Grp;
         Inc(N);
@@ -2322,16 +2232,15 @@ begin
   RecomposeAll;
   { a jig that failed has said why in the bar already }
   if Ran = N then
-    FCmdMsg := Format('%s was saved - made again: %d group%s.  Ctrl+Z puts it back.',
-      [ExtractFileName(FileName), Ran, IfThen(Ran = 1, '', 's')]);
+    FCmdMsg := Format('%s was saved - made again: %d group%s.  Ctrl+Z puts it back.', [ExtractFileName(FileName), Ran, IfThen(Ran = 1, '', 's')]);
   pbScreen.Invalidate;
   pbCmd.Invalidate;
 end;
 
-function TMainForm.RunAllJigs: Integer;
+function TMainForm.RunAllJigs: integer;
 var
   Ids: TIntArrayW;
-  I, N: Integer;
+  I, N: integer;
 begin
   Result := 0;
   if FD = nil then Exit;
@@ -2372,11 +2281,11 @@ begin
 end;
 
 { does this entity have a corner at that point? }
-function TMainForm.EntHasPoint(I: Integer; const P: TP3): Boolean;
+function TMainForm.EntHasPoint(I: integer; const P: TP3): boolean;
 const
   TOL = 1E-7;
 var
-  K: Integer;
+  K: integer;
 begin
   Result := True;
   if Dist(FD.Doc[I].A, P) < TOL then Exit;
@@ -2388,9 +2297,9 @@ end;
 
 { Double click: a face takes the edges round it, an edge the faces it
   bounds (SketchUp's rule). }
-procedure TMainForm.SelectAttached(I: Integer);
+procedure TMainForm.SelectAttached(I: integer);
 var
-  J: Integer;
+  J: integer;
 begin
   SelectOnly(I);
   if I < 0 then Exit;
@@ -2400,14 +2309,12 @@ begin
   if FD.Doc[I].Kind = ekFace then
   begin
     for J := 0 to FD.Doc.Live - 1 do
-      if (J <> I) and (FD.Doc[J].Kind in [ekLine, ekArc]) and
-         EntHasPoint(I, FD.Doc[J].A) and EntHasPoint(I, FD.Doc[J].B) then
+      if (J <> I) and (FD.Doc[J].Kind in [ekLine, ekArc]) and EntHasPoint(I, FD.Doc[J].A) and EntHasPoint(I, FD.Doc[J].B) then
         SelectAdd(J);
   end
   else
     for J := 0 to FD.Doc.Live - 1 do
-      if (J <> I) and (FD.Doc[J].Kind = ekFace) and
-         EntHasPoint(J, FD.Doc[I].A) and EntHasPoint(J, FD.Doc[I].B) then
+      if (J <> I) and (FD.Doc[J].Kind = ekFace) and EntHasPoint(J, FD.Doc[I].A) and EntHasPoint(J, FD.Doc[I].B) then
         SelectAdd(J);
 end;
 
@@ -2415,27 +2322,29 @@ end;
   shared corners, using a hash of every corner and the things that have it
   (testing everything against everything was minutes on a big part).  A
   solid's members come along in one step. }
-procedure TMainForm.SelectConnected(I: Integer);
+procedure TMainForm.SelectConnected(I: integer);
 var
-  Have: array of Boolean;
-  Queue: array of Integer;
-  QHead, QTail, J, K, N, E: Integer;
+  Have: array of boolean;
+  Queue: array of integer;
+  QHead, QTail, J, K, N, E: integer;
   Pts: TP3Array;
   Map: TFPHashList;
   Key: shortstring;
   Lists: array of TIntArrayW;
-  ListIx: Integer;
+  ListIx: integer;
 
   function KeyOf(const P: TP3): shortstring;
   var
-    Q: array[0..2] of Int64;
+    Q: array[0..2] of int64;
   begin
-    Q[0] := Round(P.X * 1E7); Q[1] := Round(P.Y * 1E7); Q[2] := Round(P.Z * 1E7);
+    Q[0] := Round(P.X * 1E7);
+    Q[1] := Round(P.Y * 1E7);
+    Q[2] := Round(P.Z * 1E7);
     SetLength(Result, 24);
     Move(Q[0], Result[1], 24);
   end;
 
-  procedure Take(E: Integer);
+  procedure Take(E: integer);
   begin
     if (E < 0) or Have[E] then Exit;
     { guides share corners but are not part of the drawing; never flood
@@ -2455,7 +2364,8 @@ begin
   N := FD.Doc.Live;
   SetLength(Have, N);
   SetLength(Queue, 64);
-  QHead := 0; QTail := 0;
+  QHead := 0;
+  QTail := 0;
   { every corner once, with the list of things that have it }
   Map := TFPHashList.Create;
   try
@@ -2512,16 +2422,17 @@ end;
 { SketchUp's modifiers: Ctrl adds, Shift toggles, both take away, nothing
   held starts over.  Right to left takes anything the box touches; left to
   right only what fits inside. }
-procedure TMainForm.FinishSelect(X, Y: Integer; Shift: TShiftState);
+procedure TMainForm.FinishSelect(X, Y: integer; Shift: TShiftState);
 var
-  I: Integer;
+  I: integer;
   Mode: TSelMode;
-  Before: array of Integer;
+  Before: array of integer;
 begin
   if [ssCtrl, ssShift] <= Shift then Mode := smRemove
   else if ssShift in Shift then Mode := smToggle
   else if ssCtrl in Shift then Mode := smAdd
-  else Mode := smOnly;
+  else
+    Mode := smOnly;
 
   if (Abs(X - FBoxX) > 3) or (Abs(Y - FBoxY) > 3) then
     SelectInBox(FBoxX, FBoxY, X, Y, X < FBoxX, Mode)
@@ -2532,7 +2443,9 @@ begin
     begin
       { SketchUp: a click on nothing while a group is open closes it }
       if Mode = smOnly then
-        if FD.Doc.Context <> 0 then CloseGroup else SelectNone;
+        if FD.Doc.Context <> 0 then CloseGroup
+        else
+          SelectNone;
     end
     else if (FD.Doc.TopPartIn(I) > 0) and (FClickN >= 2) then
       { GTK delivers a double-click's second press twice, so the count reads
@@ -2543,7 +2456,9 @@ begin
       { the first click already did its part; with a key held the rest is
         added, or taken away with both }
       Before := Copy(FSel);
-      if FClickN >= 3 then SelectConnected(I) else SelectAttached(I);
+      if FClickN >= 3 then SelectConnected(I)
+      else
+        SelectAttached(I);
       if Mode = smRemove then MergeSel(Before, smRemove)
       else if Mode <> smOnly then MergeSel(Before, smAdd);
     end
@@ -2552,8 +2467,8 @@ begin
         smRemove: SelectRemove(I);
         smToggle: SelectToggle(I);
         smAdd: SelectAdd(I);
-      else
-        SelectOnly(I);
+        else
+          SelectOnly(I);
       end;
   end;
 
@@ -2562,29 +2477,39 @@ begin
     if FCmdMsg = '' then FCmdMsg := 'Nothing selected.';
   end
   else if SoleGroup > 0 then
-    FCmdMsg := Format('Group "%s"%s - double-click to work inside it.',
-      [FD.Doc.PartName(SoleGroup),
-       specialize IfThen<string>(FD.Doc.PartLocked(SoleGroup), ' (locked)', '')])
+    FCmdMsg := Format('Group "%s"%s - double-click to work inside it.', [FD.Doc.PartName(SoleGroup), specialize IfThen<string>(
+      FD.Doc.PartLocked(SoleGroup), ' (locked)', '')])
   { a lone dimension can be told what to say, so the message says so }
   else if SelectedDim >= 0 then
     FCmdMsg := 'Dimension picked - type what it should read and press Enter.'
   else if Length(FSel) = 1 then FCmdMsg := '1 thing selected.'
-  else FCmdMsg := Format('%d things selected.', [Length(FSel)]);
+  else
+    FCmdMsg := Format('%d things selected.', [Length(FSel)]);
   FScreenDirty := True;
   InvalidateStatus;
 end;
 
 { crossing takes anything the box touches, otherwise only what is wholly
   inside }
-procedure TMainForm.SelectInBox(X0, Y0, X1, Y1: Integer; Crossing: Boolean; Mode: TSelMode);
+procedure TMainForm.SelectInBox(X0, Y0, X1, Y1: integer; Crossing: boolean; Mode: TSelMode);
 var
-  I, T: Integer;
+  I, T: integer;
   Picked: TIntArrayW;
-  Before: array of Integer;
+  Before: array of integer;
   Tk: QWord;
 begin
-  if X1 < X0 then begin T := X0; X0 := X1; X1 := T; end;
-  if Y1 < Y0 then begin T := Y0; Y0 := Y1; Y1 := T; end;
+  if X1 < X0 then
+  begin
+    T := X0;
+    X0 := X1;
+    X1 := T;
+  end;
+  if Y1 < Y0 then
+  begin
+    T := Y0;
+    Y0 := Y1;
+    Y1 := T;
+  end;
   Before := Copy(FSel);
   SetLength(FSel, 0);
   Tk := GetTickCount64;
@@ -2600,13 +2525,13 @@ end;
 
 { FSel holds what was just picked; put it together with what was selected
   before }
-procedure TMainForm.MergeSel(const Before: array of Integer; Mode: TSelMode);
+procedure TMainForm.MergeSel(const Before: array of integer; Mode: TSelMode);
 var
-  InBefore, InGot: array of Boolean;
-  Got: array of Integer;
-  K, N: Integer;
+  InBefore, InGot: array of boolean;
+  Got: array of integer;
+  K, N: integer;
 
-  procedure Keep(E: Integer);
+  procedure Keep(E: integer);
   begin
     FSel[N] := E;
     Inc(N);
@@ -2623,8 +2548,7 @@ begin
   SetLength(FSel, Length(Before) + Length(Got));
   N := 0;
   for K := 0 to High(Before) do
-    if (Before[K] >= 0) and (Before[K] < FD.Doc.Live) and
-       ((Mode = smAdd) or not InGot[Before[K]]) then Keep(Before[K]);
+    if (Before[K] >= 0) and (Before[K] < FD.Doc.Live) and ((Mode = smAdd) or not InGot[Before[K]]) then Keep(Before[K]);
   if Mode <> smRemove then
     for K := 0 to High(Got) do
       if not InBefore[Got[K]] then Keep(Got[K]);
@@ -2634,8 +2558,8 @@ end;
 
 procedure TMainForm.DeleteSelection;
 var
-  I, N: Integer;
-  Doomed: array of Boolean;
+  I, N: integer;
+  Doomed: array of boolean;
   Held: TIntArrayW;
   Tk: QWord;
 begin
@@ -2647,8 +2571,7 @@ begin
   SetLength(Doomed, FD.Doc.Live);
   for I := 0 to High(Doomed) do Doomed[I] := False;
   for I := 0 to N - 1 do
-    if (FSel[I] >= 0) and (FSel[I] < Length(Doomed)) and
-       not FD.Doc.PartLockedUp(FD.Doc.TopPartIn(FSel[I])) then Doomed[FSel[I]] := True;
+    if (FSel[I] >= 0) and (FSel[I] < Length(Doomed)) and not FD.Doc.PartLockedUp(FD.Doc.TopPartIn(FSel[I])) then Doomed[FSel[I]] := True;
   { and the faces those edges were holding up (see FacesOnEdges) }
   FD.Doc.FacesOnEdges(FSel, Held);
   for I := 0 to High(Held) do Doomed[Held[I]] := True;
@@ -2669,11 +2592,11 @@ end;
 function TMainForm.MoveDelta: TP3;
 var
   D: TP3;
-  L, Len: Double;
+  L, Len: double;
   Txt: string;
-  Abs_, Rel: Boolean;
-  N: Integer;
-  V: array[0..2] of Double;
+  Abs_, Rel: boolean;
+  N: integer;
+  V: array[0..2] of double;
 begin
   Result := Sub3(FCur, FP1);
 
@@ -2725,10 +2648,9 @@ end;
 
 { The arc's ends are on the two lines of a corner, so it could round that
   corner: the fillet that keeps the first click where it was. }
-function TMainForm.FilletCandidate(out F: TFillet): Boolean;
+function TMainForm.FilletCandidate(out F: TFillet): boolean;
 begin
-  Result := (FTool = ptArc) and (FStage = 2) and
-            FD.Doc.FilletFromEnds(FP1, FP2, F);
+  Result := (FTool = ptArc) and (FStage = 2) and FD.Doc.FilletFromEnds(FP1, FP2, F);
 end;
 
 { Is the arc being placed a fillet, and which?  As SketchUp turns the arc
@@ -2736,13 +2658,13 @@ end;
   ends, and taken when the pull is within a finger's width of its middle.  A
   number typed while magenta, or with an r suffix, is the radius.  Typed says
   a radius was typed. }
-function TMainForm.ArcFillet(out F: TFillet; out Typed: Boolean): Boolean;
+function TMainForm.ArcFillet(out F: TFillet; out Typed: boolean): boolean;
 const
   LOCK_PX = 16;
 var
   Txt: string;
-  L: Double;
-  RSuffix, Near_: Boolean;
+  L: double;
+  RSuffix, Near_: boolean;
   M: TPointF;
   F2: TFillet;
 begin
@@ -2768,22 +2690,27 @@ end;
 { The face a press is on: the one under the pointer, or during a replay the
   one holding the pressed point (another window or camera can find a
   different face behind the same pixel). }
-function TMainForm.FaceAtPress: Integer;
+function TMainForm.FaceAtPress: integer;
 begin
   if FReplayFace >= 0 then Result := FReplayFace
-  else Result := FD.Doc.HitFace(Proj, FMouseSX, FMouseSY);
+  else
+    Result := FD.Doc.HitFace(Proj, FMouseSX, FMouseSY);
 end;
 
 { the face the overlay is washing blue now, or -1: the same choices
   PaintOverlay makes, for the cursor's square }
-function TMainForm.HintFaceNow: Integer;
+function TMainForm.HintFaceNow: integer;
 begin
   Result := -1;
   case FTool of
     ptPush, ptDrill:
-      if FStage = 1 then Result := FPushFace else Result := FHoverFace;
+      if FStage = 1 then Result := FPushFace
+      else
+        Result := FHoverFace;
     ptFollow:
-      if FStage = 0 then Result := FHoverFace else Result := FFollowFace;
+      if FStage = 0 then Result := FHoverFace
+      else
+        Result := FFollowFace;
     ptLine, ptRect, ptCircle, ptArc:
       if (FStage = 0) and not FPlaneHeld then
         Result := InContextFace(FD.Doc.HitFace(Proj, FMouseSX, FMouseSY));
@@ -2792,11 +2719,11 @@ end;
 
 { The part of a tool's preview under the pointer, drawn into the cursor's
   square (see pbScreenPaint).  OX, OY is the square's corner on screen. }
-procedure TMainForm.PaintUnderCursor(S: TArtSurface; OX, OY: Integer);
+procedure TMainForm.PaintUnderCursor(S: TArtSurface; OX, OY: integer);
 var
   F: TFillet;
-  Typed: Boolean;
-  K, HF: Integer;
+  Typed: boolean;
+  K, HF: integer;
   PA, PB: TPointF;
   RectPts: TP3Array;
 begin
@@ -2846,8 +2773,7 @@ begin
   PA := ScreenOf(ArcPoint(F.ArcC, F.R, F.A0, F.Pl, F.Nm));
   for K := 1 to FSidesArc do
   begin
-    PB := ScreenOf(ArcPoint(F.ArcC, F.R, F.A0 + F.Sweep * K / FSidesArc,
-      F.Pl, F.Nm));
+    PB := ScreenOf(ArcPoint(F.ArcC, F.R, F.A0 + F.Sweep * K / FSidesArc, F.Pl, F.Nm));
     S.Line(PA.X - OX, PA.Y - OY, PB.X - OX, PB.Y - OY,
       Max(3, Round(3 * FUIScale)), Pix(225, 40, 225), 1);
     PA := PB;
@@ -2857,18 +2783,17 @@ end;
 { The second click of a double-click with the arc tool.  Right after a
   fillet it trims that corner (SketchUp's double-click); otherwise, near a
   corner, it rounds it with the last radius. }
-function TMainForm.ArcDoubleClick(SX, SY: Integer): Boolean;
+function TMainForm.ArcDoubleClick(SX, SY: integer): boolean;
 var
   Corner: TP3;
   F: TFillet;
-  N: Integer;
+  N: integer;
 begin
   Result := False;
   if FTool <> ptArc then Exit;
   { only the double-click whose first click made the fillet; a pending trim
     used a minute later would hit the old corner instead of the new one }
-  if FFilletPending and (FFilletSeq = FEditSeq) and
-     (GetTickCount64 - FFilletTick < 800) then
+  if FFilletPending and (FFilletSeq = FEditSeq) and (GetTickCount64 - FFilletTick < 800) then
   begin
     FFilletPending := False;
     N := FD.Doc.TrimFillet(FLastFillet);
@@ -2877,8 +2802,7 @@ begin
       RebuildFlatFaces;
       RenderInk;
       RecomposeAll;
-      FCmdMsg := 'Corner rounded to ' + FormatLen(FLastFillet.R, FD.Units) +
-        ' and trimmed.  Double-click another corner for the same again.';
+      FCmdMsg := 'Corner rounded to ' + FormatLen(FLastFillet.R, FD.Units) + ' and trimmed.  Double-click another corner for the same again.';
       ResetTool;
       Exit(True);
     end;
@@ -2889,8 +2813,7 @@ begin
   ResetTool;
   if not FD.Doc.FilletAt(Corner, FLastFilletR, F) then
   begin
-    FCmdMsg := 'A ' + FormatLen(FLastFilletR, FD.Units) +
-      ' radius does not fit that corner.';
+    FCmdMsg := 'A ' + FormatLen(FLastFilletR, FD.Units) + ' radius does not fit that corner.';
     Exit(True);
   end;
   PushUndo;
@@ -2904,20 +2827,18 @@ end;
 
 { Alt's tangent lock: the bulge that runs the arc smoothly out of the edge
   its first point is on (see TangentSagitta in hsDrawing). }
-function TMainForm.TangentBulge(Pl: TPlane; out Bulge: Double): Boolean;
+function TMainForm.TangentBulge(Pl: TPlane; out Bulge: double): boolean;
 begin
-  Result := FArcTanHas and
-            TangentSagitta(FP1, FP2, FArcTanDir, Pl, Bulge);
+  Result := FArcTanHas and TangentSagitta(FP1, FP2, FArcTanDir, Pl, Bulge);
 end;
 
-function TMainForm.ArcPicks(const B: TP3; out Pl: TPlane; out C: TP3;
-  out R, A0, Sweep, Bulge: Double): Boolean;
+function TMainForm.ArcPicks(const B: TP3; out Pl: TPlane; out C: TP3; out R, A0, Sweep, Bulge: double): boolean;
 var
   AU, AV, N, FN: TP3;
-  U1, V1, U2, V2, UC, VC, Ln, NU, NV, L, Size, Tol: Double;
-  F: Integer;
+  U1, V1, U2, V2, UC, VC, Ln, NU, NV, L, Size, Tol: double;
+  F: integer;
 
-  function OnPlane(const P, Org, Nm: TP3): Boolean;
+  function OnPlane(const P, Org, Nm: TP3): boolean;
   begin
     Result := Abs(Dot3(Nm, Sub3(P, Org))) <= Tol;
   end;
@@ -2925,7 +2846,10 @@ var
 begin
   Result := False;
   Bulge := 0;
-  C := FP1; R := 0; A0 := 0; Sweep := 0;
+  C := FP1;
+  R := 0;
+  A0 := 0;
+  Sweep := 0;
   Pl := FD.Plane;
   Size := Max(Dist(FP2, FP1), Dist(B, FP1));
   if Size < 1E-9 then Exit;
@@ -2941,8 +2865,7 @@ begin
     begin
       if (FD.Doc[F].Kind <> ekFace) or (Length(FD.Doc[F].Poly) < 3) then Continue;
       FN := Norm3(FD.Doc.FaceNormal(F));
-      if OnPlane(FP1, FD.Doc[F].Poly[0], FN) and OnPlane(FP2, FD.Doc[F].Poly[0], FN) and
-         OnPlane(B, FD.Doc[F].Poly[0], FN) then
+      if OnPlane(FP1, FD.Doc[F].Poly[0], FN) and OnPlane(FP2, FD.Doc[F].Poly[0], FN) and OnPlane(B, FD.Doc[F].Poly[0], FN) then
       begin
         if Abs(FN.Z) > 0.999 then Pl := plXY
         else if Abs(FN.Y) > 0.999 then Pl := plXZ
@@ -2976,7 +2899,7 @@ end;
 { The selection drawn where it would land, plus the line back to the grab. }
 procedure TMainForm.PaintMoveGhost(C: TCanvas);
 var
-  I, K: Integer;
+  I, K: integer;
   D: TP3;
   Hi: TPointFArray;
   Lo, Hi3: TP3;
@@ -3012,7 +2935,8 @@ begin
   C.Pen.Width := Max(2, Round(2 * FUIScale));
   if FMoveCopy then C.Pen.Color := PixToColor(Pix(60, 180, 110))
   else if FDetachMove then C.Pen.Color := PixToColor(Pix(235, 150, 40))
-  else C.Pen.Color := PixToColor(Pix(70, 130, 240));
+  else
+    C.Pen.Color := PixToColor(Pix(70, 130, 240));
   { the projection is affine, so one world offset is one screen offset }
   PA := ScreenOf(P3(D.X, D.Y, D.Z));
   PB := ScreenOf(P3(0, 0, 0));
@@ -3038,8 +2962,10 @@ begin
     end;
     Lo := Add3(Lo, D);
     Hi3 := Add3(Hi3, D);
-    Crate[0] := P3(Lo.X, Lo.Y, Lo.Z); Crate[1] := P3(Hi3.X, Lo.Y, Lo.Z);
-    Crate[2] := P3(Hi3.X, Hi3.Y, Lo.Z); Crate[3] := P3(Lo.X, Hi3.Y, Lo.Z);
+    Crate[0] := P3(Lo.X, Lo.Y, Lo.Z);
+    Crate[1] := P3(Hi3.X, Lo.Y, Lo.Z);
+    Crate[2] := P3(Hi3.X, Hi3.Y, Lo.Z);
+    Crate[3] := P3(Lo.X, Hi3.Y, Lo.Z);
     for K := 0 to 3 do Crate[K + 4] := P3(Crate[K].X, Crate[K].Y, Hi3.Z);
     for K := 0 to 7 do CS[K] := ScreenOf(Crate[K]);
     C.Pen.Style := psDash;
@@ -3047,12 +2973,17 @@ begin
     C.Pen.Color := PixToColor(Pix(150, 160, 150));
     for K := 0 to 3 do
     begin
-      C.MoveTo(Round(CS[K].X), Round(CS[K].Y)); C.LineTo(Round(CS[(K + 1) mod 4].X), Round(CS[(K + 1) mod 4].Y));
-      C.MoveTo(Round(CS[K + 4].X), Round(CS[K + 4].Y)); C.LineTo(Round(CS[(K + 1) mod 4 + 4].X), Round(CS[(K + 1) mod 4 + 4].Y));
-      C.MoveTo(Round(CS[K].X), Round(CS[K].Y)); C.LineTo(Round(CS[K + 4].X), Round(CS[K + 4].Y));
+      C.MoveTo(Round(CS[K].X), Round(CS[K].Y));
+      C.LineTo(Round(CS[(K + 1) mod 4].X), Round(CS[(K + 1) mod 4].Y));
+      C.MoveTo(Round(CS[K + 4].X), Round(CS[K + 4].Y));
+      C.LineTo(Round(CS[(K + 1) mod 4 + 4].X), Round(CS[(K + 1) mod 4 + 4].Y));
+      C.MoveTo(Round(CS[K].X), Round(CS[K].Y));
+      C.LineTo(Round(CS[K + 4].X), Round(CS[K + 4].Y));
     end;
-    C.MoveTo(Round(CS[0].X), Round(CS[0].Y)); C.LineTo(Round(CS[2].X), Round(CS[2].Y));
-    C.MoveTo(Round(CS[1].X), Round(CS[1].Y)); C.LineTo(Round(CS[3].X), Round(CS[3].Y));
+    C.MoveTo(Round(CS[0].X), Round(CS[0].Y));
+    C.LineTo(Round(CS[2].X), Round(CS[2].Y));
+    C.MoveTo(Round(CS[1].X), Round(CS[1].Y));
+    C.LineTo(Round(CS[3].X), Round(CS[3].Y));
     C.Pen.Style := psSolid;
     UIFont(C, 10, True, Pix(80, 110, 80));
     C.Brush.Style := bsClear;
@@ -3081,7 +3012,7 @@ end;
 function TMainForm.RotRefDir: TP3;
 var
   AU, AV, D: TP3;
-  L: Double;
+  L: double;
 begin
   AxesFromNormal(FRotAxis, AU, AV);
   if FStage < 2 then Exit(AU);
@@ -3095,10 +3026,10 @@ end;
 
 { How far round, in radians, right-handed about the axis.  Typed wins, taking
   its direction from the swing (like a typed length on a move). }
-function TMainForm.RotAngle: Double;
+function TMainForm.RotAngle: double;
 var
   Ref, D: TP3;
-  L, Deg, Snap: Double;
+  L, Deg, Snap: double;
 begin
   Ref := RotRefDir;
   D := Sub3(FCur, FP1);
@@ -3122,18 +3053,17 @@ end;
   and the selection where it would land. }
 procedure TMainForm.PaintRotateGhost(C: TCanvas);
 var
-  I, K: Integer;
+  I, K: integer;
   AU, AV, P, Q, Ref: TP3;
-  Rw, Ang, A: Double;
+  Rw, Ang, A: double;
   PA, PB: TPointF;
   W: TP3Array;
   Col: TColor;
 
-  function OnCircle(Th, Rad: Double): TP3;
+  function OnCircle(Th, Rad: double): TP3;
   begin
-    Result := P3(FP1.X + (AU.X * Cos(Th) + AV.X * Sin(Th)) * Rad,
-                 FP1.Y + (AU.Y * Cos(Th) + AV.Y * Sin(Th)) * Rad,
-                 FP1.Z + (AU.Z * Cos(Th) + AV.Z * Sin(Th)) * Rad);
+    Result := P3(FP1.X + (AU.X * Cos(Th) + AV.X * Sin(Th)) * Rad, FP1.Y + (AU.Y * Cos(Th) + AV.Y * Sin(Th)) * Rad,
+      FP1.Z + (AU.Z * Cos(Th) + AV.Z * Sin(Th)) * Rad);
   end;
 
   procedure Seg(const A, B: TP3);
@@ -3147,7 +3077,8 @@ var
 begin
   if FStage < 1 then Exit;
   if FRotAxisIx >= 0 then Col := PixToColor(AxisPix(FRotAxisIx div 2))
-  else Col := PixToColor(Pix(200, 60, 200));
+  else
+    Col := PixToColor(Pix(200, 60, 200));
   AxesFromNormal(FRotAxis, AU, AV);
   Ref := RotRefDir;
   Ang := RotAngle;
@@ -3164,7 +3095,8 @@ begin
   A := ArcTan2(Dot3(Ref, AV), Dot3(Ref, AU));
   for K := 0 to 23 do
     if K mod 6 = 0 then Seg(OnCircle(A + K * Pi / 12, Rw * 0.82), OnCircle(A + K * Pi / 12, Rw))
-    else Seg(OnCircle(A + K * Pi / 12, Rw * 0.91), OnCircle(A + K * Pi / 12, Rw));
+    else
+      Seg(OnCircle(A + K * Pi / 12, Rw * 0.91), OnCircle(A + K * Pi / 12, Rw));
 
   C.Pen.Width := Max(2, Round(2 * FUIScale));
   { the reference arm, dashed }
@@ -3188,7 +3120,8 @@ begin
     C.Pen.Style := psSolid;
     if FMoveCopy then C.Pen.Color := PixToColor(Pix(60, 180, 110))
     else if FDetachMove then C.Pen.Color := PixToColor(Pix(235, 150, 40))
-    else C.Pen.Color := PixToColor(Pix(70, 130, 240));
+    else
+      C.Pen.Color := PixToColor(Pix(70, 130, 240));
     for I := 0 to High(FSel) do
     begin
       W := FD.Doc.OutlineWorld(FSel[I]);
@@ -3206,9 +3139,9 @@ begin
   C.Pen.Style := psSolid;
 end;
 
-function TMainForm.IsDoomed(I: Integer): Boolean;
+function TMainForm.IsDoomed(I: integer): boolean;
 var
-  K: Integer;
+  K: integer;
 begin
   Result := True;
   for K := 0 to High(FDoomed) do
@@ -3219,9 +3152,9 @@ end;
 { What the right button is asking about.  Edges reach only 4 px here, not 9
   as in PickAt: on a cylinder every point is within 9 px of an edge, so its
   faces could not be reached from the menu. }
-function TMainForm.PickForMenu(SX, SY: Integer): Integer;
+function TMainForm.PickForMenu(SX, SY: integer): integer;
 var
-  E, F: Integer;
+  E, F: integer;
 begin
   Result := FD.Doc.HitNote(SX, SY);
   if Result >= 0 then Exit;
@@ -3241,8 +3174,8 @@ end;
 { every distinct group in the selection, by the entity you would click }
 function TMainForm.SelectedGroups: TIntArrayW;
 var
-  K, T, J, N: Integer;
-  Known: Boolean;
+  K, T, J, N: integer;
+  Known: boolean;
 begin
   Result := nil;
   N := 0;
@@ -3262,10 +3195,10 @@ begin
 end;
 
 { the one group the selection is, or 0 for several, loose things, or a mix }
-function TMainForm.SoleGroup: Integer;
+function TMainForm.SoleGroup: integer;
 var
   Gs: TIntArrayW;
-  K: Integer;
+  K: integer;
 begin
   Result := 0;
   Gs := SelectedGroups;
@@ -3277,7 +3210,7 @@ end;
 
 procedure TMainForm.MakeGroup;
 var
-  Id, K, T, I, J, First: Integer;
+  Id, K, T, I, J, First: integer;
   Sel: TIntArrayW;
 begin
   if Length(FSel) = 0 then
@@ -3291,8 +3224,7 @@ begin
     T := FD.Doc.TopPartIn(FSel[K]);
     if (T > 0) and FD.Doc.PartLockedUp(T) then
     begin
-      FCmdMsg := Format('"%s" is locked - unlock it before grouping it with anything.',
-        [FD.Doc.PartName(T)]);
+      FCmdMsg := Format('"%s" is locked - unlock it before grouping it with anything.', [FD.Doc.PartName(T)]);
       InvalidateStatus;
       Exit;
     end;
@@ -3317,8 +3249,7 @@ begin
         and the group left empty }
       if FD.Doc[I].Kind = ekFace then
         for J := 0 to FD.Doc.Live - 1 do
-          if (FD.Doc[J].Kind in [ekLine, ekArc]) and (FD.Doc[J].Part = FD.Doc.Context) and
-             EntHasPoint(I, FD.Doc[J].A) and EntHasPoint(I, FD.Doc[J].B) then
+          if (FD.Doc[J].Kind in [ekLine, ekArc]) and (FD.Doc[J].Part = FD.Doc.Context) and EntHasPoint(I, FD.Doc[J].A) and EntHasPoint(I, FD.Doc[J].B) then
             FD.Doc.SetPart(J, Id);
     end;
     if First < 0 then First := I;
@@ -3331,8 +3262,7 @@ begin
   RenderInk;
   RecomposeAll;
   InfoChanged;
-  FCmdMsg := Format('Grouped as "%s".  Double-click it to work inside it; ' +
-    '/name calls it something.', [FD.Doc.PartName(Id)]);
+  FCmdMsg := Format('Grouped as "%s".  Double-click it to work inside it; ' + '/name calls it something.', [FD.Doc.PartName(Id)]);
   InvalidateStatus;
   pbScreen.Invalidate;
 end;
@@ -3340,8 +3270,8 @@ end;
 procedure TMainForm.ExplodeGroups;
 var
   Gs: TIntArrayW;
-  Doom: array of Boolean;
-  K, G, Up, I, N: Integer;
+  Doom: array of boolean;
+  K, G, Up, I, N: integer;
 begin
   Gs := SelectedGroups;
   if Length(Gs) = 0 then
@@ -3372,7 +3302,8 @@ begin
       begin
         { members go up a level; a group inside stays a group }
         if FD.Doc[I].Kind = ekPart then FD.Doc.SetPartParent(FD.Doc[I].Grp, Up)
-        else FD.Doc.SetPart(I, Up);
+        else
+          FD.Doc.SetPart(I, Up);
         Inc(N);
       end;
     end;
@@ -3391,7 +3322,7 @@ begin
   pbScreen.Invalidate;
 end;
 
-procedure TMainForm.OpenGroup(Id: Integer);
+procedure TMainForm.OpenGroup(Id: integer);
 var
   T0: QWord;
 begin
@@ -3414,15 +3345,14 @@ begin
   T0 := GetTickCount64;
   InfoChanged;
   Took('OpenGroup: panels', T0);
-  FCmdMsg := Format('Inside "%s".  What you draw now belongs to it; ' +
-    'Esc or a click on nothing leaves it.', [FD.Doc.PartName(Id)]);
+  FCmdMsg := Format('Inside "%s".  What you draw now belongs to it; ' + 'Esc or a click on nothing leaves it.', [FD.Doc.PartName(Id)]);
   InvalidateStatus;
   pbScreen.Invalidate;
 end;
 
 procedure TMainForm.CloseGroup;
 var
-  Was: Integer;
+  Was: integer;
   T0: QWord;
 begin
   if FD.Doc.Context = 0 then Exit;
@@ -3440,16 +3370,16 @@ begin
   InfoChanged;
   Took('CloseGroup: panels', T0);
   if FD.Doc.Context = 0 then FCmdMsg := Format('Left "%s".', [FD.Doc.PartName(Was)])
-  else FCmdMsg := Format('Left "%s" - inside "%s" now.',
-    [FD.Doc.PartName(Was), FD.Doc.PartName(FD.Doc.Context)]);
+  else
+    FCmdMsg := Format('Left "%s" - inside "%s" now.', [FD.Doc.PartName(Was), FD.Doc.PartName(FD.Doc.Context)]);
   InvalidateStatus;
   pbScreen.Invalidate;
 end;
 
-procedure TMainForm.LockGroups(Locked: Boolean);
+procedure TMainForm.LockGroups(Locked: boolean);
 var
   Gs: TIntArrayW;
-  K: Integer;
+  K: integer;
 begin
   Gs := SelectedGroups;
   if Length(Gs) = 0 then
@@ -3462,8 +3392,7 @@ begin
   for K := 0 to High(Gs) do FD.Doc.SetPartLocked(Gs[K], Locked);
   InfoChanged;
   if Locked then
-    FCmdMsg := 'Locked.  It can still be snapped to, and picked - but not moved, ' +
-      'changed or opened until it is unlocked.'
+    FCmdMsg := 'Locked.  It can still be snapped to, and picked - but not moved, ' + 'changed or opened until it is unlocked.'
   else
     FCmdMsg := 'Unlocked.';
   InvalidateStatus;
@@ -3474,20 +3403,20 @@ end;
   contains it ("/hide labels").  Unnamed: hide takes the picked groups, show
   brings back everything.  Nothing is lost; only drawing, picking and
   snapping change. }
-procedure TMainForm.HideGroups(PutAway: Boolean; const Named: string);
+procedure TMainForm.HideGroups(PutAway: boolean; const Named: string);
 var
   Gs: TIntArrayW;
-  I, K, N: Integer;
+  I, K, N: integer;
   Want: string;
 begin
   SetLength(Gs, 0);
   Want := LowerCase(Trim(Named));
   for I := 0 to FD.Doc.Live - 1 do
-    if (FD.Doc[I].Kind = ekPart) and (FD.Doc[I].Hidden <> PutAway) and
-       (((Want <> '') and (Pos(Want, LowerCase(FD.Doc.PartName(FD.Doc[I].Grp))) > 0)) or
-        ((Want = '') and not PutAway)) then
+    if (FD.Doc[I].Kind = ekPart) and (FD.Doc[I].Hidden <> PutAway) and (((Want <> '') and (Pos(Want, LowerCase(FD.Doc.PartName(FD.Doc[I].Grp))) > 0)) or
+      ((Want = '') and not PutAway)) then
     begin
-      SetLength(Gs, Length(Gs) + 1); Gs[High(Gs)] := FD.Doc[I].Grp;
+      SetLength(Gs, Length(Gs) + 1);
+      Gs[High(Gs)] := FD.Doc[I].Grp;
     end;
   if (Want = '') and PutAway then Gs := SelectedGroups;
   if Length(Gs) = 0 then
@@ -3495,7 +3424,8 @@ begin
     if Want <> '' then
       FCmdMsg := Format('No group %s has "%s" in its name.', [IfThen(PutAway, 'showing', 'put away'), Trim(Named)])
     else if PutAway then FCmdMsg := 'Pick a group first - or /hide labels puts away every group named so.'
-    else FCmdMsg := 'Nothing is put away.';
+    else
+      FCmdMsg := 'Nothing is put away.';
     InvalidateStatus;
     Exit;
   end;
@@ -3513,8 +3443,7 @@ begin
   RecomposeAll;
   InfoChanged;
   if PutAway then
-    FCmdMsg := Format('%d group%s put away - /show brings %s back.', [N, IfThen(N = 1, '', 's'),
-      IfThen(N = 1, 'it', 'them')])
+    FCmdMsg := Format('%d group%s put away - /show brings %s back.', [N, IfThen(N = 1, '', 's'), IfThen(N = 1, 'it', 'them')])
   else
     FCmdMsg := Format('%d group%s brought back.', [N, IfThen(N = 1, '', 's')]);
   InvalidateStatus;
@@ -3523,7 +3452,7 @@ end;
 
 procedure TMainForm.RenameGroup(const NewName: string);
 var
-  G: Integer;
+  G: integer;
 begin
   G := SoleGroup;
   if G = 0 then
@@ -3548,10 +3477,10 @@ end;
 { What a move or turn takes hold of.  Whole groups go rigidly and do not
   stretch loose things touching them; loose picked things move with their
   corners as usual.  A locked group stays put. }
-function TMainForm.SplitMoveSelection: Boolean;
+function TMainForm.SplitMoveSelection: boolean;
 var
   Gs, M, Loose: TIntArrayW;
-  K, J, I, N, NL, Skipped: Integer;
+  K, J, I, N, NL, Skipped: integer;
 begin
   Result := True;
   SetLength(FMoveGroupEnts, 0);
@@ -3560,7 +3489,11 @@ begin
   Gs := SelectedGroups;
   for K := 0 to High(Gs) do
   begin
-    if FD.Doc.PartLockedUp(Gs[K]) then begin Inc(Skipped); Continue; end;
+    if FD.Doc.PartLockedUp(Gs[K]) then
+    begin
+      Inc(Skipped);
+      Continue;
+    end;
     M := FD.Doc.PartMembers(Gs[K], True);
     SetLength(FMoveGroupEnts, N + Length(M));
     for J := 0 to High(M) do FMoveGroupEnts[N + J] := M[J];
@@ -3592,7 +3525,7 @@ end;
 { A face a tool may act on: one in the open context.  As in SketchUp, a
   closed group's face is not pushed from outside.  Drawing ON it goes
   through FaceUnder, which is not filtered. }
-function TMainForm.InContextFace(F: Integer): Integer;
+function TMainForm.InContextFace(F: integer): integer;
 begin
   Result := F;
   if (F >= 0) and (FD.Doc.TopPartIn(F) <> 0) then Result := -1;
@@ -3600,25 +3533,30 @@ end;
 
 { The box round a group, as SketchUp draws one: the twelve edges of its
   bounds.  Shift offsets it, for a ghost. }
-procedure TMainForm.PaintPartBox(C: TCanvas; Id: Integer; const Col: TPix;
-  Dashed: Boolean; const Shift: TP3);
+procedure TMainForm.PaintPartBox(C: TCanvas; Id: integer; const Col: TPix; Dashed: boolean; const Shift: TP3);
 const
-  E: array[0..11, 0..1] of Integer = ((0, 1), (1, 2), (2, 3), (3, 0),
+  E: array[0..11, 0..1] of integer = ((0, 1), (1, 2), (2, 3), (3, 0),
     (4, 5), (5, 6), (6, 7), (7, 4), (0, 4), (1, 5), (2, 6), (3, 7));
 var
   Lo, Hi: TP3;
   P: array[0..7] of TPointF;
-  K: Integer;
+  K: integer;
 begin
   if not FD.Doc.PartBounds(Id, Lo, Hi) then Exit;
   Lo := Add3(Lo, Shift);
   Hi := Add3(Hi, Shift);
-  P[0] := ScreenOf(P3(Lo.X, Lo.Y, Lo.Z)); P[1] := ScreenOf(P3(Hi.X, Lo.Y, Lo.Z));
-  P[2] := ScreenOf(P3(Hi.X, Hi.Y, Lo.Z)); P[3] := ScreenOf(P3(Lo.X, Hi.Y, Lo.Z));
-  P[4] := ScreenOf(P3(Lo.X, Lo.Y, Hi.Z)); P[5] := ScreenOf(P3(Hi.X, Lo.Y, Hi.Z));
-  P[6] := ScreenOf(P3(Hi.X, Hi.Y, Hi.Z)); P[7] := ScreenOf(P3(Lo.X, Hi.Y, Hi.Z));
+  P[0] := ScreenOf(P3(Lo.X, Lo.Y, Lo.Z));
+  P[1] := ScreenOf(P3(Hi.X, Lo.Y, Lo.Z));
+  P[2] := ScreenOf(P3(Hi.X, Hi.Y, Lo.Z));
+  P[3] := ScreenOf(P3(Lo.X, Hi.Y, Lo.Z));
+  P[4] := ScreenOf(P3(Lo.X, Lo.Y, Hi.Z));
+  P[5] := ScreenOf(P3(Hi.X, Lo.Y, Hi.Z));
+  P[6] := ScreenOf(P3(Hi.X, Hi.Y, Hi.Z));
+  P[7] := ScreenOf(P3(Lo.X, Hi.Y, Hi.Z));
   C.Brush.Style := bsClear;
-  if Dashed then C.Pen.Style := psDash else C.Pen.Style := psSolid;
+  if Dashed then C.Pen.Style := psDash
+  else
+    C.Pen.Style := psSolid;
   C.Pen.Width := Max(1, Round(FUIScale));
   C.Pen.Color := PixToColor(Col);
   for K := 0 to 11 do
@@ -3632,7 +3570,7 @@ end;
 { What move and rotate take hold of when nothing is picked: a note, an
   edge, a face, anything else - never a guide (a guide is laid anew, not
   moved). }
-function TMainForm.PickToGrab(SX, SY: Integer): Integer;
+function TMainForm.PickToGrab(SX, SY: integer): integer;
 begin
   Result := FD.Doc.HitNote(SX, SY);
   if Result < 0 then
@@ -3645,13 +3583,13 @@ end;
 { What a click takes, with the group rules on top.  Inside an open group the
   rest of the drawing cannot be picked; that click closes the group (see
   FinishSelect). }
-function TMainForm.PickAt(SX, SY: Integer): Integer;
+function TMainForm.PickAt(SX, SY: integer): integer;
 begin
   Result := PickAtRaw(SX, SY);
   if (Result >= 0) and (FD.Doc.TopPartIn(Result) < 0) then Result := -1;
 end;
 
-function TMainForm.PickAtRaw(SX, SY: Integer): Integer;
+function TMainForm.PickAtRaw(SX, SY: integer): integer;
 begin
   { a note is drawn on top, so it is picked first }
   Result := FD.Doc.HitNote(SX, SY);
@@ -3667,9 +3605,9 @@ begin
 end;
 
 { add whatever is under the cursor to the eraser's gathered list }
-procedure TMainForm.DoomAt(SX, SY: Integer);
+procedure TMainForm.DoomAt(SX, SY: integer);
 var
-  I, T, K: Integer;
+  I, T, K: integer;
   M: TIntArrayW;
 begin
   { softening is about edges only (a face has no crease), so a soften stroke
@@ -3697,8 +3635,7 @@ begin
   if I < 0 then
   begin
     if FD.Doc.HitFace(Proj, SX, SY) >= 0 then
-      FCmdMsg := 'The eraser takes edges - rub out the edges round a face ' +
-        'and the face goes with them.  For the face on its own: right-click ' +
+      FCmdMsg := 'The eraser takes edges - rub out the edges round a face ' + 'and the face goes with them.  For the face on its own: right-click ' +
         'it, or pick it and press Delete.';
     Exit;
   end;
@@ -3730,24 +3667,23 @@ begin
 end;
 
 { 0 erases, 1 softens (Ctrl), 2 unsoftens (Ctrl+Shift) }
-function TMainForm.EraseModeOf(Shift: TShiftState): Integer;
+function TMainForm.EraseModeOf(Shift: TShiftState): integer;
 begin
   if not (ssCtrl in Shift) then Result := 0
   else if ssShift in Shift then Result := 2
-  else Result := 1;
+  else
+    Result := 1;
 end;
 
 { Soften what the eraser gathered instead of erasing it.  Only lines and
   arcs; faces under the stroke are skipped rather than spoiling it. }
-procedure TMainForm.SoftenDoomed(On_: Boolean);
+procedure TMainForm.SoftenDoomed(On_: boolean);
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   N := 0;
   for I := 0 to High(FDoomed) do
-    if (FDoomed[I] >= 0) and (FDoomed[I] < FD.Doc.Live) and
-       (FD.Doc[FDoomed[I]].Kind in [ekLine, ekArc]) and
-       (FD.Doc[FDoomed[I]].Soft <> On_) then
+    if (FDoomed[I] >= 0) and (FDoomed[I] < FD.Doc.Live) and (FD.Doc[FDoomed[I]].Kind in [ekLine, ekArc]) and (FD.Doc[FDoomed[I]].Soft <> On_) then
     begin
       if N = 0 then PushUndo;
       FD.Doc.SetSoft(FDoomed[I], On_);
@@ -3755,13 +3691,10 @@ begin
     end;
   SetLength(FDoomed, 0);
   if N = 0 then
-    FCmdMsg := specialize IfThen<string>(On_,
-      'Nothing there to soften.', 'Nothing there was softened.')
+    FCmdMsg := specialize IfThen<string>(On_, 'Nothing there to soften.', 'Nothing there was softened.')
   else
   begin
-    FCmdMsg := Format('%d %s %s.', [N,
-      specialize IfThen<string>(N = 1, 'edge', 'edges'),
-      specialize IfThen<string>(On_, 'softened', 'brought back')]);
+    FCmdMsg := Format('%d %s %s.', [N, specialize IfThen<string>(N = 1, 'edge', 'edges'), specialize IfThen<string>(On_, 'softened', 'brought back')]);
     RenderInk;
     RecomposeAll;
   end;
@@ -3771,11 +3704,11 @@ end;
 { Delete everything gathered, then let the face rebuild join or drop areas. }
 procedure TMainForm.BurnDoomed;
 var
-  I, J, T, N: Integer;
+  I, J, T, N: integer;
   EA, EB: array of TP3;
   Kinds: array of TEntKind;
   Held: TIntArrayW;
-  Gone: array of Boolean;
+  Gone: array of boolean;
 begin
   N := Length(FDoomed);
   if N = 0 then Exit;
@@ -3817,10 +3750,10 @@ begin
   J := J - RebuildFlatFaces;
 
   if N = 1 then FCmdMsg := 'Deleted.'
-  else FCmdMsg := Format('Deleted %d things.', [N]);
+  else
+    FCmdMsg := Format('Deleted %d things.', [N]);
   if J > 0 then
-    FCmdMsg := FCmdMsg + Format('  %d face%s gone with them.',
-      [J, IfThen(J = 1, '', 's')]);
+    FCmdMsg := FCmdMsg + Format('  %d face%s gone with them.', [J, IfThen(J = 1, '', 's')]);
   SetLength(FDoomed, 0);
   SelectNone;
   RenderInk;
@@ -3835,8 +3768,8 @@ begin
     1: Result := 'a point where it landed - Ctrl for the dashed line too';
     2: Result := 'a guide across the run - Ctrl for the point too';
     3: Result := 'nothing left behind - Ctrl to leave a guide again';
-  else
-    Result := 'guide across the run, and a point where it landed - Ctrl changes it';
+    else
+      Result := 'guide across the run, and a point where it landed - Ctrl changes it';
   end;
 end;
 
@@ -3847,7 +3780,7 @@ end;
 procedure TMainForm.LayGuide;
 var
   D, E, Nm, AU, AV: TP3;
-  Have: Boolean;
+  Have: boolean;
   Kind: TTapeGuide;
 begin
   if Dist(FP1, FP2) < 1E-9 then Exit;
@@ -3868,8 +3801,7 @@ begin
     only; anywhere else, a line across the run }
   PlaneAxes(FD.Plane, AU, AV);
   Nm := Cross3(AU, AV);
-  Have := (FMeasEdge >= 0) and (FMeasEdge < FD.Doc.Live) and
-          (FD.Doc[FMeasEdge].Kind = ekLine);
+  Have := (FMeasEdge >= 0) and (FMeasEdge < FD.Doc.Live) and (FD.Doc[FMeasEdge].Kind = ekLine);
   if Have then
     E := Sub3(FD.Doc[FMeasEdge].B, FD.Doc[FMeasEdge].A)
   else
@@ -3882,17 +3814,14 @@ begin
 
   { a line unless the run was along its starting edge, except in line-only
     mode }
-  if (FTapeDrop <> 1) and ((Kind <> tgPointOnly) or (FTapeDrop = 2)) and
-     (Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z) > 1E-18) then
+  if (FTapeDrop <> 1) and ((Kind <> tgPointOnly) or (FTapeDrop = 2)) and (Sqr(D.X) + Sqr(D.Y) + Sqr(D.Z) > 1E-18) then
     FD.Doc.AddGuide(FP2, Add3(FP2, D));
   if FTapeDrop <> 2 then FD.Doc.AddGuide(FP2, FP2);
 
   if (Kind = tgPointOnly) and (FTapeDrop <> 2) then
-    FCmdMsg := FormatLen(Dist(FP1, FP2), FD.Units) +
-      '   a point where it landed - measured along the edge, so no line with it'
+    FCmdMsg := FormatLen(Dist(FP1, FP2), FD.Units) + '   a point where it landed - measured along the edge, so no line with it'
   else if Kind = tgAlongEdge then
-    FCmdMsg := FormatLen(Dist(FP1, FP2), FD.Units) +
-      '   a guide parallel to the edge it came off  -  ' + TapeDropSays
+    FCmdMsg := FormatLen(Dist(FP1, FP2), FD.Units) + '   a guide parallel to the edge it came off  -  ' + TapeDropSays
   else
     FCmdMsg := FormatLen(Dist(FP1, FP2), FD.Units) + '   ' + TapeDropSays;
   RenderInk;
@@ -3900,9 +3829,9 @@ begin
 end;
 
 { Every drawn edge in group Part as plain segments for the region finder. }
-function TMainForm.EdgeSegments(Part: Integer): TSegArray;
+function TMainForm.EdgeSegments(Part: integer): TSegArray;
 var
-  I, K, N, Steps: Integer;
+  I, K, N, Steps: integer;
   A: TP3;
 begin
   N := 0;
@@ -3926,28 +3855,27 @@ begin
           Inc(N);
         end;
       ekArc:
+      begin
+        A := ArcPoint(FD.Doc[I].C, FD.Doc[I].R, FD.Doc[I].A0, FD.Doc[I].Plane, FD.Doc[I].Nm);
+        Steps := ArcSteps(FD.Doc[I]);
+        for K := 1 to Steps do
         begin
-          A := ArcPoint(FD.Doc[I].C, FD.Doc[I].R, FD.Doc[I].A0, FD.Doc[I].Plane, FD.Doc[I].Nm);
-          Steps := ArcSteps(FD.Doc[I]);
-          for K := 1 to Steps do
-          begin
-            if N >= Length(Result) then SetLength(Result, N * 2);
-            Result[N].A := A;
-            A := ArcPoint(FD.Doc[I].C, FD.Doc[I].R,
-              FD.Doc[I].A0 + FD.Doc[I].Sweep * K / Steps, FD.Doc[I].Plane, FD.Doc[I].Nm);
-            Result[N].B := A;
-            Inc(N);
-          end;
+          if N >= Length(Result) then SetLength(Result, N * 2);
+          Result[N].A := A;
+          A := ArcPoint(FD.Doc[I].C, FD.Doc[I].R, FD.Doc[I].A0 + FD.Doc[I].Sweep * K / Steps, FD.Doc[I].Plane, FD.Doc[I].Nm);
+          Result[N].B := A;
+          Inc(N);
         end;
+      end;
     end;
   end;
   SetLength(Result, N);
 end;
 
 { flat faces belonging to solids }
-function TMainForm.SolidFaceCount: Integer;
+function TMainForm.SolidFaceCount: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := 0 to FD.Doc.Live - 1 do
@@ -3956,9 +3884,9 @@ end;
 
 { Whether the drawing has any face at all, solids included.  FaceCount
   leaves solids out; a drawing that is only a built duct still has faces. }
-function TMainForm.AnyFace: Boolean;
+function TMainForm.AnyFace: boolean;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := False;
   for I := 0 to FD.Doc.Live - 1 do
@@ -3966,9 +3894,9 @@ begin
 end;
 
 { how many loose flat faces there are, for saying what an edit changed }
-function TMainForm.FaceCount: Integer;
+function TMainForm.FaceCount: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   Result := 0;
   for I := 0 to FD.Doc.Live - 1 do
@@ -3978,7 +3906,7 @@ end;
 { a flat area boiled down to something that can be matched next time }
 function RegionSig(const R: TRegion): TRegionSig;
 var
-  K, N: Integer;
+  K, N: integer;
 begin
   { one of the two normals, chosen the same way every time (see
     hsFaceFinder), so a loop wound the other way matches }
@@ -3993,11 +3921,10 @@ begin
   Result.Area := Abs(LoopArea(R.Outer, R.Normal));
 end;
 
-function SameRegion(const A, B: TRegionSig): Boolean;
+function SameRegion(const A, B: TRegionSig): boolean;
 begin
-  Result := (A.Part = B.Part) and (Abs(A.Nm.X - B.Nm.X) < 1E-6) and (Abs(A.Nm.Y - B.Nm.Y) < 1E-6) and
-            (Abs(A.Nm.Z - B.Nm.Z) < 1E-6) and (Abs(A.D - B.D) < 1E-4) and
-            (Abs(A.Area - B.Area) < 1E-3) and (Dist(A.Mid, B.Mid) < 1E-4);
+  Result := (A.Part = B.Part) and (Abs(A.Nm.X - B.Nm.X) < 1E-6) and (Abs(A.Nm.Y - B.Nm.Y) < 1E-6) and (Abs(A.Nm.Z - B.Nm.Z) < 1E-6) and
+    (Abs(A.D - B.D) < 1E-4) and (Abs(A.Area - B.Area) < 1E-3) and (Dist(A.Mid, B.Mid) < 1E-4);
 end;
 
 { The flat areas as they stand, recorded as seen without acting on them.
@@ -4007,7 +3934,7 @@ procedure TMainForm.SeedRegions;
 var
   R: TRegionArray;
   Parts: TIntArrayW;
-  I, P, Base, CI: Integer;
+  I, P, Base, CI: integer;
 begin
   SetLength(FD.Seen, 0);
   Parts := AllPartIds;
@@ -4033,7 +3960,7 @@ end;
   its own; that is what makes a group a group. }
 function TMainForm.AllPartIds: TIntArrayW;
 var
-  I, N: Integer;
+  I, N: integer;
 begin
   SetLength(Result, 1);
   Result[0] := 0;
@@ -4049,9 +3976,9 @@ begin
 end;
 
 { this group's region cache slot, made if it has none yet }
-function TMainForm.CacheFor(Part: Integer): Integer;
+function TMainForm.CacheFor(Part: integer): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(FRegionCaches) do
     if FRegionCaches[I].Part = Part then Exit(I);
@@ -4067,7 +3994,7 @@ end;
   edit, what areas do these edges enclose, instead of a rule per situation.
   Solid faces are kept (a solid keeps its own topology).  A new face takes
   the color and paint of whichever old face its middle fell inside. }
-function TMainForm.RebuildFlatFaces: Integer;
+function TMainForm.RebuildFlatFaces: integer;
 type
   TWas = record
     Mid: TP3;
@@ -4075,57 +4002,57 @@ type
     Holes: array of TP3Array;
     Nm: TP3;
     Ink: TColor;
-    Part: Integer;
+    Part: integer;
     { the paint carries across too, or a rebuild resets painted faces }
     Mat: TColor;
-    MatSet: Boolean;
+    MatSet: boolean;
     { and the name and comments the text gave it; the comments go to one
       piece only, if it is cut in two }
     Name, Note: string;
-    NoteGiven: Boolean;
+    NoteGiven: boolean;
   end;
 var
   R: TRegionArray;
   Was: array of TWas;
-  WasHit: Integer;
-  NWas, I, J, K, M, G, Made, DupAt: Integer;
-  RegArea, FArea, PiecesArea: Double;
+  WasHit: integer;
+  NWas, I, J, K, M, G, Made, DupAt: integer;
+  RegArea, FArea, PiecesArea: double;
   FN: TP3;
-  Pieces: array of Integer;
-  Shares: Boolean;
+  Pieces: array of integer;
+  Shares: boolean;
   Mid, Other: TP3;
   Ink: TColor;
-  Dup, HadFace, Known: Boolean;
+  Dup, HadFace, Known: boolean;
   Sig: TRegionSig;
-  HealGrp: Integer;
+  HealGrp: integer;
   SolidIx: TIntArrayW;
   SolidN, SolidP0, SolidMid, RMid: array of TP3;
-  SolidRad: array of Double;
-  RMidOK: array of Boolean;
+  SolidRad: array of double;
+  RMidOK: array of boolean;
   FE: TWorkEnt;
   FLo, FHi: TP3;
-  SolidArea: array of Double;
-  SI: Integer;
+  SolidArea: array of double;
+  SI: integer;
   LineIx, PlaneIx, RegionIx: TFPHashList;
   LineLists, PlaneLists, RegionLists, WasLists, SeenLists: array of TIntArrayW;
   WasIx, SeenIx: TFPHashList;
   WasOn, SeenOn: TIntArrayW;
-  Doomed: array of Boolean;
+  Doomed: array of boolean;
   Acc: array[0..5] of QWord;
   TL: QWord;
   Cands, RCands: TIntArrayW;
-  CI, RC: Integer;
+  CI, RC: integer;
   Tk: QWord;
   Kept: TLoopArray;
   { which group each area was found in, side by side with R }
   RPart, Parts: TIntArrayW;
   RP: TRegionArray;
-  PP, RBase, CurPart: Integer;
+  PP, RBase, CurPart: integer;
 
-  { is P on the segment AB, within a hair }
-  function OnSegment(const P, A, B: TP3): Boolean;
+{ is P on the segment AB, within a hair }
+  function OnSegment(const P, A, B: TP3): boolean;
   var
-    L, T: Double;
+    L, T: double;
     Q: TP3;
   begin
     L := Dist(A, B);
@@ -4139,11 +4066,11 @@ var
   { Every side of the loop lies along a line or circle of solid G or a loose
     one in its group: it was drawn on G's face, not left by another solid
     standing against it. }
-  function OwnLoop(const Lp: TP3Array; G, Part: Integer): Boolean;
+  function OwnLoop(const Lp: TP3Array; G, Part: integer): boolean;
   var
-    K, L: Integer;
+    K, L: integer;
     A, B: TP3;
-    Found: Boolean;
+    Found: boolean;
   begin
     Result := False;
     for K := 0 to High(Lp) do
@@ -4157,8 +4084,7 @@ var
         if FD.Doc[L].Kind = ekLine then
           Found := OnSegment(A, FD.Doc[L].A, FD.Doc[L].B) and OnSegment(B, FD.Doc[L].A, FD.Doc[L].B)
         else if FD.Doc[L].Kind = ekArc then
-          Found := (Abs(Dist(A, FD.Doc[L].C) - FD.Doc[L].R) < 1E-6) and
-                   (Abs(Dist(B, FD.Doc[L].C) - FD.Doc[L].R) < 1E-6);
+          Found := (Abs(Dist(A, FD.Doc[L].C) - FD.Doc[L].R) < 1E-6) and (Abs(Dist(B, FD.Doc[L].C) - FD.Doc[L].R) < 1E-6);
         if Found then Break;
       end;
       if not Found then Exit;
@@ -4168,19 +4094,21 @@ var
 
   { an end, and the group it is in: a solid's line in another group is not
     an edge of anything found in this one }
-  function EndKey(const P: TP3; Part: Integer): shortstring;
+  function EndKey(const P: TP3; Part: integer): shortstring;
   var
-    Q: array[0..3] of Int64;
+    Q: array[0..3] of int64;
   begin
-    Q[0] := Round(P.X * 1E6); Q[1] := Round(P.Y * 1E6); Q[2] := Round(P.Z * 1E6);
+    Q[0] := Round(P.X * 1E6);
+    Q[1] := Round(P.Y * 1E6);
+    Q[2] := Round(P.Z * 1E6);
     Q[3] := Part;
     SetLength(Result, 32);
     Move(Q[0], Result[1], 32);
   end;
 
-  procedure NoteLine(const P: TP3; L: Integer);
+  procedure NoteLine(const P: TP3; L: integer);
   var
-    Ix: Integer;
+    Ix: integer;
   begin
     Ix := LineIx.FindIndexOf(EndKey(P, FD.Doc[L].Part));
     if Ix < 0 then
@@ -4197,15 +4125,17 @@ var
 
   { the solid line, if any, that runs along P-Q, found by either end (an
     opening's edges are whole lines of the solid) }
-  function GroupLineAlong(const P, Q: TP3): Integer;
+  function GroupLineAlong(const P, Q: TP3): integer;
   var
-    Pass, Ix, K, L: Integer;
+    Pass, Ix, K, L: integer;
     Key: shortstring;
   begin
     Result := -1;
     for Pass := 0 to 1 do
     begin
-      if Pass = 0 then Key := EndKey(P, CurPart) else Key := EndKey(Q, CurPart);
+      if Pass = 0 then Key := EndKey(P, CurPart)
+      else
+        Key := EndKey(Q, CurPart);
       Ix := LineIx.FindIndexOf(Key);
       if Ix < 0 then Continue;
       Ix := PtrInt(LineIx.Items[Ix]) - 1;
@@ -4221,13 +4151,15 @@ var
   { a plane as a key: normal pointed one way, normal and offset rounded
     coarsely so faces on one plane share a key.  The fine test still runs on
     what comes back. }
-  function PlaneKey(const N, P: TP3; Part: Integer): shortstring;
+  function PlaneKey(const N, P: TP3; Part: integer): shortstring;
   var
     Nm: TP3;
-    Q: array[0..4] of Int64;
+    Q: array[0..4] of int64;
   begin
     Nm := CanonicalNormal(N);
-    Q[0] := Round(Nm.X * 1000); Q[1] := Round(Nm.Y * 1000); Q[2] := Round(Nm.Z * 1000);
+    Q[0] := Round(Nm.X * 1000);
+    Q[1] := Round(Nm.Y * 1000);
+    Q[2] := Round(Nm.Z * 1000);
     Q[3] := Round(Dot3(Nm, P) * 1000);
     { and the group: the same plane in two groups is two planes here }
     Q[4] := Part;
@@ -4235,9 +4167,9 @@ var
     Move(Q[0], Result[1], 40);
   end;
 
-  procedure NotePlane(const Key: shortstring; SI: Integer);
+  procedure NotePlane(const Key: shortstring; SI: integer);
   var
-    Ix: Integer;
+    Ix: integer;
   begin
     Ix := PlaneIx.FindIndexOf(Key);
     if Ix < 0 then
@@ -4252,9 +4184,9 @@ var
     PlaneLists[Ix][High(PlaneLists[Ix])] := SI;
   end;
 
-  procedure NoteRegion(const Key: shortstring; RI: Integer);
+  procedure NoteRegion(const Key: shortstring; RI: integer);
   var
-    Ix: Integer;
+    Ix: integer;
   begin
     Ix := RegionIx.FindIndexOf(Key);
     if Ix < 0 then
@@ -4271,9 +4203,9 @@ var
 
   { the same index for anything filed by plane: a list per plane key, with
     the three neighboring offsets returned together }
-  procedure NoteInto(H: TFPHashList; var Lists: TIntListsW; const Key: shortstring; Ix: Integer);
+  procedure NoteInto(H: TFPHashList; var Lists: TIntListsW; const Key: shortstring; Ix: integer);
   var
-    At: Integer;
+    At: integer;
   begin
     At := H.FindIndexOf(Key);
     if At < 0 then
@@ -4288,17 +4220,19 @@ var
     Lists[At][High(Lists[At])] := Ix;
   end;
 
-  function OnPlaneIn(H: TFPHashList; const Lists: TIntListsW; const N, P: TP3; Part: Integer): TIntArrayW;
+  function OnPlaneIn(H: TFPHashList; const Lists: TIntListsW; const N, P: TP3; Part: integer): TIntArrayW;
   var
     Nm: TP3;
-    Ix, K, D, Have: Integer;
+    Ix, K, D, Have: integer;
     Key: shortstring;
-    Q: array[0..4] of Int64;
+    Q: array[0..4] of int64;
   begin
     Result := nil;
     Have := 0;
     Nm := CanonicalNormal(N);
-    Q[0] := Round(Nm.X * 1000); Q[1] := Round(Nm.Y * 1000); Q[2] := Round(Nm.Z * 1000);
+    Q[0] := Round(Nm.X * 1000);
+    Q[1] := Round(Nm.Y * 1000);
+    Q[2] := Round(Nm.Z * 1000);
     Q[4] := Part;
     for D := -1 to 1 do
     begin
@@ -4317,22 +4251,24 @@ var
     end;
   end;
 
-  procedure Lap(K: Integer);
+  procedure Lap(K: integer);
   begin
     Acc[K] := Acc[K] + (GetTickCount64 - TL);
     TL := GetTickCount64;
   end;
 
-  function RegionsOnPlane(const N, P: TP3; Part: Integer): TIntArrayW;
+  function RegionsOnPlane(const N, P: TP3; Part: integer): TIntArrayW;
   var
     Nm: TP3;
-    Ix, K, D: Integer;
+    Ix, K, D: integer;
     Key: shortstring;
-    Q: array[0..4] of Int64;
+    Q: array[0..4] of int64;
   begin
     Result := nil;
     Nm := CanonicalNormal(N);
-    Q[0] := Round(Nm.X * 1000); Q[1] := Round(Nm.Y * 1000); Q[2] := Round(Nm.Z * 1000);
+    Q[0] := Round(Nm.X * 1000);
+    Q[1] := Round(Nm.Y * 1000);
+    Q[2] := Round(Nm.Z * 1000);
     Q[4] := Part;
     for D := -1 to 1 do
     begin
@@ -4352,16 +4288,18 @@ var
 
   { the solids on the plane through P with normal N; the key is coarse, so
     neighboring offsets are asked too }
-  function SolidsOnPlane(const N, P: TP3; Part: Integer): TIntArrayW;
+  function SolidsOnPlane(const N, P: TP3; Part: integer): TIntArrayW;
   var
     Nm: TP3;
-    Ix, K, D: Integer;
+    Ix, K, D: integer;
     Key: shortstring;
-    Q: array[0..4] of Int64;
+    Q: array[0..4] of int64;
   begin
     Result := nil;
     Nm := CanonicalNormal(N);
-    Q[0] := Round(Nm.X * 1000); Q[1] := Round(Nm.Y * 1000); Q[2] := Round(Nm.Z * 1000);
+    Q[0] := Round(Nm.X * 1000);
+    Q[1] := Round(Nm.Y * 1000);
+    Q[2] := Round(Nm.Z * 1000);
     Q[4] := Part;
     for D := -1 to 1 do
     begin
@@ -4379,9 +4317,9 @@ var
     end;
   end;
 
-  function OpeningOfSolid(const Rg: TRegion; out Grp: Integer): Boolean;
+  function OpeningOfSolid(const Rg: TRegion; out Grp: integer): boolean;
   var
-    E, L: Integer;
+    E, L: integer;
     P, Q: TP3;
   begin
     Result := False;
@@ -4399,9 +4337,9 @@ var
   end;
 
   { the middle of a built solid, for pointing a face away from it }
-  function SolidMidOf(G: Integer): TP3;
+  function SolidMidOf(G: integer): TP3;
   var
-    E, K, N: Integer;
+    E, K, N: integer;
   begin
     Result := P3(0, 0, 0);
     N := 0;
@@ -4418,9 +4356,9 @@ var
   { Has the line just drawn traced one of this region's sides?  That is
     SketchUp's healing gesture, the way back to a deliberately erased face.
     It beats both the erased-area memory and the solid-opening rule. }
-  function HealsThis(const Rg: TRegion): Boolean;
+  function HealsThis(const Rg: TRegion): boolean;
   var
-    E: Integer;
+    E: integer;
     P, Q: TP3;
   begin
     Result := False;
@@ -4435,18 +4373,17 @@ var
 
   { whether the old face lies in this region's plane: same normal, and the
     region's middle on it }
-  function OnPlaneOf(W: Integer): Boolean;
+  function OnPlaneOf(W: integer): boolean;
   begin
-    Result := (Abs(Abs(Dot3(Was[W].Nm, R[I].Normal)) - 1) < 1E-6) and
-      (Abs(Dot3(Was[W].Nm, Sub3(Mid, Was[W].Poly[0]))) < 1E-4);
+    Result := (Abs(Abs(Dot3(Was[W].Nm, R[I].Normal)) - 1) < 1E-6) and (Abs(Dot3(Was[W].Nm, Sub3(Mid, Was[W].Poly[0]))) < 1E-4);
   end;
 
   { Did the old face cover this point: inside its outline and not inside one
     of its holes.  Otherwise a ring with its middle erased got the middle
     back every rebuild. }
-  function WasCovering(W: Integer): Boolean;
+  function WasCovering(W: integer): boolean;
   var
-    H: Integer;
+    H: integer;
   begin
     Result := OnPlaneOf(W) and PointInLoop(Mid, Was[W].Poly, Was[W].Nm);
     if not Result then Exit;
@@ -4527,9 +4464,8 @@ begin
       end;
       Mid := RMid[I];
       { outside the face's box is not on it; this keeps the pass cheap }
-      if (Mid.X < FLo.X - 1E-4) or (Mid.X > FHi.X + 1E-4) or
-         (Mid.Y < FLo.Y - 1E-4) or (Mid.Y > FHi.Y + 1E-4) or
-         (Mid.Z < FLo.Z - 1E-4) or (Mid.Z > FHi.Z + 1E-4) then Continue;
+      if (Mid.X < FLo.X - 1E-4) or (Mid.X > FHi.X + 1E-4) or (Mid.Y < FLo.Y - 1E-4) or (Mid.Y > FHi.Y + 1E-4) or (Mid.Z < FLo.Z - 1E-4) or
+        (Mid.Z > FHi.Z + 1E-4) then Continue;
       if Abs(Abs(Dot3(Norm3(R[I].Normal), FN)) - 1) > 1E-6 then Continue;
       if Abs(Dot3(FN, Sub3(Mid, FE.Poly[0]))) > 1E-4 then Continue;
       if not PointInLoop(Mid, FE.Poly, FN) then Continue;
@@ -4545,10 +4481,8 @@ begin
       if not Shares then
         for K := 0 to High(R[I].Outer) do
           for M := 0 to High(FE.Poly) do
-            if OnSegment(R[I].Outer[K], FE.Poly[M],
-                         FE.Poly[(M + 1) mod Length(FE.Poly)]) and
-               OnSegment(R[I].Outer[(K + 1) mod Length(R[I].Outer)], FE.Poly[M],
-                         FE.Poly[(M + 1) mod Length(FE.Poly)]) then
+            if OnSegment(R[I].Outer[K], FE.Poly[M], FE.Poly[(M + 1) mod Length(FE.Poly)]) and
+              OnSegment(R[I].Outer[(K + 1) mod Length(R[I].Outer)], FE.Poly[M], FE.Poly[(M + 1) mod Length(FE.Poly)]) then
               Shares := True;
     end;
     if (Length(Pieces) < 2) or not Shares then Continue;
@@ -4584,8 +4518,7 @@ begin
   NWas := 0;
   SetLength(Was, FD.Doc.Live);
   for I := 0 to FD.Doc.Live - 1 do
-    if (FD.Doc[I].Kind = ekFace) and not FD.Doc[I].Solid and
-       (Length(FD.Doc[I].Poly) >= 3) then
+    if (FD.Doc[I].Kind = ekFace) and not FD.Doc[I].Solid and (Length(FD.Doc[I].Poly) >= 3) then
     begin
       Was[NWas].Poly := Copy(FD.Doc[I].Poly, 0, Length(FD.Doc[I].Poly));
       SetLength(Was[NWas].Holes, Length(FD.Doc[I].Holes));
@@ -4698,30 +4631,29 @@ begin
     RegArea := -1;
     Cands := SolidsOnPlane(R[I].Normal, R[I].Outer[0], RPart[I]);
     for CI := 0 to High(Cands) do
-      begin
-        SI := Cands[CI];
-        J := SolidIx[SI];
-        Other := SolidN[SI];
-        if Abs(Abs(Dot3(Other, R[I].Normal)) - 1) > 1E-6 then Continue;
-        { the same plane, not merely a parallel one }
-        if Abs(Dot3(Other, Sub3(SolidP0[SI], R[I].Outer[0]))) > 1E-4
-          then Continue;
+    begin
+      SI := Cands[CI];
+      J := SolidIx[SI];
+      Other := SolidN[SI];
+      if Abs(Abs(Dot3(Other, R[I].Normal)) - 1) > 1E-6 then Continue;
+      { the same plane, not merely a parallel one }
+      if Abs(Dot3(Other, Sub3(SolidP0[SI], R[I].Outer[0]))) > 1E-4 then Continue;
         { Outline against outline, holes ignored: the outline is what makes
           it the same face, and holes change between rebuilds (so a window
           drawn on a wall still matches and hands the wall its hole below).
           Further from the solid's middle than any corner is not inside it,
           which keeps PointInLoop to plausible candidates. }
-        if Dist(Mid, SolidMid[SI]) > SolidRad[SI] + 1E-4 then Continue;
-        if RegArea < 0 then RegArea := Abs(LoopArea(R[I].Outer, R[I].Normal));
-        if Abs(RegArea - SolidArea[SI]) > 1E-3 then
-          Continue;
-        if PointInLoop(Mid, FD.Doc[J].Poly, Other) then
-        begin
-          Dup := True;
-          DupAt := J;
-          Break;
-        end;
+      if Dist(Mid, SolidMid[SI]) > SolidRad[SI] + 1E-4 then Continue;
+      if RegArea < 0 then RegArea := Abs(LoopArea(R[I].Outer, R[I].Normal));
+      if Abs(RegArea - SolidArea[SI]) > 1E-3 then
+        Continue;
+      if PointInLoop(Mid, FD.Doc[J].Poly, Other) then
+      begin
+        Dup := True;
+        DupAt := J;
+        Break;
       end;
+    end;
     Lap(1);
     if Dup then
     begin
@@ -4769,7 +4701,11 @@ begin
         that solid's edges and never gets a face, however it got here.  Draw
         across it and it becomes a new area like any other. }
       Lap(2);
-      if OpeningOfSolid(R[I], HealGrp) then begin Lap(3); Continue; end;
+      if OpeningOfSolid(R[I], HealGrp) then
+      begin
+        Lap(3);
+        Continue;
+      end;
       Lap(3);
       Sig := RegionSig(R[I]);
       Sig.Part := RPart[I];
@@ -4828,16 +4764,14 @@ begin
         RMidOK[I] := True;
       end;
       Mid := SolidMidOf(HealGrp);
-      if Dot3(FD.Doc.FaceNormal(FD.Doc.Live - 1),
-              Sub3(RMid[I], Mid)) < 0 then
+      if Dot3(FD.Doc.FaceNormal(FD.Doc.Live - 1), Sub3(RMid[I], Mid)) < 0 then
         FD.Doc.FlipFace(FD.Doc.Live - 1);
     end;
     Inc(Made);
     Lap(5);
   end;
   if FTimings then
-    TimingLine(Format('region loop phases ms: inner %d dup %d was %d opening %d seen %d add %d',
-      [Acc[0], Acc[1], Acc[2], Acc[3], Acc[4], Acc[5]]));
+    TimingLine(Format('region loop phases ms: inner %d dup %d was %d opening %d seen %d add %d', [Acc[0], Acc[1], Acc[2], Acc[3], Acc[4], Acc[5]]));
   LineIx.Free;
   PlaneIx.Free;
   RegionIx.Free;
@@ -4874,8 +4808,8 @@ procedure TMainForm.ReportRegions;
 var
   R: TRegionArray;
   Segs: TSegArray;
-  I, Stored, Holes, CI: Integer;
-  Area, StoredArea, T0: Double;
+  I, Stored, Holes, CI: integer;
+  Area, StoredArea, T0: double;
 begin
   Segs := EdgeSegments(FD.Doc.Context);
   T0 := Now;
@@ -4900,10 +4834,8 @@ begin
     Inc(Holes, Length(R[I].Holes));
   end;
 
-  FCmdMsg := Format('%d edges -> %d regions (%s, %d holes) in %.0f ms.  ' +
-    'Stored flat faces: %d (%s)',
-    [Length(Segs), Length(R), FormatArea(Area, FD.Units), Holes, T0,
-     Stored, FormatArea(StoredArea, FD.Units)]);
+  FCmdMsg := Format('%d edges -> %d regions (%s, %d holes) in %.0f ms.  ' + 'Stored flat faces: %d (%s)', [Length(Segs), Length(R),
+    FormatArea(Area, FD.Units), Holes, T0, Stored, FormatArea(StoredArea, FD.Units)]);
   pbCmd.Invalidate;
 end;
 
@@ -4913,9 +4845,9 @@ end;
 function TMainForm.DimOffset3: TP3;
 var
   Extra: array of TP3;
-  I, K, N: Integer;
+  I, K, N: integer;
   D, Nm: TP3;
-  L: Double;
+  L: double;
 begin
   Extra := nil;
   D := Sub3(FP2, FP1);
@@ -4925,7 +4857,7 @@ begin
     N := Length(FD.Doc[I].Poly);
     for K := 0 to N - 1 do
       if ((Dist(FD.Doc[I].Poly[K], FP1) < 1E-6) and (Dist(FD.Doc[I].Poly[(K + 1) mod N], FP2) < 1E-6)) or
-         ((Dist(FD.Doc[I].Poly[K], FP2) < 1E-6) and (Dist(FD.Doc[I].Poly[(K + 1) mod N], FP1) < 1E-6)) then
+        ((Dist(FD.Doc[I].Poly[K], FP2) < 1E-6) and (Dist(FD.Doc[I].Poly[(K + 1) mod N], FP1) < 1E-6)) then
       begin
         Nm := FD.Doc.FaceNormal(I);
         SetLength(Extra, Length(Extra) + 1);
@@ -4944,9 +4876,9 @@ end;
 
 { the circle or arc that P is one of the drawn corners of (not an arc's own
   two ends), or -1 }
-function TMainForm.CurveThrough(const P: TP3): Integer;
+function TMainForm.CurveThrough(const P: TP3): integer;
 var
-  I: Integer;
+  I: integer;
   E: TWorkEnt;
   Nm: TP3;
 begin
@@ -4956,15 +4888,11 @@ begin
     E := FD.Doc[I];
     if E.Kind <> ekArc then Continue;
     if Abs(Dist(P, E.C) - E.R) > 1E-6 * Max(1, E.R) then Continue;
-    Nm := Cross3(P3(ArcPoint(E.C, 1, 0, E.Plane, E.Nm).X - E.C.X,
-                    ArcPoint(E.C, 1, 0, E.Plane, E.Nm).Y - E.C.Y,
-                    ArcPoint(E.C, 1, 0, E.Plane, E.Nm).Z - E.C.Z),
-                 P3(ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).X - E.C.X,
-                    ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).Y - E.C.Y,
-                    ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).Z - E.C.Z));
+    Nm := Cross3(P3(ArcPoint(E.C, 1, 0, E.Plane, E.Nm).X - E.C.X, ArcPoint(E.C, 1, 0, E.Plane, E.Nm).Y - E.C.Y,
+      ArcPoint(E.C, 1, 0, E.Plane, E.Nm).Z - E.C.Z), P3(ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).X - E.C.X,
+      ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).Y - E.C.Y, ArcPoint(E.C, 1, Pi / 2, E.Plane, E.Nm).Z - E.C.Z));
     if Abs(Dot3(Nm, Sub3(P, E.C))) > 1E-6 * Max(1, E.R) then Continue;
-    if (Abs(E.Sweep) < 2 * Pi - 1E-9) and
-       ((Dist(P, E.A) < 1E-6) or (Dist(P, E.B) < 1E-6)) then Continue;
+    if (Abs(E.Sweep) < 2 * Pi - 1E-9) and ((Dist(P, E.A) < 1E-6) or (Dist(P, E.B) < 1E-6)) then Continue;
     Exit(I);
   end;
 end;
@@ -4973,11 +4901,11 @@ end;
   on it nearest the pointer is one end; the other is the opposite point for
   a circle, the center for an arc.  Note is "DIA <>" or "R <>", the length
   going in the <>. }
-function TMainForm.DimRadialAt(out A, B: TP3; out Note: string): Boolean;
+function TMainForm.DimRadialAt(out A, B: TP3; out Note: string): boolean;
 var
   E: TWorkEnt;
-  K, N, BestK: Integer;
-  Ang, BestD, D, Sw: Double;
+  K, N, BestK: integer;
+  Ang, BestD, D, Sw: double;
   P: TPointF;
 begin
   Result := False;
@@ -4986,13 +4914,18 @@ begin
   Sw := E.Sweep;
   if Abs(Sw) >= 2 * Pi - 1E-9 then Sw := 2 * Pi;
   N := 360;
-  BestD := 1E30; BestK := 0;
+  BestD := 1E30;
+  BestK := 0;
   for K := 0 to N do
   begin
     Ang := E.A0 + Sw * K / N;
     P := ScreenOf(ArcPoint(E.C, E.R, Ang, E.Plane, E.Nm));
     D := Sqr(P.X - FMouseSX) + Sqr(P.Y - FMouseSY);
-    if D < BestD then begin BestD := D; BestK := K; end;
+    if D < BestD then
+    begin
+      BestD := D;
+      BestK := K;
+    end;
   end;
   B := ArcPoint(E.C, E.R, E.A0 + Sw * BestK / N, E.Plane, E.Nm);
   if Abs(E.Sweep) >= 2 * Pi - 1E-9 then
@@ -5046,10 +4979,9 @@ begin
   Result := Pix($A8, $2A, $BA);
 end;
 
-procedure TMainForm.pbScreenMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbScreenMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 var
-  NoteI: Integer;
+  NoteI: integer;
 begin
   if FBusy then Exit;
   { the cube, if it had the press }
@@ -5114,7 +5046,8 @@ begin
   begin
     FErasing2 := False;
     if FEraseMode = 0 then BurnDoomed
-    else SoftenDoomed(FEraseMode = 1);
+    else
+      SoftenDoomed(FEraseMode = 1);
     Exit;
   end;
 
@@ -5135,7 +5068,8 @@ begin
     FPanning := False;
     FOrbiting := False;
     if FTool = ptOrbit then pbScreen.Cursor := crSizeAll
-    else pbScreen.Cursor := crCross;
+    else
+      pbScreen.Cursor := crCross;
     { the camera has stopped: one full frame after the quick ones }
     if FCameraMoving then
     begin
@@ -5147,21 +5081,18 @@ begin
     end;
     { A right press released in the same place was a click, not a pan: open
       the menu (or edit a dimension).  This has to wait for the release. }
-    if (Button = mbRight) and
-       (Abs(X - FRightSX) <= 3) and (Abs(Y - FRightSY) <= 3) then
+    if (Button = mbRight) and (Abs(X - FRightSX) <= 3) and (Abs(Y - FRightSY) <= 3) then
       RightClickAt(X, Y);
   end;
 end;
 
-procedure TMainForm.pbScreenMouseWheel(Sender: TObject; Shift: TShiftState;
-  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+procedure TMainForm.pbScreenMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: integer; MousePos: TPoint; var Handled: boolean);
 const
   WHEEL_ROWS = 3;      { rows per notch, as in most lists }
 begin
   if FBusy then Exit;
   { an open list gets the wheel before the drawing does }
-  if ScrollPopup(IfThen(WheelDelta > 0, -WHEEL_ROWS, WHEEL_ROWS),
-                 MousePos.X, MousePos.Y) then
+  if ScrollPopup(IfThen(WheelDelta > 0, -WHEEL_ROWS, WHEEL_ROWS), MousePos.X, MousePos.Y) then
   begin
     Handled := True;
     Exit;
@@ -5180,7 +5111,8 @@ begin
     if not FD.SliceOn then
       SetSlice(True, FD.SliceLo, FD.SliceHi)
     else if WheelDelta > 0 then NudgeSlice(1, 0)
-    else NudgeSlice(-1, 0);
+    else
+      NudgeSlice(-1, 0);
     Handled := True;
     Exit;
   end;

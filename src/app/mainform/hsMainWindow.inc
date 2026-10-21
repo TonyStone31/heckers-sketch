@@ -8,38 +8,35 @@
   (end points, midpoints, on-edge points, intersections, centers), plus the
   origin and points on axes.  Not the grid or open air: a dimension must be
   driven by the drawing to update with it. }
-function TMainForm.DimAnchored: Boolean;
+function TMainForm.DimAnchored: boolean;
 begin
-  Result := FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross,
-                          snSubMid, snQuadrant, snOnEdge, snOnFace,
-                          snOnAxis, snOrigin];
+  Result := FSnapKind in [snEndpoint, snMidpoint, snCenter, snCross, snSubMid, snQuadrant, snOnEdge, snOnFace,
+    snOnAxis, snOrigin];
 end;
 
 { the zoom, with enough decimals that a tiny zoom never reads "0%" }
 function TMainForm.ZoomReading: string;
 var
-  Z: Double;
+  Z: double;
 begin
   Z := FD.Zoom * 100;
   if Z >= 100 then Result := Format('%.0f%%', [Z])
   else if Z >= 10 then Result := Format('%.1f%%', [Z])
   else if Z >= 1 then Result := Format('%.2f%%', [Z])
-  else Result := Format('%.3f%%', [Z]);
+  else
+    Result := Format('%.3f%%', [Z]);
 end;
 
 function TMainForm.StatusLine: string;
 var
-  L, A, RW, RH: Double;
+  L, A, RW, RH: double;
   Mv: TP3;
-  Ai: Integer;
+  Ai: integer;
 begin
   if FD.View <> vkPlan then
-    Result := Format('X %s   Y %s   Z %s',
-      [FormatLen(FCur.X, FD.Units), FormatLen(FCur.Y, FD.Units),
-       FormatLen(FCur.Z, FD.Units)])
+    Result := Format('X %s   Y %s   Z %s', [FormatLen(FCur.X, FD.Units), FormatLen(FCur.Y, FD.Units), FormatLen(FCur.Z, FD.Units)])
   else
-    Result := Format('X %s   Y %s',
-      [FormatLen(FCur.X, FD.Units), FormatLen(FCur.Y, FD.Units)]);
+    Result := Format('X %s   Y %s', [FormatLen(FCur.X, FD.Units), FormatLen(FCur.Y, FD.Units)]);
 
   if (FStage = 1) and (FTool in [ptLine, ptMeasure]) then
     Result := Result + '   LEN ' + FormatLen(Dist(FP1, PreviewTarget), FD.Units);
@@ -50,16 +47,13 @@ begin
   begin
     L := OffsetDistance;
     if Abs(L) > 1E-9 then
-      Result := Result + '   OFFSET ' + FormatLen(Abs(L), FD.Units) +
-        specialize IfThen<string>(L < 0, ' IN', ' OUT');
+      Result := Result + '   OFFSET ' + FormatLen(Abs(L), FD.Units) + specialize IfThen<string>(L < 0, ' IN', ' OUT');
   end;
 
   if (FStage = 1) and (FTool = ptRect) then
   begin
     RectSides(FP1, RectTarget, FD.Plane, RW, RH);
-    Result := Result + Format('   %s x %s   AREA %s',
-      [FormatLen(RW, FD.Units), FormatLen(RH, FD.Units),
-       FormatArea(RW * RH, FD.Units)]);
+    Result := Result + Format('   %s x %s   AREA %s', [FormatLen(RW, FD.Units), FormatLen(RH, FD.Units), FormatArea(RW * RH, FD.Units)]);
   end;
 
   if (FD.View <> vkPlan) then
@@ -76,8 +70,7 @@ begin
   { the face push/pull is offered and its size, as SketchUp shows; it tells
     stacked faces apart }
   if (FStage = 0) and (FTool in [ptPush, ptDrill]) and (FHoverFace >= 0) then
-    Result := Result + '   FACE ' +
-      FormatArea(FD.Doc.FaceArea(FHoverFace), FD.Units);
+    Result := Result + '   FACE ' + FormatArea(FD.Doc.FaceArea(FHoverFace), FD.Units);
 
   if (FStage = 1) and (FTool in [ptPush, ptDrill]) and (FPushFace >= 0) then
   begin
@@ -95,11 +88,10 @@ begin
       case Ai of
         0: if Mv.X < 0 then Ai := 1;
         2: if Mv.Y < 0 then Ai := 3;
-      else
-        if Mv.Z < 0 then Ai := 5;
+        else
+          if Mv.Z < 0 then Ai := 5;
       end;
-      Result := Result + '   PUSH ' + FormatLen(Abs(L), FD.Units) +
-        ' ' + AxisName(Ai);
+      Result := Result + '   PUSH ' + FormatLen(Abs(L), FD.Units) + ' ' + AxisName(Ai);
     end;
   end;
 
@@ -118,7 +110,7 @@ end;
 
 procedure TMainForm.FormPaint(Sender: TObject);
 var
-  VerX, Y: Integer;
+  VerX, Y: integer;
   S: string;
 begin
   if not FBooted then Exit;
@@ -147,7 +139,7 @@ end;
 { ink, precision, units                                                     }
 { ======================================================================== }
 
-procedure TMainForm.SetInk(C: TColor; Auto: Boolean);
+procedure TMainForm.SetInk(C: TColor; Auto: boolean);
 begin
   FInkColor := C;
   FInkAuto := Auto;
@@ -157,7 +149,7 @@ end;
 { How finely lengths are written and read.  One setting for both, so a typed
   number never displays as a different one.  It never changes what the model
   holds: finer input keeps every digit and is only shown rounded. }
-procedure TMainForm.SetLenPrecision(D: Integer);
+procedure TMainForm.SetLenPrecision(D: integer);
 begin
   SetLenDenom(D);
   FLenDenom := LenDenom;
@@ -172,7 +164,7 @@ begin
   pbCmd.Invalidate;
 end;
 
-procedure TMainForm.SetEdgeWidth(V: Integer);
+procedure TMainForm.SetEdgeWidth(V: integer);
 begin
   V := EnsureRange(V, MIN_PEN, MAX_PEN);
   if V = FEdgeW then Exit;
@@ -199,7 +191,7 @@ end;
 
 procedure TMainForm.PushUndo;
 var
-  I: Integer;
+  I: integer;
 begin
   { the drawing changed, so whatever would not draw may be gone now }
   FRenderBroken := False;
@@ -219,12 +211,12 @@ begin
   FD.RedoTop := 0;
 end;
 
-function TMainForm.CanUndo: Boolean;
+function TMainForm.CanUndo: boolean;
 begin
   Result := FD.UndoTop > 0;
 end;
 
-function TMainForm.CanRedo: Boolean;
+function TMainForm.CanRedo: boolean;
 begin
   Result := FD.RedoTop > 0;
 end;
@@ -283,9 +275,9 @@ begin
   Invalidate;
 end;
 
-procedure TMainForm.StepErase(Dt: Single);
+procedure TMainForm.StepErase(Dt: single);
 var
-  Amp: Single;
+  Amp: single;
 begin
   FEraseT := FEraseT + Dt / 0.7;
   if FEraseT >= 1 then
@@ -321,7 +313,7 @@ end;
   and there is no reliable notification, so it is watched on the tick. }
 procedure TMainForm.FollowScreenSize;
 var
-  W, H: Integer;
+  W, H: integer;
 begin
   if FFill = flNone then Exit;
   Screen.UpdateMonitors;
@@ -347,11 +339,11 @@ end;
 
 procedure TMainForm.tmrTickTimer(Sender: TObject);
 var
-  Dt: Single;
-  InfoSig: Int64;
+  Dt: single;
+  InfoSig: int64;
   WhatsNewForm: TWhatsNewForm;
   BreakPts: TPointFArray;
-  BreakI: Integer;
+  BreakI: integer;
 begin
   Dt := TICK_MS / 1000;
 
@@ -360,7 +352,8 @@ begin
   if SplashUp then
   begin
     if SplashFinished and (SplashAge >= SPLASH_MIN_MS) then SplashHide
-    else Exit;
+    else
+      Exit;
   end;
   { long work lets messages through to paint progress, and this fires then
     too: stand down, unless the work is long over and forgot }
@@ -382,8 +375,7 @@ begin
     selection changes; some of those are bulk loops over huge selections. }
   if GroupsPanelOn then
   begin
-    InfoSig := ((Int64(FD.Doc.FEditSeq) * 131 + FEditSeq) * 131 + Length(FSel)) * 131 +
-      FD.Doc.Context * 7 + Int64(PtrUInt(FD.Doc) and $FFFFFF);
+    InfoSig := ((int64(FD.Doc.FEditSeq) * 131 + FEditSeq) * 131 + Length(FSel)) * 131 + FD.Doc.Context * 7 + int64(PtrUInt(FD.Doc) and $FFFFFF);
     if Length(FSel) > 0 then
       InfoSig := InfoSig * 131 + FSel[0] * 17 + FSel[High(FSel)];
     if InfoSig <> FGrpSig then
@@ -508,8 +500,7 @@ begin
         begin
           FSnapM := PtF(0, 0);
           for BreakI := 0 to High(BreakPts) do
-            FSnapM := PtF(FSnapM.X + BreakPts[BreakI].X / Length(BreakPts),
-                          FSnapM.Y + BreakPts[BreakI].Y / Length(BreakPts));
+            FSnapM := PtF(FSnapM.X + BreakPts[BreakI].X / Length(BreakPts), FSnapM.Y + BreakPts[BreakI].Y / Length(BreakPts));
         end
         else
           FSnapM := PtF((FSnapA.X + FSnapB.X) / 2, (FSnapA.Y + FSnapB.Y) / 2);
@@ -545,15 +536,15 @@ begin
   end;
   try
 
-  if FErasing then
-  begin
-    StepErase(Dt);
-    Exit;
-  end;
+    if FErasing then
+    begin
+      StepErase(Dt);
+      Exit;
+    end;
 
-  { keep the command bar caret blinking }
-  if (GetTickCount64 div 500) <> ((GetTickCount64 - TICK_MS) div 500) then
-    pbCmd.Invalidate;
+    { keep the command bar caret blinking }
+    if (GetTickCount64 div 500) <> ((GetTickCount64 - TICK_MS) div 500) then
+      pbCmd.Invalidate;
 
   finally
     { one repaint per tick at most, and the camera drawn once for whatever

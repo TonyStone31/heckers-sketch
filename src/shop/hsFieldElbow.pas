@@ -146,8 +146,8 @@ begin
   if Err = '' then
   begin
     lblResult.Font.Color := Font.Color;
-    lblResult.Caption := Format('%s degrees.  Entry leg %s, exit leg %s.', [FormatFloat('0.#', RadToDeg(FSpec.Angle)),
-      FormatLen(FSpec.Leg0, FUnits), FormatLen(FSpec.Leg1, FUnits)]);
+    lblResult.Caption := Format('%s degrees.  Entry leg %s, exit leg %s.', [FormatFloat('0.#', RadToDeg(FSpec.Angle)), FormatLen(FSpec.Leg0, FUnits),
+      FormatLen(FSpec.Leg1, FUnits)]);
   end
   else
   begin

@@ -1108,8 +1108,8 @@ begin
   for I := 0 to High(Walls) do
   begin
     K := (Walls[I].First + Walls[I].Count) mod N;
-    Walls[I].Curved := (Length(Walls) > 1) and (((TurnAt(Walls[I].First) < SUGGEST_ARC_TURN) and Alike(Walls[I].Len,
-      Walls[(I + Length(Walls) - 1) mod Length(Walls)].Len)) or ((TurnAt(K) < SUGGEST_ARC_TURN) and Alike(Walls[I].Len, Walls[(I + 1) mod Length(Walls)].Len)));
+    Walls[I].Curved := (Length(Walls) > 1) and (((TurnAt(Walls[I].First) < SUGGEST_ARC_TURN) and Alike(Walls[I].Len, Walls[(I + Length(Walls) - 1) mod Length(Walls)].Len)) or
+      ((TurnAt(K) < SUGGEST_ARC_TURN) and Alike(Walls[I].Len, Walls[(I + 1) mod Length(Walls)].Len)));
     if not Walls[I].Curved then Inc(J);
   end;
   if J = 0 then
@@ -1604,8 +1604,8 @@ var
           EdgSeen[K] := EdgStamp;
           Q0 := EdgA[K];
           Q1 := EdgB[K];
-          if (Max(P0.X, P1.X) < Min(Q0.X, Q1.X) - 1E-6) or (Min(P0.X, P1.X) > Max(Q0.X, Q1.X) + 1E-6) or (Max(P0.Y, P1.Y) <
-            Min(Q0.Y, Q1.Y) - 1E-6) or (Min(P0.Y, P1.Y) > Max(Q0.Y, Q1.Y) + 1E-6) then Continue;
+          if (Max(P0.X, P1.X) < Min(Q0.X, Q1.X) - 1E-6) or (Min(P0.X, P1.X) > Max(Q0.X, Q1.X) + 1E-6) or (Max(P0.Y, P1.Y) < Min(Q0.Y, Q1.Y) - 1E-6) or
+            (Min(P0.Y, P1.Y) > Max(Q0.Y, Q1.Y) + 1E-6) then Continue;
           if SegsMeet(P0, P1, Q0, Q1) then Exit(True);
         end;
       end;
@@ -2132,11 +2132,10 @@ var
       starting inside the breakout }
     function Fits(const Pl: TPlan; R: integer): boolean;
     begin
-      Result := (LaneOut(R) <= BreakD + 1E-6) and (EdgeMax[Pl.Rows[0]] <= LaneOut(R) + 1E-6) and
-        (EdgeMax[Pl.Rows[High(Pl.Rows)]] <= LaneHome(R) + 1E-6) and LaneClear(LaneOut(R), Pl.Rows[0]) and
-        LaneClear(LaneHome(R), Pl.Rows[High(Pl.Rows)]) and JogClear(PortOut(R), LaneOut(R), JogHt(R, 0)) and
-        JogClear(PortHome(R), LaneHome(R), JogHt(R, 1)) and (PlanLen(Pl, R) <= IfThen(Compacting, MaxFt,
-        IfThen(R = 0, Limit * FirstBudget, Limit) * RankBudget[Min(R, 63)]));
+      Result := (LaneOut(R) <= BreakD + 1E-6) and (EdgeMax[Pl.Rows[0]] <= LaneOut(R) + 1E-6) and (EdgeMax[Pl.Rows[High(Pl.Rows)]] <= LaneHome(R) + 1E-6) and
+        LaneClear(LaneOut(R), Pl.Rows[0]) and LaneClear(LaneHome(R), Pl.Rows[High(Pl.Rows)]) and JogClear(PortOut(R), LaneOut(R), JogHt(R, 0)) and
+        JogClear(PortHome(R), LaneHome(R), JogHt(R, 1)) and (PlanLen(Pl, R) <= IfThen(Compacting, MaxFt, IfThen(R = 0, Limit * FirstBudget, Limit) *
+        RankBudget[Min(R, 63)]));
     end;
 
     { is there a run's worth of this piece beyond the loop's port? }
@@ -2506,8 +2505,8 @@ var
 { the boxes of P0-P1 and Q0-Q1 apart: they cannot meet }
       function Apart(const P0, P1, Q0, Q1: T2): boolean;
       begin
-        Result := (Max(P0.X, P1.X) < Min(Q0.X, Q1.X) - 1E-6) or (Min(P0.X, P1.X) > Max(Q0.X, Q1.X) + 1E-6) or (Max(P0.Y, P1.Y) <
-          Min(Q0.Y, Q1.Y) - 1E-6) or (Min(P0.Y, P1.Y) > Max(Q0.Y, Q1.Y) + 1E-6);
+        Result := (Max(P0.X, P1.X) < Min(Q0.X, Q1.X) - 1E-6) or (Min(P0.X, P1.X) > Max(Q0.X, Q1.X) + 1E-6) or (Max(P0.Y, P1.Y) < Min(Q0.Y, Q1.Y) - 1E-6) or
+          (Min(P0.Y, P1.Y) > Max(Q0.Y, Q1.Y) + 1E-6);
       end;
 
       { The candidate leaves the floor, enters an obstacle, crosses itself or
@@ -3513,8 +3512,8 @@ var
           if (Abs(Q[L][K].X - Fx) > 1E-6) or (Abs(Q[L][K + 1].X - Fx) > 1E-6) then Continue;
           A0 := Q[L][K].Y;
           A1 := Q[L][K + 1].Y;
-          if not (((Abs(A0 - (Y0 + 2 * U)) < 1E-6) and (Abs(A1 - (Y0 + 3 * U)) < 1E-6)) or ((Abs(A0 - (Y0 + 3 * U)) < 1E-6) and (Abs(A1 - (Y0 + 2 * U)) < 1E-6)))
-          then Continue;
+          if not (((Abs(A0 - (Y0 + 2 * U)) < 1E-6) and (Abs(A1 - (Y0 + 3 * U)) < 1E-6)) or ((Abs(A0 - (Y0 + 3 * U)) < 1E-6) and (Abs(A1 - (Y0 + 2 * U)) < 1E-6))) then
+            Continue;
           if (Abs(Q[L][K - 1].Y - A0) > 1E-6) or (Abs(Q[L][K + 2].Y - A1) > 1E-6) then Continue;
           if (Sign(Fx - Q[L][K - 1].X) <> G) or (Sign(Fx - Q[L][K + 2].X) <> G) then Continue;
           Lj := L;
@@ -4604,8 +4603,8 @@ begin
       Area := (UMax - UMin) * (VMax - VMin + Spec.Spacing);
       if Area > 1E-9 then R.LoopFriendly[L].Compact := Min(1, Covered / Area);
     end;
-    R.LoopFriendly[L].Score := EnsureRange(100 - 15 * Max(0, R.LoopFriendly[L].Measures - 2) - 2 * R.LoopFriendly[L].ExtraBends -
-      100 * Max(0, 0.85 - R.LoopFriendly[L].Compact), 0, 100);
+    R.LoopFriendly[L].Score := EnsureRange(100 - 15 * Max(0, R.LoopFriendly[L].Measures - 2) - 2 * R.LoopFriendly[L].ExtraBends - 100 *
+      Max(0, 0.85 - R.LoopFriendly[L].Compact), 0, 100);
     Sum := Sum + R.LoopFriendly[L].Score;
   end;
   R.Friendly := Sum / Length(R.Loops);
@@ -4682,8 +4681,8 @@ begin
   Want := Ceil(AreaSqFt / Spec.Spacing / RadiantFloorMaxFt(Spec) - 1E-9);
   if Short then
     Exit(Format('Out of reach: %d loops of %s ft at %s" cover about %s%% of this floor, not %s%% - ' +
-      'widen the spacing, lengthen the loop, raise the loops a manifold, or split the zone.', [RadiantMaxPorts(Spec) *
-      Max(1, Length(Spec.Manifolds)), FormatFloat('0', MaxFt), FormatFloat('0.#', Spec.Spacing / Spec.Inch), FormatFloat('0', Reach), FormatFloat('0', Spec.GoalCoverPct)]));
+      'widen the spacing, lengthen the loop, raise the loops a manifold, or split the zone.', [RadiantMaxPorts(Spec) * Max(1, Length(Spec.Manifolds)),
+      FormatFloat('0', MaxFt), FormatFloat('0.#', Spec.Spacing / Spec.Inch), FormatFloat('0', Reach), FormatFloat('0', Spec.GoalCoverPct)]));
   Result := Format('OUT OF REACH: %d loops of %s ft at %s" cover about %s%% of this %s sq ft floor, and the goal is %s%% - ' +
     'the whole floor wants about %d loops.  A wider spacing, a longer loop or bigger tube, more loops a manifold, ' + 'or the zone split in two.',
     [RadiantMaxPorts(Spec) * Max(1, Length(Spec.Manifolds)), FormatFloat('0', MaxFt), FormatFloat('0.#', Spec.Spacing / Spec.Inch),
@@ -4712,8 +4711,8 @@ end;
 
 function RadiantUnfriendly(const R: TRadiantResult; const Spec: TRadiantSpec): boolean;
 begin
-  Result := not Spec.LessFriendly and ((Spec.GoalCoverPct > 0) or (Spec.GoalEvenPct > 0)) and (R.Friendly >= 0) and
-    (Length(R.LoopFriendly) = Length(R.Loops)) and (Length(R.Loops) > 0) and (R.Friendly < FRIENDLY_MIN - 1E-9);
+  Result := not Spec.LessFriendly and ((Spec.GoalCoverPct > 0) or (Spec.GoalEvenPct > 0)) and (R.Friendly >= 0) and (Length(R.LoopFriendly) = Length(R.Loops)) and
+    (Length(R.Loops) > 0) and (R.Friendly < FRIENDLY_MIN - 1E-9);
 end;
 
 { ---------------------------------------------------------------------- }
@@ -6001,9 +6000,9 @@ begin
     animation.  A normal preview allocates no trace. }
     if WantTrace and Result.Ok then
     begin
-      Result := ComputeRadiantOriented(Outline, Holes, Slid(BestTry.Shift), True, BestTry.Turn, BestTry.Budget, BestTry.Ranks,
-        BestTry.BreakFt, BestTry.Seed, BestTry.RowOff, not BestTry.NoFingers, False, BestTry.EvenRows, BestTry.LoopDelta, BestTry.ShortFingers,
-        BestTry.Fold, BestTry.Strip, BestTry.Wild, nil, BestTry.Hook, BestTry.Pairs);
+      Result := ComputeRadiantOriented(Outline, Holes, Slid(BestTry.Shift), True, BestTry.Turn, BestTry.Budget, BestTry.Ranks, BestTry.BreakFt,
+        BestTry.Seed, BestTry.RowOff, not BestTry.NoFingers, False, BestTry.EvenRows, BestTry.LoopDelta, BestTry.ShortFingers, BestTry.Fold,
+        BestTry.Strip, BestTry.Wild, nil, BestTry.Hook, BestTry.Pairs);
       Result.BreakoutFt := BestTry.BreakFt;
       Result.ManifoldShiftFt := Moved(BestTry.Shift);
     end;
@@ -6223,13 +6222,13 @@ begin
   Result := Result + 'floor: concrete slab' + LineEnding;
   Result := Result + 'tube: ' + T.Name + ' PEX, ' + FormatFloat('0.#', Spec.Spacing / Spec.Inch) + '" on center' + LineEnding;
   Result := Result + 'floor area: ' + FormatArea(R.AreaSqFt, U) + LineEnding;
-  Result := Result + 'loops: ' + IntToStr(Length(R.Loops)) + ', ' + FormatFloat('0', MaxFt) + ' ft maximum each, on ' +
-    IntToStr(Length(R.Manifolds)) + ' manifold(s)' + LineEnding;
+  Result := Result + 'loops: ' + IntToStr(Length(R.Loops)) + ', ' + FormatFloat('0', MaxFt) + ' ft maximum each, on ' + IntToStr(Length(R.Manifolds)) +
+    ' manifold(s)' + LineEnding;
   Result := Result + '  each length takes in ' + FormatLen(MANIFOLD_LEAD_FT, U) + ' at the manifold, up the wall and out onto the grid' + LineEnding;
   for M := 0 to High(R.Manifolds) do
   begin
-    Result := Result + Format('manifold %d: a %d-loop%s', [M + 1, R.Manifolds[M].Ports, IfThen(R.Manifolds[M].LoopCount >
-      RadiantMaxPorts(Spec), ' - MORE LOOPS THAN THE ' + IntToStr(RadiantMaxPorts(Spec)) + ' A MANIFOLD IS SET TO TAKE: split the zone in two, a manifold each',
+    Result := Result + Format('manifold %d: a %d-loop%s', [M + 1, R.Manifolds[M].Ports, IfThen(R.Manifolds[M].LoopCount > RadiantMaxPorts(Spec),
+      ' - MORE LOOPS THAN THE ' + IntToStr(RadiantMaxPorts(Spec)) + ' A MANIFOLD IS SET TO TAKE: split the zone in two, a manifold each',
       IfThen(R.Manifolds[M].LoopCount = 0, '  - nothing near it', ''))]) + LineEnding;
     Result := Result + Format('  wall space: about %s along the wall - supply and return side by side %s" apart, ' + 'and %s" for the valves and end caps',
       [FormatLen(RadiantManifoldWallIn(R.Manifolds[M].Ports) * Spec.Inch, U), FormatFloat('0.#', MANIFOLD_PORT_PITCH_IN), FormatFloat('0', MANIFOLD_ENDS_IN)]) + LineEnding;

@@ -2558,9 +2558,8 @@ begin
       { the outline lies in the circle's plane: two circles of a size round
         one center (tubes meeting at a joint) share every distance, and two
         opposite corners, but not a plane }
-      if (D[I].Kind = ekArc) and FullCircle(D[I].Sweep) and (Abs(Dist(D[I].C, Lp[0]) - D[I].R) < 1E-6) and
-        (Abs(Dist(D[I].C, Lp[N div 2]) - D[I].R) < 1E-6) and (Abs(Dot3(Sub3(Lp[0], D[I].C), ArcNormalOf(I))) < 1E-6) and
-        (Abs(Dot3(Sub3(Lp[N div 4], D[I].C), ArcNormalOf(I))) < 1E-6) then
+      if (D[I].Kind = ekArc) and FullCircle(D[I].Sweep) and (Abs(Dist(D[I].C, Lp[0]) - D[I].R) < 1E-6) and (Abs(Dist(D[I].C, Lp[N div 2]) - D[I].R) < 1E-6) and
+        (Abs(Dot3(Sub3(Lp[0], D[I].C), ArcNormalOf(I))) < 1E-6) and (Abs(Dot3(Sub3(Lp[N div 4], D[I].C), ArcNormalOf(I))) < 1E-6) then
       begin
         ArcAt := I;
         Break;

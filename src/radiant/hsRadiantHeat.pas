@@ -613,8 +613,8 @@ var
 begin
   E := '';
   for I := 0 to High(Z.Edges) do E := E + IntToStr(Ord(Z.Edges[I]));
-  Result := Format('use=%d;ceil=%s;above=%d;walls=%d;slab=%d;cover=%d;win=%s;door=%s;tight=%d;snow=%d;run=%d;edges=%s', [Ord(Z.Use),
-    Num(Z.CeilingFt), Ord(Z.Above), Ord(Z.Walls), Ord(Z.Slab), Ord(Z.Cover), Num(Z.WindowSqFt), Num(Z.DoorSqFt), Ord(Z.Tight), Ord(Z.Snow), Z.RunIdx, E]);
+  Result := Format('use=%d;ceil=%s;above=%d;walls=%d;slab=%d;cover=%d;win=%s;door=%s;tight=%d;snow=%d;run=%d;edges=%s',
+    [Ord(Z.Use), Num(Z.CeilingFt), Ord(Z.Above), Ord(Z.Walls), Ord(Z.Slab), Ord(Z.Cover), Num(Z.WindowSqFt), Num(Z.DoorSqFt), Ord(Z.Tight), Ord(Z.Snow), Z.RunIdx, E]);
 end;
 
 function HeatZoneFromText(const S: string): THeatZone;

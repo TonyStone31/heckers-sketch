@@ -1,8 +1,8 @@
-{ hsMainForm - the menu bar and its menus.  Part of TMainForm; included by hsMainForm.pas }
+  { hsMainForm - the menu bar and its menus.  Part of TMainForm; included by hsMainForm.pas }
 
-{ ======================================================================== }
-{ the menu bar                                                              }
-{ ======================================================================== }
+  { ======================================================================== }
+  { the menu bar                                                              }
+  { ======================================================================== }
 
 { Five words across the title, as every program has them.  Each opens a
   native menu that is built fresh as it opens, so a check mark can never go
@@ -12,11 +12,15 @@
 const
   MENU_NAMES: array[0..4] of string =
     ('FILE', 'EDIT', 'VIEW', 'SETTINGS', 'HELP');
-  BAR_FILE = 0; BAR_EDIT = 1; BAR_VIEW = 2; BAR_SETTINGS = 3; BAR_HELP = 4;
+  BAR_FILE = 0;
+  BAR_EDIT = 1;
+  BAR_VIEW = 2;
+  BAR_SETTINGS = 3;
+  BAR_HELP = 4;
 
-function TMainForm.QuickWidth: Integer;
+function TMainForm.QuickWidth: integer;
 var
-  I: Integer;
+  I: integer;
 begin
   UIFont(Canvas, 10, True, Theme.Text);
   Result := Round(4 * FUIScale);
@@ -26,7 +30,7 @@ end;
 
 procedure TMainForm.RebuildQuick;
 var
-  I, X, W, H: Integer;
+  I, X, W, H: integer;
 begin
   SetLength(FQuick, 0);
   H := pbQuick.Height;
@@ -50,9 +54,9 @@ begin
   end;
 end;
 
-function TMainForm.QuickHit(X, Y: Integer): Integer;
+function TMainForm.QuickHit(X, Y: integer): integer;
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to High(FQuick) do
     if PtInRect(FQuick[I].Bounds, Point(X, Y)) then Exit(I);
@@ -61,7 +65,7 @@ end;
 
 procedure TMainForm.pbQuickPaint(Sender: TObject);
 var
-  I, W, H: Integer;
+  I, W, H: integer;
   R: TRect;
 begin
   W := pbQuick.Width;
@@ -92,10 +96,9 @@ begin
   end;
 end;
 
-procedure TMainForm.pbQuickMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
+procedure TMainForm.pbQuickMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
-  H: Integer;
+  H: integer;
 begin
   H := QuickHit(X, Y);
   if H <> FHotQuick then
@@ -114,15 +117,14 @@ begin
   end;
 end;
 
-procedure TMainForm.pbQuickMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.pbQuickMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
   if Button <> mbLeft then Exit;
   OpenBarMenu(QuickHit(X, Y));
 end;
 
 { where a menu hangs: under its own word }
-function TMainForm.BarMenuPoint(Index: Integer): TPoint;
+function TMainForm.BarMenuPoint(Index: integer): TPoint;
 begin
   Result := Point(0, pbQuick.Height);
   if (Index >= 0) and (Index <= High(FQuick)) then
@@ -130,15 +132,15 @@ begin
   Result := pbQuick.ClientToScreen(Result);
 end;
 
-function TMainForm.BarPopup(Index: Integer): TPopupMenu;
+function TMainForm.BarPopup(Index: integer): TPopupMenu;
 begin
   case Index of
     BAR_FILE: Result := pmFile;
     BAR_EDIT: Result := pmEdit;
     BAR_VIEW: Result := pmView;
     BAR_SETTINGS: Result := pmSettings;
-  else
-    Result := pmHelp;
+    else
+      Result := pmHelp;
   end;
 end;
 
@@ -161,7 +163,7 @@ end;
 procedure TMainForm.TrackBarMenu;
 var
   P: TPoint;
-  H: Integer;
+  H: integer;
 begin
   if FBarMenu < 0 then Exit;
   P := pbQuick.ScreenToClient(Mouse.CursorPos);
@@ -173,10 +175,10 @@ begin
   end;
 end;
 
-procedure TMainForm.OpenBarMenu(Index: Integer);
+procedure TMainForm.OpenBarMenu(Index: integer);
 var
   P: TPoint;
-  H: Integer;
+  H: integer;
 begin
   while (Index >= 0) and (Index <= High(FQuick)) do
   begin
@@ -198,8 +200,7 @@ begin
         the menu ate that press, so honor it here }
       P := pbQuick.ScreenToClient(Mouse.CursorPos);
       H := QuickHit(P.X, P.Y);
-      if (H >= 0) and (H <> Index) and
-        ((GetKeyState(VK_LBUTTON) and $8000) <> 0) then
+      if (H >= 0) and (H <> Index) and ((GetKeyState(VK_LBUTTON) and $8000) <> 0) then
         FBarSwitch := H;
     end;
     Index := FBarSwitch;
@@ -213,18 +214,27 @@ end;
   Everything to do with files.  Its shortcuts are shown beside each row and
   work whether the menu is open or not. }
 const
-  FM_NEW = 1; FM_OPEN = 2; FM_SAVE = 3; FM_SAVEAS = 4; FM_SAVEALL = 5;
-  FM_ADDSHEET = 6; FM_DELSHEET = 7; FM_EXPORT = 8; FM_PRINT = 9;
-  FM_EXAMPLE = 10; FM_CLOSE = 11; FM_EXIT = 12; FM_CLEARRECENT = 13;
+  FM_NEW = 1;
+  FM_OPEN = 2;
+  FM_SAVE = 3;
+  FM_SAVEAS = 4;
+  FM_SAVEALL = 5;
+  FM_ADDSHEET = 6;
+  FM_DELSHEET = 7;
+  FM_EXPORT = 8;
+  FM_PRINT = 9;
+  FM_EXAMPLE = 10;
+  FM_CLOSE = 11;
+  FM_EXIT = 12;
+  FM_CLEARRECENT = 13;
 
 procedure TMainForm.ShowFileMenu;
 var
   M, Sub: TMenuItem;
-  I, N: Integer;
+  I, N: integer;
   P: TPoint;
 
-  function Add(Parent: TMenuItem; const Caption: string; Tag: Integer; Key: Word = 0;
-    Shift: TShiftState = []; Enabled: Boolean = True): TMenuItem;
+  function Add(Parent: TMenuItem; const Caption: string; Tag: integer; Key: word = 0; Shift: TShiftState = []; Enabled: boolean = True): TMenuItem;
   begin
     Result := TMenuItem.Create(pmFile);
     Result.Caption := Caption;
@@ -232,7 +242,9 @@ var
     Result.Enabled := Enabled;
     if Key <> 0 then Result.ShortCut := Menus.ShortCut(Key, Shift);
     Result.OnClick := @FileMenuClick;
-    if Parent = nil then pmFile.Items.Add(Result) else Parent.Add(Result);
+    if Parent = nil then pmFile.Items.Add(Result)
+    else
+      Parent.Add(Result);
   end;
 
   procedure Line;
@@ -306,20 +318,20 @@ begin
     FM_EXPORT: DoExport;
     FM_PRINT: DoPrint;
     FM_EXAMPLE:
-      begin
-        NewDrawing(-1);
-        LoadExample;
-        LayoutTabs;
-        RenderInk;
-        RecomposeAll;
-      end;
+    begin
+      NewDrawing(-1);
+      LoadExample;
+      LayoutTabs;
+      RenderInk;
+      RecomposeAll;
+    end;
     FM_CLOSE: CloseDrawing(FTabIdx);
     FM_EXIT: Close;
     FM_CLEARRECENT:
-      begin
-        FRecent.Clear;
-        FCmdMsg := 'The recent files list is cleared.';
-      end;
+    begin
+      FRecent.Clear;
+      FCmdMsg := 'The recent files list is cleared.';
+    end;
   end;
   pbCmd.Invalidate;
   Invalidate;
@@ -327,7 +339,7 @@ end;
 
 procedure TMainForm.RecentClick(Sender: TObject);
 var
-  I: Integer;
+  I: integer;
   Path: string;
 begin
   I := (Sender as TMenuItem).Tag;
@@ -347,15 +359,19 @@ end;
   Undo and the clipboard.  The keys do the same whether the menu is open or
   not; the rows exist so they can be found. }
 const
-  EM_UNDO = 1; EM_REDO = 2; EM_CUT = 3; EM_COPY = 4; EM_PASTE = 5;
-  EM_ALL = 6; EM_NONE = 7;
+  EM_UNDO = 1;
+  EM_REDO = 2;
+  EM_CUT = 3;
+  EM_COPY = 4;
+  EM_PASTE = 5;
+  EM_ALL = 6;
+  EM_NONE = 7;
 
 procedure TMainForm.ShowEditMenu;
 var
   P: TPoint;
 
-  procedure Add(const Caption: string; Tag: Integer; Key: Word = 0;
-    Shift: TShiftState = []; Enabled: Boolean = True);
+  procedure Add(const Caption: string; Tag: integer; Key: word = 0; Shift: TShiftState = []; Enabled: boolean = True);
   var
     It: TMenuItem;
   begin
@@ -402,11 +418,11 @@ begin
     EM_PASTE: PasteClip;
     EM_ALL: RunCommand('all');
     EM_NONE:
-      begin
-        SelectNone;
-        FCmdMsg := 'Nothing selected.';
-        FScreenDirty := True;
-      end;
+    begin
+      SelectNone;
+      FCmdMsg := 'Nothing selected.';
+      FScreenDirty := True;
+    end;
   end;
   InvalidateStatus;
   pbCmd.Invalidate;
@@ -418,16 +434,19 @@ end;
   table the V key steps through), and what else shows: the grid, the cube
   and the two panels. }
 const
-  VM_FIT = 100; VM_ORIGIN = 101; VM_GRID = 102; VM_CUBE = 103;
-  VM_INFO = 104; VM_GROUPS = 105;
+  VM_FIT = 100;
+  VM_ORIGIN = 101;
+  VM_GRID = 102;
+  VM_CUBE = 103;
+  VM_INFO = 104;
+  VM_GROUPS = 105;
 
 procedure TMainForm.ShowViewMenu;
 var
-  I: Integer;
+  I: integer;
   P: TPoint;
 
-  function Add(const Caption: string; Tag: Integer;
-    Checked: Boolean = False): TMenuItem;
+  function Add(const Caption: string; Tag: integer; Checked: boolean = False): TMenuItem;
   begin
     Result := TMenuItem.Create(pmView);
     Result.Caption := Caption;
@@ -483,8 +502,8 @@ begin
     VM_CUBE: RunCommand('cube');
     VM_INFO: RunCommand('info');
     VM_GROUPS: RunCommand('groups');
-  else
-    ApplyViewPreset((Sender as TMenuItem).Tag);
+    else
+      ApplyViewPreset((Sender as TMenuItem).Tag);
   end;
   pbCmd.Invalidate;
 end;
@@ -502,7 +521,7 @@ const
 procedure TMainForm.ShowSettingsMenu;
 var
   Root: TMenuItem;
-  I, Sz: Integer;
+  I, Sz: integer;
   Sw: TArtSurface;
   P: TPoint;
 
@@ -513,8 +532,7 @@ var
     pmSettings.Items.Add(Result);
   end;
 
-  function Add(Parent: TMenuItem; const Caption: string; Tag: Integer;
-    Checked: Boolean): TMenuItem;
+  function Add(Parent: TMenuItem; const Caption: string; Tag: integer; Checked: boolean): TMenuItem;
   begin
     Result := TMenuItem.Create(pmSettings);
     Result.Caption := Caption;
@@ -527,7 +545,8 @@ var
   function Precision: string;
   begin
     if FLenDenom = 100 then Result := '.01"'
-    else Result := Format('1/%d"', [FLenDenom]);
+    else
+      Result := Format('1/%d"', [FLenDenom]);
   end;
 
 begin
@@ -535,8 +554,7 @@ begin
 
   Root := Sub('Print Scale  -  ' + ScaleTable(FD.Units, FD.ScaleIdx).Name);
   for I := 0 to SCALE_COUNT - 1 do
-    Add(Root, ScaleTable(FD.Units, I).Name +
-      IfThen(FD.Units = usImperial, '  =  1''-0"', ''), 1000 + I,
+    Add(Root, ScaleTable(FD.Units, I).Name + IfThen(FD.Units = usImperial, '  =  1''-0"', ''), 1000 + I,
       I = FD.ScaleIdx);
 
   Root := Sub('Snap To  -  ' + SnapName(FD.Units, FD.SnapIdx));
@@ -597,19 +615,21 @@ end;
 
 procedure TMainForm.SettingsMenuClick(Sender: TObject);
 var
-  T, I: Integer;
+  T, I: integer;
 begin
   T := (Sender as TMenuItem).Tag;
   I := T mod 1000;
   case T div 1000 of
     1: SetScaleIdx(I);
     2:
-      begin
-        FD.SnapIdx := EnsureRange(I, 0, SNAP_COUNT - 1);
-        Act('snap ' + IntToStr(FD.SnapIdx));
-        FCmdMsg := 'Snap: ' + SnapName(FD.Units, FD.SnapIdx);
-      end;
-    3: if I = Length(PALETTE) then PickAnyColor else SetInk(PALETTE[I], False);
+    begin
+      FD.SnapIdx := EnsureRange(I, 0, SNAP_COUNT - 1);
+      Act('snap ' + IntToStr(FD.SnapIdx));
+      FCmdMsg := 'Snap: ' + SnapName(FD.Units, FD.SnapIdx);
+    end;
+    3: if I = Length(PALETTE) then PickAnyColor
+      else
+        SetInk(PALETTE[I], False);
     4: SetEdgeWidth(PEN_SIZES[EnsureRange(I, 0, High(PEN_SIZES))]);
     5: SetLenPrecision(PREC_DENOMS[EnsureRange(I, 0, High(PREC_DENOMS))]);
     6: SetUnits(TUnitSystem(EnsureRange(I, 0, 1)));
@@ -621,14 +641,19 @@ end;
 
 { ---- the Help menu ---- }
 const
-  HM_ABOUT = 1; HM_UPDATE = 2; HM_WHATSNEW = 3; HM_MANUAL = 4;
-  HM_DOWNLOADS = 5; HM_PROJECT = 6; HM_REPORT = 7;
+  HM_ABOUT = 1;
+  HM_UPDATE = 2;
+  HM_WHATSNEW = 3;
+  HM_MANUAL = 4;
+  HM_DOWNLOADS = 5;
+  HM_PROJECT = 6;
+  HM_REPORT = 7;
 
 procedure TMainForm.ShowHelpMenu;
 var
   P: TPoint;
 
-  procedure Add(const Caption: string; Tag: Integer);
+  procedure Add(const Caption: string; Tag: integer);
   var
     It: TMenuItem;
   begin
@@ -667,7 +692,10 @@ procedure TMainForm.HelpMenuClick(Sender: TObject);
 begin
   case (Sender as TMenuItem).Tag of
     HM_ABOUT: ShowAbout;
-    HM_UPDATE: begin CheckForUpdate(True); DoUpdate; end;
+    HM_UPDATE: begin
+      CheckForUpdate(True);
+      DoUpdate;
+    end;
     HM_WHATSNEW: ShowWhatsNew;
     HM_MANUAL: OpenManual;
     HM_DOWNLOADS: OpenURL('https://github.com/' + UPDATE_REPO + '/releases/latest');

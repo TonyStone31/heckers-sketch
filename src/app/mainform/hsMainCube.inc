@@ -8,24 +8,27 @@
   default, under the VIEW button, as Revit places its own). }
 function TMainForm.CubeRect: TRect;
 var
-  Sz, M, L, T: Integer;
+  Sz, M, L, T: integer;
 begin
   Sz := CubeSize(FUIScale);
   M := Round(14 * FUIScale);
   { the bottom corners leave room for the scale bar along the foot }
-  if FCubeCorner in [0, 2] then L := M else L := pbScreen.Width - M - Sz;
+  if FCubeCorner in [0, 2] then L := M
+  else
+    L := pbScreen.Width - M - Sz;
   if FCubeCorner in [0, 1] then T := M
-  else T := pbScreen.Height - Round(46 * FUIScale) - Sz;
+  else
+    T := pbScreen.Height - Round(46 * FUIScale) - Sz;
   Result := Rect(L, T, L + Sz, T + Sz);
 end;
 
 { The cube's patch: its square plus a margin.  The hexagon sits in a square,
   so aiming at its edge puts the pointer off the shape; the crosshair, snap
   mark and chip must not draw over it while someone is trying to click it. }
-function TMainForm.CubeZone(X, Y: Integer): Boolean;
+function TMainForm.CubeZone(X, Y: integer): boolean;
 var
   R: TRect;
-  M: Integer;
+  M: integer;
 begin
   Result := False;
   if (not FCubeOn) or (FD = nil) or (FD.View <> vkOrbit) then
@@ -33,13 +36,12 @@ begin
   R := CubeRect;
   M := Round(10 * FUIScale);
   { the hot target's name is written under it, so the zone covers that too }
-  Result := (X >= R.Left - M) and (X <= R.Right + M) and
-            (Y >= R.Top - M) and (Y <= R.Bottom + M + Round(16 * FUIScale));
+  Result := (X >= R.Left - M) and (X <= R.Right + M) and (Y >= R.Top - M) and (Y <= R.Bottom + M + Round(16 * FUIScale));
 end;
 
 { Is the pointer on the cube itself?  For things that only need to stand
   aside (the wheel, the cursor). }
-function TMainForm.OverCube(X, Y: Integer): Boolean;
+function TMainForm.OverCube(X, Y: integer): boolean;
 var
   R: TRect;
   T: TCubeTarget;
@@ -49,16 +51,15 @@ begin
     Exit;
   if FCubeDrag then Exit(True);
   R := CubeRect;
-  Result := CubeAt(Proj, (R.Left + R.Right) / 2, (R.Top + R.Bottom) / 2,
-    (R.Right - R.Left) / 2 / 1.75, X, Y, T);
+  Result := CubeAt(Proj, (R.Left + R.Right) / 2, (R.Top + R.Bottom) / 2, (R.Right - R.Left) / 2 / 1.75, X, Y, T);
 end;
 
 procedure TMainForm.PaintViewCube(C: TCanvas);
 var
   R: TRect;
-  Half: Double;
+  Half: double;
   Labels: TCubeLabels;
-  I, TW: Integer;
+  I, TW: integer;
   Col: TPix;
 begin
   if not FCubeOn then Exit;
@@ -120,9 +121,9 @@ procedure TMainForm.PaintCompass(C: TCanvas);
 const
   TAGS: array[0..4] of string = ('E', 'W', 'N', 'S', 'U');
 var
-  R, M, Pad, CX, CY, K, TX, TY, OX, OY: Integer;
+  R, M, Pad, CX, CY, K, TX, TY, OX, OY: integer;
   Rt, Up, Dir: TP3;
-  DX, DY, L: Double;
+  DX, DY, L: double;
   Col: TPix;
 begin
   if not FShowGrid or (FD = nil) then Exit;
@@ -131,7 +132,8 @@ begin
   Pad := Round(12 * FUIScale);
   { top right; top left when the cube is there }
   if FCubeOn and (FD.View = vkOrbit) and (FCubeCorner = 1) then CX := M + Pad + R
-  else CX := pbScreen.Width - M - Pad - R;
+  else
+    CX := pbScreen.Width - M - Pad - R;
   CY := M + Pad + R;
   Rt := ViewRight(Proj);
   Up := ViewUp(Proj);
@@ -147,15 +149,19 @@ begin
       1: Dir := P3(-1, 0, 0);
       2: Dir := P3(0, 1, 0);
       3: Dir := P3(0, -1, 0);
-    else Dir := P3(0, 0, 1);
+      else
+        Dir := P3(0, 0, 1);
     end;
-    DX := Dot3(Dir, Rt); DY := -Dot3(Dir, Up);
+    DX := Dot3(Dir, Rt);
+    DY := -Dot3(Dir, Up);
     L := Hypot(DX, DY);
     { pointing at the eye (up, in plan): nothing to draw }
     if L < 0.2 then Continue;
     Col := AxisPix(K div 2);
     C.Pen.Color := PixToColor(Col);
-    if K mod 2 = 0 then C.Pen.Width := Max(2, Round(2 * FUIScale)) else C.Pen.Width := 1;
+    if K mod 2 = 0 then C.Pen.Width := Max(2, Round(2 * FUIScale))
+    else
+      C.Pen.Width := 1;
     C.Line(CX, CY, CX + Round(DX * R), CY + Round(DY * R));
     { the letter just past the point, outlined in black like the axes' }
     TX := CX + Round(DX / L * (R * L + Pad * 0.75)) - C.TextWidth(TAGS[K]) div 2;
@@ -173,12 +179,12 @@ end;
 { The pointer over the cube; True when the cube took it.  Down starts a
   click or a drag; Up decides.  A press that travels orbits, one that does
   not goes to the target under it. }
-function TMainForm.CubeMouse(X, Y: Integer; Down, Up: Boolean): Boolean;
+function TMainForm.CubeMouse(X, Y: integer; Down, Up: boolean): boolean;
 var
   R: TRect;
-  Half, Az, El, NewAz, NewEl, FitZ, FitX, FitY, Near_: Double;
+  Half, Az, El, NewAz, NewEl, FitZ, FitX, FitY, Near_: double;
   T: TCubeTarget;
-  Was: Boolean;
+  Was: boolean;
 begin
   Result := False;
   if (not FCubeOn) or (FD = nil) or (FD.View <> vkOrbit) then
@@ -213,9 +219,7 @@ begin
         Exit;
       end;
       { it never traveled, so it was a click }
-      if not FCubeMoved and
-         CubeAt(Proj, (R.Left + R.Right) / 2, (R.Top + R.Bottom) / 2,
-                Half, X, Y, T) then
+      if not FCubeMoved and CubeAt(Proj, (R.Left + R.Right) / 2, (R.Top + R.Bottom) / 2, Half, X, Y, T) then
       begin
         Az := FD.Az;
         CubeAzEl(T.Dir, Az, El);
@@ -223,8 +227,7 @@ begin
         { with something picked (and fit-selection on) it glides to center
           and size it in one movement; otherwise it turns and keeps the
           user's zoom }
-        if FCubeFitSel and (Length(FSel) > 0) and
-           FitTarget(True, Az, El, FitZ, FitX, FitY) then
+        if FCubeFitSel and (Length(FSel) > 0) and FitTarget(True, Az, El, FitZ, FitX, FitY) then
           GlideCamera(Az, El, FitZ, FitX, FitY)
         else
           GlideTo(Az, El);
@@ -262,8 +265,7 @@ begin
   end;
 
   Was := FCubeHasHot;
-  FCubeHasHot := CubeAt(Proj, (R.Left + R.Right) / 2,
-    (R.Top + R.Bottom) / 2, Half, X, Y, T);
+  FCubeHasHot := CubeAt(Proj, (R.Left + R.Right) / 2, (R.Top + R.Bottom) / 2, Half, X, Y, T);
   if FCubeHasHot then FCubeHot := T;
   if FCubeHasHot <> Was then FScreenDirty := True
   else if FCubeHasHot then FScreenDirty := True;
@@ -281,9 +283,8 @@ begin
     { a cube drag turns about the same point a click glides about }
     FTurnPivot := TurnPivot;
     FTurnAnchor := ScreenOf(FTurnPivot);
-    FTurnAnchored := not (IsNan(FTurnAnchor.X) or IsNan(FTurnAnchor.Y) or
-                          IsInfinite(FTurnAnchor.X) or IsInfinite(FTurnAnchor.Y)) and
-                     (Abs(FTurnAnchor.X) < 1E6) and (Abs(FTurnAnchor.Y) < 1E6);
+    FTurnAnchored := not (IsNan(FTurnAnchor.X) or IsNan(FTurnAnchor.Y) or IsInfinite(FTurnAnchor.X) or IsInfinite(FTurnAnchor.Y)) and
+      (Abs(FTurnAnchor.X) < 1E6) and (Abs(FTurnAnchor.Y) < 1E6);
   end;
 end;
 
@@ -314,13 +315,12 @@ end;
 { What a fit would come out as, without doing it, so a glide can aim at its
   final framing.  Computed at the destination angles, which decide where the
   middle lands. }
-function TMainForm.FitTarget(OnSelection: Boolean; AzT, ElT: Double;
-  out NewZoom, NewOX, NewOY: Double): Boolean;
+function TMainForm.FitTarget(OnSelection: boolean; AzT, ElT: double; out NewZoom, NewOX, NewOY: double): boolean;
 var
   Lo, Hi, Mid: TP3;
   V: TProjector;
   P: TPointF;
-  BaseP, W, H, Z: Double;
+  BaseP, W, H, Z: double;
 begin
   NewZoom := FD.Zoom;
   NewOX := FD.ViewX;
@@ -334,17 +334,17 @@ begin
   BaseP := PixelsPerUnit(FD.Units, CurScale, Screen.PixelsPerInch);
   case FD.View of
     vkIso:
-      begin
-        W := Max((Abs(Hi.X - Lo.X) + Abs(Hi.Y - Lo.Y)) * ISO_COS, 1E-6);
-        H := Max((Hi.X - Lo.X + Hi.Y - Lo.Y) * ISO_SIN + (Hi.Z - Lo.Z), 1E-6);
-      end;
+    begin
+      W := Max((Abs(Hi.X - Lo.X) + Abs(Hi.Y - Lo.Y)) * ISO_COS, 1E-6);
+      H := Max((Hi.X - Lo.X + Hi.Y - Lo.Y) * ISO_SIN + (Hi.Z - Lo.Z), 1E-6);
+    end;
     vkOrbit:
-      begin
-        { the diagonal is a safe bound from any camera angle }
-        W := Max(Sqrt(Sqr(Hi.X - Lo.X) + Sqr(Hi.Y - Lo.Y) + Sqr(Hi.Z - Lo.Z)), 1E-6);
-        H := W;
-      end;
-  else
+    begin
+      { the diagonal is a safe bound from any camera angle }
+      W := Max(Sqrt(Sqr(Hi.X - Lo.X) + Sqr(Hi.Y - Lo.Y) + Sqr(Hi.Z - Lo.Z)), 1E-6);
+      H := W;
+    end;
+    else
     begin
       W := Max(Hi.X - Lo.X, 1E-6);
       H := Max(Hi.Y - Lo.Y, 1E-6);
@@ -370,7 +370,7 @@ end;
 
 { A glide that carries the framing too: turns, slides and zooms at once, so
   the target arrives centered and sized without a jump at either end. }
-procedure TMainForm.GlideCamera(Az, El, Zoom, OX, OY: Double);
+procedure TMainForm.GlideCamera(Az, El, Zoom, OX, OY: double);
 begin
   if FD = nil then Exit;
   GlideTo(Az, El);
@@ -381,9 +381,7 @@ begin
   FGlideOY0 := FD.ViewY;
   FGlideOY1 := OY;
   { worth moving for the framing alone (the FIT button) }
-  if (FGlideT = 0) and
-     ((Abs(FGlideZ1 - FGlideZ0) > 1E-4 * Max(1, FGlideZ0)) or
-      (Abs(FGlideOX1 - FGlideOX0) > 0.5) or (Abs(FGlideOY1 - FGlideOY0) > 0.5)) then
+  if (FGlideT = 0) and ((Abs(FGlideZ1 - FGlideZ0) > 1E-4 * Max(1, FGlideZ0)) or (Abs(FGlideOX1 - FGlideOX0) > 0.5) or (Abs(FGlideOY1 - FGlideOY0) > 0.5)) then
   begin
     FGlideD0 := FGlideD1;
     FGlideT := 1E-6;
@@ -395,9 +393,9 @@ end;
 
 { The view an orbit would snap to if released now: the nearest of the cube's
   26 (6 faces, 12 edges, 8 corners).  Free 3D view only. }
-function TMainForm.OrbitSnapTarget(out T: TCubeTarget): Boolean;
+function TMainForm.OrbitSnapTarget(out T: TCubeTarget): boolean;
 var
-  Near_: Double;
+  Near_: double;
 begin
   Result := False;
   if (FD = nil) or (FD.View <> vkOrbit) then Exit;
@@ -412,7 +410,7 @@ end;
 procedure TMainForm.SnapOrbitToNearest;
 var
   T: TCubeTarget;
-  Az, El: Double;
+  Az, El: double;
 begin
   if not OrbitSnapTarget(T) then Exit;
   Az := FD.Az;
@@ -426,20 +424,20 @@ end;
 
 { Ctrl+arrow: one step round the 26, gliding as a cube click does.  3D view
   only. }
-procedure TMainForm.StepCubeView(Key: Word);
+procedure TMainForm.StepCubeView(Key: word);
 var
   T: TCubeTarget;
-  Near_, Az, El: Double;
+  Near_, Az, El: double;
   Dir: TP3;
   Step: TCubeStep;
 begin
   if (FD = nil) or (FD.View <> vkOrbit) then Exit;
   case Key of
-    VK_LEFT:  Step := csLeft;
+    VK_LEFT: Step := csLeft;
     VK_RIGHT: Step := csRight;
-    VK_UP:    Step := csUp;
-  else
-    Step := csDown;
+    VK_UP: Step := csUp;
+    else
+      Step := csDown;
   end;
   { from where a running glide is going, so a quick second press carries on }
   if FGlideT > 0 then
@@ -447,15 +445,16 @@ begin
   else
     Az := FD.Az;
   if FGlideT > 0 then
-    T := CubeNearest(P3(Cos(FGlideEl1) * Cos(FGlideAz1),
-      Cos(FGlideEl1) * Sin(FGlideAz1), Sin(FGlideEl1)), Near_)
+    T := CubeNearest(P3(Cos(FGlideEl1) * Cos(FGlideAz1), Cos(FGlideEl1) * Sin(FGlideAz1), Sin(FGlideEl1)), Near_)
   else
     T := CubeNearest(ViewDir(Proj), Near_);
   Dir := CubeStep(T.Dir, Az, Step);
   if (Dir.X = 0) and (Dir.Y = 0) and (Step in [csLeft, csRight]) then
   begin
     { looking straight down or up: turn the drawing a side's worth }
-    if Step = csRight then Az := Az + Pi / 4 else Az := Az - Pi / 4;
+    if Step = csRight then Az := Az + Pi / 4
+    else
+      Az := Az - Pi / 4;
     El := FD.El;
     if FGlideT > 0 then El := FGlideEl1;
   end
@@ -468,12 +467,12 @@ begin
   Trail('cube step to ' + T.Name);
 end;
 
-procedure TMainForm.GlideTo(Az, El: Double);
+procedure TMainForm.GlideTo(Az, El: double);
 var
-  D: Double;
+  D: double;
 
-  { where the camera stands, as a direction }
-  function DirOf(A, E: Double): TP3;
+{ where the camera stands, as a direction }
+  function DirOf(A, E: double): TP3;
   begin
     Result := P3(Cos(E) * Cos(A), Cos(E) * Sin(A), Sin(E));
   end;
@@ -499,9 +498,8 @@ begin
   { what it turns about, and where that is on screen now }
   FTurnPivot := TurnPivot;
   FTurnAnchor := ScreenOf(FTurnPivot);
-  FTurnAnchored := not (IsNan(FTurnAnchor.X) or IsNan(FTurnAnchor.Y) or
-                        IsInfinite(FTurnAnchor.X) or IsInfinite(FTurnAnchor.Y)) and
-                   (Abs(FTurnAnchor.X) < 1E6) and (Abs(FTurnAnchor.Y) < 1E6);
+  FTurnAnchored := not (IsNan(FTurnAnchor.X) or IsNan(FTurnAnchor.Y) or IsInfinite(FTurnAnchor.X) or IsInfinite(FTurnAnchor.Y)) and
+    (Abs(FTurnAnchor.X) < 1E6) and (Abs(FTurnAnchor.Y) < 1E6);
   FGlideT := 1E-6;
   FGlideAt := GetTickCount64;
   FGlideFrame := False;
@@ -509,10 +507,10 @@ begin
 end;
 
 { Dt is unused: this runs on the clock, not on how often the timer fired. }
-procedure TMainForm.StepGlide(Dt: Double);
+procedure TMainForm.StepGlide(Dt: double);
 var
-  K, NewAz, NewEl, Dot, Ang, S0, S1, Flat: Double;
-  NewZ, NewOX, NewOY: Double;
+  K, NewAz, NewEl, Dot, Ang, S0, S1, Flat: double;
+  NewZ, NewOX, NewOY: double;
   D: TP3;
 begin
   if FGlideT <= 0 then Exit;
@@ -529,8 +527,7 @@ begin
   { The camera rolls along the great circle between the two directions at a
     constant rate, rather than interpolating azimuth and elevation, which
     swings it sideways on the way from corner to far corner. }
-  Dot := FGlideD0.X * FGlideD1.X + FGlideD0.Y * FGlideD1.Y +
-         FGlideD0.Z * FGlideD1.Z;
+  Dot := FGlideD0.X * FGlideD1.X + FGlideD0.Y * FGlideD1.Y + FGlideD0.Z * FGlideD1.Z;
   if Dot > 1 then Dot := 1;
   if Dot < -1 then Dot := -1;
   Ang := ArcCos(Dot);
@@ -540,14 +537,14 @@ begin
   begin
     S0 := Sin((1 - K) * Ang) / Sin(Ang);
     S1 := Sin(K * Ang) / Sin(Ang);
-    D := P3(FGlideD0.X * S0 + FGlideD1.X * S1,
-            FGlideD0.Y * S0 + FGlideD1.Y * S1,
-            FGlideD0.Z * S0 + FGlideD1.Z * S1);
+    D := P3(FGlideD0.X * S0 + FGlideD1.X * S1, FGlideD0.Y * S0 + FGlideD1.Y * S1, FGlideD0.Z * S0 + FGlideD1.Z * S1);
   end;
 
   { and back into turn and tilt }
   Flat := Sqrt(D.X * D.X + D.Y * D.Y);
-  if Flat > 1E-9 then NewAz := ArcTan2(D.Y, D.X) else NewAz := FD.Az;
+  if Flat > 1E-9 then NewAz := ArcTan2(D.Y, D.X)
+  else
+    NewAz := FD.Az;
   NewEl := ArcTan2(D.Z, Flat);
   if NewEl < -1.45 then NewEl := -1.45;
   if NewEl > 1.45 then NewEl := 1.45;

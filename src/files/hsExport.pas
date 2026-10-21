@@ -797,8 +797,8 @@ begin
   end;
   Fields := Format('export=%s stage=%s' + LineEnding + 'asked for=%dx%d from a %dx%d screen, size choice %d' + LineEnding +
     'film=%d a second, loop=%s, recorded=%.1fs, axes=%s' + LineEnding + 'what it said: %s' + LineEnding + 'path=%s', [KIND_NAME[FKind],
-    FStage, W, H, FSrcW, FSrcH, cbSize.ItemIndex, FILM_FPS, BoolToStr(cbLoop.Checked, 'yes', 'no'), CamPathLength(FCam), BoolToStr(cbAxes.Checked, 'yes', 'no'),
-    FMsg, ExtractFileName(edPath.Text)]);
+    FStage, W, H, FSrcW, FSrcH, cbSize.ItemIndex, FILM_FPS, BoolToStr(cbLoop.Checked, 'yes', 'no'), CamPathLength(FCam),
+    BoolToStr(cbAxes.Checked, 'yes', 'no'), FMsg, ExtractFileName(edPath.Text)]);
   ModalResult := mrCancel;
   { The report needs a screenshot and this window is in front, so close it
     first; the main window then raises the report. }

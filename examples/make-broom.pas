@@ -172,10 +172,10 @@ var
     for I := 0 to HANDLE_N - 1 do
     begin
       Ang := 2 * Pi * I / HANDLE_N;
-      Lo[I] := Pt(BaseX + Rad * Cos(Ang) * Side.X + Rad * Sin(Ang) * Up.X, BaseY + Rad * Cos(Ang) * Side.Y + Rad * Sin(Ang) *
-        Up.Y, BaseZ + Rad * Cos(Ang) * Side.Z + Rad * Sin(Ang) * Up.Z);
-      Hi[I] := Pt(BaseX + Rad * Cos(Ang) * Side.X + Rad * Sin(Ang) * Up.X + Len * Dir.X, BaseY + Rad * Cos(Ang) * Side.Y +
-        Rad * Sin(Ang) * Up.Y + Len * Dir.Y, BaseZ + Rad * Cos(Ang) * Side.Z + Rad * Sin(Ang) * Up.Z + Len * Dir.Z);
+      Lo[I] := Pt(BaseX + Rad * Cos(Ang) * Side.X + Rad * Sin(Ang) * Up.X, BaseY + Rad * Cos(Ang) * Side.Y + Rad * Sin(Ang) * Up.Y,
+        BaseZ + Rad * Cos(Ang) * Side.Z + Rad * Sin(Ang) * Up.Z);
+      Hi[I] := Pt(BaseX + Rad * Cos(Ang) * Side.X + Rad * Sin(Ang) * Up.X + Len * Dir.X, BaseY + Rad * Cos(Ang) * Side.Y + Rad *
+        Sin(Ang) * Up.Y + Len * Dir.Y, BaseZ + Rad * Cos(Ang) * Side.Z + Rad * Sin(Ang) * Up.Z + Len * Dir.Z);
     end;
     Tube(Lo, Hi, Mat, 1.0);
   end;

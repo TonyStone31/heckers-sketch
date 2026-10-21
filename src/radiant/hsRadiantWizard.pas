@@ -276,8 +276,8 @@ type
       out Layouts: TRadiantResults; out ZoneNames: TStringArray; out Job: TRadiantJob): boolean;
     { the same, opened on a job the drawing kept: its zones, manifolds,
       settings and layouts as built, already searched }
-    class function Reopen(Units: TUnitSystem; const Was: TRadiantJob; out Zones: TRadiantZones; out Spec: TRadiantSpec;
-      out Manifolds: TP3Array; out Ports: TIntArray; out Layouts: TRadiantResults; out ZoneNames: TStringArray; out Job: TRadiantJob): boolean;
+    class function Reopen(Units: TUnitSystem; const Was: TRadiantJob; out Zones: TRadiantZones; out Spec: TRadiantSpec; out Manifolds: TP3Array;
+      out Ports: TIntArray; out Layouts: TRadiantResults; out ZoneNames: TStringArray; out Job: TRadiantJob): boolean;
   end;
 
 implementation
@@ -732,8 +732,8 @@ end;
 function TRadiantForm.ManifoldLoops(Z: integer): integer;
 begin
   Result := 0;
-  if (Z <= High(FLayouts)) and (Z <= High(FSearched)) and FSearched[Z] and FLayouts[Z].Ok and
-    (Length(FLayouts[Z].Manifolds) > 0) then Result := FLayouts[Z].Manifolds[0].LoopCount
+  if (Z <= High(FLayouts)) and (Z <= High(FSearched)) and FSearched[Z] and FLayouts[Z].Ok and (Length(FLayouts[Z].Manifolds) > 0) then
+    Result := FLayouts[Z].Manifolds[0].LoopCount
   else if Z <= High(FPorts) then Result := FPorts[Z];
   Result := Max(MANIFOLD_PORTS_MIN, Result);
 end;
@@ -1397,8 +1397,8 @@ begin
   FBusy.ShowFound(Lines);
   RadiantMeasure(Best, Cover, Spread);
   if Best.Ok then
-    Now_ := Format('best so far: %s%% covered, loops within %s%% (%s ft), %d loops', [FormatFloat('0.0', Cover * 100),
-      FormatFloat('0', Spread * 100), FormatFloat('0', RadiantSpreadFt(Best)), Length(Best.Loops)])
+    Now_ := Format('best so far: %s%% covered, loops within %s%% (%s ft), %d loops', [FormatFloat('0.0', Cover * 100), FormatFloat('0', Spread * 100),
+      FormatFloat('0', RadiantSpreadFt(Best)), Length(Best.Loops)])
   else
     Now_ := 'no layout yet';
   if Total > 0 then

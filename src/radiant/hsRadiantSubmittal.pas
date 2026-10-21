@@ -652,8 +652,7 @@ begin
       end;
     if Length(Pieces) > 4 then Line := Line + Format(' - too short for %d loops', [Length(Pieces)])
     else if Length(Pieces) > 0 then Line := Line + ' - too short for ' + AndList(Pieces);
-    Row([FtWords(Sizes[K], Job.Units), IntToStr(Length(Rolls.Left)), FtWords(Length(Rolls.Left) * Sizes[K], Job.Units),
-      FtWords(Left, Job.Units), Line]);
+    Row([FtWords(Sizes[K], Job.Units), IntToStr(Length(Rolls.Left)), FtWords(Length(Rolls.Left) * Sizes[K], Job.Units), FtWords(Left, Job.Units), Line]);
   end;
 
   Add(skHeading, 'Zones');
@@ -810,8 +809,8 @@ begin
     begin
       R := Job.Layouts[Z];
       RadiantMeasure(R, Cover, Spread);
-      Row([ZoneTitleOf(Job, Z).Replace('Zone ', ''), Pct(Cover), Pct(Spread) + ' (' + FormatLen(RadiantSpreadFt(R), Job.Units) + ')', IntToStr(R.Bends),
-        EasyOf(R), IfThen(R.ShortOfGoals, 'short', 'met')]);
+      Row([ZoneTitleOf(Job, Z).Replace('Zone ', ''), Pct(Cover), Pct(Spread) + ' (' + FormatLen(RadiantSpreadFt(R), Job.Units) + ')',
+        IntToStr(R.Bends), EasyOf(R), IfThen(R.ShortOfGoals, 'short', 'met')]);
     end;
   for Z := 0 to Zones - 1 do
   begin
@@ -840,8 +839,8 @@ begin
     'grid within the breakout given for the zone; the tube keeps ' + FormatFloat('0', EDGE_INSET_IN) +
     '" off every wall and obstacle.  Where a zone''s rows did not pair up, the rows at its far wall may have been ' +
     'closed up a little so every row has a partner - the zone''s page says so where it was done.');
-  Add(skPara, 'Loop lengths run from the manifold and back, both leads included, and take in ' +
-    FormatLen(MANIFOLD_LEAD_FT, Job.Units) + ' more for the climb up the wall to the manifold and the tube fanned out ' +
+  Add(skPara, 'Loop lengths run from the manifold and back, both leads included, and take in ' + FormatLen(MANIFOLD_LEAD_FT, Job.Units) +
+    ' more for the climb up the wall to the manifold and the tube fanned out ' +
     'onto the grid, which the plan draws square.  That counts against the longest loop allowed.  Loops are numbered left to right ' +
     'along their manifold, standing in front of it.  The rolls are worked out with the loops laid in that order, ' +
     'zone by zone, each off the first roll that still has enough on it.');
@@ -1403,7 +1402,7 @@ var
 const
   MANIFOLD_NEAR_FT = 1.0;
 
-  { the outline's corner at point I goes straight on }
+{ the outline's corner at point I goes straight on }
   function Straight(I: integer): boolean;
   var
     P, Q, S: T2;
@@ -2109,8 +2108,8 @@ var
     begin
       N := Order[K];
       J := K;
-      while (J > 0) and (Min(IfThen(DimSide[Order[J - 1]] >= 2, Dm[Order[J - 1]].A.X, Dm[Order[J - 1]].A.Y), IfThen(DimSide[Order[J - 1]] >= 2,
-          Dm[Order[J - 1]].B.X, Dm[Order[J - 1]].B.Y)) > Min(IfThen(DimSide[N] >= 2, Dm[N].A.X, Dm[N].A.Y), IfThen(DimSide[N] >= 2, Dm[N].B.X, Dm[N].B.Y))) do
+      while (J > 0) and (Min(IfThen(DimSide[Order[J - 1]] >= 2, Dm[Order[J - 1]].A.X, Dm[Order[J - 1]].A.Y), IfThen(DimSide[Order[J - 1]] >=
+          2, Dm[Order[J - 1]].B.X, Dm[Order[J - 1]].B.Y)) > Min(IfThen(DimSide[N] >= 2, Dm[N].A.X, Dm[N].A.Y), IfThen(DimSide[N] >= 2, Dm[N].B.X, Dm[N].B.Y))) do
       begin
         Order[J] := Order[J - 1];
         Dec(J);

@@ -167,8 +167,7 @@ begin
   Result := P3(0, 0, 0);
   if Length(Segs) = 0 then Exit;
   for I := 0 to High(Segs) do
-    Result := P3(Result.X + (Segs[I].A.X + Segs[I].B.X) / 2, Result.Y + (Segs[I].A.Y + Segs[I].B.Y) / 2, Result.Z +
-      (Segs[I].A.Z + Segs[I].B.Z) / 2);
+    Result := P3(Result.X + (Segs[I].A.X + Segs[I].B.X) / 2, Result.Y + (Segs[I].A.Y + Segs[I].B.Y) / 2, Result.Z + (Segs[I].A.Z + Segs[I].B.Z) / 2);
   Result := P3(Result.X / Length(Segs), Result.Y / Length(Segs), Result.Z / Length(Segs));
 end;
 
